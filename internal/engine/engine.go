@@ -166,7 +166,7 @@ func Run(opts Options) (*Result, error) {
 	}
 
 	// 3. Walk the filesystem, honouring extra ignore patterns from config.
-	files, err := walker.Walk(root, cfg.Ignore)
+	files, err := walker.Walk(root, cfg.ScanIgnore())
 	if err != nil {
 		return nil, fmt.Errorf("walking %s: %w", root, err)
 	}

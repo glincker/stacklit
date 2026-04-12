@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/git"
 	"github.com/glincker/stacklit/internal/schema"
 	"github.com/glincker/stacklit/internal/walker"
@@ -32,8 +33,9 @@ func newDiffCmd() *cobra.Command {
 				return fmt.Errorf("stacklit.json has no merkle_hash; run 'stacklit generate' to rebuild")
 			}
 
-			// 2. Walk current source files
-			files, err := walker.Walk(".", nil)
+			// 2. Walk current source files, excluding Stacklit's own generated outputs.
+			cfg := config.Load(".")
+			files, err := walker.Walk(".", cfg.ScanIgnore())
 			if err != nil {
 				return fmt.Errorf("failed to walk source files: %w", err)
 			}

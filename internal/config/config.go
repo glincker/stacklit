@@ -72,3 +72,16 @@ func Load(root string) *Config {
 
 	return cfg
 }
+
+// ScanIgnore returns ignore patterns plus Stacklit output files so generated artifacts
+// never feed back into the next scan.
+func (c *Config) ScanIgnore() []string {
+	ignore := append([]string{}, c.Ignore...)
+	for _, out := range []string{c.Output.JSON, c.Output.Mermaid, c.Output.HTML} {
+		if out == "" {
+			continue
+		}
+		ignore = append(ignore, filepath.ToSlash(out))
+	}
+	return ignore
+}

@@ -35,8 +35,8 @@ func TestWalkSourceFiles(t *testing.T) {
 	// Must include Go source files.
 	wantIncluded := []string{
 		"main.go",
-		filepath.Join("internal", "handler.go"),
-		filepath.Join("internal", "handler_test.go"),
+		filepath.ToSlash(filepath.Join("internal", "handler.go")),
+		filepath.ToSlash(filepath.Join("internal", "handler_test.go")),
 	}
 	for _, want := range wantIncluded {
 		if !fileSet[want] {
@@ -46,8 +46,8 @@ func TestWalkSourceFiles(t *testing.T) {
 
 	// Must exclude gitignored directories.
 	wantExcluded := []string{
-		filepath.Join("vendor", "lib.go"),
-		filepath.Join("node_modules", "pkg.js"),
+		filepath.ToSlash(filepath.Join("vendor", "lib.go")),
+		filepath.ToSlash(filepath.Join("node_modules", "pkg.js")),
 	}
 	for _, exclude := range wantExcluded {
 		if fileSet[exclude] {
@@ -124,7 +124,7 @@ func TestWalkAlwaysIgnoresDirs(t *testing.T) {
 	}
 
 	for _, d := range ignoredDirs {
-		p := filepath.Join(d, "file.go")
+		p := filepath.ToSlash(filepath.Join(d, "file.go"))
 		if fileSet[p] {
 			t.Errorf("expected %q inside always-ignore dir to be excluded", p)
 		}

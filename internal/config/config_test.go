@@ -54,3 +54,22 @@ func TestLoadMalformed(t *testing.T) {
 		t.Errorf("expected default max_depth=4 after malformed file, got %d", cfg.MaxDepth)
 	}
 }
+
+func TestScanIgnoreIncludesOutputs(t *testing.T) {
+	cfg := DefaultConfig()
+	cfg.Ignore = []string{"custom/"}
+	cfg.Output.JSON = "out\\stacklit.json"
+	cfg.Output.Mermaid = "docs\\DEPENDENCIES.md"
+	cfg.Output.HTML = "stacklit.html"
+
+	got := cfg.ScanIgnore()
+	want := []string{"custom/", "out/stacklit.json", "docs/DEPENDENCIES.md", "stacklit.html"}
+	if len(got) != len(want) {
+		t.Fatalf("expected %d ignore patterns, got %d: %v", len(want), len(got), got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("expected ignore[%d]=%q, got %q (all=%v)", i, want[i], got[i], got)
+		}
+	}
+}

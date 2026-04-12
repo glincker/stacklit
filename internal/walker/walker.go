@@ -99,6 +99,9 @@ func Walk(root string, extraIgnore []string) ([]string, error) {
 			return relErr
 		}
 
+		// Normalize path separators so generated output and ignore matching stay stable across OSes.
+		rel = filepath.ToSlash(rel)
+
 		// Skip the root itself.
 		if rel == "." {
 			return nil
