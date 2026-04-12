@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"strings"
@@ -18,5 +19,9 @@ func WriteHTML(idx *schema.Index, path string) error {
 	}
 	html := strings.Replace(assets.TemplateHTML, "{{STACKLIT_DATA}}", string(dataJSON), 1)
 	html = strings.Replace(html, "{{LANG_ICONS_JS}}", assets.LangIconsJS, 1)
-	return os.WriteFile(path, []byte(html), 0644)
+	data := []byte(html)
+	if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, data) {
+		return nil
+	}
+	return os.WriteFile(path, data, 0644)
 }

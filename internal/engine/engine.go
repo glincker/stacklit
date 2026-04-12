@@ -452,17 +452,20 @@ func assembleIndex(
 			}
 		}
 
-		// Cap type defs to maxExports per module.
+		// Cap type defs to maxExports per module in a deterministic order.
 		typeDefs := mod.TypeDefs
 		if maxExports > 0 && len(typeDefs) > maxExports {
+			keys := make([]string, 0, len(typeDefs))
+			for k := range typeDefs {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
 			trimmed := make(map[string]string, maxExports)
-			i := 0
-			for k, v := range typeDefs {
-				trimmed[k] = v
-				i++
+			for i, k := range keys {
 				if i >= maxExports {
 					break
 				}
+				trimmed[k] = typeDefs[k]
 			}
 			typeDefs = trimmed
 		}

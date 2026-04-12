@@ -1,8 +1,10 @@
 package renderer
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 	"unicode"
@@ -82,8 +84,13 @@ func WriteMermaid(idx *schema.Index, path string) error {
 		}
 	}
 
-	// Write classDef entries for used languages.
+	// Write classDef entries for used languages in deterministic order.
+	langs := make([]string, 0, len(usedLangs))
 	for lang := range usedLangs {
+		langs = append(langs, lang)
+	}
+	sort.Strings(langs)
+	for _, lang := range langs {
 		colors := langColors[lang]
 		sb.WriteString(fmt.Sprintf("  classDef %s fill:%s,color:%s,stroke:%s\n",
 			lang, colors[0], colors[1], colors[0]))
@@ -92,8 +99,14 @@ func WriteMermaid(idx *schema.Index, path string) error {
 	// Determine primary language for node class assignment.
 	primaryLang := strings.ToLower(idx.Tech.PrimaryLanguage)
 
-	// Write node definitions.
-	for name, mod := range idx.Modules {
+	// Write node definitions in deterministic order.
+	moduleNames := make([]string, 0, len(idx.Modules))
+	for name := range idx.Modules {
+		moduleNames = append(moduleNames, name)
+	}
+	sort.Strings(moduleNames)
+	for _, name := range moduleNames {
+		mod := idx.Modules[name]
 		id := sanitizeMermaidID(name)
 		label := truncate(mod.Purpose, 40)
 		nodeClass := primaryLang
@@ -115,5 +128,9 @@ func WriteMermaid(idx *schema.Index, path string) error {
 	}
 
 	sb.WriteString("```\n")
-	return os.WriteFile(path, []byte(sb.String()), 0644)
+	data := []byte(sb.String())
+	if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, data) {
+		return nil
+	}
+	return os.WriteFile(path, data, 0644)
 }
