@@ -172,7 +172,7 @@ Read stacklit.json before exploring files. Use modules to locate code, hints for
 
 MCP server exposes 7 tools: `get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`.
 
-**Any other agent**  - `stacklit.json` is a plain JSON file. Any tool that reads files can use it.
+**Any other agent** - `stacklit.json` is a plain JSON file. Any tool that reads files can use it.
 
 </details>
 
