@@ -1,4 +1,4 @@
-# AI Codebase Context Tools — Comparison
+# AI Codebase Context Tools  - Comparison
 
 > How do you give AI agents codebase context? Here's every approach compared.
 >
@@ -6,7 +6,7 @@
 
 ## The Problem
 
-AI coding agents (Claude Code, Cursor, Copilot, Aider) need to understand your codebase before they can help. Without context, they waste thousands of tokens exploring — reading files, grepping, globbing — just to figure out your project structure.
+AI coding agents (Claude Code, Cursor, Copilot, Aider) need to understand your codebase before they can help. Without context, they waste thousands of tokens exploring  - reading files, grepping, globbing  - just to figure out your project structure.
 
 Different tools solve this differently. Some dump everything. Some build knowledge graphs. Some generate compressed maps. Here's how they compare.
 
@@ -34,7 +34,7 @@ Different tools solve this differently. Some dump everything. Some build knowled
 Concatenate all source files into one big prompt. Simple, works everywhere, but:
 - Burns 50k-500k tokens on medium repos
 - Often exceeds context windows entirely
-- No structural intelligence — agent still has to parse everything
+- No structural intelligence  - agent still has to parse everything
 - Repomix's `--compress` mode uses tree-sitter to reduce output, but remains per-file (no cross-file dependency analysis)
 
 Best for: Small repos (<5k lines), one-shot conversations, pasting into ChatGPT.
@@ -46,7 +46,7 @@ Build a queryable graph of your codebase, served over MCP:
 - Rich structural data (call graphs, blast radius, community detection)
 - Requires running a server process
 - Each query costs tokens (tool call overhead)
-- No committable artifact — the knowledge lives in the server
+- No committable artifact  - the knowledge lives in the server
 
 Best for: Large codebases, long interactive sessions, teams with infra capacity.
 
@@ -54,7 +54,7 @@ Best for: Large codebases, long interactive sessions, teams with infra capacity.
 
 Parses code with tree-sitter, builds a module-level dependency graph, outputs a compact navigation map:
 - **~250 tokens** for the compact map (vs 50k-500k for dumpers)
-- Static artifact — commit `stacklit.json` to your repo
+- Static artifact  - commit `stacklit.json` to your repo
 - Self-contained HTML visualization
 - Auto-configures Claude Code, Cursor, Aider via `stacklit setup`
 - Git hook keeps the index fresh
@@ -124,7 +124,7 @@ Repomix counts estimated from file sizes. Stacklit counts measured directly.
 ## Install
 
 ```bash
-# npm (easiest — downloads the right binary automatically)
+# npm (easiest  - downloads the right binary automatically)
 npm i -g stacklit
 
 # From source

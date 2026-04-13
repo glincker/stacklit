@@ -151,13 +151,13 @@ modules:
 <details>
 <summary>Configure manually instead</summary>
 
-**Claude Code** — add to `CLAUDE.md`:
+**Claude Code**  - add to `CLAUDE.md`:
 
 ```
 Read stacklit.json before exploring files. Use modules to locate code, hints for conventions.
 ```
 
-**Claude Desktop / Cursor (MCP)** — add to MCP config:
+**Claude Desktop / Cursor (MCP)**  - add to MCP config:
 
 ```json
 {
@@ -172,7 +172,7 @@ Read stacklit.json before exploring files. Use modules to locate code, hints for
 
 MCP server exposes 7 tools: `get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`.
 
-**Any other agent** — `stacklit.json` is a plain JSON file. Any tool that reads files can use it.
+**Any other agent**  - `stacklit.json` is a plain JSON file. Any tool that reads files can use it.
 
 </details>
 
@@ -291,19 +291,6 @@ html = "stacklit.html"
 | Aider repo-map | Tree-sitter + PageRank | ~1k | No | No |
 
 [Full comparison with 7 tools →](https://github.com/glincker/stacklit/discussions/13)
-
-## Compared to alternatives
-
-| | Stacklit | Repomix | Aider repo-map | Codebase Memory MCP |
-|---|---|---|---|---|
-| Output | ~4k token index | 500k+ token dump | Ephemeral text | SQLite DB |
-| Committed to repo | Yes | Too large | No | No |
-| Dependency graph | Yes | No | Yes | Yes |
-| Visual output | HTML (4 views) | No | No | No |
-| MCP server | Yes (7 tools) | No | No | Yes |
-| Monorepo aware | Yes | No | No | No |
-| Languages | 11 (tree-sitter) | N/A | Many | 66 |
-| Runtime needed | No | No | Yes (Python) | Yes (C server) |
 
 ## Monorepo support
 
