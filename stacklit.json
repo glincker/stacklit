@@ -1,7 +1,7 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-04-13T00:40:28Z",
+  "generated_at": "2026-04-13T00:41:07Z",
   "stacklit_version": "dev",
   "merkle_hash": "ae6184f085f428e554ce1069c7f5c1e3baf35c5f3cb7b381384adfc4ed4dbb22",
   "project": {
@@ -430,15 +430,15 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
-        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
-        "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
-        "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
+        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
+        "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
       "depended_by": [
         "internal/cli",
@@ -675,7 +675,7 @@
     "hot_files": [
       {
         "path": "stacklit.json",
-        "commits_90d": 28
+        "commits_90d": 29
       },
       {
         "path": "README.md",
@@ -755,12 +755,12 @@
       }
     ],
     "recent": [
+      "stacklit.json",
       "DEPENDENCIES.md",
       "internal/detect/framework_patterns.go",
       "internal/detect/framework_patterns_test.go",
       "internal/engine/engine.go",
       "internal/schema/schema.go",
-      "stacklit.json",
       "assets/template.html",
       "README.md",
       ".github/workflows/stacklit-index.yml",
