@@ -1,12 +1,15 @@
-name: Check stacklit index
+name: Update stacklit index
 on:
-  pull_request:
+  push:
+    branches: [master]
 
 jobs:
   stacklit:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: glincker/stacklit-action@v1
         with:
-          mode: check
+          mode: auto-commit
