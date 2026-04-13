@@ -1,4 +1,4 @@
-# AI Codebase Context Tools  - Comparison
+# AI Codebase Context Tools - Comparison
 
 > How do you give AI agents codebase context? Here's every approach compared.
 >
