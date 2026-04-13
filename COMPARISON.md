@@ -124,7 +124,7 @@ Repomix counts estimated from file sizes. Stacklit counts measured directly.
 ## Install
 
 ```bash
-# npm (easiest  - downloads the right binary automatically)
+# npm (easiest - downloads the right binary automatically)
 npm i -g stacklit
 
 # From source
