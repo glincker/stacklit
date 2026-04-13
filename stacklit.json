@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-04-13T00:35:00Z",
+  "generated_at": "2026-04-13T00:40:28Z",
   "stacklit_version": "dev",
-  "merkle_hash": "401fb57379393fa0bb33bf340a0a5df4be8ff2f64f01ac48a4e800053070f70a",
+  "merkle_hash": "ae6184f085f428e554ce1069c7f5c1e3baf35c5f3cb7b381384adfc4ed4dbb22",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 60,
-        "lines": 8194
+        "files": 62,
+        "lines": 8517
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 71,
-    "total_lines": 8400
+    "total_files": 73,
+    "total_lines": 8723
   },
   "modules": {
     "assets": {
@@ -167,17 +167,24 @@
     "internal/detect": {
       "purpose": "Framework and tool detection",
       "language": "go",
-      "files": 3,
-      "lines": 423,
+      "files": 5,
+      "lines": 720,
       "file_list": [
         "envvars.go",
+        "framework_patterns.go",
+        "framework_patterns_test.go",
         "frameworks.go",
         "frameworks_test.go"
       ],
       "exports": [
         "DetectEnvVars(root string, contents map[string][]byte) []string",
-        "DetectFrameworks(root string, imports []string) []string"
+        "DetectFrameworkPatterns(root string) []FrameworkPattern",
+        "DetectFrameworks(root string, imports []string) []string",
+        "type FrameworkPattern"
       ],
+      "type_defs": {
+        "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string"
+      },
       "depended_by": [
         "internal/engine"
       ],
@@ -187,7 +194,7 @@
       "purpose": "Core orchestration engine",
       "language": "go",
       "files": 1,
-      "lines": 558,
+      "lines": 572,
       "file_list": [
         "engine.go"
       ],
@@ -405,33 +412,33 @@
       "purpose": "Data schema definitions",
       "language": "go",
       "files": 1,
-      "lines": 107,
+      "lines": 119,
       "file_list": [
         "schema.go"
       ],
       "exports": [
         "type Architecture",
         "type Dependencies",
+        "type FrameworkPattern",
         "type GitInfo",
         "type Hints",
         "type HotFile",
         "type Index",
         "type LangStats",
         "type ModuleInfo",
-        "type MultiIndex",
-        "type Project"
+        "type MultiIndex"
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
         "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
+        "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
+        "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "Project": "Name string, Root string, Type string, Workspaces []string",
-        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
-        "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string"
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
       },
       "depended_by": [
         "internal/cli",
@@ -668,7 +675,7 @@
     "hot_files": [
       {
         "path": "stacklit.json",
-        "commits_90d": 27
+        "commits_90d": 28
       },
       {
         "path": "README.md",
@@ -676,7 +683,7 @@
       },
       {
         "path": "internal/engine/engine.go",
-        "commits_90d": 14
+        "commits_90d": 15
       },
       {
         "path": "stacklit.mmd",
@@ -691,11 +698,11 @@
         "commits_90d": 9
       },
       {
-        "path": "internal/renderer/mermaid.go",
-        "commits_90d": 7
+        "path": "internal/schema/schema.go",
+        "commits_90d": 8
       },
       {
-        "path": "internal/schema/schema.go",
+        "path": "internal/renderer/mermaid.go",
         "commits_90d": 7
       },
       {
@@ -748,16 +755,16 @@
       }
     ],
     "recent": [
-      "assets/template.html",
+      "DEPENDENCIES.md",
+      "internal/detect/framework_patterns.go",
+      "internal/detect/framework_patterns_test.go",
+      "internal/engine/engine.go",
+      "internal/schema/schema.go",
       "stacklit.json",
+      "assets/template.html",
       "README.md",
       ".github/workflows/stacklit-index.yml",
-      "docs/superpowers/plans/2026-04-12-growth-package.md",
-      "docs/superpowers/specs/2026-04-12-growth-package-design.md",
-      "internal/cli/diff.go",
-      "internal/config/config.go",
-      "internal/config/config_test.go",
-      "internal/engine/engine.go"
+      "docs/superpowers/plans/2026-04-12-growth-package.md"
     ],
     "stable": [
       ".github/workflows/stacklit-index.yml",
