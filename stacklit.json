@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-04-14T00:15:37Z",
+  "generated_at": "2026-05-04T13:24:15Z",
   "stacklit_version": "dev",
-  "merkle_hash": "390a42bfa745d14573b505f6e62b8e80d7bd621965c62f056a489603973fcf4c",
+  "merkle_hash": "df2f2e019587fbc890d82a2dae0012908afc29c3cc3fea42bb2ab90b73c11e89",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 63,
-        "lines": 8642
+        "files": 64,
+        "lines": 8721
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 74,
-    "total_lines": 8848
+    "total_files": 75,
+    "total_lines": 8927
   },
   "modules": {
     "assets": {
@@ -482,13 +482,15 @@
     "internal/summary": {
       "purpose": "AI-powered codebase summaries",
       "language": "go",
-      "files": 1,
-      "lines": 129,
+      "files": 2,
+      "lines": 208,
       "file_list": [
-        "ai.go"
+        "ai.go",
+        "cli.go"
       ],
       "exports": [
-        "Generate(idx *schema.Index) (string, error)"
+        "Generate(idx *schema.Index) (string, error)",
+        "Run(idx *schema.Index) (string, error)"
       ],
       "depends_on": [
         "internal/schema"
