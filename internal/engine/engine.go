@@ -253,7 +253,7 @@ func Run(opts Options) (*Result, error) {
 		if !opts.Quiet {
 			fmt.Println("[stacklit] generating AI summary...")
 		}
-		text, summaryErr := summary.Generate(idx)
+		text, summaryErr := summary.Run(idx)
 		if summaryErr != nil {
 			fmt.Printf("[stacklit] warning: summary failed: %v\n", summaryErr)
 		} else {
