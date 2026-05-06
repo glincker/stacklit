@@ -78,10 +78,22 @@ async function install() {
   }
 
   // Extract
-  if (archivePath.endsWith('.zip') || url.endsWith('.zip')) {
-    execSync(`unzip -o "${archivePath}" stacklit.exe -d "${binDir}"`, { stdio: 'ignore' });
+  if (url.endsWith('.zip')) {
+    if (os.platform() === 'win32') {
+      // Windows has no `unzip`. PowerShell Expand-Archive ships with Windows 10+.
+      execSync(
+        `powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -Force -Path '${archivePath}' -DestinationPath '${binDir}'"`,
+        { stdio: 'inherit' }
+      );
+    } else {
+      execSync(`unzip -o "${archivePath}" stacklit.exe -d "${binDir}"`, { stdio: 'inherit' });
+    }
   } else {
-    execSync(`tar -xzf "${archivePath}" -C "${binDir}" stacklit`, { stdio: 'ignore' });
+    execSync(`tar -xzf "${archivePath}" -C "${binDir}" stacklit`, { stdio: 'inherit' });
+  }
+
+  if (!fs.existsSync(binPath)) {
+    throw new Error(`extraction completed but ${binPath} is missing`);
   }
 
   // Make executable
