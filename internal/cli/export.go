@@ -29,7 +29,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, args []string) error {
 			data, err := os.ReadFile(source)
 			if err != nil {
-				return fmt.Errorf("could not read %s: %w (run 'stacklit init' first)", source, err)
+				return fmt.Errorf("could not read %s: %w (run 'stacklit generate' first, or 'stacklit init')", source, err)
 			}
 			var idx schema.Index
 			if err := json.Unmarshal(data, &idx); err != nil {
@@ -48,7 +48,7 @@ Examples:
 				fmt.Fprintf(cmd.OutOrStderr(), "Wrote %s\n", output)
 				return nil
 			default:
-				return fmt.Errorf("unknown format %q (supported: md)", format)
+				return fmt.Errorf("unknown format %q (supported: md, markdown)", format)
 			}
 		},
 	}
