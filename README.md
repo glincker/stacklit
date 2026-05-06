@@ -267,16 +267,18 @@ stacklit setup cursor            # configure Cursor + MCP
 ```
 
 <details>
-<summary>Configuration (stacklit.toml)</summary>
+<summary>Configuration (.stacklitrc.json)</summary>
 
-```toml
-ignore = ["vendor/", "generated/"]
-max_depth = 3
-
-[output]
-json = "stacklit.json"
-mermaid = "DEPENDENCIES.md"
-html = "stacklit.html"
+```json
+{
+  "ignore": ["vendor/", "generated/"],
+  "max_depth": 3,
+  "output": {
+    "json": "stacklit.json",
+    "mermaid": "DEPENDENCIES.md",
+    "html": "stacklit.html"
+  }
+}
 ```
 
 </details>
