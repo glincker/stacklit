@@ -2,7 +2,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 const VERSION = '0.3.0';
 const REPO = 'glincker/stacklit';
@@ -77,32 +77,50 @@ async function install() {
     return;
   }
 
-  // Extract
-  if (url.endsWith('.zip')) {
-    if (os.platform() === 'win32') {
-      // Windows has no `unzip`. PowerShell Expand-Archive ships with Windows 10+.
-      execSync(
-        `powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -Force -Path '${archivePath}' -DestinationPath '${binDir}'"`,
-        { stdio: 'inherit' }
-      );
+  try {
+    // Extract. execFileSync passes args directly to the binary, so no shell
+    // quoting of paths is needed. On Windows we hand paths to PowerShell via
+    // env vars so a single quote in __dirname (e.g. C:\Users\O'Connor\...)
+    // cannot terminate the script string.
+    if (url.endsWith('.zip')) {
+      if (os.platform() === 'win32') {
+        execFileSync(
+          'powershell',
+          [
+            '-NoProfile',
+            '-ExecutionPolicy', 'Bypass',
+            '-Command',
+            'Expand-Archive -Force -LiteralPath $env:STACKLIT_ARCHIVE -DestinationPath $env:STACKLIT_BINDIR',
+          ],
+          {
+            stdio: 'inherit',
+            env: { ...process.env, STACKLIT_ARCHIVE: archivePath, STACKLIT_BINDIR: binDir },
+          }
+        );
+      } else {
+        execFileSync('unzip', ['-o', archivePath, 'stacklit.exe', '-d', binDir], { stdio: 'inherit' });
+      }
     } else {
-      execSync(`unzip -o "${archivePath}" stacklit.exe -d "${binDir}"`, { stdio: 'inherit' });
+      execFileSync('tar', ['-xzf', archivePath, '-C', binDir, 'stacklit'], { stdio: 'inherit' });
     }
-  } else {
-    execSync(`tar -xzf "${archivePath}" -C "${binDir}" stacklit`, { stdio: 'inherit' });
-  }
 
-  if (!fs.existsSync(binPath)) {
-    throw new Error(`extraction completed but ${binPath} is missing`);
-  }
+    if (!fs.existsSync(binPath)) {
+      throw new Error(`extraction completed but ${binPath} is missing`);
+    }
 
-  // Make executable
-  if (os.platform() !== 'win32') {
-    fs.chmodSync(binPath, 0o755);
+    if (os.platform() !== 'win32') {
+      fs.chmodSync(binPath, 0o755);
+    }
+  } finally {
+    if (fs.existsSync(archivePath)) {
+      try {
+        fs.unlinkSync(archivePath);
+      } catch (cleanupErr) {
+        // best-effort cleanup; warn but don't mask the original failure
+        console.warn(`Could not remove ${archivePath}: ${cleanupErr.message}`);
+      }
+    }
   }
-
-  // Cleanup
-  fs.unlinkSync(archivePath);
 
   console.log('stacklit installed successfully.');
 }
@@ -110,4 +128,7 @@ async function install() {
 install().catch((err) => {
   console.error('Installation failed:', err.message);
   console.error('You can install manually: go install github.com/glincker/stacklit/cmd/stacklit@latest');
+  // Surface the failure to npm so postinstall doesn't appear to succeed when
+  // the binary is actually missing or extraction broke.
+  process.exitCode = 1;
 });
