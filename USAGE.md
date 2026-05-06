@@ -152,27 +152,23 @@ The server auto-reloads when `stacklit.json` changes on disk.
 
 ## Configuration
 
-Create `stacklit.toml` in your project root (optional):
+Create `.stacklitrc.json` in your project root (optional):
 
-```toml
-# Paths to ignore on top of .gitignore
-ignore = ["vendor/", "generated/", "*.pb.go"]
-
-# Module detection depth (default: 4)
-max_depth = 3
-
-# Max modules before collapsing (default: 200)
-max_modules = 150
-
-# Max exports per module (default: 10)
-max_exports = 15
-
-# Output file names
-[output]
-json = "stacklit.json"
-mermaid = "DEPENDENCIES.md"
-html = "stacklit.html"
+```json
+{
+  "ignore": ["vendor/", "generated/", "*.pb.go"],
+  "max_depth": 3,
+  "max_modules": 150,
+  "max_exports": 15,
+  "output": {
+    "json": "stacklit.json",
+    "mermaid": "DEPENDENCIES.md",
+    "html": "stacklit.html"
+  }
+}
 ```
+
+Keys: `ignore` (extra paths on top of `.gitignore`), `max_depth` (module detection depth, default 4), `max_modules` (collapse threshold, default 200), `max_exports` (per module, default 10), and `output` (override generated file names).
 
 ---
 
