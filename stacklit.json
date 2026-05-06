@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-05-04T13:24:15Z",
+  "generated_at": "2026-05-06T00:26:25Z",
   "stacklit_version": "dev",
-  "merkle_hash": "df2f2e019587fbc890d82a2dae0012908afc29c3cc3fea42bb2ab90b73c11e89",
+  "merkle_hash": "61d317c22a9be2e46e6fb4ff31aa3617f484ca56487420a18969bbbdac4255d4",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -22,7 +22,7 @@
       },
       "javascript": {
         "files": 3,
-        "lines": 127
+        "lines": 160
       },
       "python": {
         "files": 1,
@@ -47,7 +47,7 @@
       "cmd/stacklit/main.go"
     ],
     "total_files": 75,
-    "total_lines": 8927
+    "total_lines": 8960
   },
   "modules": {
     "assets": {
@@ -522,7 +522,7 @@
       "purpose": "Npm",
       "language": "javascript",
       "files": 1,
-      "lines": 101,
+      "lines": 134,
       "file_list": [
         "install.js"
       ],
