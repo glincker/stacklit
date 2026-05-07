@@ -4,7 +4,11 @@ const path = require('path');
 const https = require('https');
 const { execFileSync } = require('child_process');
 
-const VERSION = '0.3.0';
+// Read the version from package.json so the npm publish workflow's
+// `npm version <tag>` bump is the single source of truth. Previously this was
+// a hard-coded constant that drifted from package.json on every release,
+// causing the postinstall to pull an outdated binary archive.
+const VERSION = require('./package.json').version;
 const REPO = 'glincker/stacklit';
 
 const PLATFORM_MAP = {
