@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-05-06T00:26:25Z",
+  "generated_at": "2026-05-07T02:22:31Z",
   "stacklit_version": "dev",
-  "merkle_hash": "61d317c22a9be2e46e6fb4ff31aa3617f484ca56487420a18969bbbdac4255d4",
+  "merkle_hash": "bd6587e6387afbead2f09cf39756d021d4f75708d8055bef52be8752c67fa78a",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 64,
-        "lines": 8721
+        "files": 67,
+        "lines": 9396
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 75,
-    "total_lines": 8960
+    "total_files": 78,
+    "total_lines": 9635
   },
   "modules": {
     "assets": {
@@ -84,11 +84,12 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 8,
-      "lines": 499,
+      "files": 9,
+      "lines": 560,
       "file_list": [
         "derive.go",
         "diff.go",
+        "export.go",
         "generate.go",
         "init.go",
         "root.go",
@@ -384,19 +385,23 @@
     "internal/renderer": {
       "purpose": "Output renderers",
       "language": "go",
-      "files": 6,
-      "lines": 448,
+      "files": 8,
+      "lines": 1062,
       "file_list": [
         "html.go",
         "json.go",
         "json_test.go",
+        "markdown.go",
+        "markdown_test.go",
         "mermaid.go",
         "mermaid_test.go",
         "stable.go"
       ],
       "exports": [
+        "RenderMarkdown(idx *schema.Index) string",
         "WriteHTML(idx *schema.Index, path string) error",
         "WriteJSON(idx *schema.Index, path string) error",
+        "WriteMarkdown(idx *schema.Index, path string) error",
         "WriteMermaid(idx *schema.Index, path string) error"
       ],
       "depends_on": [
