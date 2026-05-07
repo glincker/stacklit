@@ -118,6 +118,8 @@ Regenerates `stacklit.html` and opens it in your browser.
 | `stacklit derive` | Print compact navigation map (~250 tokens) to stdout |
 | `stacklit derive --inject claude` | Inject map into CLAUDE.md |
 | `stacklit derive --inject cursor` | Inject map into .cursorrules |
+| `stacklit export` | Print a readable markdown overview to stdout |
+| `stacklit export -o stacklit.md` | Write the markdown overview to a file |
 | `stacklit setup` | Auto-detect and configure all AI tools |
 | `stacklit setup claude` | Configure Claude Code (CLAUDE.md + MCP) |
 | `stacklit setup cursor` | Configure Cursor (.cursorrules + MCP) |
@@ -147,6 +149,30 @@ Seven tools available to your AI agent:
 | `get_hints` | Where to add features, test commands, env vars |
 
 The server auto-reloads when `stacklit.json` changes on disk.
+
+---
+
+## Exporting to markdown
+
+`stacklit.json` is built for AI agents and tooling. When you want something a person can skim — a PR description, a GitHub issue, a Slack message — use the markdown export:
+
+```bash
+stacklit export                # print to stdout
+stacklit export -o stacklit.md # write to a file
+```
+
+The markdown contains:
+
+- A title with the project name, language, file count, and total lines
+- A language and framework summary table
+- Entrypoints and key directories (when present)
+- A modules table with purpose, size, and direct dependencies
+- Per-module collapsible `<details>` blocks listing exports and types
+- A dependency edge list, plus most-depended-on and isolated modules
+- Hot files from the last 90 days (when git data is present)
+- Hints: how to add a feature, the test command, env vars
+
+Output is deterministic: the same `stacklit.json` produces byte-identical markdown across runs and machines, so it's safe to commit.
 
 ---
 

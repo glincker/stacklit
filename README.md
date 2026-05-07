@@ -261,6 +261,8 @@ stacklit diff                    # check if index is stale
 stacklit serve                   # start MCP server
 stacklit derive                  # print compact nav map (~250 tokens)
 stacklit derive --inject claude  # inject map into CLAUDE.md
+stacklit export                  # print readable markdown overview
+stacklit export -o stacklit.md   # write markdown overview to a file
 stacklit setup                   # auto-configure all detected AI tools
 stacklit setup claude            # configure Claude Code + MCP
 stacklit setup cursor            # configure Cursor + MCP
