@@ -34,7 +34,7 @@ func (g *SymGraph) ImpactFor(root, target string, depth, budget int, asJSON, cal
 			return g.importersView(root, t, label, also, files, budget, asJSON), nil
 		}
 	}
-	return g.Impact(target, depth, budget, asJSON)
+	return g.impactAt(root, target, depth, budget, asJSON)
 }
 
 func cleanTarget(s string) string {
