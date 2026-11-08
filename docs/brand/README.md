@@ -9,7 +9,8 @@ The mark is three stacked bars, each shifted sideways, with the top bar lit in t
 | `stacklit-mark.svg` | One color mark, uses `currentColor`. Use it where the surrounding text color should decide. |
 | `stacklit-mark-light.svg` | Mark with the accent baked in, for light backgrounds. |
 | `stacklit-mark-dark.svg` | Mark with the accent baked in, for dark backgrounds. |
-| `stacklit-logo.svg` | Mark and wordmark, horizontal. |
+| `stacklit-logo.svg` | Mark and wordmark, horizontal, uses `currentColor`. |
+| `stacklit-logo-light.svg`, `stacklit-logo-dark.svg` | The horizontal logo with colors baked in, for `<picture>` swaps on GitHub. |
 | `stacklit-logo-stacked.svg` | Mark above the wordmark. |
 | `favicon.svg` | 32 px app icon on a dark tile. |
 | `social-preview.png` | 1280 by 640 link preview. |
