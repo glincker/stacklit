@@ -95,7 +95,11 @@ func registerGraphTools(s *sdkmcp.Server) {
 			if a.Query == "" {
 				return "", fmt.Errorf("query is required")
 			}
-			return g.Query(a.Query, a.Budget, a.JSON), nil
+			out := g.Query(a.Query, a.Budget, a.JSON)
+			if !a.JSON {
+				out += staleSuffix()
+			}
+			return out, nil
 		})
 	add("shortest_path", "Shortest path between two symbols with weakest-hop confidence",
 		func(g *graph.SymGraph, a graphArgs) (string, error) {

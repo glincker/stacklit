@@ -184,7 +184,7 @@ stacklit setup --report               # always-on tokens each integration adds
 
 Supported: Claude Code, Cursor, Aider, Codex, Gemini CLI, GitHub Copilot, Windsurf, Cline, Zed, Continue, OpenCode, Amp, Roo Code, Kilo Code, Junie, JetBrains AI, Augment, Trae, Kiro, Goose, Warp, Crush, Qwen Code, Factory Droid, Replit, generic AGENTS.md.
 
-Claude Code extras are opt-in: `--pretool-hook` (nudge before broad Grep/Glob), `--session-hook`, `--skill` (`/stacklit`). Nothing outside the repo is written unless you pass `--global`.
+Claude Code extras are opt-in: `--pretool-hook` (a grepped identifier gets its definition and top callers from the symbol graph, under 120 tokens), `--session-hook`, `--skill` (`/stacklit`). Nothing outside the repo is written unless you pass `--global`.
 
 Add docs, ADRs, OpenAPI, SQL schemas and CODEOWNERS to a sidecar with `stacklit ingest`. Shell completions: `stacklit completion bash|zsh|fish`. Homebrew: `brew install glincker/tap/stacklit`.
 

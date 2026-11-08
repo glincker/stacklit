@@ -164,6 +164,7 @@ func (w *watcher) write() error {
 	}
 	g := Resolve(fs, ResolveOptions{GoModules: w.mods})
 	g.Root = filepath.Base(w.o.Root)
+	g.attachBodies(w.o.Root)
 	tmp := w.o.Out + ".tmp"
 	if err := g.Save(tmp); err != nil {
 		return err

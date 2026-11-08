@@ -136,6 +136,11 @@ func (r *Runner) applyAiderConf(uninstall bool) error {
 
 func (r *Runner) applyGitHook(uninstall bool) error {
 	if uninstall {
+		if !r.DryRun {
+			if _, err := git.RemoveRefreshHooks(r.Root); err != nil {
+				return err
+			}
+		}
 		return r.removeGitHook()
 	}
 	if _, err := os.Stat(r.abs(filepath.Join(".git", "hooks"))); err != nil {
@@ -143,12 +148,25 @@ func (r *Runner) applyGitHook(uninstall bool) error {
 	}
 	if r.gitHookInstalled() {
 		fmt.Fprintln(r.Out, "  unchanged .git/hooks/post-commit")
+		if !r.DryRun {
+			if _, err := git.InstallRefreshHooks(r.Root); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 	r.say("install", ".git/hooks/post-commit")
 	r.Changed++
 	if r.DryRun {
+		r.say("install", ".git/hooks/{post-checkout,post-merge,post-rewrite}")
 		return nil
 	}
-	return git.InstallHook(r.Root)
+	if err := git.InstallHook(r.Root); err != nil {
+		return err
+	}
+	if _, err := git.InstallRefreshHooks(r.Root); err != nil {
+		return err
+	}
+	r.say("install", ".git/hooks/{post-checkout,post-merge,post-rewrite}")
+	return nil
 }

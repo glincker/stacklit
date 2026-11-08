@@ -63,9 +63,34 @@ func errResult(err error) (*sdkmcp.CallToolResult, any, error) {
 	}, nil, nil
 }
 
-// StartServer creates and runs the MCP server over stdio.
-func StartServer() error {
+// StartServer runs the full-profile MCP server over stdio.
+func StartServer() error { return StartServerProfile(ProfileFull) }
+
+// StartServerProfile runs the MCP server for the named profile over stdio.
+func StartServerProfile(profile string) error {
+	s, err := NewServer(profile)
+	if err != nil {
+		return err
+	}
+	err = s.Run(context.Background(), &sdkmcp.StdioTransport{})
+	// EOF on stdin is normal shutdown, not an error to report.
+	if err != nil && strings.Contains(err.Error(), "EOF") {
+		return nil
+	}
+	return err
+}
+
+// NewServer builds the MCP server with the tools of one profile.
+func NewServer(profile string) (*sdkmcp.Server, error) {
 	s := sdkmcp.NewServer(&sdkmcp.Implementation{Name: "stacklit", Version: "0.1.0"}, nil)
+	switch profile {
+	case "", ProfileFull:
+	case ProfileMinimal:
+		registerMinimalTools(s)
+		return s, nil
+	default:
+		return nil, fmt.Errorf("unknown profile %q (use %s or %s)", profile, ProfileFull, ProfileMinimal)
+	}
 
 	// get_overview — project info, tech stack, entry points
 	type emptyArgs struct{}
@@ -226,11 +251,5 @@ func StartServer() error {
 	})
 
 	registerGraphTools(s)
-
-	err := s.Run(context.Background(), &sdkmcp.StdioTransport{})
-	// EOF on stdin is normal shutdown — not an error to report.
-	if err != nil && strings.Contains(err.Error(), "EOF") {
-		return nil
-	}
-	return err
+	return s, nil
 }

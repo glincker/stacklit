@@ -291,6 +291,9 @@ func Run(opts Options) (*Result, error) {
 		if hookErr := git.InstallHook(root); hookErr != nil && !opts.Quiet {
 			fmt.Printf("[stacklit] warning: could not install hook: %v\n", hookErr)
 		}
+		if _, hookErr := git.InstallRefreshHooks(root); hookErr != nil && !opts.Quiet {
+			fmt.Printf("[stacklit] warning: could not install refresh hooks: %v\n", hookErr)
+		}
 	}
 
 	dur := time.Since(start)

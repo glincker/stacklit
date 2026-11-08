@@ -12,6 +12,11 @@ All notable changes, reconstructed from the git history and release tags. Dates 
 - A reproducible benchmark harness in `bench/` with a third arm for the graph query path, plus rewritten README and USAGE, ARCHITECTURE.md, CONTRIBUTING.md, SECURITY.md, ROADMAP.md and issue and PR templates.
 
 - Ecosystem: `export --format` graphml, cypher, json, dot, mermaid, obsidian and markdown-wiki; `merge-graphs` with cross-repo links; `ingest --adapter` for external concept extractors and `ingest --scip` to upgrade edges to EXACT; `stacklit check` architecture rules with exit code 3.
+- Retrieval: `query` now ranks with BM25 over symbol name, signature, doc comment, a capped body word list and path, blended with PageRank. Identifier queries resolve exact then prefix first, snake_case and schema-prefixed names resolve, and quoted phrases filter. A 40-question gold set over this repo gates the top-5 rate.
+- `stacklit status` (index and graph age versus git HEAD, files changed since) and a one-line stale warning on `query`. `STACKLIT_NO_STALE=1` silences it.
+- `stacklit serve --profile minimal`: four tools (query, slice, impact, map) in about 230 tokens of schema; `full` stays the default.
+- The opt-in PreToolUse hook now answers a grepped identifier with its definition and top callers (max 120 tokens), and stays silent without a graph.
+- `init --hook` and `setup` also install quiet post-checkout, post-merge and post-rewrite refresh hooks.
 
 ### Changed
 - `timestamps` and `git_activity` now default to off so a committed index is byte-stable. Opt in with the config keys or `STACKLIT_TIMESTAMPS=1` and `STACKLIT_GIT=1`.
