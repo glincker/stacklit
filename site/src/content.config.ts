@@ -1,15 +1,9 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { docsLoader } from '@astrojs/starlight/loaders';
+import { docsSchema } from '@astrojs/starlight/schema';
 import { z } from 'astro/zod';
 
-const docs = defineCollection({
-  loader: glob({ pattern: '*.md', base: './src/content/docs' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    order: z.number(),
-    source: z.string(),
-  }),
-});
-
-export const collections = { docs };
+// The generated pages carry one extra field, the repo file they were built from.
+export const collections = {
+  docs: defineCollection({ loader: docsLoader(), schema: docsSchema({ extend: z.object({ source: z.string().optional() }) }) }),
+};
