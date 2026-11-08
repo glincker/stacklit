@@ -79,9 +79,9 @@ func registerMinimalTools(s *sdkmcp.Server) {
 		func(ctx context.Context, req *sdkmcp.CallToolRequest, a minSymArgs) (*sdkmcp.CallToolResult, any, error) {
 			return run(func(g *graph.SymGraph) (string, error) { return g.Slice(".", a.Symbol, a.Budget) })
 		})
-	sdkmcp.AddTool(s, &sdkmcp.Tool{Name: "impact", Description: "What depends on a symbol"},
+	sdkmcp.AddTool(s, &sdkmcp.Tool{Name: "impact", Description: "Who imports a file or package, or depends on a symbol"},
 		func(ctx context.Context, req *sdkmcp.CallToolRequest, a minSymArgs) (*sdkmcp.CallToolResult, any, error) {
-			return run(func(g *graph.SymGraph) (string, error) { return g.Impact(a.Symbol, 0, a.Budget, false) })
+			return run(func(g *graph.SymGraph) (string, error) { return g.ImpactFor(".", a.Symbol, 0, a.Budget, false, false) })
 		})
 	sdkmcp.AddTool(s, &sdkmcp.Tool{Name: "map", Description: "Repo map: areas and key symbols"},
 		func(ctx context.Context, req *sdkmcp.CallToolRequest, a minMapArgs) (*sdkmcp.CallToolResult, any, error) {

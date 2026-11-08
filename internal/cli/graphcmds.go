@@ -211,16 +211,21 @@ func newExplainCmd() *cobra.Command {
 func newImpactCmd() *cobra.Command {
 	var f graphFlags
 	var budget, depth int
+	var calls bool
 	c := &cobra.Command{
-		Use:   "impact <symbol|file>",
-		Short: "Blast radius: everything that depends on a symbol or file",
-		Args:  cobra.ExactArgs(1),
+		Use:   "impact <name|file|dir>",
+		Short: "Who depends on it: importers of a file or package (file:line), callers of a symbol",
+		Long: `A file or directory lists the files that import it, one per line with the line
+of the import, within the token budget. A directory means the package in that
+directory; subpackages are separate. An exact symbol name lists its dependents
+by call depth. --calls forces the call-level view for files and directories too.`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			g, err := f.load(cmd)
 			if err != nil {
 				return err
 			}
-			out, err := g.Impact(args[0], depth, budget, f.json)
+			out, err := g.ImpactFor(f.root, args[0], depth, budget, f.json, calls)
 			if err != nil {
 				return err
 			}
@@ -231,7 +236,8 @@ func newImpactCmd() *cobra.Command {
 	}
 	f.bind(c)
 	c.Flags().IntVar(&budget, "budget", graph.DefaultImpactBudget, "Hard output limit in tokens")
-	c.Flags().IntVar(&depth, "depth", 4, "Maximum dependency depth")
+	c.Flags().IntVar(&depth, "depth", 4, "Maximum dependency depth (call-level view)")
+	c.Flags().BoolVar(&calls, "calls", false, "Show the call-level blast radius even for a file or directory")
 	return c
 }
 
