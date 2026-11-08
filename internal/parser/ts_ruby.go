@@ -26,53 +26,32 @@ func extractRuby(root *gts.Node, lang *gts.Language, src []byte, path string) *F
 	gts.Walk(root, func(node *gts.Node, depth int) gts.WalkAction {
 		switch node.Type(lang) {
 		case "call":
-			// require / require_relative calls.
-			// Tree-sitter Ruby: call node has method child and arguments child.
-			method := childByType(node, lang, "identifier")
-			if method == nil {
-				return gts.WalkSkipChildren
-			}
-			methodName := nodeText(method, src)
-			if methodName != "require" && methodName != "require_relative" {
-				return gts.WalkSkipChildren
-			}
-			// Find argument: string node.
-			args := childByType(node, lang, "argument_list")
-			if args == nil {
-				return gts.WalkSkipChildren
-			}
-			str := childByType(args, lang, "string")
-			if str == nil {
-				// try string_content directly in args
-				str = childByType(args, lang, "string_literal")
-			}
-			if str != nil {
-				val := rubyStringValue(str, lang, src)
-				if val != "" {
-					info.Imports = append(info.Imports, val)
-				}
+			if v := rubyRequire(node, lang, src); v != "" {
+				info.Imports = append(info.Imports, v)
 			}
 			return gts.WalkSkipChildren
 
 		case "class", "module":
 			// Collect class/module name and their methods.
-			name := rubyDefName(node, lang, src)
-			if name == "" {
+			// Requires inside class bodies still count as imports.
+			gts.Walk(node, func(c *gts.Node, _ int) gts.WalkAction {
+				if c.Type(lang) == "call" {
+					if v := rubyRequire(c, lang, src); v != "" {
+						info.Imports = append(info.Imports, v)
+					}
+				}
 				return gts.WalkContinue
-			}
-			info.Exports = append(info.Exports, name)
-			methods := rubyClassMethods(node, lang, src)
-			classes = append(classes, classEntry{name: name, methods: methods})
-			// Skip into class body is handled by WalkContinue but we don't
-			// want to double-count nested classes. Use WalkSkipChildren and
-			// recurse manually only into the body for methods (already done above).
+			})
+			rubyCollect(node, lang, src, "", func(name string, methods []string) {
+				info.Exports = append(info.Exports, name)
+				classes = append(classes, classEntry{name: name, methods: methods})
+			})
 			return gts.WalkSkipChildren
 
 		case "method", "singleton_method":
 			// Top-level method (not inside a class).
-			name := rubyMethodName(node, lang, src)
-			if name != "" && !strings.HasPrefix(name, "_") {
-				info.Exports = append(info.Exports, name)
+			if name := rubyMethodName(node, lang, src); name != "" && !strings.HasPrefix(name, "_") {
+				info.Exports = append(info.Exports, rubyMethodSig(node, lang, src, name))
 				topMethods = append(topMethods, name)
 			}
 			return gts.WalkSkipChildren
@@ -135,23 +114,70 @@ func rubyMethodName(node *gts.Node, lang *gts.Language, src []byte) string {
 	return ""
 }
 
-// rubyClassMethods collects method names defined inside a class or module body.
-func rubyClassMethods(node *gts.Node, lang *gts.Language, src []byte) []string {
-	var methods []string
-	// Find the body_statement child.
-	body := childByType(node, lang, "body_statement")
-	if body == nil {
-		return methods
+// rubyRequire returns the target of a require/require_relative call, or "".
+func rubyRequire(node *gts.Node, lang *gts.Language, src []byte) string {
+	method := childByType(node, lang, "identifier")
+	if method == nil {
+		return ""
 	}
-	for i := 0; i < body.ChildCount(); i++ {
-		child := body.Child(i)
-		switch child.Type(lang) {
-		case "method", "singleton_method":
-			name := rubyMethodName(child, lang, src)
-			if name != "" {
-				methods = append(methods, name)
+	if m := nodeText(method, src); m != "require" && m != "require_relative" {
+		return ""
+	}
+	args := childByType(node, lang, "argument_list")
+	if args == nil {
+		return ""
+	}
+	str := childByType(args, lang, "string")
+	if str == nil {
+		return ""
+	}
+	return rubyStringValue(str, lang, src)
+}
+
+// rubyMethodSig renders `name(params)` for a method node.
+func rubyMethodSig(node *gts.Node, lang *gts.Language, src []byte, name string) string {
+	if p := childByType(node, lang, "method_parameters"); p != nil {
+		return truncSig(name+nodeText(p, src), 80)
+	}
+	return name
+}
+
+// rubyCollect records a class/module (qualified by its enclosing modules) and
+// recurses into nested ones. Methods after a bare private/protected are skipped.
+func rubyCollect(node *gts.Node, lang *gts.Language, src []byte, prefix string, emit func(name string, methods []string)) {
+	name := rubyDefName(node, lang, src)
+	if name == "" {
+		return
+	}
+	full := prefix + name
+	var methods []string
+	var nested []*gts.Node
+	if body := childByType(node, lang, "body_statement"); body != nil {
+		public := true
+		for i := 0; i < body.ChildCount(); i++ {
+			child := body.Child(i)
+			switch child.Type(lang) {
+			case "identifier":
+				if t := nodeText(child, src); t == "private" || t == "protected" {
+					public = false
+				} else if t == "public" {
+					public = true
+				}
+			case "method", "singleton_method":
+				if n := rubyMethodName(child, lang, src); n != "" && public {
+					sig := rubyMethodSig(child, lang, src, n)
+					if child.Type(lang) == "singleton_method" {
+						sig = "self." + sig
+					}
+					methods = append(methods, sig)
+				}
+			case "class", "module":
+				nested = append(nested, child)
 			}
 		}
 	}
-	return methods
+	emit(full, methods)
+	for _, n := range nested {
+		rubyCollect(n, lang, src, full+"::", emit)
+	}
 }

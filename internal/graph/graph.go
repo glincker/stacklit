@@ -365,6 +365,10 @@ func normalizePythonImport(imp string) (string, bool) {
 		// Bare relative like "." or ".." without module name — can't resolve.
 		return "", false
 	}
+	// "./x.js" and "../x" are already path-style (JS/TS), not Python dot notation.
+	if rest != "" && rest[0] == '/' {
+		return "", false
+	}
 	// Convert dots to path: 1 dot → "./", 2 dots → "../", 3 dots → "../../", etc.
 	prefix := "./"
 	for i := 1; i < dots; i++ {

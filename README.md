@@ -231,7 +231,7 @@ jobs:
 - **Table** -- Sortable module table with search filter.
 - **Flow** -- Top-down dependency flow from entrypoints to leaves.
 
-## 11 languages via tree-sitter
+## 23 languages via tree-sitter
 
 | Language | Extracts |
 |----------|----------|
@@ -243,9 +243,20 @@ jobs:
 | C# | using directives, public types, method signatures |
 | Ruby | require, classes, modules, methods |
 | PHP | namespace use, classes, traits, public methods |
-| Kotlin | imports, classes, objects, functions |
+| Kotlin | imports, classes, objects, enum entries, functions with signatures |
 | Swift | imports, structs, classes, protocols |
-| C/C++ | includes, functions, structs, typedefs |
+| C/C++ | includes, non-static functions, structs, unions, enums, classes, typedefs, namespaces |
+| Elixir | alias/import/require/use, modules, protocols, public def/defmacro, structs, @type/@callback |
+| Zig | @import, pub functions, pub structs/enums/unions with methods, pub constants |
+| Dart | imports/exports, classes, mixins, enums, extensions, typedefs, public functions and methods |
+| Scala | imports (with selectors), traits, classes, objects, enums, type aliases, defs and vals |
+| Lua | require, non-local functions, `M.fn` and `M:method` definitions |
+| Shell | source/`.` includes, function definitions |
+| SQL | tables with columns, views, functions |
+| GDScript | class_name, signals, constants, enums, public funcs, inner classes, preload/load paths |
+| Vue / Svelte | script block imports, exports, types (parsed as TypeScript) |
+| Terraform/HCL | resources, data sources, variables, outputs, modules, providers, module sources |
+| Protobuf | imports, messages (nested), enums, services with rpc signatures |
 
 Any other language gets basic support (line count + language detection).
 

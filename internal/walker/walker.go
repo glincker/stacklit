@@ -38,6 +38,10 @@ var sourceExtensions = map[string]bool{
 	".graphql": true,
 	".gql":     true,
 	".proto":   true,
+	".gd":      true,
+	".tf":      true,
+	".hcl":     true,
+	".zsh":     true,
 }
 
 // alwaysIgnoreDirs contains directory names that are always skipped regardless
