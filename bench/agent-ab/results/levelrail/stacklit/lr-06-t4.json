@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr-06",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/deploy/autoscale.go, cmd/levelrail/boot_stages_workers.go, cmd/levelrail/boot_loaders.go, internal/apiclient/autoscale.go, internal/store/autoscale.go, internal/spec/autoscale.go, internal/api/autoscale_signals.go, internal/api/autoscale.go",
+  "turns": 4,
+  "cost_usd": 0.0319369,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 470,
+    "cache_creation_input_tokens": 6248,
+    "cache_read_input_tokens": 22329
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 31.521104375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/autoscale\" --budget 800",
+    "Grep pattern=internal/autoscale",
+    "Grep pattern=^\\s*(\\w+\\s+)?\"[^\"]*/internal/autoscale\""
+  ],
+  "at": "2026-11-08T21:10:43Z"
+}

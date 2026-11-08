@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/slack/slack.go, provider/slack/slack_test.go, provider/discord/discord.go, provider/discord/discord_test.go, provider/discord/doc.go",
+  "turns": 5,
+  "cost_usd": 0.060343,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 697,
+    "cache_creation_input_tokens": 12937,
+    "cache_read_input_tokens": 16130
+  },
+  "tool_calls": {
+    "Glob": 2,
+    "Grep": 1,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 2603,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.746782584,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=(?i)(github|google|gitlab|discord)",
+    "Glob pattern=**/*{provider,oauth,social}*",
+    "Glob pattern=provider/**/*.go",
+    "Read /private/tmp/abreal/work/ab-249815466/co-972318440/docs/provider-catalog.md"
+  ],
+  "at": "2026-11-08T21:00:03Z"
+}

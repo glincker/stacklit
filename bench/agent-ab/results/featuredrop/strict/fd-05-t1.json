@@ -1,0 +1,41 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-05",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.9230769230769231,
+  "answer": "src/angular/index.ts, src/astro/index.ts, src/helpers.ts, src/next/index.ts, src/nuxt/index.ts, src/react/provider.tsx, src/remix/index.ts, src/renderer.ts, src/solid/store.ts, src/svelte/index.ts, src/vue/provider.ts, src/web-components/index.ts",
+  "turns": 7,
+  "cost_usd": 0.059559600000000004,
+  "usage": {
+    "input_tokens": 14,
+    "output_tokens": 1456,
+    "cache_creation_input_tokens": 9526,
+    "cache_read_input_tokens": 68676
+  },
+  "tool_calls": {
+    "Bash": 6
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 4,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 1,
+  "result_subtype": "success",
+  "seconds": 17.496099625,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit impact src/core.ts --budget 800",
+    "Bash stacklit impact src/core.ts --budget 4000 | grep -E '^[a-zA-Z]|depth' | grep -B1 'depth 1' | grep -E '^[a-zA-Z]' | sort -u",
+    "Bash stacklit impact src/core.ts --budget 4000 | awk '/^[a-zA-Z]/{f=$0} /depth 1 /{print f}' | sort -u",
+    "Bash stacklit impact src/core.ts --budget 4000",
+    "Bash grep -nE \"from ['\\\"][^'\\\"]*/core(\\.js)?['\\\"]\" apps/docs/components/shadcn-demos/changelog-widget-demo.tsx examples/nextjs-shadcn/components/featuredrop/changelo",
+    "Bash grep -lE \"from ['\\\"][^'\\\"]*/core(\\.js)?['\\\"]\" src/angular/index.ts src/astro/index.ts src/helpers.ts src/next/index.ts src/nuxt/index.ts src/react/provider.tsx "
+  ],
+  "at": "2026-11-08T21:32:47Z",
+  "crawl_redirects": 0
+}

@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr-05",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "cmd/levelrail/boot_source.go, cmd/levelrail/boot_stages_workers.go, cmd/levelrail/jobs_http_target.go, internal/api/router.go, internal/api/app_sleep_wake.go, internal/api/app_sleep_history.go, internal/api/app_sleep.go, internal/api/app_sleep_state.go",
+  "turns": 3,
+  "cost_usd": 0.027301199999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 341,
+    "cache_creation_input_tokens": 5660,
+    "cache_read_input_tokens": 12432
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 24.576330125,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/appsleep\" --budget 800",
+    "Grep pattern=internal/appsleep\""
+  ],
+  "at": "2026-11-08T21:09:10Z"
+}

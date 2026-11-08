@@ -1,0 +1,36 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-10",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/semver.ts, src/core.ts",
+  "turns": 3,
+  "cost_usd": 0.0164114,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 285,
+    "cache_creation_input_tokens": 3015,
+    "cache_read_input_tokens": 14894
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.210069625,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Grep pattern=semver|compareVersions?|satisfies\\(|versionCompare|minVersion|maxVersion",
+    "Grep pattern=semver|compareVersions? path=src/core.ts"
+  ],
+  "at": "2026-11-08T21:04:52Z"
+}

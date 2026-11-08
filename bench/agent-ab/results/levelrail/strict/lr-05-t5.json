@@ -1,0 +1,44 @@
+{
+  "repo": "levelrail",
+  "task": "lr-05",
+  "kind": "impact",
+  "trial": 5,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.625,
+  "answer": "internal/api/app_sleep_state.go, internal/api/app_sleep_wake.go, internal/api/app_sleep.go, internal/api/app_sleep_history.go, cmd/levelrail/jobs_http_target.go\n\nThis list may be incomplete. The stacklit index doesn't record imports, so I took the files from its ranked results for \"internal appsleep\" and checked each file's import line. My repo-wide grep for the import path was blocked twice by a hook, so I didn't run it. Files that import the package but didn't rank, such as the wiring in `cmd/levelrail`, could be missing. If you want it confirmed, I can run that grep once you allow it.",
+  "turns": 10,
+  "cost_usd": 0.0802175,
+  "usage": {
+    "input_tokens": 20,
+    "output_tokens": 1597,
+    "cache_creation_input_tokens": 13099,
+    "cache_read_input_tokens": 118115
+  },
+  "tool_calls": {
+    "Bash": 9
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 6,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 2,
+  "result_subtype": "success",
+  "seconds": 36.317728417,
+  "seven_day_utilization": 0.58,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/appsleep\" --budget 800",
+    "Bash stacklit impact internal/appsleep 2>&1 | head -60",
+    "Bash stacklit impact internal/appsleep/appsleep.go --depth 1 --budget 3000 2>&1 | head -80",
+    "Bash grep -o '\"[^\"]*appsleep[^\"]*\"' stacklit.graph.json | sort | uniq -c | head -20; head -c 600 stacklit.graph.json",
+    "Bash grep -rl --include='*.go' --exclude='*_test.go' '/internal/appsleep\"' . | sort",
+    "Bash grep -rl --include='*.go' --exclude='*_test.go' '/internal/appsleep\"' . | sort",
+    "Bash stacklit query \"internal appsleep\" --budget 1600",
+    "Bash stacklit query \"internal appsleep\" --budget 6000 | grep -E '^[0-9]+\\. ' ",
+    "Bash grep -l '/internal/appsleep\"' internal/api/app_sleep_state.go internal/api/app_sleep_wake.go internal/api/app_sleep.go internal/api/app_sleep_history.go cmd/lev"
+  ],
+  "at": "2026-11-08T21:33:35Z",
+  "crawl_redirects": 2
+}

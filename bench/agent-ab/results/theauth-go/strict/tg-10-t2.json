@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-10",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/scim/filter.go, internal/scim/wire.go",
+  "turns": 2,
+  "cost_usd": 0.022517899999999997,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 97,
+    "cache_creation_input_tokens": 5074,
+    "cache_read_input_tokens": 12439
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.447769458,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"SCIM filter expression parser (userName eq)\" --budget 800"
+  ],
+  "at": "2026-11-08T21:26:57Z",
+  "crawl_redirects": 0
+}

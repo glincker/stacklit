@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr-07",
+  "kind": "add",
+  "trial": 4,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/mcptools/server.go, internal/mcptools/classes.go",
+  "turns": 5,
+  "cost_usd": 0.0331184,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 472,
+    "cache_creation_input_tokens": 6053,
+    "cache_read_input_tokens": 41664
+  },
+  "tool_calls": {
+    "Bash": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 1,
+  "result_subtype": "success",
+  "seconds": 24.937338084,
+  "seven_day_utilization": 0.58,
+  "call_log": [
+    "Bash stacklit query \"MCP tool registration groups and tool classification table read mutate destructive\" --budget 800",
+    "Bash cd internal/mcptools && grep -n \"register[A-Za-z]*Tools\\b\" toolsets.go modes.go | head -20; grep -n \"toolTable\\s*=\" classes.go",
+    "Bash grep -rn \"registerPlanTools\" --include=*.go . | grep -v \"^./tools_plan.go\"",
+    "Bash stacklit explain registerPlanTools"
+  ],
+  "at": "2026-11-08T21:46:36Z",
+  "crawl_redirects": 1
+}

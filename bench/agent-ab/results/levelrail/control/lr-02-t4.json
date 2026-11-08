@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr-02",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ddns/detect.go",
+  "turns": 5,
+  "cost_usd": 0.05950419999999999,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 624,
+    "cache_creation_input_tokens": 12035,
+    "cache_read_input_tokens": 51042
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.798230292,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Grep pattern=(?i)public.?ip|probe",
+    "Grep pattern=(?i)ddns|dynamicdns|dyndns|dynamic.dns",
+    "Grep pattern=https?:// path=/private/tmp/abreal/work/ab-1216595303/co-283532664/internal/ddns",
+    "Grep pattern=agree|quorum|consensus|mismatch path=/private/tmp/abreal/work/ab-1216595303/co-283532664/internal/ddns"
+  ],
+  "at": "2026-11-08T21:18:08Z"
+}

@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-03",
+  "kind": "trace",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/astro/index.ts, src/next/index.ts, src/nuxt/index.ts, src/remix/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0247947,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 244,
+    "cache_creation_input_tokens": 5275,
+    "cache_read_input_tokens": 12467
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.984767083,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"getNewFeaturesServer server side rendering helper\" --budget 800",
+    "Grep pattern=getNewFeaturesServer"
+  ],
+  "at": "2026-11-08T21:06:04Z"
+}

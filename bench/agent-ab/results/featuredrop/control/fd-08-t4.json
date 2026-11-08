@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-08",
+  "kind": "add",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-your-hook.ts, src/react/hooks/index.ts, src/react/index.ts",
+  "turns": 4,
+  "cost_usd": 0.0206866,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 411,
+    "cache_creation_input_tokens": 3755,
+    "cache_read_input_tokens": 15446
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.46343425,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=export (function|const) use[A-Z]",
+    "Glob pattern=**/hooks/**/*.{ts,tsx}",
+    "Grep pattern=use-tab-notification|useTabNotification path=src/react"
+  ],
+  "at": "2026-11-08T21:02:59Z"
+}

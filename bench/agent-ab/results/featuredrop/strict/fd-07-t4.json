@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-07",
+  "kind": "add",
+  "trial": 4,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/adapters/dynamodb.ts, src/adapters/index.ts",
+  "turns": 4,
+  "cost_usd": 0.0339883,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 431,
+    "cache_creation_input_tokens": 6597,
+    "cache_read_input_tokens": 32743
+  },
+  "tool_calls": {
+    "Bash": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.332012125,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"storage adapters and how they are exported/registered\" --budget 800",
+    "Bash stacklit query \"where adapters are exported entry points package.json exports tsup config redis adapter\" --budget 600; grep -n -i \"adapters/redis\\|adapters/mong",
+    "Bash grep -n -i \"redis\" package.json tsup.config.ts src/index.ts src/adapters/index.ts 2>&1 | head"
+  ],
+  "at": "2026-11-08T21:31:18Z",
+  "crawl_redirects": 0
+}

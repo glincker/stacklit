@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr-03",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/components/AppAutoscaleCard.tsx, web/src/components/autoscale/AutoscaleForm.tsx, web/src/queries/autoscale.ts",
+  "turns": 3,
+  "cost_usd": 0.0277619,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 222,
+    "cache_creation_input_tokens": 5835,
+    "cache_read_input_tokens": 21899
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 28.520012041,
+  "seven_day_utilization": 0.58,
+  "call_log": [
+    "Bash stacklit query \"autoscale settings card form and data query for app in web dashboard\" --budget 800",
+    "Bash stacklit query \"autoscale form editor policy\" --budget 500 | grep -i autoscal"
+  ],
+  "at": "2026-11-08T21:49:25Z",
+  "crawl_redirects": 0
+}
