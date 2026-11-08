@@ -67,7 +67,7 @@ Determinism is a design goal: files are walked in sorted order, maps are written
 
 ## MCP server
 
-`internal/mcp` registers seven read-only tools with the official Go MCP SDK and serves them over stdio. Each call loads `stacklit.json` from the working directory, caching it until the file's modification time changes.
+`internal/mcp` registers fifteen read-only tools (seven over the index, eight over the symbol graph) with the official Go MCP SDK and serves them over stdio. Each call loads `stacklit.json` from the working directory, caching it until the file's modification time changes.
 
 ## Network use
 

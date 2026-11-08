@@ -91,6 +91,10 @@ All commands run against the current directory. Run `stacklit <command> --help` 
 | [`export`](#stacklit-export) | Render the index as a readable markdown overview |
 | [`setup`](#stacklit-setup) | Configure detected AI tools and install the git hook |
 | [`serve`](#stacklit-serve) | Run the MCP server over stdio |
+| [`graph`, `query`, `explain`, `impact`, `path`, `hubs`, `communities`, `report`, `slice`, `watch`](#symbol-graph-commands) | Symbol-level graph and token-budgeted queries |
+| [`doctor`](#stacklit-doctor) | Diagnose config, hooks, a stale index and parse errors |
+| [`ingest`](#stacklit-ingest) | Add docs, OpenAPI, SQL schemas and ownership to `stacklit.context.json` |
+| `completion` | Shell completions for bash, zsh, fish and PowerShell |
 
 Global flags: `--version`, `--help`.
 
@@ -198,6 +202,39 @@ stacklit serve
 
 Starts the MCP server on stdio. Run it from the repo root: it reads `stacklit.json` from the working directory. See [MCP server](#mcp-server).
 
+### Symbol graph commands
+
+```
+stacklit graph                          # build stacklit.graph.json (query commands build it in memory if it is missing)
+stacklit query "where is auth checked?" # scoped subgraph for a question, hard limit via --budget (default 2000 tokens)
+stacklit explain <symbol>               # definition, location, callers, callees (--budget, default 1500)
+stacklit impact <symbol|file>           # everything that depends on it (--depth, default 4)
+stacklit path <from> <to>               # shortest path between two symbols
+stacklit hubs -n 15                     # most connected symbols
+stacklit communities                    # deterministic file clusters with labels
+stacklit report -o GRAPH_REPORT.md      # key concepts, surprising links, suggested questions
+stacklit slice <symbol>                 # only that symbol's source, with line numbers
+stacklit watch                          # keep the graph current as files change
+```
+
+All of them accept `--root`, `--graph` and (except `watch`) `--json`. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
+
+### stacklit doctor
+
+```
+stacklit doctor [path] [--json] [--strict]
+```
+
+Checks the config file, git hook, index freshness and parse errors. `--strict` also fails on warnings.
+
+### stacklit ingest
+
+```
+stacklit ingest [--docs] [--api] [--schema] [--owners] [--git-owners]
+```
+
+Writes `stacklit.context.json` next to the index and leaves `stacklit.json` untouched. With no connector flag, all but `--git-owners` run. Limits: `STACKLIT_INGEST_MAX_BYTES`, `STACKLIT_INGEST_MAX_ITEMS`.
+
 ---
 
 ## MCP server
@@ -206,7 +243,7 @@ Starts the MCP server on stdio. Run it from the repo root: it reads `stacklit.js
 stacklit serve
 ```
 
-Seven read-only tools:
+Fifteen read-only tools. The first seven read `stacklit.json`; the last eight read the symbol graph (`stacklit.graph.json`, built in memory when missing).
 
 | Tool | Input | Returns |
 |------|-------|---------|
@@ -217,6 +254,14 @@ Seven read-only tools:
 | `get_dependencies` | `module` | the dependency edges that touch that module |
 | `get_hot_files` | none | the most-changed files in the last 90 days |
 | `get_hints` | none | add-feature guidance, test command, env var names, do-not-touch paths |
+| `query_graph` | `query`, optional `budget` | scoped symbol subgraph grouped by file, hard token budget (default 2000) |
+| `shortest_path` | `from`, `to` | shortest path between two symbols with weakest-hop confidence |
+| `explain_symbol` | `symbol` | definition, file and line range, signature, callers and callees |
+| `impact` | `symbol` (name, `Type.Method` or file path), optional `depth`, `budget` | symbols and files that depend on it |
+| `get_hubs` | optional `top` | most connected symbols |
+| `get_communities` | none | deterministic file clusters with labels |
+| `graph_report` | none | key concepts, surprising links, suggested questions |
+| `slice_symbol` | `symbol` | only that symbol's source lines |
 
 The server re-reads `stacklit.json` whenever its modification time changes, so you do not need to restart it after `generate`.
 
@@ -247,6 +292,11 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `max_modules` | 200 | Above this many modules, deeper ones are collapsed into their parents |
 | `max_exports` | 10 | Exports kept per module. Symbols beyond the cap are not in the index, so raise it if lookups by symbol name miss. |
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
+| `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
+| `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
+| `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
+| `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
+| `parse_memory_mb` | 512 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |
 
 A file that is missing, unreadable or invalid JSON is ignored and the defaults are used.
 

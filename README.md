@@ -2,7 +2,7 @@
 
 **A committed map of your codebase, built for AI coding agents.**
 
-Stacklit parses your repo with tree-sitter and writes `stacklit.json`: modules, what each exports, who depends on whom, which files are hot in git, and hints for running tests and adding features. A coding agent reads that file (or a smaller derived map of it) instead of rediscovering the layout every session.
+Stacklit parses your repo with tree-sitter and writes `stacklit.json`: modules, what each exports, who depends on whom, which files are hot in git (opt in), and hints for running tests and adding features. A coding agent reads that file (or a smaller derived map of it) instead of rediscovering the layout every session.
 
 [![CI](https://github.com/glincker/stacklit/actions/workflows/ci.yml/badge.svg)](https://github.com/glincker/stacklit/actions)
 [![Release](https://img.shields.io/github/v/release/glincker/stacklit)](https://github.com/glincker/stacklit/releases)
@@ -55,17 +55,17 @@ All figures below come from the reproducible harness in [bench/](bench/) (full m
 
 | Repo | Language | Source lines | Modules | `stacklit.json` | `stacklit derive` map | Generate (median) |
 |------|----------|-------------:|--------:|----------------:|----------------------:|------------------:|
-| gin v1.10.0 | Go | 19,161 | 6 | 2,410 tokens | 122 tokens | 39 ms |
-| flask 3.1.2 | Python | 17,909 | 9 | 2,045 tokens | 164 tokens | 3.7 s |
-| hono v4.6.0 | TypeScript | 55,896 | 72 | 11,814 tokens | 1,122 tokens | 2.3 s |
+| gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens | 40 ms |
+| flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens | 2.3 s |
+| hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens | 0.6 s |
 
 What that says, and what it does not:
 
-- The index is roughly 2,000 to 12,000 tokens on these repos, and the derived map is roughly 120 to 1,100 tokens. Both grow with the number of modules, not with lines of code. The map is about 250 tokens only for repos of around 10 to 25 modules.
-- On the 30 tasks, a simulated agent that greps and then reads its top 3 files spent about 2.4x more tokens end to end than one that read the map, looked up modules in the index and read 1 file. The ratio ranged from roughly 1x on hono to about 7x on gin.
+- The index is roughly 2,500 to 16,000 tokens on these repos, and the derived map is roughly 140 to 1,400 tokens. Both grow with the number of modules, not with lines of code.
+- On the 30 tasks, a simulated agent that greps and then reads its top 3 files spent about 2.3x more tokens end to end than one that read the map, looked up modules in the index and read 1 file. The ratio ranged from roughly 1x on hono to about 7x on gin.
 - For lookups where you already know the exact symbol name, grep alone is cheaper than the map (a few hundred tokens versus roughly 700 including the map).
-- The grep and read path found the verified answer on 30 of 30 tasks. The stacklit path found it on 25 of 30. The misses are mostly unexported symbols, truncated export lists and imperfect dependency edges. They are listed in the results file and tracked on the [roadmap](ROADMAP.md).
-- Generating the index is fast on Go and slower on Python and TypeScript, with peak memory around 1 to 2 GB on the larger two. That is a known cost and is on the roadmap.
+- The grep and read path found the verified answer on 30 of 30 tasks. The map-and-lookup stacklit path found it on 27 of 30, and the graph query path (`stacklit query --budget 2000`, one call, about 1,650 tokens per task) on 28 of 30. The misses are mostly unexported symbols, truncated export lists and imperfect dependency edges. They are listed in the results file and tracked on the [roadmap](ROADMAP.md).
+- Generating the index is fast on Go and slower on Python and TypeScript, with cold-run peak memory of about 1.6 GB on flask and 0.9 GB on hono (a single large Python file costs about 350 MB inside the parser library). That is a known cost and is on the roadmap.
 
 This is a token-cost proxy, not an agent evaluation. See the limitations section of the results file before quoting any figure.
 
@@ -81,7 +81,7 @@ This is a token-cost proxy, not an agent evaluation. See the limitations section
 
 `stacklit setup` with no argument configures every tool it detects and installs a post-commit git hook that regenerates the index.
 
-The MCP server exposes seven tools: `get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`.
+The MCP server exposes fifteen tools: seven over the index (`get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`) and eight over the symbol graph (`query_graph`, `shortest_path`, `explain_symbol`, `impact`, `get_hubs`, `get_communities`, `graph_report`, `slice_symbol`).
 
 ## Supported languages (48 languages and formats)
 
@@ -158,7 +158,7 @@ Monorepos are detected automatically: pnpm, npm and yarn workspaces, Go workspac
 }
 ```
 
-Project and tech summary, modules with exports and type definitions, module-level dependency edges, git hot files, framework patterns and hints. See [USAGE.md](USAGE.md#reading-stacklitjson) for every field.
+Project and tech summary, modules with exports and type definitions, module-level dependency edges, git hot files (opt in), framework patterns and hints. See [USAGE.md](USAGE.md#reading-stacklitjson) for every field.
 
 ## Set up your AI tools
 
@@ -194,13 +194,15 @@ Add docs, ADRs, OpenAPI, SQL schemas and CODEOWNERS to a sidecar with `stacklit 
 stacklit derive         # print to stdout
 ```
 
-The compact map from `stacklit derive` looks like this (gin, 122 tokens):
+The compact map from `stacklit derive` looks like this (gin, 137 tokens):
 
 ```
-gin | go | 6 modules | 19,161 lines | Gin, GitHub Actions, net/http
+gin | go | 8 modules | 19,537 lines | Gin, GitHub Actions, net/http
 test: go test ./... | env: PORT
 
 modules:
+  .github             .github
+  .github/workflows   workflows
   binding             binding | depends: bytesconv, json
   ginS                gins
   internal/bytesconv  bytesconv | depended-by: binding, render, root
