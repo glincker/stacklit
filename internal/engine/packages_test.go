@@ -34,7 +34,7 @@ func TestBuildPackagesManifestAndRelativeEdges(t *testing.T) {
 		t.Fatalf("packages: %+v", pkgs)
 	}
 	want := map[[2]string]int{
-		{"@acme/web", "@acme/ui"}: 2,
+		{"@acme/web", "@acme/ui"}:  2,
 		{"@acme/ui", "@acme/core"}: 1,
 	}
 	got := map[[2]string]int{}

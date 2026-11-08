@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,6 +26,9 @@ type Options struct {
 	InstallHook bool
 	Quiet       bool
 	Summary     bool
+	// NoWrite builds the index in memory only (used by multi-repo scans so
+	// member repos are never modified).
+	NoWrite bool
 }
 
 // Result holds the output paths and assembled index from a Run.
@@ -36,6 +38,11 @@ type Result struct {
 	MermaidPath string
 	Index       *schema.Index
 	Duration    time.Duration
+	// Imports maps module name to its sorted unique import strings. Only
+	// filled when Options.NoWrite is set.
+	Imports map[string][]string
+	// Provides lists manifest names (root and workspaces) this repo publishes.
+	Provides []string
 }
 
 // purposeMap maps common directory names to human-readable descriptions.
@@ -255,11 +262,20 @@ func Run(opts Options) (*Result, error) {
 		}
 	}
 
-	// 11. Write outputs using config-driven paths.
 	jsonPath := filepath.Join(root, cfg.Output.JSON)
 	mmdPath := filepath.Join(root, cfg.Output.Mermaid)
 	htmlPath := filepath.Join(root, cfg.Output.HTML)
 
+	if opts.NoWrite {
+		return &Result{
+			Index:    idx,
+			Duration: time.Since(start),
+			Imports:  importsByModule(parsed, idx.Modules),
+			Provides: repoProvides(root, mono),
+		}, nil
+	}
+
+	// 11. Write outputs using config-driven paths.
 	if err := renderer.WriteJSON(idx, jsonPath); err != nil {
 		return nil, fmt.Errorf("writing JSON: %w", err)
 	}
@@ -293,104 +309,6 @@ func Run(opts Options) (*Result, error) {
 		Index:       idx,
 		Duration:    dur,
 	}, nil
-}
-
-// MultiOptions configures a RunMulti call.
-type MultiOptions struct {
-	ReposFile string
-	Quiet     bool
-}
-
-// MultiResult holds the output of a RunMulti call.
-type MultiResult struct {
-	OutputPath string
-	RepoCount  int
-	Duration   time.Duration
-}
-
-// RunMulti reads a repos file, scans each repo, and writes a combined stacklit-multi.json.
-func RunMulti(opts MultiOptions) (*MultiResult, error) {
-	start := time.Now()
-
-	// 1. Read repos file.
-	data, err := os.ReadFile(opts.ReposFile)
-	if err != nil {
-		return nil, fmt.Errorf("reading repos file: %w", err)
-	}
-
-	// 2. Parse lines (skip empty lines and comments).
-	var repos []string
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		repos = append(repos, line)
-	}
-
-	// 3. Run stacklit on each repo.
-	var indices []*schema.Index
-	for _, repo := range repos {
-		if !opts.Quiet {
-			fmt.Printf("[stacklit] scanning %s...\n", repo)
-		}
-		result, err := Run(Options{Root: repo, Quiet: true})
-		if err != nil {
-			fmt.Printf("[stacklit] warning: failed to scan %s: %v\n", repo, err)
-			continue
-		}
-		indices = append(indices, result.Index)
-	}
-
-	// 4. Generate cross-repo summary.
-	multi := buildMultiIndex(indices)
-
-	// 5. Write to stacklit-multi.json in current directory.
-	outputPath := "stacklit-multi.json"
-	multiData, err := json.MarshalIndent(multi, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("marshaling multi-index: %w", err)
-	}
-	if err := os.WriteFile(outputPath, append(multiData, '\n'), 0644); err != nil {
-		return nil, fmt.Errorf("writing %s: %w", outputPath, err)
-	}
-
-	dur := time.Since(start)
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] multi-repo scan done in %s — %d repos, %d modules, %d files\n",
-			dur.Round(time.Millisecond), len(indices), multi.TotalModules, multi.TotalFiles)
-	}
-
-	return &MultiResult{OutputPath: outputPath, RepoCount: len(indices), Duration: dur}, nil
-}
-
-// buildMultiIndex assembles a MultiIndex from individual repo indices.
-func buildMultiIndex(indices []*schema.Index) *schema.MultiIndex {
-	multi := &schema.MultiIndex{
-		Schema:      "https://stacklit.dev/schema/v1-multi.json",
-		Version:     "1",
-		Type:        "polyrepo",
-		GeneratedAt: time.Now().UTC().Format(time.RFC3339),
-	}
-
-	for _, idx := range indices {
-		multi.TotalFiles += idx.Structure.TotalFiles
-		multi.TotalLines += idx.Structure.TotalLines
-		multi.TotalModules += len(idx.Modules)
-
-		multi.Repos = append(multi.Repos, schema.RepoSummary{
-			Name:            idx.Project.Name,
-			Path:            idx.Project.Root,
-			PrimaryLanguage: idx.Tech.PrimaryLanguage,
-			TotalFiles:      idx.Structure.TotalFiles,
-			TotalLines:      idx.Structure.TotalLines,
-			Modules:         idx.Modules,
-			Frameworks:      idx.Tech.Frameworks,
-			Entrypoints:     idx.Structure.Entrypoints,
-		})
-	}
-
-	return multi
 }
 
 // assembleIndex builds a schema.Index from the pipeline outputs.
