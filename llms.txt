@@ -1,6 +1,6 @@
 # Stacklit
 
-> Stacklit writes a small, committable JSON index of a codebase (modules, exports, dependency edges, hints) and a symbol graph, so AI coding agents can orient themselves without re-exploring the repo each session. Free, MIT licensed, one Go binary, deterministic, runs locally with no LLM and no network.
+> Stacklit writes a small, committable JSON index of a codebase (modules, exports, dependency edges, hints) and a symbol graph, so AI coding agents can orient themselves without re-exploring the repo each session. Free, MIT licensed, one Go binary, deterministic, runs locally with no LLM, and the CLI makes no network calls.
 
 Key facts:
 - Install: `npx stacklit init`, `brew install glincker/tap/stacklit`, `npm install -g stacklit`, or `go install github.com/glincker/stacklit/cmd/stacklit@latest`.
