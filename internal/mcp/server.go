@@ -82,7 +82,8 @@ func StartServerProfile(profile string) error {
 
 // NewServer builds the MCP server with the tools of one profile.
 func NewServer(profile string) (*sdkmcp.Server, error) {
-	s := sdkmcp.NewServer(&sdkmcp.Implementation{Name: "stacklit", Version: "0.1.0"}, nil)
+	s := sdkmcp.NewServer(&sdkmcp.Implementation{Name: "stacklit", Version: "0.1.0"},
+		&sdkmcp.ServerOptions{Instructions: Instructions(profile)})
 	switch profile {
 	case "", ProfileFull:
 	case ProfileMinimal:

@@ -37,8 +37,11 @@ type Config struct {
 	GitActivity    *bool    `json:"git_activity,omitempty"`     // include hot/recent files, default off
 	MapIcons       string   `json:"map_icons,omitempty"`        // "remote" (default) or "off" for the HTML map
 
-	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b" or "c").
+	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b", "c" or "d", the strict no-crawl wording).
 	Steering string `json:"steering,omitempty"`
+	// CrawlGuard sets the Claude Code crawl guard hook mode: "off", "nudge" or
+	// "redirect". Also STACKLIT_CRAWL_GUARD. Empty uses the mode setup installed.
+	CrawlGuard string `json:"crawl_guard,omitempty"`
 	// Stats turns on the local usage log (also STACKLIT_STATS=1). Default off.
 	Stats *bool `json:"stats,omitempty"`
 
