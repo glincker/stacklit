@@ -26,5 +26,5 @@
       "root"
     ]
   },
-  "generateOut": "[stacklit] found 101 files\n[stacklit] parsed 101 files (0 errors, 0 cached)\n[stacklit] done in 37ms — wrote stacklit.json, DEPENDENCIES.md, stacklit.html"
+  "generateOut": "[stacklit] found 101 files\n[stacklit] parsed 101 files (0 errors, 0 cached)\n[stacklit] done in 37ms -- wrote stacklit.json, DEPENDENCIES.md, stacklit.html"
 }

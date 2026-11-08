@@ -21,6 +21,7 @@ const time = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)} s` : `${v} ms
       <button class="chip" type="button" aria-pressed="true" data-lang="all">All</button>
       {languages.map((l) => <button class="chip" type="button" aria-pressed="false" data-lang={l}>{l}</button>)}
     </div>
+    <h2 class="visually-hidden">Maps</h2>
     <ul class="demo-grid">
       {demos.map((d) => (
         <li class="demo" data-lang={d.language}>
