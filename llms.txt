@@ -20,7 +20,7 @@ Key facts:
 - [FAQ](https://github.com/glincker/stacklit/blob/master/docs/FAQ.md)
 - [Privacy](https://github.com/glincker/stacklit/blob/master/docs/PRIVACY.md)
 - [Architecture](https://github.com/glincker/stacklit/blob/master/docs/ARCHITECTURE.md)
-- [Skill for agents](https://github.com/glincker/stacklit/blob/master/SKILL.md)
+- [Skill for agents](https://github.com/glincker/stacklit/blob/master/skills/stacklit/SKILL.md)
 
 ## Optional
 - [Comparison](https://github.com/glincker/stacklit/blob/master/docs/COMPARISON.md)

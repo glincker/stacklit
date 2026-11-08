@@ -138,12 +138,12 @@ func TestHooksPreserveUserHooks(t *testing.T) {
 }
 
 func TestSkillEmbedMatchesRoot(t *testing.T) {
-	b, err := os.ReadFile("../../SKILL.md")
+	b, err := os.ReadFile("../../skills/stacklit/SKILL.md")
 	if err != nil {
-		t.Skip("root SKILL.md not found")
+		t.Skip("skills/stacklit/SKILL.md not found")
 	}
 	if string(b) != SkillMD {
-		t.Fatal("internal/setup/skill/SKILL.md out of sync with SKILL.md")
+		t.Fatal("internal/setup/skill/SKILL.md out of sync with skills/stacklit/SKILL.md")
 	}
 }
 
