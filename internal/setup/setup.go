@@ -102,7 +102,7 @@ func (r *Runner) applyRule(rule Rule, o Options) error {
 	if !existed {
 		base = rule.Frontmatter
 	}
-	return r.write(rule.Path, old, existed, upsertBlock(base, BodyFor(o.Index, SteeringFor(o.Root)), rule.Style))
+	return r.write(rule.Path, old, existed, upsertBlock(base, BodyForRoot(o.Root, o.Index, SteeringFor(o.Root)), rule.Style))
 }
 
 // applyAiderConf points Aider at CONVENTIONS.md without clobbering a user's own read list.
