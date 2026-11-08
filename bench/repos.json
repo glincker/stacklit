@@ -1,0 +1,29 @@
+[
+  {
+    "name": "gin",
+    "language": "Go",
+    "url": "https://github.com/gin-gonic/gin.git",
+    "ref": "v1.10.0",
+    "sha": "75ccf94d605a05fe24817fc2f166f6f2959d5cea",
+    "exts": [".go"],
+    "test_markers": ["_test.go", "/testdata/", "/examples/"]
+  },
+  {
+    "name": "flask",
+    "language": "Python",
+    "url": "https://github.com/pallets/flask.git",
+    "ref": "3.1.2",
+    "sha": "2c1b30d0503cfb064f1cb252e6614a06915a362a",
+    "exts": [".py"],
+    "test_markers": ["/tests/", "/test_", "/conftest.py"]
+  },
+  {
+    "name": "hono",
+    "language": "TypeScript",
+    "url": "https://github.com/honojs/hono.git",
+    "ref": "v4.6.0",
+    "sha": "73ff6c0e82d66468e28ed439481220f56ab03882",
+    "exts": [".ts", ".tsx"],
+    "test_markers": [".test.ts", ".test.tsx", ".d.ts", "/runtime_tests/", "/perf-measures/"]
+  }
+]
