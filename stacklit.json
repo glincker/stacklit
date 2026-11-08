@@ -1,20 +1,28 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-05-07T02:35:01Z",
+  "generated_at": "2026-11-08T16:48:13Z",
   "stacklit_version": "dev",
-  "merkle_hash": "b99fe2df208508d2562bc18f0950a25193578caecf4f05c492c8cc20033a728c",
+  "merkle_hash": "cd2137b04f3b639f31e4545461d38395430be3b103651f01cb7a02353d68ecf1",
   "project": {
-    "name": "stacklit",
+    "name": "stacklit-langs",
     "root": ".",
     "type": "single"
   },
   "tech": {
     "primary_language": "go",
     "languages": {
+      "dart": {
+        "files": 1,
+        "lines": 44
+      },
+      "elixir": {
+        "files": 1,
+        "lines": 34
+      },
       "go": {
-        "files": 67,
-        "lines": 9396
+        "files": 80,
+        "lines": 10689
       },
       "java": {
         "files": 1,
@@ -24,6 +32,18 @@
         "files": 3,
         "lines": 164
       },
+      "kotlin": {
+        "files": 1,
+        "lines": 31
+      },
+      "lua": {
+        "files": 1,
+        "lines": 23
+      },
+      "protobuf": {
+        "files": 1,
+        "lines": 24
+      },
       "python": {
         "files": 1,
         "lines": 20
@@ -32,9 +52,25 @@
         "files": 1,
         "lines": 19
       },
+      "scala": {
+        "files": 1,
+        "lines": 25
+      },
+      "shell": {
+        "files": 1,
+        "lines": 17
+      },
+      "sql": {
+        "files": 1,
+        "lines": 16
+      },
       "typescript": {
         "files": 5,
         "lines": 24
+      },
+      "unknown": {
+        "files": 3,
+        "lines": 63
       }
     },
     "frameworks": [
@@ -46,8 +82,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 78,
-    "total_lines": 9639
+    "total_files": 102,
+    "total_lines": 11209
   },
   "modules": {
     "assets": {
@@ -336,29 +372,29 @@
     "internal/parser": {
       "purpose": "Source code parsers",
       "language": "go",
-      "files": 20,
-      "lines": 3267,
+      "files": 33,
+      "lines": 4556,
       "file_list": [
         "generic.go",
         "generic_test.go",
         "golang.go",
         "golang_test.go",
         "java_test.go",
+        "langs_test.go",
         "parser.go",
         "python_test.go",
         "rust_test.go",
         "treesitter.go",
         "ts_c.go",
+        "ts_common.go",
         "ts_csharp.go",
+        "ts_dart.go",
+        "ts_elixir.go",
+        "ts_gdscript.go",
+        "ts_hcl.go",
         "ts_java.go",
         "ts_kotlin.go",
-        "ts_php.go",
-        "ts_python.go",
-        "ts_ruby.go",
-        "ts_rust.go",
-        "ts_swift.go",
-        "ts_typescript.go",
-        "typescript_test.go"
+        "ts_lua.go"
       ],
       "exports": [
         "CanParse(_ string) bool",
@@ -436,15 +472,15 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
-        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
-        "HotFile": "Path string, Commits90d int",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
-        "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
+        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
+        "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
       "depended_by": [
         "internal/cli",
@@ -509,7 +545,7 @@
       "purpose": "File system walker",
       "language": "go",
       "files": 2,
-      "lines": 294,
+      "lines": 298,
       "file_list": [
         "walker.go",
         "walker_test.go"
@@ -682,109 +718,29 @@
   "git": {
     "hot_files": [
       {
-        "path": ".github/workflows/ci.yml",
+        "path": "internal/parser/ts_kotlin.go",
         "commits_90d": 1
       },
       {
-        "path": ".github/workflows/release.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/stacklit-index.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".gitignore",
-        "commits_90d": 1
-      },
-      {
-        "path": ".goreleaser.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "COMPARISON.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "DEPENDENCIES.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "LICENSE",
-        "commits_90d": 1
-      },
-      {
-        "path": "Makefile",
-        "commits_90d": 1
-      },
-      {
-        "path": "README.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "SKILL.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "USAGE.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "action/action.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/embed.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/lang-icons.js",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/template.html",
-        "commits_90d": 1
-      },
-      {
-        "path": "cmd/stacklit/main.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.gif",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.tape",
-        "commits_90d": 1
-      },
-      {
-        "path": "docs/superpowers/plans/2026-04-12-growth-package.md",
+        "path": "testdata/langs/sample.kt",
         "commits_90d": 1
       }
     ],
     "recent": [
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
+      "internal/parser/ts_kotlin.go",
+      "testdata/langs/sample.kt",
+      "stacklit.json",
+      "npm/install.js",
       "DEPENDENCIES.md",
-      "LICENSE",
-      "Makefile",
-      "README.md"
+      ".github/workflows/ci.yml",
+      "README.md",
+      "USAGE.md",
+      "internal/cli/export.go",
+      "internal/cli/root.go"
     ],
     "stable": [
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
-      "DEPENDENCIES.md",
-      "LICENSE",
-      "Makefile",
-      "README.md"
+      "internal/parser/ts_kotlin.go",
+      "testdata/langs/sample.kt"
     ]
   },
   "hints": {
