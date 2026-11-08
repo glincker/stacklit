@@ -24,7 +24,6 @@ All notable changes, reconstructed from the git history and release tags. Dates 
 - `query` prints files in relevance order (numbered, best symbol score first, ties by path) with a `best match:` line, instead of sorting by path. `--order path` or `STACKLIT_QUERY_ORDER=path` keeps the old layout. `--json` adds `rank` and `score`. On the benchmark this took found@1 for `query --budget 1000` read top to bottom from 13% to 81% (bench/RESULTS.md). The budget guarantee and byte-stable output are unchanged.
 - `query` ranking demotes files under test, example and benchmark directories unless the question names them (`STACKLIT_AUX_PENALTY`) and boosts symbols named like an identifier in the question (`STACKLIT_IDENT_TOKEN_BOOST`).
 - Multi-line signatures and doc comments now print on one line in `query`, `explain` and `impact` output.
-### Changed
 - The generated digest no longer ranks modules by line count and carries a `map <hash>` token, so ordinary edits leave it byte-identical.
 - `setup --no-mcp` no longer skips the Claude Code hooks and skill.
 - The symbol graph file is written atomically.
