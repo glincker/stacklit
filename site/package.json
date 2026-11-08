@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "check:links": "node scripts/check-links.mjs",
     "stars": "node scripts/fetch-stars.mjs",
-    "og": "node scripts/make-og.mjs"
+    "og": "node scripts/make-og.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.10",
