@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T19:21:27Z",
+  "generated_at": "2026-11-08T19:32:11Z",
   "stacklit_version": "dev",
-  "merkle_hash": "e6ac7dcc40fd18796e8ac6482d52b6e2212b93e1b4056c7fd1fb39cce40fef3b",
+  "merkle_hash": "6c8fb78b12dc20e785fdab784fea635a48aafc57c3d803c8bd532c0e97fc4b48",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -34,7 +34,7 @@
       },
       "go": {
         "files": 246,
-        "lines": 35664
+        "lines": 35703
       },
       "graphql": {
         "files": 1,
@@ -112,7 +112,7 @@
       "examples/adapters/keyword_concepts.py"
     ],
     "total_files": 315,
-    "total_lines": 37252
+    "total_lines": 37291
   },
   "modules": {
     "assets": {
@@ -576,7 +576,7 @@
       "purpose": "Dependency graph",
       "language": "go",
       "files": 46,
-      "lines": 11027,
+      "lines": 11066,
       "file_list": [
         "analysis.go",
         "body.go",
