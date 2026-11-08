@@ -219,6 +219,27 @@ Uses the existing `stacklit.json`, or generates one if none exists, then configu
 
 With no argument it configures every detected tool and installs the post-commit hook. If no tool is detected it prints the map to stdout so you can paste it. `.mcp.json` is listed in this repository's `.gitignore` because it is user-specific; decide for your own repo whether to commit it.
 
+### stacklit refresh, digest and stats
+
+Session plumbing, see [docs/SESSIONS.md](docs/SESSIONS.md) for the design.
+
+```
+stacklit refresh --files a.go,b.go [--json]    # or: --stdin with a hook payload
+stacklit digest [--check] [--session ID]
+stacklit stats [--json] [--since 7d]
+```
+
+- `refresh` updates `stacklit.json` (and `stacklit.graph.json` when it exists) for just the named files. Unchanged files are skipped by content hash, concurrent callers coalesce behind a lock, and writes are atomic. The result matches a full `generate`.
+- `digest` prints the structure hash (module names, edges and exported names only). `--check` exits 0 when it equals what a session was given, 1 when it changed, 2 when nothing was recorded.
+- `stats` reports the opt-in local usage log (`STACKLIT_STATS=1`). `served` is measured (bytes/4); `replaced_est` is an estimate of whole-file read cost, not a measured saving.
+
+Claude Code hooks (opt-in, written to `.claude/settings.json`, or `~/.claude` with `--global`):
+
+| Flag | Installs |
+|---|---|
+| `--session-hook` | `SessionStart` for startup, resume, clear and compact; `SubagentStart` for Explore and Plan |
+| `--refresh-hook` | async `PostToolUse` on Edit, Write, MultiEdit and NotebookEdit |
+
 ### stacklit serve
 
 ```
@@ -367,6 +388,8 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
 | `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
+| `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b` or `c` (see [docs/SESSIONS.md](docs/SESSIONS.md)). Env: `STACKLIT_STEERING`. |
+| `stats` | false | Append a local usage log of `query`, `slice`, `explain` and `impact` calls. Env: `STACKLIT_STATS=1`. Never networked. |
 | `map_icons` | remote | `remote` lets the HTML map request language logos from thesvg.org when you open it. `off` removes every remote URL and shows letters instead. Env: `STACKLIT_MAP_ICONS=off`. |
 | `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
 | `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
@@ -396,6 +419,12 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_EXPORT_PAGE_TOKENS` | `export --format markdown-wiki`, `obsidian` | Token budget per page. Default: 2000. |
 | `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
+| `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
+| `STACKLIT_STEERING` | `setup` | Steering wording variant `a`, `b` or `c`. |
+| `STACKLIT_STATS` | `query`, `slice`, `explain`, `impact` | `1` logs usage locally, `0` forces it off. |
+| `STACKLIT_CACHE_DIR` | cache, hooks, stats | Where the parse cache, session state and usage log live. |
+| `STACKLIT_REFRESH_DEBOUNCE_MS`, `STACKLIT_LOCK_STALE_SEC` | `refresh` | Debounce before a refresh (default 30) and age at which a lock is treated as abandoned (default 30). |
+| `STACKLIT_SUBAGENT_TYPES` | `hook subagent` | Comma list of agent types that get the digest. Default `Explore,Plan`. |
 | `STACKLIT_SCIP_MAX_BYTES` | `ingest --scip` | Largest SCIP file read. Default: 512 MiB. |
 
 ### Summary (opt-in)
@@ -562,6 +591,8 @@ Runs `stacklit generate --quiet` after each commit and stages the two committed 
 ---
 
 ## Troubleshooting
+
+**The session hook does not fire, the index looks stale, or two sessions collide**: see the troubleshooting section of [docs/SESSIONS.md](docs/SESSIONS.md). Quick checks: `/hooks` in Claude Code, `echo '{"source":"startup","cwd":"'$PWD'"}' | stacklit hook session`, `stacklit status`, and `stacklit refresh --files <paths>`.
 
 **`could not read stacklit.json`**: run `stacklit init` or `stacklit generate` first, and run the command from the repo root.
 
