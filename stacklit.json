@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "135b30e24f85aa285d3ecaf0b84fa7c9506075a92bd81c83b15f508489a5e2a6",
+  "merkle_hash": "95f75960204d49dc83ae1cff0ce93777a62df903adf288f53b97e63bbeab5dd3",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -70,7 +70,7 @@
       },
       "go": {
         "files": 272,
-        "lines": 40740
+        "lines": 40628
       },
       "graphql": {
         "files": 1,
@@ -198,7 +198,7 @@
       },
       "yaml": {
         "files": 13,
-        "lines": 494
+        "lines": 513
       },
       "zig": {
         "files": 3,
@@ -206,8 +206,7 @@
       }
     },
     "frameworks": [
-      "GitHub Actions",
-      "net/http"
+      "GitHub Actions"
     ]
   },
   "structure": {
@@ -216,7 +215,7 @@
       "examples/adapters/keyword_concepts.py"
     ],
     "total_files": 410,
-    "total_lines": 44441
+    "total_lines": 44348
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -244,7 +243,7 @@
       "purpose": "Workflows",
       "language": "yaml",
       "files": 5,
-      "lines": 216,
+      "lines": 230,
       "file_list": [
         "site.yml",
         "release.yml",
@@ -1306,13 +1305,12 @@
       "purpose": "AI-powered codebase summaries",
       "language": "go",
       "files": 2,
-      "lines": 208,
+      "lines": 96,
       "file_list": [
-        "ai.go",
-        "cli.go"
+        "cli.go",
+        "ai.go"
       ],
       "exports": [
-        "Generate(idx *schema.Index) (string, error)",
         "Run(idx *schema.Index) (string, error)"
       ],
       "depends_on": [
@@ -1397,7 +1395,7 @@
       "purpose": "Root package",
       "language": "make",
       "files": 2,
-      "lines": 96,
+      "lines": 101,
       "file_list": [
         ".goreleaser.yml",
         "Makefile"
@@ -1838,7 +1836,6 @@
     "test_command": "go test ./...",
     "env_vars": [
       "AGENT_BROWSER",
-      "ANTHROPIC_API_KEY",
       "CLAUDE_PROJECT_DIR",
       "DEMO_MAX_BYTES",
       "GOMEMLIMIT",

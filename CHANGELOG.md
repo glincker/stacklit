@@ -2,7 +2,7 @@
 
 All notable changes, reconstructed from the git history and release tags. Dates are tag dates (UTC). Versions follow semantic versioning while below 1.0, so minor releases may include behavior changes.
 
-## Unreleased (0.5.0)
+## 0.5.0 (2026-11-08)
 
 ### Added
 - Query layer: a symbol graph (`stacklit graph`) with `query` (token-budgeted subgraph for a question), `path`, `explain`, `impact`, `hubs`, `communities`, `report` and `slice`, an incremental `watch` command (fsnotify with a polling fallback), graph tools in the MCP server, and a Symbols tab in the visual map.
