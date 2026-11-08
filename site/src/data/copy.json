@@ -16,10 +16,11 @@
         "sub": "gin v1.10.0, Go source with tests, tokens as bytes divided by 4. Stacklit writes the map into git for your coding agent."
       }
     },
-    "caption": "stacklit derive on gin v1.10.0. Tokens are bytes divided by 4. Method and limits are in the benchmark.",
-    "captionLink": "Method and limits are in the benchmark.",
+    "caption": "stacklit derive on gin v1.10.0. Tokens are bytes divided by 4. The map is small. Whether that saves an agent money depends on repo size and question type: see the real agent test.",
+    "captionLink": "see the real agent test",
     "primaryCta": "Run npx stacklit init",
-    "secondaryCta": "Read the benchmark, including where grep wins"
+    "secondaryCta": "Read the benchmark, including where grep wins",
+    "captionHref": "/#agent-test"
   },
   "cta": {
     "install": "npx stacklit init",
@@ -46,18 +47,28 @@
   "steps": {
     "title": "Three commands",
     "items": [
-      { "name": "Map it", "text": "One command scans the repo with tree-sitter and writes stacklit.json, a dependency diagram and a visual map, then opens the map in your browser.", "command": "npx stacklit init" },
-      { "name": "Wire it up", "text": "Setup finds the assistants on your machine and writes the config each one reads. It also installs git hooks that rebuild the map after commits, checkouts and merges.", "command": "stacklit setup" },
-      { "name": "Ask where", "text": "Your agent asks a plain question and gets a ranked file list that fits a token budget. Slice prints one symbol's source. Impact lists what depends on it.", "command": "stacklit query \"where is auth checked\" --budget 1000" }
+      {
+        "name": "Map it",
+        "text": "One command scans the repo with tree-sitter and writes stacklit.json, a dependency diagram and a visual map, then opens the map in your browser.",
+        "command": "npx stacklit init"
+      },
+      {
+        "name": "Wire it up",
+        "text": "Setup finds the assistants on your machine and writes the config each one reads. It also installs git hooks that rebuild the map after commits, checkouts and merges.",
+        "command": "stacklit setup"
+      },
+      {
+        "name": "Ask where",
+        "text": "Your agent asks a plain question and gets a ranked file list that fits a token budget. Slice prints one symbol's source. Impact lists what depends on it.",
+        "command": "stacklit query \"where is auth checked\" --budget 1000"
+      }
     ]
   },
   "proof": {
     "title": "What we measured, and what we did not",
     "intro": "A benchmark of 47 where-is-X questions over six repos in six languages, with a simulated reader and no model. One 1,000 token query put the right file first on 81% of questions (95% interval 70 to 91) and in the top five on 96%.",
-    "note": "Grep with a hand written pattern did better: 89% first, 100% in the top five. Our query beat plain keyword search at the first file, 81% to 57%. The 81% came after tuning on these questions. On a separate 40 question set from our own repo the right file was first on 28 and in the top five on all 40. This is a benchmark, not an agent study. We have not shown a token or cost saving.",
-    "sizes": "Sizes side by side: the derive map is {range} tokens on these repos, the session digest is 290 to 515 tokens, and one query is about 1,000.",
-    "agentAbTitle": "Agent A/B run",
-    "agentAbNote": "Same tasks and model, with and without Stacklit."
+    "note": "Grep with a hand written pattern did better: 89% first, 100% in the top five. Our query beat plain keyword search at the first file, 81% to 57%. The 81% came after tuning on these questions. On a separate 40 question set from our own repo the right file was first on 28 and in the top five on all 40. This is a benchmark with no model in the loop. The real agent test is the next section.",
+    "sizes": "Sizes side by side: the derive map is {range} tokens on these repos, the session digest is 290 to 515 tokens, and one query is about 1,000."
   },
   "trust": {
     "items": [
@@ -72,10 +83,22 @@
   "faq": {
     "title": "Questions",
     "items": [
-      { "q": "Will it lower my token bill?", "a": "We do not know yet. Published work on a different tool, ContextSniper (arXiv 2607.01916), reports 51.5% fewer tokens and 36.4% lower cost on 50 SWE-bench Lite tasks with one agent. That tool uses embeddings and a context gate, and we have not reproduced its result with Stacklit. Our benchmark shows no token saving over grep. We will publish our own agent test whichever way it goes." },
-      { "q": "Why not just use grep?", "a": "Grep is the better tool when you already know the name. In our benchmark, grep with a hand written pattern found the file first more often than our query, 89% to 81%. Stacklit takes a plain question with no pattern, and it is one file in git that every assistant reads and a pull request can review." },
-      { "q": "Does it keep the map fresh?", "a": "A git hook rebuilds it after commits, checkouts and merges. In Claude Code an optional hook refreshes it after each edit, and stacklit watch keeps the symbol graph current. Edits made by hand while none of these run wait for the next run. Use stacklit refresh or stacklit generate." },
-      { "q": "Does it send my code anywhere?", "a": "No. It runs locally with no account and no telemetry. The one exception is the optional init --summary, which pipes module names and exports, no file contents, to a command you configure. The visual map page loads small language logos from thesvg.org unless you turn that off." }
+      {
+        "q": "Will it lower my token bill?",
+        "a": "Not overall, in our test. We ran Claude Code on three public repos with and without Stacklit, {sessions} sessions in all: pooled cost ratio {pooledCost}, tokens {pooledTokens}. Cost was lower on the largest repo (about 16,000 files, {levelrail}) and higher on the smaller ones ({theauth} at about 1,300 files, {featuredrop} at about 400). What did change is how the agent works: about a third fewer tool calls and a quarter fewer turns. Published work on a different tool, ContextSniper (arXiv 2607.01916), reports 51.5% fewer tokens and 36.4% lower cost on 50 SWE-bench Lite tasks with one agent. That tool uses embeddings and a context gate, and we have not reproduced its result with Stacklit. Other studies of context files and code graphs found no saving, or more token use. Results, method and limits are on the agent test page."
+      },
+      {
+        "q": "Why not just use grep?",
+        "a": "Grep is the better tool when you already know the name. In our benchmark, grep with a hand written pattern found the file first more often than our query, 89% to 81%. Stacklit takes a plain question with no pattern, and it is one file in git that every assistant reads and a pull request can review."
+      },
+      {
+        "q": "Does it keep the map fresh?",
+        "a": "A git hook rebuilds it after commits, checkouts and merges. In Claude Code an optional hook refreshes it after each edit, and stacklit watch keeps the symbol graph current. Edits made by hand while none of these run wait for the next run. Use stacklit refresh or stacklit generate."
+      },
+      {
+        "q": "Does it send my code anywhere?",
+        "a": "No. It runs locally with no account and no telemetry. The one exception is the optional init --summary, which pipes module names and exports, no file contents, to a command you configure. The visual map page loads small language logos from thesvg.org unless you turn that off."
+      }
     ],
     "more": "More answers in the FAQ"
   },
@@ -87,7 +110,7 @@
     "title": "Stacklit: a 137 token map of a 19,500 line repo",
     "description": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. Free, MIT, one Go binary. Sets up 25 assistants.",
     "structured": "Stacklit is a free, MIT licensed command line tool that writes a small committed map of a codebase for AI coding agents, with token budgeted queries for files, symbols and dependents.",
-    "llms": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. A 19,500 line Go repo (gin v1.10.0) becomes a 137 token map (tokens are bytes divided by 4). It parses a repository with tree-sitter and writes stacklit.json, a dependency diagram and an interactive HTML map, and sets up 25 assistants including Claude Code, Cursor and Codex. The map is built without an LLM or embeddings. Free, MIT, one Go binary, no account, no telemetry. In our benchmark a 1,000 token query puts the right file first on 81% of questions, and grep with a hand written pattern does better at 89%; it is a benchmark, not an agent study."
+    "llms": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. A 19,500 line Go repo (gin v1.10.0) becomes a 137 token map (tokens are bytes divided by 4). It parses a repository with tree-sitter and writes stacklit.json, a dependency diagram and an interactive HTML map, and sets up 25 assistants including Claude Code, Cursor and Codex. The map is built without an LLM or embeddings. Free, MIT, one Go binary, no account, no telemetry. In our benchmark a 1,000 token query puts the right file first on 81% of questions, and grep with a hand written pattern does better at 89%; it is a benchmark, not an agent study. In a separate test of 450 real Claude Code sessions on three public repos, Stacklit cut tool calls by about a third but did not lower cost overall (cost ratio 1.00, 95% interval 0.93 to 1.07): cheaper on the largest repo, more expensive on the two small ones."
   },
   "og": {
     "line1": "A 19,500 line repo.",
@@ -100,5 +123,28 @@
   "demos": {
     "title": "Real maps of six public repos",
     "sub": "Each one is the single stacklit.html the tool wrote for a pinned release. Open it, switch views, click a module."
+  },
+  "agentTest": {
+    "title": "What happened in real agent sessions",
+    "intro": "We ran Claude Code on three public repos the model had not memorised, with and without Stacklit: {sessions} sessions, with the plan written down before the first run. Stacklit changed how the agent works. It did not lower the cost overall.",
+    "tableCaption": "Cost of a session with Stacklit divided by the same session without it, with a 95% interval. Below 1 means cheaper. 50 paired sessions per repo, {pairs} in all. Cost is the CLI's notional list price.",
+    "pooledLabel": "All three repos",
+    "behaviourTitle": "What changed in how the agent worked",
+    "helpsTitle": "Where it helped",
+    "helps": [
+      "The largest repo: cost {levelrailRatio}.",
+      "Locate questions (where is X), cost {locate}.",
+      "Add questions (where does a new thing go), cost {add}."
+    ],
+    "failsTitle": "Where it did not",
+    "fails": [
+      "The two smaller repos cost the same or more.",
+      "Trace questions (follow a path across files): cost {trace}, and right {traceArm}% of the time against {traceControl}% without Stacklit.",
+      "Impact questions (who imports X): cost {impact}, because one exact grep already answers it.",
+      "The strict setup (crawl guard plus strict rules) was worse: cost {strictCost}, tokens {strictTokens}, right {strictCorrect}%. It is off by default."
+    ],
+    "limits": "Limits: one model (Sonnet), 30 questions we wrote, three repos, one day. Most questions needed only one or two exact greps. Editing tasks, other models and harder reasoning were not tested.",
+    "link": "Read the full agent test",
+    "linkHref": "/docs/agent-test/"
   }
 }

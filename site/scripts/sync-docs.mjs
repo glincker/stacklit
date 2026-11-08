@@ -90,6 +90,8 @@ const FAQ = load('docs/FAQ.md');
 const PRIVACY = load('docs/PRIVACY.md');
 const LANGUAGES = load('docs/LANGUAGES.md');
 const RESULTS = load('bench/RESULTS.md');
+const AB_RESULTS = load('bench/agent-ab/RESULTS.md');
+const AB_CLAIMS = load('bench/agent-ab/PROPOSED_CLAIMS.md');
 const CHANGELOG = load('CHANGELOG.md');
 
 // A page body is a list of parts, each remembering the file it came from so
@@ -171,7 +173,15 @@ add('benchmarks', 'Benchmarks',
   'A deterministic token-cost proxy on six pinned repos and 58 tasks, with intervals, the methodology, the misses and the limitations.', 13,
   'bench/RESULTS.md', [part(RESULTS, whole(RESULTS).replace(/<!--.*?-->\n?/g, ''))]);
 
-add('changelog', 'Changelog', 'Release history for Stacklit.', 14, 'CHANGELOG.md', [part(CHANGELOG, whole(CHANGELOG))]);
+// The real agent test: the results, then the wording the data does and does not support.
+add('agent-test', 'Agent test',
+  'A real Claude Code A/B on three public repos, 450 sessions: fewer tool calls, no overall cost saving. Results, method, limits and the claims we do and do not make.', 14,
+  'bench/agent-ab/RESULTS.md', [
+    part(AB_RESULTS, whole(AB_RESULTS)),
+    part(AB_CLAIMS, '## What we claim, and what we do not\n\n' + shift(whole(AB_CLAIMS), 1)),
+  ]);
+
+add('changelog', 'Changelog', 'Release history for Stacklit.', 15, 'CHANGELOG.md', [part(CHANGELOG, whole(CHANGELOG))]);
 
 // Anchor index: slug -> page, so USAGE cross-references land on the right page.
 const anchorPage = new Map();
@@ -201,6 +211,8 @@ const fileToPage = {
   'docs/LANGUAGES.md': '/docs/languages/',
   'docs/ARCHITECTURE.md': '/docs/how-it-works/',
   'bench/RESULTS.md': '/docs/benchmarks/',
+  'bench/agent-ab/RESULTS.md': '/docs/agent-test/',
+  'bench/agent-ab/PROPOSED_CLAIMS.md': '/docs/agent-test/',
   'CHANGELOG.md': '/docs/changelog/',
 };
 // Usage guide headings that moved to a differently named page.

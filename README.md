@@ -119,7 +119,17 @@ Anything else gets line counts and language detection.
 
 ## Benchmark
 
-Six pinned repos in six languages, 58 tasks (47 where-is-X localization questions and 11 dependents questions), no model calls, tokens as bytes / 4. The derived map is 137 to 1,351 tokens. On the 47 localization questions one `stacklit query` with a 1,000 token budget put the right file first on 81% and in the top five on 96% (95% intervals 70 to 91 and 89 to 100). Grep with a hand written pattern did better, 89% first and 100% in the top five, and plain BM25 over the question did worse, 57% first. The 81% is in our benchmark, tuned after looking at failures, so treat it as an upper bound; on a separate 40 question set from this repo, not used for tuning, the right file was first on 28 and in the top five on 40 of 40. This does **not** show a token saving over grep or that an agent does better with the map. Method, misses and limits: [bench/RESULTS.md](bench/RESULTS.md).
+Two tests, with different answers. The first, with no model in the loop: six pinned repos in six languages, 58 tasks, tokens as bytes / 4. The derived map is 137 to 1,351 tokens. On 47 where-is-X questions one `stacklit query` with a 1,000 token budget put the right file first on 81% (95% interval 70 to 91) and in the top five on 96%. Grep with a hand written pattern did better, 89% first and 100% in the top five. The 81% was tuned after looking at failures, so treat it as an upper bound. Method and limits: [bench/RESULTS.md](bench/RESULTS.md).
+
+The second is a real agent test: 450 Claude Code sessions (Sonnet, 30 questions, three public repos the model has not memorised, plan written before the first run). Stacklit changed how the agent works but **did not lower cost overall**: pooled cost ratio 1.00 [0.93, 1.07], tokens 1.01 [0.92, 1.10]. It used about a third fewer tool calls (0.68 [0.61, 0.77]), a quarter fewer turns (0.77) and over four fifths fewer grep and glob calls (0.18). Answers were right slightly less often (94.0% to 88.0% on the pre-registered grader, 98.0% to 95.3% audited). Cost ratio by repo (below 1 is cheaper, 50 paired sessions each; full tables, method, limits and the claims we do not make are in [bench/agent-ab/RESULTS.md](bench/agent-ab/RESULTS.md)):
+
+| Repo | Size | Cost ratio [95% CI] |
+|---|---|---|
+| levelrail | about 16,000 files | 0.78 [0.70, 0.86] |
+| theauth-go | about 1,300 files | 1.10 [0.98, 1.25] |
+| featuredrop | about 400 files | 1.23 [1.14, 1.33] |
+
+**When it helps.** Locate and add-feature questions ("where is it", "where does a new thing go") were 12 to 22 percent cheaper, mostly on the large repo. Trace questions cost the same and were right less often. "Who imports X" cost 1.59x [1.47, 1.72] because one exact grep already answers it. Small repos cost more, since the map is overhead there. The strict setup (crawl guard plus strict rules) measured worse and is off by default.
 
 ## Docs
 
