@@ -53,10 +53,11 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 	var mu sync.Mutex
 	envSeen := map[string]bool{}
 	results := parser.ScanFiles(walked.Files, parser.PoolOptions{
-		Root:        root,
-		Workers:     cfg.WorkerCount(),
-		MaxFileSize: cfg.MaxFileSize,
-		Cache:       pc,
+		Root:         root,
+		Workers:      cfg.WorkerCount(),
+		MemoryBudget: cfg.ParseMemoryBytes(),
+		MaxFileSize:  cfg.MaxFileSize,
+		Cache:        pc,
 		Visit: func(_ string, content []byte) {
 			vars := detect.FileEnvVars(content)
 			if len(vars) == 0 {

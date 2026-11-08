@@ -2,6 +2,7 @@ package parser
 
 import (
 	"strings"
+	"sync"
 
 	gts "github.com/odvcencio/gotreesitter"
 	"github.com/odvcencio/gotreesitter/grammars"
@@ -107,6 +108,24 @@ func detectEntry(path string) *grammars.LangEntry {
 	return grammars.DetectLanguage(path)
 }
 
+// parserPools reuses one parser per grammar. A fresh parser re-allocates its
+// GLR scratch buffers (tens of MB) and forgets its arena sizing hints.
+var parserPools sync.Map // grammar name -> *sync.Pool
+
+func acquireParser(name string, lang *gts.Language) *gts.Parser {
+	v, _ := parserPools.LoadOrStore(name, &sync.Pool{})
+	if p, ok := v.(*sync.Pool).Get().(*gts.Parser); ok {
+		return p
+	}
+	return gts.NewParser(lang)
+}
+
+func releaseParser(name string, p *gts.Parser) {
+	if v, ok := parserPools.Load(name); ok {
+		v.(*sync.Pool).Put(p)
+	}
+}
+
 func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error) {
 	entry := detectEntry(path)
 	if entry == nil {
@@ -114,7 +133,8 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 	}
 
 	lang := entry.Language()
-	parser := gts.NewParser(lang)
+	parser := acquireParser(entry.Name, lang)
+	defer releaseParser(entry.Name, parser)
 	parseSrc := content
 	if entry.Name == "sql" {
 		parseSrc = maskDollarQuotes(content)
@@ -125,6 +145,10 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 		g := &GenericParser{}
 		return g.Parse(path, content)
 	}
+
+	// Release returns the node arena to the library pool; without it every
+	// file allocates a fresh multi-MB arena and the heap balloons.
+	defer tree.Release()
 
 	root := tree.RootNode()
 	if root == nil {

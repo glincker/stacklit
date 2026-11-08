@@ -128,3 +128,18 @@ func TestParseContentRecoversPanic(t *testing.T) {
 		t.Fatalf("panic must stay isolated: %+v %+v", res[0], res[1])
 	}
 }
+
+func TestMemGateRunsOversizedAlone(t *testing.T) {
+	g := newMemGate(100)
+	g.acquire(500) // larger than the whole budget, admitted because the gate is empty
+	done := make(chan struct{})
+	go func() { g.acquire(10); close(done) }()
+	select {
+	case <-done:
+		t.Fatal("second request admitted while an oversized one is running")
+	default:
+	}
+	g.release(500)
+	<-done
+	g.release(10)
+}

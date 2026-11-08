@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"strings"
 	"sync"
 )
 
@@ -26,6 +27,12 @@ type PoolOptions struct {
 	// extract extra data without keeping every file in memory. It must be
 	// safe for concurrent use.
 	Visit func(rel string, content []byte)
+	// MemoryBudget caps the estimated working set of concurrent tree-sitter
+	// parses, in bytes. One file larger than the budget still runs, alone.
+	// 0 disables the cap.
+	MemoryBudget int64
+
+	gate *memGate
 }
 
 // Scanned is the per-file outcome of ScanFiles.
@@ -87,6 +94,7 @@ func ScanFiles(files []string, o PoolOptions) []Scanned {
 		workers = len(files)
 	}
 
+	o.gate = newMemGate(o.MemoryBudget)
 	jobs := make(chan int)
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
@@ -132,7 +140,10 @@ func scanOne(rel string, o PoolOptions) (res Scanned) {
 			return res
 		}
 	}
+	cost := parseCost(rel, len(content))
+	o.gate.acquire(cost)
 	info, err := ParseContent(rel, content)
+	o.gate.release(cost)
 	if err != nil {
 		res.Err = err
 		_, res.Panicked = err.(*PanicError)
@@ -143,4 +154,54 @@ func scanOne(rel string, o PoolOptions) (res Scanned) {
 		o.Cache.Put(key, info)
 	}
 	return res
+}
+
+// parseCost estimates the peak bytes a tree-sitter parse of one file holds.
+// The GLR parser allocates roughly 6.5 KB per source byte plus a fixed floor
+// (measured on Python and TypeScript sources). Go uses the stdlib parser.
+func parseCost(rel string, size int) int64 {
+	if strings.HasSuffix(rel, ".go") {
+		return 0
+	}
+	return 24<<20 + int64(size)*6500
+}
+
+// memGate is a weighted semaphore. A request larger than the whole budget
+// waits for an empty gate and then runs alone.
+type memGate struct {
+	mu     sync.Mutex
+	cond   *sync.Cond
+	budget int64
+	used   int64
+}
+
+func newMemGate(budget int64) *memGate {
+	if budget <= 0 {
+		return nil
+	}
+	g := &memGate{budget: budget}
+	g.cond = sync.NewCond(&g.mu)
+	return g
+}
+
+func (g *memGate) acquire(n int64) {
+	if g == nil || n <= 0 {
+		return
+	}
+	g.mu.Lock()
+	for g.used > 0 && g.used+n > g.budget {
+		g.cond.Wait()
+	}
+	g.used += n
+	g.mu.Unlock()
+}
+
+func (g *memGate) release(n int64) {
+	if g == nil || n <= 0 {
+		return
+	}
+	g.mu.Lock()
+	g.used -= n
+	g.mu.Unlock()
+	g.cond.Broadcast()
 }

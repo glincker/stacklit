@@ -28,6 +28,14 @@ func (c *Config) applyEnv() {
 			c.Workers = n
 		}
 	}
+	if v := os.Getenv("STACKLIT_PARSE_MEMORY_MB"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			c.ParseMemoryMB = n
+			if n == 0 {
+				c.ParseMemoryMB = -1
+			}
+		}
+	}
 	if v := os.Getenv("STACKLIT_NO_CACHE"); v != "" {
 		off := false
 		c.Cache = &off
@@ -151,4 +159,19 @@ func Check(root string) error {
 		return &Error{err}
 	}
 	return nil
+}
+
+// DefaultParseMemoryMB bounds concurrent parser memory when nothing is set.
+const DefaultParseMemoryMB = 512
+
+// ParseMemoryBytes returns the concurrent-parse memory budget, or 0 for
+// unlimited (STACKLIT_PARSE_MEMORY_MB=0).
+func (c *Config) ParseMemoryBytes() int64 {
+	switch {
+	case c.ParseMemoryMB < 0:
+		return 0
+	case c.ParseMemoryMB == 0:
+		return DefaultParseMemoryMB << 20
+	}
+	return int64(c.ParseMemoryMB) << 20
 }

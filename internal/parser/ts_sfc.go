@@ -35,6 +35,7 @@ func extractSFC(root *gts.Node, lang *gts.Language, src []byte, name string) *Fi
 			continue
 		}
 		sub := extractTypeScript(tree.RootNode(), tsLang, body, "x.ts")
+		tree.Release()
 		info.Imports = append(info.Imports, sub.Imports...)
 		info.Exports = append(info.Exports, sub.Exports...)
 		for k, v := range sub.TypeDefs {

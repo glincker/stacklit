@@ -16,14 +16,15 @@ type Config struct {
 	Output     OutputConfig `json:"output,omitempty"`
 
 	// Scan controls (see scan.go for env overrides and validation).
-	Roots       []string `json:"roots,omitempty"`         // scan only these subdirectories
-	Include     []string `json:"include,omitempty"`       // gitignore-style globs; when set only matches are kept
-	Exclude     []string `json:"exclude,omitempty"`       // gitignore-style globs always skipped
-	MaxFileSize int64    `json:"max_file_size,omitempty"` // bytes; larger files are skipped with a warning
-	Workers     int      `json:"workers,omitempty"`       // parser pool size; 0 means NumCPU
-	Cache       *bool    `json:"cache,omitempty"`         // incremental cache, default on
-	Timestamps  *bool    `json:"timestamps,omitempty"`    // write generated_at, default off
-	GitActivity *bool    `json:"git_activity,omitempty"`  // include hot/recent files, default off
+	Roots         []string `json:"roots,omitempty"`           // scan only these subdirectories
+	Include       []string `json:"include,omitempty"`         // gitignore-style globs; when set only matches are kept
+	Exclude       []string `json:"exclude,omitempty"`         // gitignore-style globs always skipped
+	MaxFileSize   int64    `json:"max_file_size,omitempty"`   // bytes; larger files are skipped with a warning
+	Workers       int      `json:"workers,omitempty"`         // parser pool size; 0 means NumCPU
+	ParseMemoryMB int      `json:"parse_memory_mb,omitempty"` // soft cap on concurrent parse memory; 0 means default
+	Cache         *bool    `json:"cache,omitempty"`           // incremental cache, default on
+	Timestamps    *bool    `json:"timestamps,omitempty"`      // write generated_at, default off
+	GitActivity   *bool    `json:"git_activity,omitempty"`    // include hot/recent files, default off
 }
 
 // OutputConfig controls where output files are written.
