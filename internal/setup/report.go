@@ -107,6 +107,8 @@ func Report(idx *schema.Index, tools []Tool, mcpTokens int) []ReportRow {
 		ReportRow{Item: "claude skill (name+description)", Tokens: Tokens(frontmatterField(SkillMD, "name") + frontmatterField(SkillMD, "description")), Note: "always on; body loads only when invoked"},
 		ReportRow{Item: "claude skill body", Tokens: Tokens(SkillMD), Note: "only when invoked"},
 		ReportRow{Item: "claude PreToolUse pointer", Tokens: graph.DefaultPointerTokens, Note: "max, only on Grep for a known identifier"},
+		ReportRow{Item: "claude crawl guard nudge", Tokens: Tokens(crawlNudgeSample), Note: "only on a recognised repo-wide crawl, opt in"},
+		ReportRow{Item: "claude crawl guard deny reason", Tokens: Tokens(crawlDenySample), Note: "only on a redirected crawl, at most twice per session, opt in"},
 		ReportRow{Item: "claude SessionStart status line", Tokens: Tokens(sessionStatusSample), Note: "once per session when CLAUDE.md already holds the map"},
 	)
 	return rows

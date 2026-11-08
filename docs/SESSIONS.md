@@ -75,13 +75,43 @@ Exports are capped per module (`max_exports`), so a change to a symbol beyond th
 
 ## Steering text
 
-The `CLAUDE.md` or `AGENTS.md` block opens with short rules. Three phrasings are available through `"steering": "a" | "b" | "c"` in `.stacklitrc.json` or `STACKLIT_STEERING`:
+The `CLAUDE.md` or `AGENTS.md` block opens with short rules. Four phrasings are available through `"steering": "a" | "b" | "c" | "d"` in `.stacklitrc.json` or `STACKLIT_STEERING`:
 
 - `a` (default): three imperative lines, query before grep, slice instead of whole-file reads, impact before editing shared code.
 - `b`: the same three rules on one line.
 - `c`: a one-line rationale and three bullets.
+- `d`: strict. States that Stacklit is the source of truth for structure and tells the agent not to crawl: structure questions go to `stacklit query ... --budget 800` and `explain`, `impact` or `path`; no recursive listings, `find`, `tree` or repo wide grep to learn structure; open a file only after the map points to it and read it with `stacklit slice`; refresh or regenerate when stacklit reports a stale index or a missing symbol; subagents follow the same rules. `stacklit guide` prints this text plus the command list.
 
 Each is byte-stable, and the whole block stays under `STACKLIT_DIGEST_TOKENS` (default 500). The variants exist so they can be compared with the agent harness. There is no evidence yet that one wording beats another.
+
+## Source of truth
+
+Three layers push an agent to answer structure questions from the index instead of crawling the repo.
+
+1. MCP handshake. `stacklit serve` returns an `instructions` string in the initialize result (both profiles, about 75 tokens, byte stable). It says the index and graph are the source of truth, to use query, explain, impact and path (query, impact and map on the minimal profile) before searching, to read code with slice, and to refresh when stale.
+2. Rules block. Steering variant `d` above, set with `steering` or `STACKLIT_STEERING=d`. The default stays `a` until the A/B run says otherwise.
+3. Crawl guard. Opt in, below.
+
+## Crawl guard
+
+`stacklit setup claude --crawl-guard[=nudge|redirect|off]` adds a `PreToolUse` hook (`stacklit hook crawl <mode>`) matching `Bash|Glob|Read|Agent|Task`. Mode precedence: `STACKLIT_CRAWL_GUARD`, then `crawl_guard` in `.stacklitrc.json`, then the mode the hook was installed with. With nothing set the guard is off.
+
+What counts as a crawl:
+
+- Bash: `find` from the root (not `-maxdepth 1`, not `-delete`), `ls -R`, `tree` (not `-L 1`), `grep -r` or `rg` or `git grep` with no path or only the root, `dir /s`, `Get-ChildItem -Recurse`, `findstr /s`. Chains are split on `&&`, `;` and `|`; a `cd` into a subdirectory ends the check; `bash -c` and `powershell -Command` bodies are checked; a grep reading a pipe is not a crawl.
+- Glob: `**`, `**/*`, `**/*.ext` or `**/*.{a,b}` with no subdirectory. A named file (`**/main.go`) or a subdirectory is narrow.
+- Read: the path is a directory.
+- Agent or Task: a short prompt asking to explore, survey or map the whole codebase or repo that names no identifier, path or file.
+
+Behaviour:
+
+- `nudge`: adds `additionalContext` naming the command, for example `stacklit explain parseToken` for a grepped identifier (using the same pointer as the Grep hook when the graph is small enough), else `stacklit query "<words>" --budget 800`. Needs an index and graph; silent without them.
+- `redirect`: returns `permissionDecision: "deny"` with a short reason naming the command, only for a recognised crawl, only when the index exists and matches the working tree (same check as `stacklit status`), and at most `STACKLIT_CRAWL_REDIRECTS` (default 2) times in a row per session. After that the guard stands down for the rest of the session and only nudges. A non-crawl call resets the run. A stale index or a missing session id degrades to a nudge.
+- Everything else is allowed with no output: narrow reads and greps, Edit, Write, tests, builds, and any payload that fails to parse. Panics are recovered and treated as allow.
+
+Session state is one small file per session id under the worktree state dir in the user cache dir (`crawl-<session>.json`), pruned after `STACKLIT_CRAWL_STATE_DAYS`. The staleness verdict is reused for `STACKLIT_CRAWL_FRESH_TTL` seconds because it runs several git commands; non-crawl calls cost one stat and no git.
+
+Install is idempotent; `--dry-run` previews; `--crawl-guard=off` or `--uninstall` removes it. Switching modes replaces the entry.
 
 ## Measuring
 
@@ -106,4 +136,6 @@ Two layers, kept apart on purpose.
 
 - That a live Claude Code session fires `SessionStart` on `compact` and adds the output as documented, that `SubagentStart` injection reaches an Explore agent, and that `async` PostToolUse hooks run on every edit. The payload shapes were taken from the docs and the handlers are tested against them, but no interactive session was driven.
 - The exact `cwd` and field names in the `SubagentStart` payload are not in the docs excerpt that was read; the handler reads `agent_type` and `cwd` and stays silent if they are absent.
+- The crawl guard in a live session: that Claude Code shows the `deny` reason to the model and that `additionalContext` on `PreToolUse` reaches it. Both are taken from the hooks reference (`permissionDecisionReason` is shown to Claude on deny; `additionalContext` is added alongside the tool result). The docs do not say what happens to `additionalContext` on a denied call, so the deny path puts everything in the reason. The subagent tool is documented as `Agent`; `Task` is matched too in case an older version still reports it. The `Glob`, `Read` and `Agent` input field names (`pattern`/`path`, `file_path`, `prompt`) come from the same reference.
+- Whether the MCP `instructions` string is surfaced to the model by each client, and whether any of this lowers crawling. That needs the paid A/B run.
 - Savings from any of this on real tasks. That needs the paid A/B run.

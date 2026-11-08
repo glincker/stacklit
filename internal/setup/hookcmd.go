@@ -18,6 +18,8 @@ type hookInput struct {
 	Source    string `json:"source"`
 	AgentType string `json:"agent_type"`
 	ToolInput struct {
+		Command string `json:"command"`
+		Prompt  string `json:"prompt"`
 		Pattern string `json:"pattern"`
 		Path    string `json:"path"`
 		Glob    string `json:"glob"`
