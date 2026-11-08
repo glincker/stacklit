@@ -41,7 +41,7 @@ Other consumers of the index:
 2. `TreeSitterParser` handles TypeScript, JavaScript, TSX, JSX, Python, Rust, Java, C#, Ruby, PHP, Kotlin, Swift, C and C++. It uses a pure-Go tree-sitter runtime (no cgo), so the binary cross-compiles to every release target without a C toolchain. Each language has an extractor in `internal/parser/ts_*.go`.
 3. `GenericParser` is the fallback. It records line count and language only.
 
-Adding a language means adding an extractor and registering it in `tsLangMap`; see [CONTRIBUTING.md](../CONTRIBUTING.md).
+Adding a language means adding an extractor and registering it in `tsLangMap`; see [CONTRIBUTING.md](../.github/CONTRIBUTING.md).
 
 ## Modules and dependency resolution
 
@@ -53,7 +53,7 @@ This is deliberately approximate. It works from import text, not from a type-che
 
 ## The index
 
-`internal/schema` defines `stacklit.json`. Top-level sections: `project`, `tech`, `structure`, `modules`, `dependencies`, `git`, `hints`, `architecture` and `merkle_hash`. Field-by-field description: [USAGE.md](../USAGE.md#reading-stacklitjson).
+`internal/schema` defines `stacklit.json`. Top-level sections: `project`, `tech`, `structure`, `modules`, `dependencies`, `git`, `hints`, `architecture` and `merkle_hash`. Field-by-field description: [USAGE.md](USAGE.md#reading-stacklitjson).
 
 Determinism is a design goal: files are walked in sorted order, maps are written with stable key order, and paths are normalized to forward slashes. The same source tree should produce the same index on any OS, which is what makes it safe to commit and to diff.
 

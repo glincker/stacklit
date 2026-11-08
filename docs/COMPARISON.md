@@ -91,7 +91,7 @@ Built into IDEs, not standalone:
 
 ## Measured Stacklit Sizes
 
-Measured with the reproducible harness in [bench/](bench/) on pinned commits (tokens approximated as bytes / 4). Figures for other tools are not re-measured here; a full dump is roughly the size of the source itself.
+Measured with the reproducible harness in [bench/](../bench/) on pinned commits (tokens approximated as bytes / 4). Figures for other tools are not re-measured here; a full dump is roughly the size of the source itself.
 
 | Repository | Language | Source lines | Modules | Stacklit JSON | Stacklit compact map |
 |-----------|----------|-------------:|--------:|--------------:|---------------------:|
@@ -99,7 +99,7 @@ Measured with the reproducible harness in [bench/](bench/) on pinned commits (to
 | flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens |
 | hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens |
 
-Size follows the number of modules, not lines of code. See [bench/RESULTS.md](bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 30 navigation tasks, and limitations.
+Size follows the number of modules, not lines of code. See [bench/RESULTS.md](../bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 30 navigation tasks, and limitations.
 
 ## When to Use What
 
