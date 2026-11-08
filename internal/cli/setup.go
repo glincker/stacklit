@@ -36,7 +36,7 @@ Nothing outside the repo is touched unless you pass --global. Every step is
 idempotent. Use --dry-run to preview and --uninstall to reverse.
 
 Claude Code extras (opt-in):
-  --pretool-hook   nudge toward the map before broad Grep/Glob calls
+  --pretool-hook   point a grepped identifier at its definition and callers
   --session-hook   inject the compact map at session start
   --skill          install the /stacklit skill
 These go to .claude/settings.json in the repo, or ~/.claude with --global.
@@ -66,7 +66,7 @@ Examples:
 	fl.BoolVar(&f.report, "report", false, "Print the always-on tokens each integration adds to an agent's context")
 	fl.BoolVar(&f.noMCP, "no-mcp", false, "Skip MCP server registration")
 	fl.BoolVar(&f.noGitHook, "no-git-hook", false, "Skip the post-commit git hook")
-	fl.BoolVar(&f.preTool, "pretool-hook", false, "Claude Code: add a PreToolUse hook that nudges toward the map on broad Grep/Glob")
+	fl.BoolVar(&f.preTool, "pretool-hook", false, "Claude Code: add a PreToolUse hook that points a grepped identifier at its definition and callers (needs the symbol graph)")
 	fl.BoolVar(&f.session, "session-hook", false, "Claude Code: add a SessionStart hook that injects the map")
 	fl.BoolVar(&f.skill, "skill", false, "Claude Code: install the /stacklit skill")
 	return cmd
