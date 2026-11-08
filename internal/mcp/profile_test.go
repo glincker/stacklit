@@ -111,3 +111,34 @@ func sortedCopy(in []string) []string {
 	sort.Strings(out)
 	return out
 }
+
+func TestInstructionsPresentAndSmall(t *testing.T) {
+	limit := 120
+	if v := os.Getenv("STACKLIT_INSTRUCTIONS_TOKENS"); v != "" {
+		n, err := strconv.Atoi(v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		limit = n
+	}
+	for _, p := range []string{ProfileFull, ProfileMinimal} {
+		sess := connect(t, p)
+		got := sess.InitializeResult().Instructions
+		if got == "" {
+			t.Fatalf("%s: no instructions in initialize result", p)
+		}
+		if got != Instructions(p) {
+			t.Fatalf("%s: instructions not byte stable", p)
+		}
+		if tok := (len(got) + 3) / 4; tok > limit {
+			t.Fatalf("%s: instructions %d tokens > %d", p, tok, limit)
+		} else {
+			t.Logf("%s instructions: %d tokens", p, tok)
+		}
+		for _, w := range []string{"source of truth", "slice", "refresh"} {
+			if !strings.Contains(got, w) {
+				t.Fatalf("%s: missing %q", p, w)
+			}
+		}
+	}
+}
