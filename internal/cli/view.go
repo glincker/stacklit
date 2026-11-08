@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/graph"
 	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/glincker/stacklit/internal/schema"
@@ -25,6 +26,7 @@ var viewCmd = &cobra.Command{
 			return fmt.Errorf("parsing stacklit.json: %w", err)
 		}
 
+		renderer.SetMapIcons(!config.Load(".").MapIconsOff())
 		htmlPath := "stacklit.html"
 		var err2 error
 		if g, gerr := graph.Load(graphFile); gerr == nil {

@@ -367,6 +367,7 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
 | `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
+| `map_icons` | remote | `remote` lets the HTML map request language logos from thesvg.org when you open it. `off` removes every remote URL and shows letters instead. Env: `STACKLIT_MAP_ICONS=off`. |
 | `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
 | `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
 | `parse_memory_mb` | 256 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |

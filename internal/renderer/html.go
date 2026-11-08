@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"github.com/glincker/stacklit/internal/fsutil"
 	"os"
-	"strings"
 
-	"github.com/glincker/stacklit/assets"
 	"github.com/glincker/stacklit/internal/schema"
 )
 
@@ -18,10 +16,7 @@ func WriteHTML(idx *schema.Index, path string) error {
 	if err != nil {
 		return err
 	}
-	html := strings.Replace(assets.TemplateHTML, "{{STACKLIT_DATA}}", string(dataJSON), 1)
-	html = strings.Replace(html, "{{STACKLIT_GRAPH}}", "null", 1)
-	html = strings.Replace(html, "{{SYMBOLS_JS}}", assets.SymbolsJS, 1)
-	html = strings.Replace(html, "{{LANG_ICONS_JS}}", assets.LangIconsJS, 1)
+	html := renderPage(string(dataJSON), "null")
 	data := []byte(html)
 	if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, data) {
 		return nil

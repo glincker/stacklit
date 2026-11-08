@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/engine"
 	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ var generateCmd = &cobra.Command{
 		if err := g.Save(graphFile); err != nil {
 			return err
 		}
+		renderer.SetMapIcons(!config.Load(".").MapIconsOff())
 		return renderer.WriteHTMLWithGraph(res.Index, g, htmlMaxNodes(), res.HTMLPath)
 	},
 }
