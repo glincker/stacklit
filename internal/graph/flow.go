@@ -13,7 +13,7 @@ import (
 // misread as a single-file answer, because the top result looks authoritative.
 // These helpers decide when to add one line naming the next candidate files.
 // The word list is an input, not a tuning knob: STACKLIT_FLOW_WORDS replaces it.
-const defaultFlowWords = "trace,flow,through,path,calls,caller,callers,wake,lifecycle,chain,pipeline,sequence,end to end,who calls,takes part,take part"
+const defaultFlowWords = "trace,flow,through,path,calls,caller,callers,wake,lifecycle,chain,pipeline,sequence,end to end,who calls,call chain,callees,called by,invoked by,downstream,upstream,takes part,take part"
 
 // Defaults for the spread test. All overridable by environment:
 // STACKLIT_QUERY_NEXT (0 turns the line off), STACKLIT_QUERY_SPREAD_DIRS,
@@ -148,4 +148,59 @@ func (g *SymGraph) nextCandidates(items []item, k int, shown map[string]bool, n 
 	line = fmt.Sprintf("several files may take part; also ranked: %s. Expand: stacklit explain %s | stacklit path %s %s",
 		strings.Join(files, ", "), top, top, firstSym)
 	return files, line
+}
+
+// Bounds of the call chain added to a flow question. Env overrides:
+// STACKLIT_FLOW_DEPTH (hops each way) and STACKLIT_FLOW_CHAIN_MAX (nodes).
+const (
+	defaultFlowDepth    = 2
+	defaultFlowChainMax = 30
+)
+
+type chainNode struct {
+	node  int
+	depth int
+	up    bool // a caller of the seed, otherwise a callee
+}
+
+// flowChain walks call edges from seed in both directions, breadth first, to a
+// bounded depth. Files are skipped; order is deterministic.
+func (g *SymGraph) flowChain(seed int) []chainNode {
+	maxDepth := envInt("STACKLIT_FLOW_DEPTH", defaultFlowDepth)
+	limit := envInt("STACKLIT_FLOW_CHAIN_MAX", defaultFlowChainMax)
+	seen := map[int]bool{seed: true}
+	var out []chainNode
+	for _, up := range []bool{true, false} {
+		frontier := []int{seed}
+		for d := 1; d <= maxDepth && len(frontier) > 0; d++ {
+			var next []int
+			for _, u := range frontier {
+				list := g.out[u]
+				if up {
+					list = g.in[u]
+				}
+				for _, ei := range list {
+					e := g.Edges[ei]
+					v := e.To
+					if up {
+						v = e.From
+					}
+					if e.Kind != EdgeCalls || seen[v] || g.Nodes[v].Kind == KindFile {
+						continue
+					}
+					seen[v] = true
+					next = append(next, v)
+				}
+			}
+			sort.Ints(next)
+			for _, v := range next {
+				if len(out) >= limit {
+					return out
+				}
+				out = append(out, chainNode{v, d, up})
+			}
+			frontier = next
+		}
+	}
+	return out
 }

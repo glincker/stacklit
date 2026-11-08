@@ -98,6 +98,34 @@ func (g *SymGraph) QueryOrdered(q string, budget int, asJSON bool, order Order) 
 			}
 		}
 	}
+	flow := questionSuggestsFlow(q)
+	chainTags := map[int]string{}
+	var chainHead []string
+	if flow {
+		// A flow question gets the whole bounded call chain of its best symbol in
+		// this one answer, so no follow-up explain or path call is needed.
+		for _, s := range seeds {
+			if g.Nodes[s].Kind == KindFile {
+				continue
+			}
+			ups, downs := 0, 0
+			for _, c := range g.flowChain(s) {
+				dir := "callee"
+				if c.up {
+					dir = "caller"
+					ups++
+				} else {
+					downs++
+				}
+				chainTags[c.node] = fmt.Sprintf("%s of %s, depth %d", dir, g.Nodes[s].Name, c.depth)
+				if v := score[s] * 0.95 / float64(c.depth); v > score[c.node] {
+					score[c.node] = v
+				}
+			}
+			chainHead = []string{fmt.Sprintf("call chain of %s: %d callers, %d callees", g.Label(s), ups, downs)}
+			break
+		}
+	}
 	ids := make([]int, 0, len(score))
 	for i := range score {
 		ids = append(ids, i)
@@ -109,10 +137,13 @@ func (g *SymGraph) QueryOrdered(q string, budget int, asJSON bool, order Order) 
 	items := make([]item, len(ids))
 	for i, id := range ids {
 		items[i] = item{node: id, score: score[id]}
+		if t, ok := chainTags[id]; ok {
+			items[i].tags = []string{t}
+		}
 	}
-	head := []string{fmt.Sprintf("%d seeds, %d candidates", len(seeds), len(ids))}
+	head := append([]string{fmt.Sprintf("%d seeds, %d candidates", len(seeds), len(ids))}, chainHead...)
 	next := 0
-	if n := nextFilesWanted(); n > 0 && (questionSuggestsFlow(q) || spreadsDirs(g.rankFiles(ids, func(i int) float64 { return score[i] }))) {
+	if n := nextFilesWanted(); n > 0 && (flow || spreadsDirs(g.rankFiles(ids, func(i int) float64 { return score[i] }))) {
 		next = n
 	}
 	return g.FitView(viewSpec{title: title, head: head, items: items, edges: true, hint: hint, ranked: true, order: order, nextFiles: next}, budget, asJSON)
