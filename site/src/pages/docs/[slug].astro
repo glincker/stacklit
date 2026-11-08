@@ -27,4 +27,22 @@ const sourceUrl = `https://github.com/glincker/stacklit/blob/master/${entry.data
       </div>
     </article>
   </div>
+  <script is:inline>
+    // Language logos come from a CDN. If one is blocked, show the first letter instead.
+    (function () {
+      function fall(img) {
+        var s = document.createElement('span');
+        s.className = 'lang-fallback';
+        s.setAttribute('role', 'img');
+        s.setAttribute('aria-label', img.alt);
+        s.textContent = (img.alt || '?').charAt(0);
+        var pic = img.closest('picture');
+        (pic || img).replaceWith(s);
+      }
+      document.querySelectorAll('.prose img[src*="thesvg"]').forEach(function (img) {
+        if (img.complete && img.naturalWidth === 0) fall(img);
+        else img.addEventListener('error', function () { fall(img); }, { once: true });
+      });
+    })();
+  </script>
 </Base>

@@ -178,7 +178,22 @@ code, kbd, pre { font-family: var(--font-mono); }
 
 /* Hero */
 .hero { padding-block: var(--s-8) var(--s-7); }
-.hero h1 { font-size: var(--fs-hero); letter-spacing: -0.04em; line-height: 1.02; max-width: 14em; }
+.hero h1 { font-size: clamp(2.1rem, 0.4rem + 8.6vw, 6.75rem); letter-spacing: -0.045em; line-height: 1; font-weight: 700; max-width: none; }
+.hero h1 .line { display: block; }
+.hero h1 .n { color: var(--accent-text); }
+.hero-caption { margin-top: var(--s-5); font-size: var(--fs-sm); line-height: 1.5; color: var(--muted); max-width: 44rem; }
+.hero-caption a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.hero-grid { margin-top: var(--s-6); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6); align-items: start; }
+@media (min-width: 64rem) { .hero-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 6fr); gap: var(--s-7); } }
+.hero-grid .lede { margin-top: 0; font-size: var(--fs-lg); }
+.hero-term pre { font-size: var(--fs-xs); }
+.prose img[src*="thesvg"] { display: inline-block; vertical-align: middle; margin: 0 4px 0 0; border-radius: 0; }
+.lang-fallback { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 4px; border-radius: var(--r-1); background: var(--sunk); color: var(--muted); font-size: var(--fs-xs); font-weight: 650; }
+.prose-p { max-width: 38rem; color: var(--muted); }
+.cite-quote { margin: 0; padding-left: var(--s-4); border-left: 3px solid var(--accent); max-width: 38rem; }
+.cite-quote p { font-size: var(--fs-lg); line-height: 1.45; }
+.cite-quote footer { margin-top: var(--s-2); font-size: var(--fs-sm); color: var(--muted); }
+.cite-quote footer a { font-weight: 600; }
 .hero .lede, .final .lede { margin-top: var(--s-5); font-size: var(--fs-xl); line-height: 1.4; color: var(--muted); max-width: 44rem; }
 .hero-actions { margin-top: var(--s-6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
 .hero-buttons { display: flex; flex-wrap: wrap; gap: var(--s-3); }
