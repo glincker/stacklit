@@ -1,0 +1,42 @@
+name: Bug report
+description: Something stacklit did is wrong or crashed
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran, what you expected, and what you got. Paste output as text.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `stacklit --version`
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS and architecture
+      placeholder: macOS arm64, Ubuntu 24.04 amd64, Windows 11 amd64
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Languages in the repo
+      placeholder: Python, TypeScript
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: A public repo and commit, or a small snippet. For a wrong dependency edge, show the two files involved.
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Not a security issue
+      options:
+        - label: This is not a security vulnerability (those go through the private report form, see SECURITY.md)
+          required: true

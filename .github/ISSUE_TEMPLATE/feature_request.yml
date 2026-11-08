@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that stacklit does not help with today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Proposed solution
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Languages and parsing
+        - Dependency graph accuracy
+        - Query and MCP tools
+        - Integrations with AI tools
+        - Monorepo or multi-repo
+        - CLI and outputs
+        - Performance
+        - Docs
