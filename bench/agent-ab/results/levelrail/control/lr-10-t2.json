@@ -1,0 +1,34 @@
+{
+  "repo": "levelrail",
+  "task": "lr-10",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/api/app_sleep_wake.go, internal/appsleep/portwake.go, internal/reconcile/ingress/sleep.go",
+  "turns": 2,
+  "cost_usd": 0.0296048,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 284,
+    "cache_creation_input_tokens": 6414,
+    "cache_read_input_tokens": 11008
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.2936925,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=(?i)wake path=/private/tmp/abreal/work/ab-1133762422/co-3216464452/internal"
+  ],
+  "at": "2026-11-08T20:37:22Z"
+}

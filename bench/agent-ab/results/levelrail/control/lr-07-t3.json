@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr-07",
+  "kind": "add",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/mcptools/server.go, internal/mcptools/classes.go",
+  "turns": 6,
+  "cost_usd": 0.051362200000000004,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 887,
+    "cache_creation_input_tokens": 9550,
+    "cache_read_input_tokens": 42722
+  },
+  "tool_calls": {
+    "Grep": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 21.362496958,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=destructive path=/private/tmp/abreal/work/ab-1133762422/co-4186957447/internal/mcptools",
+    "Grep pattern=func Register\\w*\\(|Group path=/private/tmp/abreal/work/ab-1133762422/co-4186957447/internal/mcptools",
+    "Grep pattern=^func |^var |^type  path=/private/tmp/abreal/work/ab-1133762422/co-4186957447/internal/mcptools",
+    "Grep pattern=register\\w*\\(server|func New\\w*\\(|func Register path=/private/tmp/abreal/work/ab-1133762422/co-4186957447/internal/mcptools",
+    "Grep pattern=registerAuditTools\\( path=/private/tmp/abreal/work/ab-1133762422/co-4186957447/internal/mcptools"
+  ],
+  "at": "2026-11-08T20:44:53Z"
+}

@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-01",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/as/device.go, internal/apitokens/device.go",
+  "turns": 4,
+  "cost_usd": 0.030619,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 486,
+    "cache_creation_input_tokens": 6025,
+    "cache_read_input_tokens": 16470
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.170188625,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=user_code|user-code|userCode|UserCode",
+    "Grep pattern=device.?(code|flow|auth|login)",
+    "Grep pattern=func .*(UserCode|userCode|generate|random|rand)|crypto/rand|alphabet path=/private/tmp/abreal/work/ab-1246330160/co-3614764276/internal"
+  ],
+  "at": "2026-11-08T20:12:46Z"
+}

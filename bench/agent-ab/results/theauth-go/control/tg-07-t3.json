@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/slack/slack.go, provider/slack/slack_test.go, provider/github/github.go\n\nSlack already exists at `provider/slack/`. For a different provider, put the new code in `provider/\u003cname\u003e/\u003cname\u003e.go` and `provider/\u003cname\u003e/\u003cname\u003e_test.go`. Use `provider/github/github.go` as the template.",
+  "turns": 5,
+  "cost_usd": 0.0306875,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 824,
+    "cache_creation_input_tokens": 5205,
+    "cache_read_input_tokens": 16155
+  },
+  "tool_calls": {
+    "Glob": 2,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.001804916,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=github|google|oauth",
+    "Glob pattern=**/*{provider,oauth,social}*",
+    "Glob pattern=provider/**/*.go",
+    "Grep pattern=provider path=docs/provider-catalog.md"
+  ],
+  "at": "2026-11-08T20:15:07Z"
+}

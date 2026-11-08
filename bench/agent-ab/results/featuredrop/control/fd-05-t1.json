@@ -1,0 +1,36 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-05",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/provider.tsx, src/helpers.ts, src/renderer.ts, src/nuxt/index.ts, src/next/index.ts, src/solid/store.ts, src/remix/index.ts, src/astro/index.ts, src/vue/provider.ts, src/index.ts, src/angular/index.ts, src/svelte/index.ts, src/web-components/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0180252,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 376,
+    "cache_creation_input_tokens": 3344,
+    "cache_read_input_tokens": 8812
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.647205167,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=from\\s+['\"][^'\"]*\\bcore(\\.js|\\.ts)?['\"]|require\\(['\"][^'\"]*\\bcore(\\.js|\\.ts)?['\"",
+    "Glob pattern=**/src/core.ts"
+  ],
+  "at": "2026-11-08T20:26:48Z"
+}

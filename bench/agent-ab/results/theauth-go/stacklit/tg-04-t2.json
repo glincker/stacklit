@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-04",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "storage/memory/memory_ciba.go, storage/postgres/postgres_ciba.go, storage/sqlite/ciba.go",
+  "turns": 3,
+  "cost_usd": 0.024828000000000003,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 174,
+    "cache_creation_input_tokens": 5458,
+    "cache_read_input_tokens": 12480
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Glob": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 25.296065958,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"CIBA backchannel authentication request storage persistence\" --budget 800",
+    "Glob pattern=**/*ciba*"
+  ],
+  "at": "2026-11-08T20:15:40Z"
+}

@@ -49,3 +49,13 @@ Paired by task and trial. For each metric: mean per arm, mean paired difference 
 ## Known limits (stated up front)
 
 One model, tasks written by us, small n, correctness by path match, notional cost is not membership usage, day-to-day variation in the service.
+
+## Amendment 1 (written after the 3-trial checkpoint, before any further session)
+
+Facts at this point: the 3-trial run for arms control and stacklit on all three repos finished (180 sessions, 4.9 USD notional of the 60 USD cap, no harness failures). The pilot and run showed sessions cost about 0.03 USD, far below the planning figure. Outcomes of the checkpoint are committed in git history (tables.md at that commit) and have been seen.
+
+Decisions, taken on cost and on grading defects, not to improve either arm:
+
+1. Trials 4 and 5 are added for control and stacklit on every task (same seed, same harness). The headline uses all 5 trials. The 3-trial table stays in git history.
+2. Third arm `strict` (stacklit-strict) is run for 5 trials per task, paired with the existing control sessions. It is NOT interleaved with control (control ran earlier), a limit stated in RESULTS.md. Interface from the branch owner: `stacklit generate --graph`, then `stacklit setup claude --session-hook --no-mcp --no-git-hook --crawl-guard=redirect`, steering variant d via STACKLIT_STEERING=d, `Bash(stacklit *)` allowed, binary built from origin/feat/source-of-truth at fdc0f40.
+3. Transcript spot check found three grading defects, all independent of arm. They are reported as a second metric, `correct_audited`, next to the pre-registered `correct` (never replacing it): (a) the matcher rejected answers written as `./path` or as an absolute path inside the checkout, (b) fd-07 asks where to add a new adapter and the model correctly names a new file under src/adapters/, which the pinned any-of list (existing files) did not allow, (c) fd-09: src/analytics.ts (PostHogAdapter) also forwards events to PostHog and was missing from the pinned answer.

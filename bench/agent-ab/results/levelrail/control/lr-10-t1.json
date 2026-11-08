@@ -1,0 +1,35 @@
+{
+  "repo": "levelrail",
+  "task": "lr-10",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/api/app_sleep_wake.go, internal/appsleep/portwake.go, internal/reconcile/ingress/sleep.go",
+  "turns": 3,
+  "cost_usd": 0.0371825,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 509,
+    "cache_creation_input_tokens": 7504,
+    "cache_read_input_tokens": 20645
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.694952709,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=(?i)wake path=/private/tmp/abreal/work/ab-1133762422/co-1506314084/internal",
+    "Grep pattern=(?i)wake path=/private/tmp/abreal/work/ab-1133762422/co-1506314084/internal/reconcile/ingress"
+  ],
+  "at": "2026-11-08T20:40:30Z"
+}
