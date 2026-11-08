@@ -1,0 +1,13 @@
+[
+  {"name": "django", "language": "Python", "url": "https://github.com/django/django.git", "ref": "6.1.3"},
+  {"name": "react", "language": "JavaScript", "url": "https://github.com/facebook/react.git", "ref": "v19.3.1"},
+  {"name": "typescript", "language": "TypeScript", "url": "https://github.com/microsoft/TypeScript.git", "ref": "v6.0.3"},
+  {"name": "rails", "language": "Ruby", "url": "https://github.com/rails/rails.git", "ref": "v8.1.4.1"},
+  {"name": "kafka", "language": "Java", "url": "https://github.com/apache/kafka.git", "ref": "4.4.0"},
+  {"name": "tokio", "language": "Rust", "url": "https://github.com/tokio-rs/tokio.git", "ref": "tokio-1.54.1"},
+  {"name": "kubernetes", "language": "Go", "url": "https://github.com/kubernetes/kubernetes.git", "ref": "v1.37.2"},
+  {"name": "vscode", "language": "TypeScript", "url": "https://github.com/microsoft/vscode.git", "ref": "1.145.2"},
+  {"name": "aspnetcore", "language": "C#", "url": "https://github.com/dotnet/aspnetcore.git", "ref": "v10.0.14"},
+  {"name": "rust", "language": "Rust", "url": "https://github.com/rust-lang/rust.git", "ref": "1.99.1"},
+  {"name": "linux", "language": "C", "url": "https://github.com/torvalds/linux.git", "ref": "v7.3"}
+]
