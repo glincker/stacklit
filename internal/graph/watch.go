@@ -222,6 +222,9 @@ func (w *watcher) runFSNotify(ctx context.Context, dirs []string) error {
 			return err
 		}
 	}
+	// Edits made after the first graph was written but before the watches existed
+	// produce no event, so reconcile once now.
+	w.rebuild(true, nil)
 	dirty := map[string]bool{}
 	structural := false
 	timer := time.NewTimer(time.Hour)
