@@ -146,7 +146,7 @@ func (g *SymGraph) Report() string {
 		}
 	}
 	for _, e := range g.Edges {
-		if e.Conf == ConfExtracted {
+		if e.Conf != ConfInferred {
 			ext++
 		} else {
 			inf++

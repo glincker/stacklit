@@ -50,6 +50,8 @@ type SymNode struct {
 	Lang      string `json:"lang,omitempty"`
 	Sig       string `json:"sig,omitempty"`
 	Community int    `json:"community"`
+	Repo      string `json:"repo,omitempty"`   // set when graphs from several repos are merged
+	Source    string `json:"source,omitempty"` // adapter or index that produced the node, empty for the built-in extractor
 }
 
 // SymEdge connects two nodes by index into SymGraph.Nodes.
@@ -59,6 +61,7 @@ type SymEdge struct {
 	Kind  string  `json:"k"`
 	Conf  string  `json:"c"`
 	Score float64 `json:"s"`
+	Src   string  `json:"src,omitempty"` // adapter or index that produced the edge
 }
 
 // Community is a cluster of files found by label propagation.
