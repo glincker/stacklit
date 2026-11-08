@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T17:50:28Z",
+  "generated_at": "2026-11-08T18:10:19Z",
   "stacklit_version": "dev",
-  "merkle_hash": "c0b7c7a38957d7272f891f19ff4045eb10cda97e9c8b432ebc9f933e9f02a176",
+  "merkle_hash": "cbeee2e67e8588f2bb01d5a3cb16619510fd69b1e107e67b12f15829b8c8bc27",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 34
       },
       "go": {
-        "files": 186,
-        "lines": 24758
+        "files": 208,
+        "lines": 27523
       },
       "graphql": {
         "files": 1,
@@ -65,8 +65,8 @@
         "lines": 24
       },
       "python": {
-        "files": 1,
-        "lines": 20
+        "files": 2,
+        "lines": 74
       },
       "ruby": {
         "files": 1,
@@ -108,10 +108,11 @@
   },
   "structure": {
     "entrypoints": [
-      "cmd/stacklit/main.go"
+      "cmd/stacklit/main.go",
+      "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 217,
-    "total_lines": 25777
+    "total_files": 240,
+    "total_lines": 28596
   },
   "modules": {
     "assets": {
@@ -147,6 +148,21 @@
       ],
       "activity": "low"
     },
+    "examples/adapters": {
+      "purpose": "Adapters",
+      "language": "python",
+      "files": 1,
+      "lines": 54,
+      "file_list": [
+        "keyword_concepts.py"
+      ],
+      "exports": [
+        "ext(path)",
+        "extract(path)",
+        "main()"
+      ],
+      "activity": "low"
+    },
     "internal/cache": {
       "purpose": "Cache",
       "language": "go",
@@ -175,12 +191,46 @@
       ],
       "activity": "low"
     },
+    "internal/check": {
+      "purpose": "Check",
+      "language": "go",
+      "files": 2,
+      "lines": 261,
+      "file_list": [
+        "check.go",
+        "check_test.go"
+      ],
+      "exports": [
+        "RuleCycle",
+        "RuleFanIn",
+        "RuleFanOut",
+        "RuleForbidden",
+        "RuleOrphan",
+        "Run(idx *schema.Index, cfg *config.CheckConfig) *Result",
+        "type Result",
+        "type Violation"
+      ],
+      "type_defs": {
+        "Result": "OK bool, Violations []Violation",
+        "Violation": "Rule string, Message string, Modules []string"
+      },
+      "depends_on": [
+        "internal/config",
+        "internal/schema"
+      ],
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 17,
-      "lines": 1276,
+      "files": 21,
+      "lines": 1636,
       "file_list": [
+        "check.go",
+        "check_test.go",
         "derive.go",
         "diff.go",
         "doctor.go",
@@ -191,13 +241,14 @@
         "graphcmds.go",
         "hook.go",
         "ingest.go",
+        "ingest_ext.go",
         "init.go",
+        "mergegraphs.go",
         "root.go",
         "serve.go",
         "setup.go",
         "version.go",
-        "version_test.go",
-        "view.go"
+        "version_test.go"
       ],
       "exports": [
         "Error() string",
@@ -215,16 +266,20 @@
         "ExitError": "Code int, Err error"
       },
       "depends_on": [
+        "internal/check",
         "internal/config",
         "internal/derive",
         "internal/doctor",
         "internal/engine",
+        "internal/export",
         "internal/git",
         "internal/graph",
         "internal/ingest",
         "internal/mcp",
+        "internal/merge",
         "internal/renderer",
         "internal/schema",
+        "internal/scip",
         "internal/setup",
         "internal/walker"
       ],
@@ -237,7 +292,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 472,
+      "lines": 493,
       "file_list": [
         "config.go",
         "config_test.go",
@@ -258,11 +313,14 @@
         "NormalizedRoots() []string"
       ],
       "type_defs": {
+        "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
         "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, Workers int, ParseMemoryMB int, Cache *boo...",
         "Error": "Err error",
+        "ForbiddenEdge": "From string, To string, Reason string",
         "OutputConfig": "JSON string, Mermaid string, HTML string"
       },
       "depended_by": [
+        "internal/check",
         "internal/cli",
         "internal/doctor",
         "internal/engine",
@@ -407,6 +465,47 @@
       ],
       "activity": "low"
     },
+    "internal/export": {
+      "purpose": "Export",
+      "language": "go",
+      "files": 5,
+      "lines": 848,
+      "file_list": [
+        "export.go",
+        "export_test.go",
+        "formats.go",
+        "model.go",
+        "notes.go"
+      ],
+      "exports": [
+        "Formats",
+        "Render(format string, in Input, o Options) ([]File, error)",
+        "ScopeModules",
+        "ScopeSymbols",
+        "WriteStdout(w interface{}, files []File) error",
+        "WriteTo(out string, files []File) ([]string, error)",
+        "type Edge",
+        "type File",
+        "type Input",
+        "type Model"
+      ],
+      "type_defs": {
+        "Edge": "From string, To string, Kind string, Conf string, Score float64",
+        "File": "Name string, Content string",
+        "Input": "Index *schema.Index, Graph *graph.SymGraph",
+        "Model": "Scope string, Nodes []Node, Edges []Edge",
+        "Node": "ID string, Label string, Kind string, File string, Line int, Group string",
+        "Options": "Scope string, PageTokens int, MaxNodes int"
+      },
+      "depends_on": [
+        "internal/graph",
+        "internal/schema"
+      ],
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
     "internal/fsutil": {
       "purpose": "Fsutil",
       "language": "go",
@@ -462,11 +561,12 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 26,
-      "lines": 5565,
+      "files": 27,
+      "lines": 5572,
       "file_list": [
         "analysis.go",
         "community.go",
+        "confidence.go",
         "explain.go",
         "extract.go",
         "extract_ecma.go",
@@ -483,20 +583,19 @@
         "perf_test.go",
         "query.go",
         "rank.go",
-        "resolve.go",
-        "resolve_test.go"
+        "resolve.go"
       ],
       "exports": [
         "Build(files []*parser.FileInfo, opts BuildOptions) *Graph",
         "BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph",
         "ComputeCommunities()",
+        "ConfExact",
         "ConfExtracted",
         "ConfInferred",
         "DefaultExplainBudget",
         "DefaultImpactBudget",
         "DefaultQueryBudget",
-        "DiscoverGoModules(root string, files []string) map[string]string",
-        "EdgeCalls"
+        "DiscoverGoModules(root string, files []string) map[string]string"
       ],
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int",
@@ -517,47 +616,60 @@
       "depended_by": [
         "internal/cli",
         "internal/engine",
+        "internal/export",
+        "internal/ingest",
         "internal/mcp",
-        "internal/renderer"
+        "internal/merge",
+        "internal/renderer",
+        "internal/scip"
       ],
       "activity": "low"
     },
     "internal/ingest": {
       "purpose": "Ingest",
       "language": "go",
-      "files": 6,
-      "lines": 728,
+      "files": 11,
+      "lines": 1256,
       "file_list": [
+        "adapter.go",
+        "adapter_graph.go",
+        "adapter_test.go",
         "api.go",
         "docs.go",
         "ingest.go",
         "ingest_test.go",
         "owners.go",
+        "proc_unix.go",
+        "proc_windows.go",
         "schema.go"
       ],
       "exports": [
+        "ApplyAdapter(ctx *Context, r *AdapterResult)",
+        "CarryAdapterOutput(ctx *Context, path string)",
+        "ConfInferred",
         "ContextFile",
-        "Run(o Options) (*Context, error)",
-        "type API",
-        "type Context",
-        "type Doc",
-        "type ModuleOwners",
-        "type Operation",
-        "type Options",
-        "type OwnerRule",
-        "type Owners"
+        "DefaultAdapterName(command string) string",
+        "FilterFiles(files []string, globs []string) []string",
+        "KindConcept",
+        "ListFiles(root string) []string",
+        "MergeIntoGraph(g *graph.SymGraph, r *AdapterResult) int",
+        "Run(o Options) (*Context, error)"
       ],
       "type_defs": {
         "API": "File string, Title string, Operations []Operation",
-        "Context": "Version string, Docs []Doc, APIs []API, Tables []Table, Owners *Owners",
+        "AdapterOptions": "Root string, Command string, Name string, Files []string, Timeout time.Duration, MaxBytes int64, MaxItems int",
+        "AdapterResult": "Name string, Concepts []Concept, Links []ConceptLink, Skipped int",
+        "Concept": "ID string, Name string, Kind string, Summary string, SourceFile string, Conf string, Source string",
+        "ConceptLink": "From string, To string, Kind string, SourceFile string, Conf string, Source string",
+        "Context": "Version string, Docs []Doc, APIs []API, Tables []Table, Owners *Owners, Concepts []Concept, Links []ConceptLink",
         "Doc": "Path string, Kind string, Title string, Status string, Headings []string",
         "ModuleOwners": "Module string, Codeowner []string, Authors []string",
         "Operation": "Method string, Path string, ID string, Summary string",
-        "Options": "Root string, Docs bool, API bool, Schema bool, Owners bool, GitOwners bool, GitDays int, Modules []string",
-        "OwnerRule": "Pattern string, Owners []string",
-        "Owners": "Rules []OwnerRule, Modules []ModuleOwners",
-        "Table": "Name string, File string, Columns []string"
+        "Options": "Root string, Docs bool, API bool, Schema bool, Owners bool, GitOwners bool, GitDays int, Modules []string"
       },
+      "depends_on": [
+        "internal/graph"
+      ],
       "depended_by": [
         "internal/cli"
       ],
@@ -581,6 +693,34 @@
         "internal/graph",
         "internal/schema",
         "internal/walker"
+      ],
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
+    "internal/merge": {
+      "purpose": "Merge",
+      "language": "go",
+      "files": 2,
+      "lines": 230,
+      "file_list": [
+        "merge.go",
+        "merge_test.go"
+      ],
+      "exports": [
+        "DefaultName(g *graph.SymGraph, file string) string",
+        "EdgeDependsOn",
+        "KindRepo",
+        "Merge(inputs []Input, multi *schema.MultiIndex) (*graph.SymGraph, error)",
+        "type Input"
+      ],
+      "type_defs": {
+        "Input": "Name string, Graph *graph.SymGraph"
+      },
+      "depends_on": [
+        "internal/graph",
+        "internal/schema"
       ],
       "depended_by": [
         "internal/cli"
@@ -741,14 +881,52 @@
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string"
       },
       "depended_by": [
+        "internal/check",
         "internal/cli",
         "internal/derive",
         "internal/doctor",
         "internal/engine",
+        "internal/export",
         "internal/mcp",
+        "internal/merge",
         "internal/renderer",
         "internal/setup",
         "internal/summary"
+      ],
+      "activity": "low"
+    },
+    "internal/scip": {
+      "purpose": "Scip",
+      "language": "go",
+      "files": 3,
+      "lines": 510,
+      "file_list": [
+        "confirm.go",
+        "read.go",
+        "scip_test.go"
+      ],
+      "exports": [
+        "Load(path string) (*Index, error)",
+        "Parse(data []byte) (*Index, error)",
+        "RoleDefinition",
+        "SrcTag",
+        "Upgrade(g *graph.SymGraph, idx *Index) Stats",
+        "type Document",
+        "type Index",
+        "type Occurrence",
+        "type Stats"
+      ],
+      "type_defs": {
+        "Document": "Path string, Occurrences []Occurrence",
+        "Index": "Documents []Document",
+        "Occurrence": "Line int, Symbol string, Roles int32, IsLocal bool",
+        "Stats": "Upgraded int, AlreadyExact int, StillInferred int, UnmatchedFiles int, DocumentsParsed int"
+      },
+      "depends_on": [
+        "internal/graph"
+      ],
+      "depended_by": [
+        "internal/cli"
       ],
       "activity": "low"
     },
@@ -894,6 +1072,18 @@
         "internal/parser"
       ],
       [
+        "internal/check",
+        "internal/config"
+      ],
+      [
+        "internal/check",
+        "internal/schema"
+      ],
+      [
+        "internal/cli",
+        "internal/check"
+      ],
+      [
         "internal/cli",
         "internal/config"
       ],
@@ -908,6 +1098,10 @@
       [
         "internal/cli",
         "internal/engine"
+      ],
+      [
+        "internal/cli",
+        "internal/export"
       ],
       [
         "internal/cli",
@@ -927,11 +1121,19 @@
       ],
       [
         "internal/cli",
+        "internal/merge"
+      ],
+      [
+        "internal/cli",
         "internal/renderer"
       ],
       [
         "internal/cli",
         "internal/schema"
+      ],
+      [
+        "internal/cli",
+        "internal/scip"
       ],
       [
         "internal/cli",
@@ -1018,12 +1220,24 @@
         "internal/walker"
       ],
       [
+        "internal/export",
+        "internal/graph"
+      ],
+      [
+        "internal/export",
+        "internal/schema"
+      ],
+      [
         "internal/graph",
         "internal/parser"
       ],
       [
         "internal/graph",
         "internal/walker"
+      ],
+      [
+        "internal/ingest",
+        "internal/graph"
       ],
       [
         "internal/mcp",
@@ -1042,6 +1256,14 @@
         "internal/walker"
       ],
       [
+        "internal/merge",
+        "internal/graph"
+      ],
+      [
+        "internal/merge",
+        "internal/schema"
+      ],
+      [
         "internal/renderer",
         "assets"
       ],
@@ -1058,6 +1280,10 @@
         "internal/schema"
       ],
       [
+        "internal/scip",
+        "internal/graph"
+      ],
+      [
         "internal/setup",
         "internal/git"
       ],
@@ -1071,14 +1297,15 @@
       ]
     ],
     "entrypoints": [
-      "cmd/stacklit/main.go"
+      "cmd/stacklit/main.go",
+      "examples/adapters/keyword_concepts.py"
     ],
     "most_depended": [
       "internal/schema",
-      "internal/walker",
-      "internal/config",
-      "internal/git",
       "internal/graph",
+      "internal/config",
+      "internal/walker",
+      "internal/git",
       "internal/parser",
       "internal/fsutil",
       "internal/cache",
@@ -1086,6 +1313,7 @@
       "assets"
     ],
     "isolated": [
+      "examples/adapters",
       "npm",
       "npm/bin"
     ]
@@ -1212,6 +1440,7 @@
       "STACKLIT_NO_GIT",
       "STACKLIT_PARSE_MEMORY_MB",
       "STACKLIT_ROOTS",
+      "STACKLIT_SCIP_MAX_BYTES",
       "STACKLIT_SKIP_CHECKSUM",
       "STACKLIT_TIMESTAMPS",
       "STACKLIT_WORKERS"
