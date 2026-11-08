@@ -160,7 +160,7 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 		return err
 	}
 	if idx != nil && !f.uninstall {
-		body := setup.BodyFor(idx, setup.SteeringFor(root))
+		body := setup.BodyForRoot(root, idx, setup.SteeringFor(root))
 		fmt.Fprintf(out, "\ninjected digest: %d tokens (%d bytes, bytes/4)\n", setup.Tokens(body), len(body))
 	}
 	switch {

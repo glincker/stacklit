@@ -68,3 +68,24 @@ func TestLoadStrictErrors(t *testing.T) {
 		t.Fatalf("missing file must be fine: %v", err)
 	}
 }
+
+func TestSmallRepoLimit(t *testing.T) {
+	if got := Load(t.TempDir()).SmallRepoLimit(); got != DefaultSmallRepoFiles {
+		t.Fatalf("default %d", got)
+	}
+	if got := Load(writeRC(t, `{"small_repo_files":0}`)).SmallRepoLimit(); got != 0 {
+		t.Fatalf("explicit 0 must turn it off, got %d", got)
+	}
+	dir := writeRC(t, `{"small_repo_files":10}`)
+	t.Setenv("STACKLIT_SMALL_REPO_FILES", "25")
+	if got := Load(dir).SmallRepoLimit(); got != 25 {
+		t.Fatalf("env must win, got %d", got)
+	}
+	t.Setenv("STACKLIT_SMALL_REPO_FILES", "junk")
+	if got := Load(dir).SmallRepoLimit(); got != 10 {
+		t.Fatalf("a bad env value is ignored, got %d", got)
+	}
+	if _, err := LoadStrict(writeRC(t, `{"small_repo_files":-1}`)); err == nil {
+		t.Fatal("a negative limit must fail validation")
+	}
+}
