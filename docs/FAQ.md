@@ -1,5 +1,7 @@
 # FAQ
 
+Short answers about what Stacklit reads, when it helps, how accurate its dependency edges are and how it fits with git and assistants.
+
 **Does it read my code?**
 Yes, locally, to extract structure with tree-sitter. Nothing leaves your machine unless you pass `--summary` (see Privacy).
 
@@ -17,6 +19,9 @@ Files are still counted and language-detected, and the module map, git activity 
 
 **Does the git hook slow commits down?**
 It runs `stacklit generate --quiet` after each commit. On Go repos of this size that is tens of milliseconds; on Python and TypeScript repos in the benchmark it took a few seconds. If that is too slow, run `stacklit generate` manually or in CI instead.
+
+**Can I keep the Mermaid file out of the repo root?**
+Yes. Set `"output": {"mermaid": "docs/DEPENDENCIES.md"}` in `.stacklitrc.json`. The git hook stages the configured path.
 
 **Can I use it with Copilot?**
 Yes. Commit `stacklit.json` and tell Copilot to read it in `.github/copilot-instructions.md`, or paste the output of `stacklit derive` there.

@@ -1,20 +1,20 @@
 # Stacklit
 
-> Stacklit writes a small, committable JSON index of a codebase (modules, exports, dependency edges, hints) so AI coding agents can orient themselves without re-exploring the repo each session. Free, MIT licensed, one Go binary, runs locally with no LLM and no network.
+> Stacklit writes a small, committable JSON index of a codebase (modules, exports, dependency edges, hints) and a symbol graph, so AI coding agents can orient themselves without re-exploring the repo each session. Free, MIT licensed, one Go binary, deterministic, runs locally with no LLM and no network.
 
 Key facts:
 - Install: `npx stacklit init`, `brew install glincker/tap/stacklit`, `npm install -g stacklit`, or `go install github.com/glincker/stacklit/cmd/stacklit@latest`.
-- Output: `stacklit.json` (index), `DEPENDENCIES.md` (Mermaid diagram), `stacklit.html` (interactive map), `stacklit derive` (compact text map for prompts).
+- Output: `stacklit.json` (index), a Mermaid dependency file (`DEPENDENCIES.md` by default, `output.mermaid` in `.stacklitrc.json`), `stacklit.html` (interactive map), `stacklit derive` (compact text map for prompts).
 - Deterministic: same repo gives the same bytes. Hard token budgets on queries (`--budget`).
-- Languages: 48 languages and formats in the index. Symbol graph (query, impact, explain, slice, path, hubs) covers Go, TypeScript/JavaScript, Python, Rust and Java on master; more in progress.
-- Assistants: `stacklit setup` configures 26 targets, including Claude Code, Cursor, Aider, Codex, Gemini CLI, GitHub Copilot, Windsurf, Cline, Zed and a generic AGENTS.md. MCP server via `stacklit serve` (stdio, 15 tools).
-- Privacy: no telemetry, no account, no upload. The only opt-in external call is `stacklit init --summary`, which pipes names-only index data to a command the user chooses.
+- Languages: 48 languages and formats in the index; the symbol graph (query, explain, impact, path, hubs, slice) covers 20 languages.
+- Assistants: `stacklit setup` configures 26 targets, including Claude Code, Cursor, Aider, Codex, Gemini CLI, GitHub Copilot, Windsurf, Cline, Zed and a generic AGENTS.md. MCP server via `stacklit serve` (stdio, 15 tools, or `--profile minimal` for 4).
+- Privacy: no telemetry, no account, no upload. The generated HTML map requests small language logos from thesvg.org unless `STACKLIT_MAP_ICONS=off`. The only opt-in external call is `stacklit init --summary`.
 - Benchmarks: reproducible, no LLM calls, three pinned repos. The derived map is 137 to 1,372 tokens. The benchmark does not show a token saving over grep; it shows cheap orientation. Limitations are documented.
 - Not a search engine. When the exact identifier is known, grep is cheaper.
 
 ## Docs
-- [README](https://github.com/glincker/stacklit/blob/master/README.md): overview and quick start
-- [USAGE](https://github.com/glincker/stacklit/blob/master/docs/USAGE.md): commands, MCP tools, config, index schema
+- [README](https://github.com/glincker/stacklit/blob/master/README.md): overview and install
+- [Usage](https://github.com/glincker/stacklit/blob/master/docs/USAGE.md): commands, MCP tools, config, index schema
 - [Benchmarks](https://github.com/glincker/stacklit/blob/master/bench/RESULTS.md): methodology, results, limitations
 - [Languages](https://github.com/glincker/stacklit/blob/master/docs/LANGUAGES.md): what is extracted per language
 - [FAQ](https://github.com/glincker/stacklit/blob/master/docs/FAQ.md)
