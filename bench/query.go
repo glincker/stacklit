@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// queryDoc is the part of `stacklit query --json` the harness reads. The tool
-// prints files grouped and sorted by path; it exposes no per-file relevance
-// score, so relevance order cannot be read back from the output.
+// queryDoc is the part of `stacklit query --json` the harness reads. Files come
+// in the order the tool prints them: relevance order by default, path order with
+// `--order path`.
 type queryDoc struct {
 	Files []struct {
 		File    string `json:"file"`
@@ -23,11 +23,13 @@ type queryDoc struct {
 
 // RunQuery is the graph query arm: one `stacklit query --budget` call per
 // task with the question text verbatim, no derive map, no follow-up lookups.
-// It returns two results from the same call: the files opened in the order the
-// tool prints them (path order), and the files opened in an order a reader
-// picks from the printed text alone (see readerOrder).
-func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, budget string, sizes RepoSizes, readCap, maxExtra int) (ArmResult, ArmResult) {
+// It returns three results: files opened in the order the tool prints them by
+// default (relevance order), files opened in the order of `--order path` (the
+// tool's behaviour before ranked output, kept for comparison), and files opened
+// in an order a reader picks from the path-ordered text alone (see readerOrder).
+func RunQuery(arm, pathArm, readerArm, binary, dir string, task Task, modules []string, budget string, sizes RepoSizes, readCap, maxExtra int) (ArmResult, ArmResult, ArmResult) {
 	tool := ArmResult{Arm: arm}
+	byPath := ArmResult{Arm: pathArm}
 	reader := ArmResult{Arm: readerArm}
 	run := func(extra ...string) []byte {
 		args := append([]string{"query", task.Question, "--budget", budget}, extra...)
@@ -36,13 +38,18 @@ func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, b
 		out, _ := cmd.Output() // no match still exits cleanly; stderr notes are not read by the agent
 		return out
 	}
-	tool.Lookup = CostOf(string(run()))
-	reader.Lookup = tool.Lookup
-
-	var doc queryDoc
-	if err := json.Unmarshal(run("--json"), &doc); err != nil {
-		doc = queryDoc{}
+	parse := func(extra ...string) queryDoc {
+		var doc queryDoc
+		if err := json.Unmarshal(run(append([]string{"--json"}, extra...)...), &doc); err != nil {
+			doc = queryDoc{}
+		}
+		return doc
 	}
+	tool.Lookup = CostOf(string(run()))
+	byPath.Lookup = CostOf(string(run("--order", "path")))
+	reader.Lookup = byPath.Lookup
+
+	doc, pathDoc := parse(), parse("--order", "path")
 	if task.Kind == "dependents" {
 		mods := map[string]bool{}
 		for _, f := range doc.Files {
@@ -53,22 +60,38 @@ func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, b
 		}
 		sort.Strings(tool.Modules)
 		gradeDependents(&tool, task, maxExtra)
-		reader.NA = true
-		return tool, reader
-	}
-
-	seen := map[string]bool{}
-	for _, f := range doc.Files {
-		if !seen[f.File] {
-			seen[f.File] = true
-			tool.Ranked = append(tool.Ranked, f.File)
+		pm := map[string]bool{}
+		for _, f := range pathDoc.Files {
+			pm[moduleOfFile(f.File, modules)] = true
 		}
+		for m := range pm {
+			byPath.Modules = append(byPath.Modules, m)
+		}
+		sort.Strings(byPath.Modules)
+		gradeDependents(&byPath, task, maxExtra)
+		reader.NA = true
+		return tool, byPath, reader
 	}
-	finishLocalization(&tool, task, sizes, readCap)
 
-	reader.Ranked = readerOrder(doc, task.Question)
+	ranked := func(d queryDoc) []string {
+		seen := map[string]bool{}
+		var out []string
+		for _, f := range d.Files {
+			if !seen[f.File] {
+				seen[f.File] = true
+				out = append(out, f.File)
+			}
+		}
+		return out
+	}
+	tool.Ranked = ranked(doc)
+	finishLocalization(&tool, task, sizes, readCap)
+	byPath.Ranked = ranked(pathDoc)
+	finishLocalization(&byPath, task, sizes, readCap)
+
+	reader.Ranked = readerOrder(pathDoc, task.Question)
 	finishLocalization(&reader, task, sizes, readCap)
-	return tool, reader
+	return tool, byPath, reader
 }
 
 // readerOrder ranks the printed files from the question and the printed text
