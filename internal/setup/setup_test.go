@@ -2,6 +2,7 @@ package setup
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -149,11 +150,16 @@ func TestPreToolHookBroadOnly(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "stacklit.json"), []byte("{}"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	broad := `{"tool_name":"Grep","cwd":"` + dir + `","tool_input":{"pattern":"foo"}}`
+	// Marshal the payload so Windows backslashes in dir are escaped.
+	cwd, err := json.Marshal(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	broad := `{"tool_name":"Grep","cwd":` + string(cwd) + `,"tool_input":{"pattern":"foo"}}`
 	if out := PreToolHook(strings.NewReader(broad)); !strings.Contains(out, "additionalContext") {
 		t.Fatalf("expected nudge, got %q", out)
 	}
-	narrow := `{"tool_name":"Grep","cwd":"` + dir + `","tool_input":{"pattern":"foo","path":"src/auth"}}`
+	narrow := `{"tool_name":"Grep","cwd":` + string(cwd) + `,"tool_input":{"pattern":"foo","path":"src/auth"}}`
 	if out := PreToolHook(strings.NewReader(narrow)); out != "" {
 		t.Fatalf("narrow grep nudged: %q", out)
 	}
