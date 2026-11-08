@@ -25,6 +25,9 @@ type Config struct {
 	Cache         *bool    `json:"cache,omitempty"`           // incremental cache, default on
 	Timestamps    *bool    `json:"timestamps,omitempty"`      // write generated_at, default off
 	GitActivity   *bool    `json:"git_activity,omitempty"`    // include hot/recent files, default off
+
+	// Check holds architecture rules evaluated by `stacklit check`.
+	Check *CheckConfig `json:"check,omitempty"`
 }
 
 // OutputConfig controls where output files are written.
@@ -116,4 +119,22 @@ func (c *Config) ScanIgnore() []string {
 func toSlash(p string) string {
 	p = filepath.ToSlash(p)
 	return strings.ReplaceAll(p, "\\", "/")
+}
+
+// CheckConfig lists the architecture rules `stacklit check` enforces. Every
+// rule is off until configured; limits come from this file, never from code.
+type CheckConfig struct {
+	Forbidden []ForbiddenEdge `json:"forbidden,omitempty"`
+	Cycles    bool            `json:"cycles,omitempty"`  // report import cycles between modules
+	Orphans   bool            `json:"orphans,omitempty"` // report modules with no edges in or out
+	MaxFanIn  int             `json:"max_fan_in,omitempty"`
+	MaxFanOut int             `json:"max_fan_out,omitempty"`
+}
+
+// ForbiddenEdge bans dependencies from modules matching From to modules matching To.
+// Patterns are module paths with optional * wildcards; "dir/**" matches dir and below.
+type ForbiddenEdge struct {
+	From   string `json:"from"`
+	To     string `json:"to"`
+	Reason string `json:"reason,omitempty"`
 }
