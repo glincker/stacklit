@@ -1,89 +1,107 @@
 # Stacklit
 
-**108,000 lines of code. 4,000 tokens of index.**
+**A committed map of your codebase, built for AI coding agents.**
 
-One command makes any repo AI-agent-ready. No server, no setup.
+Stacklit parses your repo with tree-sitter and writes `stacklit.json`: modules, what each exports, who depends on whom, which files are hot in git, and hints for running tests and adding features. A coding agent reads that file (or a smaller derived map of it) instead of rediscovering the layout every session.
 
 [![CI](https://github.com/glincker/stacklit/actions/workflows/ci.yml/badge.svg)](https://github.com/glincker/stacklit/actions)
 [![Release](https://img.shields.io/github/v/release/glincker/stacklit)](https://github.com/glincker/stacklit/releases)
 [![npm](https://img.shields.io/npm/v/stacklit)](https://www.npmjs.com/package/stacklit)
-[![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-## Install and run
+> **Fully open source. MIT licensed. No paid tier, no gated features, no account.** Everything in this repository is everything there is: the CLI, the MCP server, the visual map, the GitHub Action and the npm installer.
+
+![Stacklit demo](demo.gif)
+
+## Quickstart
 
 ```bash
 npx stacklit init
 ```
 
-That is it. Downloads the binary, scans your codebase, generates the index, opens the visual map. One command.
-
-Other install options:
-
-```bash
-npm install -g stacklit              # install globally, then run: stacklit init
-go install github.com/glincker/stacklit/cmd/stacklit@latest
-```
-
-Or grab a binary from [GitHub Releases](https://github.com/glincker/stacklit/releases) (macOS, Linux, Windows).
-
-## CI / GitHub Action
-
-Use [glincker/stacklit-action](https://github.com/glincker/stacklit-action) to keep the index fresh automatically. Auto-commit on push, or gate PRs with check mode:
-
-```yaml
-- uses: actions/checkout@v4
-- uses: glincker/stacklit-action@v1        # auto-commit (default)
-# or: with: { mode: check }               # fail PR if index is stale
-```
-
-Add `permissions: contents: write` to the job when using `auto-commit` mode.
-
-![Stacklit demo](demo.gif)
-
-## What happens when you run it
-
-```
-$ stacklit init
-[stacklit] found 342 files
-[stacklit] parsed 342 files (0 errors)
-[stacklit] done in 89ms -- wrote stacklit.json, DEPENDENCIES.md, stacklit.html
-
-Opening visual map...
-```
-
-Three files appear in your project:
-
-| File | What it is | Commit it? |
-|------|-----------|------------|
-| `stacklit.json` | Codebase index for AI agents | **Yes** |
-| `DEPENDENCIES.md` | Mermaid dependency diagram | **Yes** (renders on GitHub) |
-| `stacklit.html` | Interactive visual map (4 views) | No (gitignored, regenerates) |
+That downloads the binary, scans the current directory, writes the index and opens the visual map. Then commit the two portable outputs:
 
 ```bash
 git add stacklit.json DEPENDENCIES.md
 git commit -m "add stacklit codebase index"
 ```
 
-Done. Every AI agent that opens this repo can now read `stacklit.json` instead of scanning files.
+Other ways to install:
 
-## Why
+```bash
+npm install -g stacklit
+go install github.com/glincker/stacklit/cmd/stacklit@latest
+```
 
-AI coding agents burn most of their context window figuring out where things live. Reading one large file to find a function signature costs thousands of tokens. Five agents on the same repo each rebuild the same mental model from scratch.
+Or download a binary for macOS, Linux or Windows from [GitHub Releases](https://github.com/glincker/stacklit/releases).
 
-**Without stacklit:** Agent reads 8-12 files. ~400,000 tokens. 45 seconds before writing a line.
+To wire your AI tools up in one step:
 
-**With stacklit:** Agent reads `stacklit.json`. ~4,000 tokens. Knows the structure instantly.
+```bash
+stacklit setup        # detects Claude Code, Cursor and Aider, configures each, installs a git hook
+```
 
-### Token efficiency (measured on real projects)
+## What you get
 
-| Project | Language | Lines of code | Index tokens |
-|---------|----------|---------------|-------------|
-| Express.js | JavaScript | 21,346 | 3,765 |
-| FastAPI | Python | 108,075 | 4,142 |
-| Gin | Go | 23,829 | 3,361 |
-| Axum | Rust | 43,997 | 14,371 |
+| File | What it is | Commit it? |
+|------|-----------|------------|
+| `stacklit.json` | The index agents read | Yes |
+| `DEPENDENCIES.md` | Mermaid dependency diagram, renders on GitHub | Yes |
+| `stacklit.html` | Self-contained interactive map (graph, tree, table, flow) | No, it is gitignored and regenerates |
 
-See [examples/](examples/) for full outputs.
+## Measured numbers
+
+All figures below come from the reproducible harness in [bench/](bench/) (full methodology and limitations in [bench/RESULTS.md](bench/RESULTS.md)). Three pinned public repos, 30 navigation tasks, no LLM calls. Tokens are approximated as bytes / 4.
+
+| Repo | Language | Source lines | Modules | `stacklit.json` | `stacklit derive` map | Generate (median) |
+|------|----------|-------------:|--------:|----------------:|----------------------:|------------------:|
+| gin v1.10.0 | Go | 19,161 | 6 | 2,410 tokens | 122 tokens | 39 ms |
+| flask 3.1.2 | Python | 17,909 | 9 | 2,045 tokens | 164 tokens | 3.7 s |
+| hono v4.6.0 | TypeScript | 55,896 | 72 | 11,814 tokens | 1,122 tokens | 2.3 s |
+
+What that says, and what it does not:
+
+- The index is roughly 2,000 to 12,000 tokens on these repos, and the derived map is roughly 120 to 1,100 tokens. Both grow with the number of modules, not with lines of code. The map is about 250 tokens only for repos of around 10 to 25 modules.
+- On the 30 tasks, a simulated agent that greps and then reads its top 3 files spent about 2.4x more tokens end to end than one that read the map, looked up modules in the index and read 1 file. The ratio ranged from roughly 1x on hono to about 7x on gin.
+- For lookups where you already know the exact symbol name, grep alone is cheaper than the map (a few hundred tokens versus roughly 700 including the map).
+- The grep and read path found the verified answer on 30 of 30 tasks. The stacklit path found it on 25 of 30. The misses are mostly unexported symbols, truncated export lists and imperfect dependency edges. They are listed in the results file and tracked on the [roadmap](ROADMAP.md).
+- Generating the index is fast on Go and slower on Python and TypeScript, with peak memory around 1 to 2 GB on the larger two. That is a known cost and is on the roadmap.
+
+This is a token-cost proxy, not an agent evaluation. See the limitations section of the results file before quoting any figure.
+
+## Supported AI tools
+
+| Tool | How | Command |
+|------|-----|---------|
+| Claude Code | Injects the compact map into `CLAUDE.md`, adds an MCP server entry to `.mcp.json` | `stacklit setup claude` |
+| Cursor | Injects the map into `.cursorrules`, adds `.cursor/mcp.json` | `stacklit setup cursor` |
+| Aider | Injects the map into `.aider.conf.yml` | `stacklit setup aider` |
+| Any MCP client | Run `stacklit serve` (stdio) | see [USAGE.md](USAGE.md#mcp-server) |
+| Anything else | `stacklit.json` is plain JSON, point the agent at it | |
+
+`stacklit setup` with no argument configures every tool it detects and installs a post-commit git hook that regenerates the index.
+
+The MCP server exposes seven tools: `get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`.
+
+## Supported languages
+
+| Language | Parser | Extracts |
+|----------|--------|----------|
+| Go | Go standard library AST | imports, exports with signatures, struct fields, interface methods |
+| TypeScript, JavaScript (incl. TSX, JSX) | tree-sitter | imports (ESM, CJS, dynamic), classes, interfaces, type aliases |
+| Python | tree-sitter | imports, classes with methods, type hints, decorators |
+| Rust | tree-sitter | use, mod, crate, pub items with generics, trait methods |
+| Java | tree-sitter | imports, public classes, method signatures |
+| C# | tree-sitter | using directives, public types, method signatures |
+| Ruby | tree-sitter | require, classes, modules, methods |
+| PHP | tree-sitter | namespace use, classes, traits, public methods |
+| Kotlin | tree-sitter | imports, classes, objects, functions |
+| Swift | tree-sitter | imports, structs, classes, protocols |
+| C, C++ | tree-sitter | includes, functions, structs, typedefs |
+
+Other source files (Scala, Dart, Lua, SQL, Vue, Svelte and similar) are counted and language-detected but not parsed for exports or imports. More languages are on the [roadmap](ROADMAP.md).
+
+Monorepos are detected automatically: pnpm, npm and yarn workspaces, Go workspaces, Turborepo, Nx, Lerna, Cargo workspaces, and `apps/`, `packages/`, `services/`, `libs/` conventions.
 
 ## What is in stacklit.json
 
@@ -91,250 +109,108 @@ See [examples/](examples/) for full outputs.
 {
   "modules": {
     "src/auth": {
-      "purpose": "Authentication and session management",
+      "purpose": "Authentication and authorization",
       "files": 8, "lines": 1200,
       "exports": ["AuthProvider", "useSession()", "loginAction()"],
       "depends_on": ["src/db", "src/config"],
+      "depended_by": ["src/api"],
       "activity": "high"
     }
   },
   "hints": {
-    "add_feature": "Create handler in src/api/, add route in src/index.ts",
+    "add_feature": "Add handler in src/api, register in src/index.ts",
     "test_command": "npm test"
   }
 }
 ```
 
-Modules, dependencies, exports with signatures, type definitions, git activity heatmap, framework detection, and hints for where to add features and how to run tests.
+Project and tech summary, modules with exports and type definitions, module-level dependency edges, git hot files, framework patterns and hints. See [USAGE.md](USAGE.md#reading-stacklitjson) for every field.
 
-## Set up your AI tools
-
-### One command (recommended)
-
-```bash
-stacklit setup
-```
-
-Auto-detects Claude Code, Cursor, and Aider. For each:
-- Injects a compact ~250-token codebase map into the tool's config file
-- Configures MCP server integration
-- Installs a git hook to keep the map fresh on every commit
-
-Or configure a specific tool:
-
-```bash
-stacklit setup claude   # updates CLAUDE.md + .mcp.json
-stacklit setup cursor   # updates .cursorrules + .cursor/mcp.json
-stacklit setup aider    # updates .aider.conf.yml
-```
-
-### Compact navigation map
-
-```bash
-stacklit derive         # print to stdout
-```
-
-Generates a ~250-token navigation map that replaces 3,000-8,000 tokens of agent exploration:
+The compact map from `stacklit derive` looks like this (gin, 122 tokens):
 
 ```
-myapp | go | 14 modules | 8,420 lines
-entry: cmd/api/main.go | test: go test ./...
+gin | go | 6 modules | 19,161 lines | Gin, GitHub Actions, net/http
+test: go test ./... | env: PORT
 
 modules:
-  cmd/api/          entrypoint, routes, middleware
-  internal/auth/    jwt, session | depends: store, config
-  internal/store/   postgres | depended-by: auth, handler
+  binding             binding | depends: bytesconv, json
+  ginS                gins
+  internal/bytesconv  bytesconv | depended-by: binding, render, root
+  internal/json       json | depended-by: binding, render, root
+  render              render | depends: bytesconv, json
+  root                root package | depends: binding, bytesconv, json, render
+do-not-touch: .github/
 ```
 
-### Manual setup
-
-<details>
-<summary>Configure manually instead</summary>
-
-**Claude Code**  - add to `CLAUDE.md`:
-
-```
-Read stacklit.json before exploring files. Use modules to locate code, hints for conventions.
-```
-
-**Claude Desktop / Cursor (MCP)**  - add to MCP config:
-
-```json
-{
-  "mcpServers": {
-    "stacklit": {
-      "command": "stacklit",
-      "args": ["serve"]
-    }
-  }
-}
-```
-
-MCP server exposes 7 tools: `get_overview`, `get_module`, `find_module`, `list_modules`, `get_dependencies`, `get_hot_files`, `get_hints`.
-
-**Any other agent** - `stacklit.json` is a plain JSON file. Any tool that reads files can use it.
-
-</details>
-
-## Keep it updated
+## Keeping the index fresh
 
 ```bash
-stacklit init --hook
+stacklit generate            # regenerate now
+stacklit generate --quiet    # silent, for scripts and CI
+stacklit diff                # is the index stale? (compares a content hash)
+stacklit init --hook         # post-commit hook that regenerates on every commit
 ```
 
-Installs a git hook that regenerates the index on every commit. Uses Merkle hashing to skip regeneration when only docs or configs changed.
+In CI, [glincker/stacklit-action](https://github.com/glincker/stacklit-action) either auto-commits a refreshed index or fails a PR when it is stale. A hand-written workflow is in [USAGE.md](USAGE.md#cicd).
 
-Other ways to keep it fresh:
+## Privacy
 
-```bash
-stacklit generate          # manual regeneration
-stacklit generate --quiet  # silent (for scripts/CI)
-stacklit diff              # check if the index is stale
-```
+Stacklit runs locally. It reads your source files on your machine, writes its outputs into your repository, and makes no network requests.
 
-<details>
-<summary>GitHub Action for auto-updates</summary>
+- No telemetry, no analytics, no account, no upload.
+- The generated HTML map is self-contained and loads nothing from the network.
+- The only network activity in the whole project happens outside the program: `npx stacklit` and `npm install -g stacklit` download the release binary from GitHub when you install.
+- The one opt-in exception is `stacklit init --summary`. It pipes a snapshot of the index (module names, exports, dependency edges, entrypoints; no file contents) to a command you control, `claude -p` by default or whatever `STACKLIT_SUMMARY_CMD` names. Whether that command talks to a network is up to that command. Without the flag, nothing is sent anywhere.
 
-```yaml
-name: Update stacklit index
-on:
-  push:
-    branches: [main]
-    paths-ignore: ['stacklit.json', 'DEPENDENCIES.md', '**.md']
-
-jobs:
-  stacklit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-      - run: go install github.com/glincker/stacklit/cmd/stacklit@latest
-      - run: stacklit generate --quiet
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update stacklit index"
-          file_pattern: "stacklit.json DEPENDENCIES.md"
-```
-
-</details>
-
-## Visual map
-
-![Stacklit visual map](stacklit-og.png)
-
-`stacklit view` opens the interactive HTML. Four views:
-
-- **Graph** -- Force-directed dependency map. Click a node to see exports, types, files.
-- **Tree** -- Collapsible directory hierarchy with file and line counts.
-- **Table** -- Sortable module table with search filter.
-- **Flow** -- Top-down dependency flow from entrypoints to leaves.
-
-## 11 languages via tree-sitter
-
-| Language | Extracts |
-|----------|----------|
-| Go | imports, exports with signatures, struct fields, interface methods |
-| TypeScript/JS | imports (ESM, CJS, dynamic), classes, interfaces, type aliases |
-| Python | imports, classes with methods, type hints, decorators |
-| Rust | use/mod/crate, pub items with generics, trait methods |
-| Java | imports, public classes, method signatures with types |
-| C# | using directives, public types, method signatures |
-| Ruby | require, classes, modules, methods |
-| PHP | namespace use, classes, traits, public methods |
-| Kotlin | imports, classes, objects, functions |
-| Swift | imports, structs, classes, protocols |
-| C/C++ | includes, functions, structs, typedefs |
-
-Any other language gets basic support (line count + language detection).
-
-## All CLI commands
-
-```
-stacklit init                    # scan, generate, open HTML
-stacklit init --hook             # also install git post-commit hook
-stacklit init --multi repos.txt  # polyrepo: scan multiple repos
-stacklit generate                # regenerate from current source
-stacklit view                    # regenerate HTML, open in browser
-stacklit diff                    # check if index is stale
-stacklit serve                   # start MCP server
-stacklit derive                  # print compact nav map (~250 tokens)
-stacklit derive --inject claude  # inject map into CLAUDE.md
-stacklit export                  # print readable markdown overview
-stacklit export -o stacklit.md   # write markdown overview to a file
-stacklit setup                   # auto-configure all detected AI tools
-stacklit setup claude            # configure Claude Code + MCP
-stacklit setup cursor            # configure Cursor + MCP
-```
-
-<details>
-<summary>Configuration (.stacklitrc.json)</summary>
-
-```json
-{
-  "ignore": ["vendor/", "generated/"],
-  "max_depth": 3,
-  "output": {
-    "json": "stacklit.json",
-    "mermaid": "DEPENDENCIES.md",
-    "html": "stacklit.html"
-  }
-}
-```
-
-</details>
-
-## How it compares
-
-| Tool | Approach | Tokens | Committable | Visual map |
-|------|----------|--------|-------------|------------|
-| **Stacklit** | Structured index | ~250 | Yes | Yes |
-| Repomix | Full dump | 50k-500k | No | No |
-| code2prompt | Full dump | 50k-500k | No | No |
-| Aider repo-map | Tree-sitter + PageRank | ~1k | No | No |
-
-[Full comparison with 7 tools →](https://github.com/glincker/stacklit/discussions/13)
-
-## Monorepo support
-
-Auto-detects: pnpm, npm, yarn workspaces, Go workspaces, Turborepo, Nx, Lerna, Cargo workspaces, and convention directories (`apps/`, `packages/`, `services/`).
-
-## How does Stacklit compare to Repomix?
-
-Repomix concatenates all files into one prompt (50k-500k tokens). Stacklit parses code structure and generates a ~250-token navigation map. Use Repomix for small repos and one-shot chats. Use Stacklit for daily AI-assisted development on larger codebases. See the [full comparison](https://github.com/glincker/stacklit/discussions/13).
+`stacklit.json` lists names of modules, files and exported symbols, and detected environment variable names (not values). Review it before committing a private repo's index to a public place.
 
 ## FAQ
 
-**Does Stacklit read my code?**
-Yes, locally. It parses source files with tree-sitter to extract structure (imports, exports, types). No code is sent anywhere unless you use the optional `--summary` flag (which calls the Claude API).
+**Does it read my code?**
+Yes, locally, to extract structure with tree-sitter. Nothing leaves your machine unless you pass `--summary` (see Privacy).
 
-**What if my language isn't supported?**
-Stacklit falls back to basic support (line count + language detection) for any language not in the tree-sitter list. The module map, dependency graph, and git activity still work.
+**Does it help on small repos?**
+Less. If the whole repo fits comfortably in a prompt, an agent can just read it. The index pays off once exploring costs more than reading a map, and it saves the most when the agent would otherwise read several large files to confirm a location.
 
-**Does the git hook slow down commits?**
-No. Stacklit uses Merkle hashing to skip regeneration when only docs or configs changed. On a 10k-line repo, regeneration takes ~50ms.
+**When is grep better?**
+When you already know the exact identifier. A single grep is cheaper than loading a map. The index helps with questions grep cannot answer in one step, such as "what depends on this module" or "where would a new adapter go".
 
-**Can I use Stacklit with GitHub Copilot?**
-Yes. Run `stacklit derive --inject claude` and rename the output to `.github/copilot-instructions.md`, or just commit `stacklit.json` and reference it in your Copilot instructions.
+**How accurate are the dependency edges?**
+Module-level edges are built from import statements and are good enough to orient an agent, but not exact. In the benchmark, 4 of 7 "what depends on X" lookups were fully correct. Known weak spots: test files counted as dependents, relative imports resolved to the wrong module, and short module names that can be ambiguous. Treat the graph as a guide and confirm with a read.
+
+**What if my language is not supported?**
+Files are still counted and language-detected, and the module map, git activity and hints still work. Exports and dependency edges need a parser.
+
+**Does the git hook slow commits down?**
+It runs `stacklit generate --quiet` after each commit. On Go repos of this size that is tens of milliseconds; on Python and TypeScript repos in the benchmark it took a few seconds. If that is too slow, run `stacklit generate` manually or in CI instead.
+
+**Can I use it with Copilot?**
+Yes. Commit `stacklit.json` and tell Copilot to read it in `.github/copilot-instructions.md`, or paste the output of `stacklit derive` there.
+
+**How is it different from dumping the whole repo into a prompt?**
+A dump is the full source. Stacklit is structure only: it is orders of magnitude smaller but cannot answer questions that need code bodies. See [COMPARISON.md](COMPARISON.md) for a factual feature comparison.
 
 ## Documentation
 
-- [USAGE.md](USAGE.md) -- full usage guide, command reference, MCP tools, configuration
-- [COMPARISON.md](COMPARISON.md) -- head-to-head comparison with Repomix, code2prompt, Codebase-Memory
-- [SKILL.md](SKILL.md) -- instructions for AI agents on how to use stacklit.json
-- [examples/](examples/) -- real stacklit.json outputs from Express.js, FastAPI, Gin, Axum
-- [Discussions](https://github.com/glincker/stacklit/discussions) -- guides, Q&A, feature requests
+- [USAGE.md](USAGE.md): full command reference, MCP tools, configuration, index schema
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the pipeline works
+- [bench/RESULTS.md](bench/RESULTS.md): benchmark methodology and results
+- [ROADMAP.md](ROADMAP.md): what is planned and what is in progress
+- [CHANGELOG.md](CHANGELOG.md): release history
+- [COMPARISON.md](COMPARISON.md): feature comparison with other context tools
+- [SKILL.md](SKILL.md): instructions an agent can follow to use `stacklit.json`
+- [examples/](examples/): sample outputs (generated with earlier versions)
+- [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md)
 
 ## Contributing
 
 ```bash
-make build   # build binary
+make build   # build the binary
 make test    # run all tests
 ```
 
-Contributions welcome. See [open issues](https://github.com/glincker/stacklit/issues) or start a [discussion](https://github.com/glincker/stacklit/discussions).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Questions and ideas are welcome in [Discussions](https://github.com/glincker/stacklit/discussions).
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
