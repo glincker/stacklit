@@ -6,6 +6,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/glincker/stacklit/internal/fsutil"
 )
 
 // SchemaVersion is the version tag written into stacklit.graph.json.
@@ -146,7 +148,8 @@ func (g *SymGraph) Save(path string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0o644)
+	// Atomic so a concurrent reader never sees a half-written graph.
+	return fsutil.WriteFileAtomic(path, data, 0o644)
 }
 
 // Label is a short unambiguous display name for a node.

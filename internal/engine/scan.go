@@ -19,10 +19,13 @@ import (
 
 // scanResult is everything the walk-and-parse stage hands to index assembly.
 type scanResult struct {
-	Files       []string
-	Parsed      []*parser.FileInfo
-	EnvVars     []string
-	MerkleHash  string
+	Files      []string
+	Parsed     []*parser.FileInfo
+	EnvVars    []string
+	MerkleHash string
+	// Leaves and FileEnv are per-file facts the incremental refresh keeps.
+	Leaves      map[string][]byte
+	FileEnv     map[string][]string
 	Info        *schema.ScanInfo
 	ParseErrors int
 	CacheHits   int
@@ -58,6 +61,7 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 
 	var mu sync.Mutex
 	envSeen := map[string]bool{}
+	fileEnv := map[string][]string{}
 	results := parser.ScanFiles(walked.Files, parser.PoolOptions{
 		Root:         root,
 		Workers:      cfg.WorkerCount(),
@@ -65,12 +69,13 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		MaxFileSize:  cfg.MaxFileSize,
 		Limits:       cfg.ParseLimits(),
 		Cache:        pc,
-		Visit: func(_ string, content []byte) {
+		Visit: func(path string, content []byte) {
 			vars := detect.FileEnvVars(content)
 			if len(vars) == 0 {
 				return
 			}
 			mu.Lock()
+			fileEnv[path] = vars
 			for _, v := range vars {
 				envSeen[v] = true
 			}
@@ -101,6 +106,7 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		leaves[r.Path] = r.Leaf
 	}
 	out.Files = kept
+	out.Leaves, out.FileEnv = leaves, fileEnv
 	out.MerkleHash = git.ComputeMerkleFromLeaves(leaves)
 
 	for _, s := range walked.Skipped {
