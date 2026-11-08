@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/glincker/stacklit/internal/graph"
 	"github.com/glincker/stacklit/internal/schema"
 )
 
@@ -145,26 +147,45 @@ func TestSkillEmbedMatchesRoot(t *testing.T) {
 	}
 }
 
-func TestPreToolHookBroadOnly(t *testing.T) {
+func TestPreToolHookIdentifierPointer(t *testing.T) {
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "stacklit.json"), []byte("{}"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// Marshal the payload so Windows backslashes in dir are escaped.
+	g := &graph.SymGraph{Version: graph.SchemaVersion, Nodes: []graph.SymNode{
+		{ID: "a.go", Name: "a.go", Kind: graph.KindFile, File: "a.go"},
+		{ID: "a.go::Load", Name: "Load", Kind: graph.KindFunc, File: "a.go", Line: 4, End: 9, Sig: "func Load() error"},
+		{ID: "b.go::Run", Name: "Run", Kind: graph.KindFunc, File: "b.go", Line: 2, End: 6},
+	}, Edges: []graph.SymEdge{{From: 2, To: 1, Kind: graph.EdgeCalls, Conf: graph.ConfExtracted, Score: 1}}}
+	// Marshal the dir so Windows backslashes are escaped in the JSON payload.
 	cwd, err := json.Marshal(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	broad := `{"tool_name":"Grep","cwd":` + string(cwd) + `,"tool_input":{"pattern":"foo"}}`
-	if out := PreToolHook(strings.NewReader(broad)); !strings.Contains(out, "additionalContext") {
-		t.Fatalf("expected nudge, got %q", out)
+	call := func(pat string) string {
+		in := `{"tool_name":"Grep","cwd":` + string(cwd) + `,"tool_input":{"pattern":` + strconv.Quote(pat) + `}}`
+		return PreToolHook(strings.NewReader(in))
 	}
-	narrow := `{"tool_name":"Grep","cwd":` + string(cwd) + `,"tool_input":{"pattern":"foo","path":"src/auth"}}`
-	if out := PreToolHook(strings.NewReader(narrow)); out != "" {
-		t.Fatalf("narrow grep nudged: %q", out)
+	if out := call("Load"); out != "" {
+		t.Fatalf("no graph must stay silent, got %q", out)
+	}
+	if err := g.Save(filepath.Join(dir, "stacklit.graph.json")); err != nil {
+		t.Fatal(err)
+	}
+	out := call(`\bLoad\(`)
+	for _, want := range []string{"a.go:4", "callers: Run b.go:2", "additionalContext"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("pointer missing %q in %q", want, out)
+		}
+	}
+	var o hookOutput
+	if err := json.Unmarshal([]byte(out), &o); err != nil || Tokens(o.Spec.Context) > 120 {
+		t.Fatalf("pointer over 120 tokens or invalid: %v %d", err, Tokens(o.Spec.Context))
+	}
+	for _, pat := range []string{"foo bar baz", "Load.*Error", "Nope", "ab"} {
+		if out := call(pat); out != "" {
+			t.Fatalf("%q should be silent, got %q", pat, out)
+		}
 	}
 	if out := PreToolHook(strings.NewReader("garbage")); out != "" {
-		t.Fatalf("garbage nudged: %q", out)
+		t.Fatalf("garbage answered: %q", out)
 	}
 }
 
@@ -202,7 +223,7 @@ func TestDigestBudgetAndStability(t *testing.T) {
 }
 
 func TestNudgesAndSkillSmall(t *testing.T) {
-	if Tokens(preToolNudge) > 100 || Tokens(sessionNudge) > 100 {
+	if Tokens(sessionNudge) > 100 {
 		t.Fatal("hook nudge over 100 tokens")
 	}
 	if len(SkillMD) > 1100 {
