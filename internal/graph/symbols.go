@@ -79,9 +79,8 @@ type SymGraph struct {
 	Nodes       []SymNode   `json:"nodes"`
 	Edges       []SymEdge   `json:"edges"`
 	Communities []Community `json:"communities,omitempty"`
-	// Built and Commit record when and at which HEAD the graph was written,
-	// so status and query can warn when it has gone stale.
-	Built  string `json:"built,omitempty"`
+	// Commit is the HEAD the graph was built at, so status and query can warn
+	// when it has gone stale. No timestamp: the file stays reproducible.
 	Commit string `json:"commit,omitempty"`
 
 	out, in  [][]int32

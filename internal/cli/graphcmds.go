@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -22,6 +23,8 @@ type graphFlags struct {
 	file string
 	root string
 	json bool
+	// loaded is the mtime of the graph file read by load, zero when built in memory.
+	loaded time.Time
 }
 
 func (f *graphFlags) bind(c *cobra.Command) {
@@ -37,7 +40,9 @@ func buildSymbolGraph(root string) (*graph.SymGraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	return graph.BuildSymbols(root, files, graph.ExtractOptions{}), nil
+	g := graph.BuildSymbols(root, files, graph.ExtractOptions{})
+	g.Stamp(root)
+	return g, nil
 }
 
 // load reads the graph file, or builds one in memory when it does not exist.
@@ -49,6 +54,9 @@ func (f *graphFlags) load(cmd *cobra.Command) (*graph.SymGraph, error) {
 		}
 	}
 	if g, err := graph.Load(p); err == nil {
+		if st, serr := os.Stat(p); serr == nil {
+			f.loaded = st.ModTime()
+		}
 		return g, nil
 	} else if !os.IsNotExist(err) {
 		return nil, err
@@ -103,6 +111,9 @@ func newQueryCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprint(cmd.OutOrStdout(), g.Query(joinArgs(args), budget, f.json))
+			if !f.json && !f.loaded.IsZero() {
+				fmt.Fprint(cmd.OutOrStdout(), graph.StaleLine(f.root, g, f.loaded))
+			}
 			return nil
 		},
 	}
