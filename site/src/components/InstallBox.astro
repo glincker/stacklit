@@ -1,0 +1,8 @@
+---
+import copy from '../data/copy.json';
+const { id = 'install' } = Astro.props;
+---
+<div class="install-box">
+  <code id={id}><span class="p" aria-hidden="true">$ </span>{copy.cta.install}</code>
+  <button class="copy" type="button" data-copy={copy.cta.install} aria-label={`Copy ${copy.cta.install}`}>Copy</button>
+</div>

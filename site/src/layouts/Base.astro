@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../data/site';
+import copy from '../data/copy.json';
 
 interface Props {
   title: string;
@@ -18,7 +19,7 @@ const ld = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
   name: 'Stacklit',
-  description: 'Generates a committed map of a codebase (modules, exports, dependencies) for AI coding agents and people.',
+  description: copy.meta.structured,
   url: SITE + '/',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'macOS, Linux, Windows',
@@ -47,7 +48,7 @@ const ld = {
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1280" />
     <meta property="og:image:height" content="640" />
-    <meta property="og:image:alt" content="Stacklit logo: three stacked bars with the top bar in teal." />
+    <meta property="og:image:alt" content={copy.og.alt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
