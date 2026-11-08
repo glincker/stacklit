@@ -1,0 +1,227 @@
+---
+import Base from '../layouts/Base.astro';
+import samples from '../data/samples.json';
+import bench from '../data/bench.json';
+
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// The binary prints a long dash in its progress line; this site does not use that character.
+const dashless = (s: string) => s.replace(/ — /g, ' -- ');
+
+const deriveHtml = samples.derive
+  .trimEnd()
+  .split('\n')
+  .map((l, i) => {
+    let h = esc(l);
+    if (i === 0) return `<span class="a">${h}</span>`;
+    h = h.replace(/(depends:|depended-by:)/g, '<span class="d">$1</span>');
+    h = h.replace(/^(modules:|do-not-touch:|test:)/, '<span class="d">$1</span>');
+    return h;
+  })
+  .join('\n');
+
+const genHtml = esc(dashless(samples.generateOut))
+  .split('\n')
+  .map((l) => l.replace(/^(\[stacklit\])/, '<span class="d">$1</span>'))
+  .join('\n');
+
+const queryHtml = esc(samples.query)
+  .split('\n')
+  .map((l, i) => (i === 0 ? `<span class="a">${l}</span>` : /^\s+calls/.test(l) ? `<span class="d">${l}</span>` : l))
+  .join('\n');
+
+const moduleJson = JSON.stringify({ [samples.moduleName]: samples.module }, null, 2);
+
+const assistants = [
+  ['claude-code', 'Claude Code'],
+  ['cursor', 'Cursor'],
+  ['github-copilot', 'GitHub Copilot'],
+  ['windsurf', 'Windsurf'],
+  ['cline', 'Cline'],
+  ['zed', 'Zed'],
+  ['codex', 'Codex'],
+  ['gemini', 'Gemini CLI'],
+  ['continue', 'Continue'],
+  ['opencode', 'OpenCode'],
+  ['junie', 'Junie'],
+  ['aider', 'Aider'],
+];
+const n = (s: string) => Number(s).toLocaleString('en-US');
+const ms = (s: string) => (Number(s) >= 1000 ? `${(Number(s) / 1000).toFixed(1)} s` : `${s} ms`);
+---
+<Base
+  title="Stacklit: a committed map of your codebase for AI agents"
+  description="Stacklit parses your repo and writes a small index plus an interactive map. Free, MIT, local only, one Go binary, deterministic output."
+  path="/"
+  jsonLd
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Your codebase, mapped for agents.</h1>
+        <p class="lede">A small index and an interactive map, generated locally in one pass.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#install">Install in 30 seconds</a>
+          <a class="btn" href="/demos/">Open a live map</a>
+        </div>
+      </div>
+      <figure class="strata">
+        <div class="term">
+          <div class="term-head"><span>$ stacklit derive</span><span>gin v1.10.0, 137 tokens</span></div>
+          <pre tabindex="0"><code set:html={deriveHtml} /></pre>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <div class="container">
+      <div class="section-head">
+        <h2>Install, then run it in your repo</h2>
+        <p>Pick one. The first run scans the current directory and writes the index.</p>
+      </div>
+      <ul class="install">
+        <li>
+          <code><span class="p">$ </span>npx stacklit init</code>
+          <button class="copy" type="button" data-copy="npx stacklit init" aria-label="Copy the npx command">Copy</button>
+          <span class="how">No install. Downloads the binary on first use.</span>
+        </li>
+        <li>
+          <code><span class="p">$ </span>brew install glincker/tap/stacklit</code>
+          <button class="copy" type="button" data-copy="brew install glincker/tap/stacklit" aria-label="Copy the Homebrew command">Copy</button>
+          <span class="how">Homebrew tap for macOS and Linux.</span>
+        </li>
+        <li>
+          <code><span class="p">$ </span>go install github.com/glincker/stacklit/cmd/stacklit@latest</code>
+          <button class="copy" type="button" data-copy="go install github.com/glincker/stacklit/cmd/stacklit@latest" aria-label="Copy the go install command">Copy</button>
+          <span class="how">From source, needs Go.</span>
+        </li>
+      </ul>
+      <p class="after-install">Then commit <code>stacklit.json</code>, and run <code>stacklit setup</code> to wire up your AI tools. <a href="/docs/quickstart/">Quickstart</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split">
+      <div class="copy-block">
+        <h2>What a run looks like</h2>
+        <p>The real output of <code>stacklit generate --graph</code> on gin v1.10.0 (101 files) from a cold cache. It writes <code>stacklit.json</code>, a Mermaid diagram and a self-contained HTML map.</p>
+        <p><a href="/demos/">Browse the generated maps</a></p>
+      </div>
+      <div class="term">
+        <div class="term-head"><span>$ stacklit generate --graph</span><span>gin v1.10.0</span></div>
+        <pre tabindex="0"><code set:html={genHtml} /></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>What you get</h2></div>
+      <div class="rows">
+        <div class="row split">
+          <div class="copy-block">
+            <h3>An index agents can read</h3>
+            <p>Modules, what each exports, who depends on whom, and hints for tests and where to add code. Plain JSON you commit next to the source.</p>
+            <p><a href="/docs/format/">Index format</a></p>
+          </div>
+          <div>
+            <div class="term"><div class="term-head"><span>stacklit.json, one module</span><span>gin v1.10.0</span></div><pre tabindex="0"><code>{moduleJson}</code></pre></div>
+            <p class="snippet-note">Excerpt. Export lists are capped by default, so a module entry is not exhaustive.</p>
+          </div>
+        </div>
+        <div class="row split">
+          <div class="copy-block">
+            <h3>A small map to steer the agent</h3>
+            <p><code>stacklit derive</code> prints a compact map of a few hundred tokens. <code>stacklit setup</code> injects it into your assistant's config, so a new session starts oriented. The same graph answers token-budgeted queries, also exposed as MCP tools.</p>
+            <p><a href="/docs/assistants/">Assistants and setup</a></p>
+          </div>
+          <div>
+            <div class="term"><div class="term-head"><span>$ stacklit query "{samples.question}" --budget 500</span><span>excerpt</span></div><pre tabindex="0"><code set:html={queryHtml} /></pre></div>
+            <p class="snippet-note">Output cut to the first lines. <a href="/docs/mcp/">MCP tools</a></p>
+          </div>
+        </div>
+        <div class="row split">
+          <div class="copy-block">
+            <h3>A map you can open</h3>
+            <p>Every run also writes one HTML file with graph, tree, table and flow views. No server and no build step. Six maps generated from pinned public repos are on the demos page.</p>
+            <p><a href="/demos/">See the demos</a></p>
+          </div>
+          <div>
+            <div class="term"><div class="term-head"><span>stacklit export</span><span>formats</span></div><pre tabindex="0"><code>Markdown index, GraphML, Cypher, JSON, DOT,
+Mermaid, an Obsidian vault, a markdown wiki</code></pre></div>
+            <p class="snippet-note">From the commands reference. <a href="/docs/commands/">Commands</a></p>
+          </div>
+        </div>
+        <div class="row split">
+          <div class="copy-block">
+            <h3>The same bytes every time</h3>
+            <p>Output has no timestamps by default, so the file changes only when the code does. Two cold runs on the same checkout gave one hash.</p>
+            <p><a href="/docs/ci/">Keep it fresh in CI</a></p>
+          </div>
+          <div>
+            <div class="term"><div class="term-head"><span>$ shasum stacklit.json</span><span>two cold runs</span></div><pre tabindex="0"><code><span class="d">run 1</span>  {samples.hashFirst}
+<span class="d">run 2</span>  {samples.hashSecond}
+<span class="d">$ </span>stacklit diff
+{samples.diff}</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Works with</h2>
+        <p>Setup covers 26 assistants. These are some of them.</p>
+      </div>
+      <ul class="works">
+        {assistants.map(([slug, name]) => (
+          <li>
+            <span class="wlogo" aria-hidden="true"><span>{name[0]}</span><img src={`https://thesvg.org/icons/${slug}/default.svg`} alt="" width="28" height="28" loading="lazy" decoding="async" referrerpolicy="no-referrer" /></span>
+            <span>{name}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="works-note">Any MCP client works through <code>stacklit serve</code>, and anything else can read <code>stacklit.json</code> directly. Logos load from thesvg.org when you view this page. Without them the letters stay.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Plain terms</h2></div>
+      <ul class="trust">
+        <li><strong>MIT license</strong><span>Read it, fork it, ship it.</span></li>
+        <li><strong>Free</strong><span>No paid tier, no gated features, no account.</span></li>
+        <li><strong>Local only</strong><span>No telemetry, no upload.</span></li>
+        <li><strong>One Go binary</strong><span>Nothing to run alongside it.</span></li>
+        <li><strong>Deterministic</strong><span>Same code, same bytes.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>What we measured</h2>
+        <p>Three pinned public repos, run on {bench.date}. These are index sizes and generation times, not a claim about agent quality.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Repo</th><th>Language</th><th class="num">Source lines</th><th class="num">Modules</th><th class="num">stacklit.json tokens</th><th class="num">derive map tokens</th><th class="num">Generate, median</th></tr></thead>
+          <tbody>
+            {bench.repos.map((r) => (
+              <tr><td>{r.repo}</td><td>{r.lang}</td><td class="num">{n(r.lines)}</td><td class="num">{r.modules}</td><td class="num">{n(r.indexTokens)}</td><td class="num">{n(r.deriveTokens)}</td><td class="num">{ms(r.genMedianMs)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul class="bench-points">
+        <li>When you already know the exact symbol, grep is cheaper than loading a map.</li>
+        <li>On 30 navigation tasks, grep plus reading files reached the verified answer {bench.allTasks.grepFound} times and the map-and-lookup path {bench.allTasks.stacklitFound}. The misses are listed by name.</li>
+        <li>Tokens are bytes divided by four and no model was involved. It is a proxy, not an agent evaluation.</li>
+      </ul>
+      <p class="after-install"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with methodology and limitations.</p>
+    </div>
+  </section>
+</Base>
