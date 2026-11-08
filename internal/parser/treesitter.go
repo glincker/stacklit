@@ -28,7 +28,7 @@ var tsLangMap = map[string]func(root *gts.Node, lang *gts.Language, src []byte, 
 	"swift":       extractSwift,
 	"c":           extractC,
 	"cpp":         extractC,
-	"objective-c": extractC,
+	"objc":        extractObjC,
 	"elixir":      extractElixir,
 	"zig":         extractZig,
 	"dart":        extractDart,
@@ -41,6 +41,12 @@ var tsLangMap = map[string]func(root *gts.Node, lang *gts.Language, src []byte, 
 	"svelte":      extractSvelte,
 	"hcl":         extractHCL,
 	"proto":       extractProto,
+	"haskell":     extractHaskell,
+	"ocaml":       extractOCaml,
+	"clojure":     extractClojure,
+	"r":           extractR,
+	"perl":        extractPerl,
+	"julia":       extractJulia,
 }
 
 // skipExts are file extensions handled by other parsers or that we skip.
@@ -55,7 +61,7 @@ func (p *TreeSitterParser) CanParse(filename string) bool {
 			return false
 		}
 	}
-	entry := grammars.DetectLanguage(filename)
+	entry := detectEntry(filename)
 	if entry == nil {
 		return false
 	}
@@ -63,8 +69,30 @@ func (p *TreeSitterParser) CanParse(filename string) bool {
 	return ok
 }
 
+// detectEntry resolves the grammar for a path. It overrides the registry where
+// an extension is ambiguous (.fs is F# far more often than Forth) and adds the
+// extensionless build files the registry only matches by exact name.
+func detectEntry(path string) *grammars.LangEntry {
+	lower := strings.ToLower(path)
+	base := lower
+	if i := strings.LastIndexAny(base, "/\\"); i >= 0 {
+		base = base[i+1:]
+	}
+	switch {
+	case base == "dockerfile" || strings.HasPrefix(base, "dockerfile.") || strings.HasSuffix(base, ".dockerfile"):
+		return grammars.DetectLanguageByName("dockerfile")
+	case base == "makefile" || base == "gnumakefile" || strings.HasSuffix(base, ".mk"):
+		return grammars.DetectLanguageByName("make")
+	case strings.HasSuffix(base, ".fs"):
+		return grammars.DetectLanguageByName("fsharp")
+	case strings.HasSuffix(base, ".m") || strings.HasSuffix(base, ".mm"):
+		return grammars.DetectLanguageByName("objc")
+	}
+	return grammars.DetectLanguage(path)
+}
+
 func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error) {
-	entry := grammars.DetectLanguage(path)
+	entry := detectEntry(path)
 	if entry == nil {
 		return nil, nil
 	}

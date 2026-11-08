@@ -140,6 +140,50 @@ func TestMoreLanguages(t *testing.T) {
 			exports:  []string{"Entity", "struct Vec2", "compute(int a)"},
 			typeDefs: map[string]string{"Entity": "update(float dt)", "Vec2": "y"},
 		},
+		{
+			name: "haskell", file: "sample.hs", language: "haskell",
+			imports:  []string{"Data.List", "Data.Map", "Control.Monad"},
+			exports:  []string{"Shape", "area :: Shape -> Double", "mkSquare :: Double -> Shape"},
+			typeDefs: map[string]string{"Shape": "Circle Double"},
+		},
+		{
+			name: "ocaml", file: "sample.ml", language: "ocaml",
+			imports:  []string{"Core", "Printf"},
+			exports:  []string{"let add a b", "let fact n", "type color", "type point", "module Circle", "module type SHAPE", "exception Not_found_here"},
+			typeDefs: map[string]string{"color": "Red", "point": "x : int"},
+		},
+		{
+			name: "clojure", file: "sample.clj", language: "clojure",
+			imports:    []string{"clojure.string", "my.app.util", "clojure.set", "java.util.Date"},
+			exports:    []string{"defn greet [name greeting]", "def version", "defmacro unless", "defprotocol Shape", "defrecord Circle"},
+			notExports: []string{"private-fn"},
+			typeDefs:   map[string]string{"Shape": "area", "Circle": "[r]"},
+		},
+		{
+			name: "r", file: "sample.r", language: "r",
+			imports:    []string{"dplyr", "ggplot2", "helpers.R"},
+			exports:    []string{"add(a, b = 2)", "compute(x, ...)", "PI_VALUE"},
+			notExports: []string{".hidden"},
+		},
+		{
+			name: "perl", file: "sample.pl", language: "perl",
+			imports:    []string{"List::Util", "Base::Class", "Foo::Bar"},
+			exports:    []string{"package My::Module", "sub new", "sub add"},
+			notExports: []string{"_private"},
+			typeDefs:   map[string]string{"My::Module": "sub add"},
+		},
+		{
+			name: "julia", file: "sample.jl", language: "julia",
+			imports:  []string{"LinearAlgebra", "Base", "Statistics"},
+			exports:  []string{"module Geometry", "Point", "function area(c::Circle)"},
+			typeDefs: map[string]string{"Point": "x::Float64"},
+		},
+		{
+			name: "objective-c", file: "sample.m", language: "objective-c",
+			imports:  []string{"Foundation/Foundation.h", "Util.h"},
+			exports:  []string{"@interface Person", "@protocol Walker"},
+			typeDefs: map[string]string{"Person": "- (void)greet:(NSString *)who", "Walker": "- (void)walk"},
+		},
 	}
 
 	p := &TreeSitterParser{}
