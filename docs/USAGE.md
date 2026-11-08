@@ -219,7 +219,7 @@ Uses the existing `stacklit.json`, or generates one if none exists, then configu
 
 With no argument it configures every detected tool and installs the post-commit hook. If no tool is detected it prints the map to stdout so you can paste it. `.mcp.json` is listed in this repository's `.gitignore` because it is user-specific; decide for your own repo whether to commit it.
 
-Claude Code crawl guard (opt in): `stacklit setup claude --crawl-guard[=nudge|redirect|off]` installs a `PreToolUse` hook that recognises repo-wide crawls (`find .`, `ls -R`, `tree`, `grep -r` or `rg` on the root, `Glob **/*`, a Read of a directory, generic "explore the codebase" subagent prompts). A bare `--crawl-guard` means `nudge`; pass a mode with `=`. `nudge` adds a pointer to the stacklit command. `redirect` denies with a reason naming the command, at most twice in a row per session and only while the index is current. `off` removes the hook, as does `--uninstall`. Supports `--dry-run`. Details in [docs/SESSIONS.md](SESSIONS.md#crawl-guard).
+Claude Code crawl guard (opt in, not recommended: in the first real-agent A/B the strict arm built on `--crawl-guard=redirect` and steering `d` cost 1.12x and was right 82.7% of the time against 94.0% without Stacklit, see [docs/SESSIONS.md](SESSIONS.md#what-the-first-real-agent-ab-measured)): `stacklit setup claude --crawl-guard[=nudge|redirect|off]` installs a `PreToolUse` hook that recognises repo-wide crawls (`find .`, `ls -R`, `tree`, `grep -r` or `rg` on the root, `Glob **/*`, a Read of a directory, generic "explore the codebase" subagent prompts). A bare `--crawl-guard` means `nudge`; pass a mode with `=`. `nudge` adds a pointer to the stacklit command. `redirect` denies with a reason naming the command, at most twice in a row per session and only while the index is current. `off` removes the hook, as does `--uninstall`. Supports `--dry-run`. Details in [docs/SESSIONS.md](SESSIONS.md#crawl-guard).
 
 ### stacklit guide
 
@@ -227,7 +227,7 @@ Claude Code crawl guard (opt in): `stacklit setup claude --crawl-guard[=nudge|re
 stacklit guide [--json]
 ```
 
-Prints the agent usage guide (rules, command list, examples). It is the same text the strict rules block (steering `d`) uses, so you can paste it into any tool.
+Prints the agent usage guide (rules, command list, examples) so you can paste it into any tool. The rules are the routed wording (steering `e`): query when you do not know where something is, grep or `impact` for an exact name, check the neighbours when the answer is several files. `STACKLIT_STEERING=d` prints the earlier strict no-crawl wording, which measured worse.
 
 ### stacklit refresh, digest and stats
 
@@ -264,7 +264,7 @@ Starts the MCP server on stdio. Run it from the repo root: it reads `stacklit.js
 stacklit graph                          # build stacklit.graph.json (query commands build it in memory if it is missing)
 stacklit query "where is auth checked?" # scoped subgraph for a question, hard limit via --budget (default 2000 tokens)
 stacklit explain <symbol>               # definition, location, callers, callees (--budget, default 1500)
-stacklit impact <symbol|file>           # everything that depends on it (--depth, default 4)
+stacklit impact <name|file|dir>         # importers of a file or package with file:line, or dependents of a symbol (--depth, --calls)
 stacklit path <from> <to>               # shortest path between two symbols
 stacklit hubs -n 15                     # most connected symbols
 stacklit communities                    # deterministic file clusters with labels
@@ -274,6 +274,10 @@ stacklit watch                          # keep the graph current as files change
 ```
 
 `query` prints files in relevance order: each file group is numbered (`1. path`) by the best score among its symbols (ties by path), symbols inside a file go by score then line, and a `best match: <file>:<line> <symbol>` line names the top result. Output is byte-stable between runs, and the `--budget` limit drops the lowest ranked results first. `--order relevance|path` picks the layout; `path` is the older alphabetical grouping with no numbers (default from `STACKLIT_QUERY_ORDER`, otherwise `relevance`). With `--json` each file has `rank` (1 is best) and `score` (0 to about 1.2, relative to the best seed), each symbol has its own `score`, and files stay in the printed order. The MCP `query_graph` and `query` tools return the same text. Two scoring knobs: `STACKLIT_AUX_PENALTY` (default 0.6) multiplies the score of files under test, example, benchmark or fixture directories unless the question mentions them (1 turns it off), and `STACKLIT_IDENT_TOKEN_BOOST` (default 0.5) raises symbols named exactly like a camelCase or snake_case word in the question.
+
+`query` adds one line, "several files may take part; also ranked: ...", with the next ranked files and the `explain` and `path` commands to expand, when the question words suggest a flow or chain (trace, flow, through, path, calls, wake, lifecycle, and similar; `STACKLIT_FLOW_WORDS` replaces the list) or when the top files are scattered over many directories with similar scores (`STACKLIT_QUERY_SPREAD_DIRS`, default 4 of the top `STACKLIT_QUERY_SPREAD_TOP` 5 files, within `STACKLIT_QUERY_FLATNESS` 0.5 of the best score). It counts against `--budget`, and single-answer questions are unchanged. `STACKLIT_QUERY_NEXT` sets how many files it lists (default 4, at most 5; 0 turns the line off). With `--json` the files are in `next`.
+
+`impact` answers "who imports X" the way a grep would, in fewer tokens: a file path (`src/core.ts`, or a unique suffix or bare name) or a directory (a Go package, `internal/appsleep`) lists the files that import it, one per line as `path:line`, tests excluded, inside `--budget`, with a `[truncated: ...]` line when cut. A directory means the package in that directory; a subpackage is separate. For script languages (TypeScript, JavaScript, Vue, Svelte, Astro) the sources are also read to catch imports the extractor missed, so the list matches a grep (`STACKLIT_IMPACT_SCAN=0` turns that off, `STACKLIT_IMPACT_SCAN_MAX` caps the files read, default 20000). An exact symbol name keeps the call-level view by depth, and `--calls` forces that view for files and directories. Measured on this repository and three others, the list for a package was about 40 to 160 tokens against 110 to 390 for `grep -rn` of the same import and the same number of lines. Before this change, `impact` on a directory returned an error and on a file returned a 1,400 token call-level list.
 
 All of them accept `--root`, `--graph`, `--include-tests` (keep test files in the graph; also `STACKLIT_GRAPH_INCLUDE_TESTS=1`) and (except `watch`) `--json`. Twenty languages produce symbols and call, import and inheritance edges; the per-language table is in [docs/ARCHITECTURE.md](ARCHITECTURE.md#symbol-graph-extraction). `STACKLIT_GRAPH_MAX_PARSE_BYTES` (default 196608) sets the largest file parsed with tree-sitter, and `STACKLIT_PARSE_MEMORY_MB` bounds concurrent parse memory. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
 
@@ -361,7 +365,7 @@ Fifteen read-only tools. The first seven read `stacklit.json`; the last eight re
 | `query_graph` | `query`, optional `budget` | scoped symbol subgraph grouped by file, hard token budget (default 2000) |
 | `shortest_path` | `from`, `to` | shortest path between two symbols with weakest-hop confidence |
 | `explain_symbol` | `symbol` | definition, file and line range, signature, callers and callees |
-| `impact` | `symbol` (name, `Type.Method` or file path), optional `depth`, `budget` | symbols and files that depend on it |
+| `impact` | `symbol` (name, `Type.Method`, file path or directory), optional `depth`, `budget` | importers of a file or package with file:line, or the dependents of a symbol |
 | `get_hubs` | optional `top` | most connected symbols |
 | `get_communities` | none | deterministic file clusters with labels |
 | `graph_report` | none | key concepts, surprising links, suggested questions |
@@ -400,7 +404,8 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
 | `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
-| `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b`, `c` or `d` (see [docs/SESSIONS.md](docs/SESSIONS.md)). Env: `STACKLIT_STEERING`. |
+| `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b`, `c`, `d` (strict, measured worse, not recommended) or `e` (routed, not yet measured); see [docs/SESSIONS.md](docs/SESSIONS.md). Env: `STACKLIT_STEERING`. |
+| `small_repo_files` | 600 | A repo with fewer indexed source files than this gets a one line note instead of the digest in the session hook and in `setup`. 0 turns it off. Env: `STACKLIT_SMALL_REPO_FILES`. |
 | `crawl_guard` | (installed mode) | Crawl guard mode: `off`, `nudge` or `redirect`. Env: `STACKLIT_CRAWL_GUARD`. |
 | `stats` | false | Append a local usage log of `query`, `slice`, `explain` and `impact` calls. Env: `STACKLIT_STATS=1`. Never networked. |
 | `map_icons` | remote | `remote` lets the HTML map request language logos from thesvg.org when you open it. `off` removes every remote URL and shows letters instead. Env: `STACKLIT_MAP_ICONS=off`. |
@@ -433,7 +438,10 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
 | `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
-| `STACKLIT_STEERING` | `setup` | Steering wording variant `a`, `b`, `c` or `d`. |
+| `STACKLIT_STEERING` | `setup`, `guide`, `serve` | Steering wording variant `a`, `b`, `c`, `d` or `e`. `d` also selects the older MCP and guide wording. |
+| `STACKLIT_SMALL_REPO_FILES` | `setup`, hooks | Source file count below which a repo gets the small repo note instead of the digest. Default 600, 0 off. |
+| `STACKLIT_QUERY_NEXT`, `STACKLIT_FLOW_WORDS`, `STACKLIT_QUERY_SPREAD_DIRS`, `STACKLIT_QUERY_SPREAD_TOP`, `STACKLIT_QUERY_FLATNESS` | `query` | The "also ranked" line: files listed (default 4, 0 off), flow word list, and the spread test (defaults 4, 5, 0.5). |
+| `STACKLIT_IMPACT_SCAN`, `STACKLIT_IMPACT_SCAN_MAX` | `impact` | `0` stops `impact` reading script sources to confirm importers; cap on files read (default 20000). |
 | `STACKLIT_CRAWL_GUARD` | `hook crawl` | `off`, `nudge` or `redirect`. Overrides the `crawl_guard` config key and the mode the hook was installed with. Default off when nothing sets it. |
 | `STACKLIT_CRAWL_REDIRECTS`, `STACKLIT_CRAWL_FRESH_TTL` | `hook crawl` | Consecutive redirects per session before the guard stands down (default 2), and seconds a staleness verdict is reused (default 10). |
 | `STACKLIT_CRAWL_MAX_DEPTH`, `STACKLIT_CRAWL_PROMPT_CHARS` | `hook crawl` | Deepest `find -maxdepth` or `tree -L` still treated as narrow (default 1), and longest subagent prompt judged generic (default 600). |
