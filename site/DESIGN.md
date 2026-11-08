@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Stacklit
-description: Plain, warm, technical. A paper page with one deep green accent and real command output as the main picture.
+description: Plain, warm, technical. A paper page that is a map of the product: coordinates, a legend, contour hairlines, and real output as the terrain.
 colors:
   primary: "#0a6b5b"
   on-primary: "#ffffff"
@@ -66,6 +66,18 @@ typography:
     fontSize: 0.8125rem
     fontWeight: 400
     lineHeight: 1.65
+  display:
+    fontFamily: system-ui
+    fontSize: 6.5rem
+    fontWeight: 700
+    lineHeight: 0.96
+    letterSpacing: -0.045em
+  label:
+    fontFamily: ui-monospace
+    fontSize: 0.75rem
+    fontWeight: 500
+    letterSpacing: 0.14em
+    textTransform: uppercase
 rounded:
   sm: 4px
   md: 8px
@@ -106,46 +118,83 @@ components:
 
 # Stacklit design system
 
+## Concept card
+
+```
+Idea:        The page is a map. Stacklit writes a map of a codebase, so the site is laid out as one.
+Metaphor:    Cartography. Coordinates for sections, a legend for facts, contour lines for dividers, terrain for output.
+Anchor:      The product. stacklit.json is literally a map of modules, and every claim on the page is a reading taken from it.
+Signature:   ASK THE MAP. Five preset questions, each showing the real recorded `stacklit query` output on gin v1.10.0.
+             One chip is an exact-name question where the honest answer is "grep is enough here".
+Emotion:     Calm, exact, trustworthy. A surveyor's sheet, not a sales page.
+Motion verb: settle. Things drift 12px into place once and rest. The chapter marker slides to the current section and stops.
+Screenshot:  the hero: a giant tight headline, the legend (spec table) beside the intro, the editor window as terrain.
+```
+
+Swap test: replace "Stacklit" with another product in "this page is a map of the thing it describes". It falls apart for anything that does not itself produce a map. The coordinates (A1 to J1), the legend and the terrain all map to real parts of the product (modules, the spec facts, command output). The page is not a template with the name changed.
+
+Result: pass. The idea depends on the product writing a committed map, the same fact the headline sells.
+
 ## Overview
 
-Stacklit is a developer tool that tells the truth about itself, so the page looks like a well made README: warm paper, plain type, one green accent and real command output as the main picture. No stock imagery, no gradients, no decorative motion. The tone is calm and exact. Good news and bad news sit side by side at the same size.
+Stacklit tells the truth about itself, so the page reads like a surveyor's sheet: warm paper, giant tight system type, tiny monospace labels for metadata only, hairlines instead of boxes, one deep green accent. Real command output is the picture. Good and bad news sit side by side at the same size.
 
-## Colors
+Borrowed as a style from an editorial studio page (giant tight display type, a metadata layer of mono labels, numbered sections with a circled index, a floating pill nav, hairlines, one large rounded frame, a huge typographic footer). Borrowed as trust patterns from a developer tool home page: a slim release banner with the real version, the star count in the nav, a Works with row, a stats strip, a copy-setup-prompt box that is real. Not borrowed: any colour, font, copy or image, the gradient field, highlighter blocks, dashed borders, wireframe art, cookie banners, inflated counters, backed-by badges.
 
-- **Primary (#0a6b5b):** deep green, the only accent. Used for the main button, links and the top bar of the mark. 5.8 to 1 on paper.
-- **Paper (#f5f3ee):** the page. Surface, raised and sunk step away from it for panels and wells.
-- **Ink (#1b1a17):** text. Muted and faint are the two lighter text steps, both above 4.5 to 1 on every surface they sit on.
-- **Bad (#9b2c1d):** only for the unfavourable numbers, so they read as results and not as errors.
-- **Term (#1b1a17):** the code block surface, dark in both themes so command output looks like a terminal.
+## Role palette
 
-Dark theme keeps the same roles: paper becomes #151410, ink #ece9df and the accent lifts to #5fd0b5 to hold contrast on dark. Every pair is checked by `npm run check:contrast`.
+| Role | Token | Use |
+| --- | --- | --- |
+| ground | paper | The page. Warm, never white. |
+| panel | surface, raised, sunk | The legend table wells, the editor window and its tab bar. |
+| ink | ink, muted, faint | Text. All above 4.5 to 1 on every ground. |
+| route | accent, accent-text | The one link, button and "you are here" colour. |
+| drift | bad, warn | Only the unfavourable stat cells. Never decoration. |
+| terrain | code-* tokens | Syntax colours inside the editor window, light and dark. |
 
 ## Typography
 
-System fonts only, so the site loads no font files and makes no third party request. The stack starts at Avenir Next and Segoe UI Variable. Sizes step on a fixed scale: caption 14px, body 16px, lead up to 22px, h3 20px, h2 up to 40px, hero up to 64px, stat 36px. Headings are one weight and one colour. Labels are body type, sentence case, never tracked capitals. Code is 13px mono and never wraps.
+System fonts only, no font files, no third party request. Display: the system sans at weight 700, size up to 104px, tracking -0.045em, leading 0.96. Body 16px. Labels: the system monospace, 12px, uppercase, tracking 0.14em, used for metadata, kickers, spec keys and captions only, never for body text. Code is the monospace at 13px and never wraps (the window scrolls).
 
 ## Layout
 
-One container for every section: 76rem wide, centred, with a gutter of 16px that grows to 40px. Backgrounds can run full width, content never does. Vertical rhythm comes from one section padding token (64px growing to 112px) and the 4px spacing scale. Text blocks stop at 40rem and headings at 48rem. Grid children carry min-width 0 so code and tables cannot widen a column. Button rows wrap as a row and never stack at odd widths.
+12 columns inside one container (76rem, gutter 16px growing to 40px). Display type spans the container, intros are two columns (text left, legend right), hairlines separate sections. Chapter rail on wide screens: a thin left rail of coordinates with a marker that settles on the current section (scroll linked, progressive enhancement). Section moods: poster (hero), legend (intro), terrain (code window), ledger (stats and tables), statement (footer).
 
-## Elevation and Depth
+## Shape and depth
 
-Flat. Panels are separated by a 1px line, not a shadow. Focus is a 2px outline in the accent colour with a 2px offset and appears instantly.
+One radius per level: 4px inline code, 8px controls inside a frame, 20px for the one large frame, full for pills. No shadows except a faint ring on the floating pill nav. Flat everywhere else, hairlines not boxes.
 
-## Shapes
+## Motion
 
-Radii are 4px for inline code, 8px for buttons and inputs, 12px for panels and code blocks, full only for pills.
+Only transform and opacity. Scroll linked reveals use `animation-timeline: view()` inside `@supports`, so a browser without it shows everything at once, and `prefers-reduced-motion: reduce` turns them off. Pill nav hover is a background fade. No JavaScript is needed for any of it. The only scripts are the theme toggle and the copy buttons.
+
+## Trust checklist
+
+- Every number links to its source (agent test or benchmark page). Stat cells carry a source link.
+- No invented stats, testimonials or logos. The assistants and language rows are the real support lists.
+- Limits are on the page: the unfavourable stat cells, "where it did not help" and the exact-name question in Ask the map.
+- Real output, not mockups: the derive output, the query output, .stacklitrc.json and the install commands are recorded from the real tool.
+- One type scale, one spacing scale, one radius per level.
+- Fast and accessible: AA contrast in both themes (checked), visible focus, keyboard tabs, no JavaScript needed to read.
+- No decorative gradients, glow, glass, grain, particles or 3D.
+- Restrained palette: green plus neutrals, amber and red only for unfavourable cells.
+- Provenance in the legend: current version and date, MIT, source link, npm provenance, release checksums, and what the CLI does on the network (nothing, see source and privacy page).
+- A Verify note links the checksum file and the npm provenance page.
 
 ## Components
 
-- **Button:** one component, 44px high, two variants (primary, secondary) and one quiet link form. Labels never wrap inside a button.
-- **Code block:** dark surface, mono 13px, horizontal scroll, copy button, keyboard focusable. Never wraps.
-- **Stat row:** a big number, a small label and a source link. Favourable, neutral and unfavourable results are shown at the same size.
-- **Section and Container:** the only way to place content on a page. A lint script fails the build when a landing section skips them.
+- **Header:** logo left, a centred floating pill nav with an active state, a pill GitHub button with the star count right. On phones the pill nav docks to the bottom of the screen. CSS only.
+- **CodeWindow:** build time Shiki, three quiet dots, a CSS only tab bar (radio inputs), line numbers, line highlight and diff marks, a copy button and a mono caption row per tab. Code never wraps.
+- **Kicker, Intro, Legend:** the circled index, the mono label, the two column intro and the hairline spec table.
+- **AskTheMap:** preset question chips and recorded output. Labelled as recorded, not live.
+- **Setup prompt:** one click copies a prompt for your coding agent. Its text is tested against the real commands.
+- **Release banner:** slim, the real current version and date from the GitHub release at build time, with a fallback to the changelog.
+- **Section and Container:** the only way to place content. A lint script fails the build otherwise.
 
 ## Do's and Don'ts
 
 - Do show real output. Do show the numbers that make Stacklit look worse next to the ones that make it look better.
 - Do keep claims inside the benchmark. Never imply a general token or cost saving.
-- Don't use em or en dashes, gradients, glass effects, emoji icons or tracked capitals.
+- Don't use em or en dashes, gradients, glass, emoji icons, dashed borders or highlighter blocks behind words.
 - Don't add a colour or a font outside the tokens in `src/styles/tokens.css`.
+- Mono labels only for metadata. Never for sentences.
