@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T16:47:56Z",
+  "generated_at": "2026-11-08T16:49:17Z",
   "stacklit_version": "dev",
-  "merkle_hash": "4069d9f58349a993e019e593f0713d4928e5e423c3ca3022cfde3d98a90c6365",
+  "merkle_hash": "f2c1f302f3ecd7214202542aca33ea5644d002c7a5daa1e0872c1dca6d40cb0a",
   "project": {
     "name": "stacklit-integrations",
     "root": ".",
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 78,
-        "lines": 10438
+        "files": 85,
+        "lines": 11247
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 89,
-    "total_lines": 10681
+    "total_files": 96,
+    "total_lines": 11490
   },
   "modules": {
     "assets": {
@@ -84,14 +84,15 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 12,
-      "lines": 694,
+      "files": 13,
+      "lines": 775,
       "file_list": [
         "derive.go",
         "diff.go",
         "export.go",
         "generate.go",
         "hook.go",
+        "ingest.go",
         "init.go",
         "root.go",
         "serve.go",
@@ -109,6 +110,7 @@
         "internal/derive",
         "internal/engine",
         "internal/git",
+        "internal/ingest",
         "internal/mcp",
         "internal/renderer",
         "internal/schema",
@@ -297,6 +299,47 @@
       ],
       "activity": "low"
     },
+    "internal/ingest": {
+      "purpose": "Ingest",
+      "language": "go",
+      "files": 6,
+      "lines": 728,
+      "file_list": [
+        "api.go",
+        "docs.go",
+        "ingest.go",
+        "ingest_test.go",
+        "owners.go",
+        "schema.go"
+      ],
+      "exports": [
+        "ContextFile",
+        "Run(o Options) (*Context, error)",
+        "type API",
+        "type Context",
+        "type Doc",
+        "type ModuleOwners",
+        "type Operation",
+        "type Options",
+        "type OwnerRule",
+        "type Owners"
+      ],
+      "type_defs": {
+        "API": "File string, Title string, Operations []Operation",
+        "Context": "Version string, Docs []Doc, APIs []API, Tables []Table, Owners *Owners",
+        "Doc": "Path string, Kind string, Title string, Status string, Headings []string",
+        "ModuleOwners": "Module string, Codeowner []string, Authors []string",
+        "Operation": "Method string, Path string, ID string, Summary string",
+        "Options": "Root string, Docs bool, API bool, Schema bool, Owners bool, GitOwners bool, GitDays int, Modules []string",
+        "OwnerRule": "Pattern string, Owners []string",
+        "Owners": "Rules []OwnerRule, Modules []ModuleOwners",
+        "Table": "Name string, File string, Columns []string"
+      },
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
     "internal/mcp": {
       "purpose": "MCP server for AI agents",
       "language": "go",
@@ -441,13 +484,13 @@
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
         "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
-        "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "HotFile": "Path string, Commits90d int",
-        "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "Project": "Name string, Root string, Type string, Workspaces []string",
+        "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
         "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
       "depended_by": [
@@ -591,6 +634,10 @@
       ],
       [
         "internal/cli",
+        "internal/ingest"
+      ],
+      [
+        "internal/cli",
         "internal/mcp"
       ],
       [
@@ -709,6 +756,14 @@
   "git": {
     "hot_files": [
       {
+        "path": "stacklit.json",
+        "commits_90d": 2
+      },
+      {
+        "path": "stacklit.mmd",
+        "commits_90d": 2
+      },
+      {
         "path": "Makefile",
         "commits_90d": 1
       },
@@ -721,6 +776,10 @@
         "commits_90d": 1
       },
       {
+        "path": "internal/cli/ingest.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/cli/setup.go",
         "commits_90d": 1
       },
@@ -730,6 +789,30 @@
       },
       {
         "path": "internal/cli/version_test.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/api.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/docs.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/ingest.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/ingest_test.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/owners.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/ingest/schema.go",
         "commits_90d": 1
       },
       {
@@ -751,59 +834,31 @@
       {
         "path": "internal/setup/mcp.go",
         "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/runner.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/setup.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/setup_test.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/skill/SKILL.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/tools.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "stacklit.json",
-        "commits_90d": 1
-      },
-      {
-        "path": "stacklit.mmd",
-        "commits_90d": 1
       }
     ],
     "recent": [
-      "SKILL.md",
-      "internal/cli/hook.go",
-      "internal/cli/setup.go",
-      "internal/setup/block.go",
-      "internal/setup/claude.go",
-      "internal/setup/git.go",
-      "internal/setup/hookcmd.go",
-      "internal/setup/mcp.go",
-      "internal/setup/runner.go",
-      "internal/setup/setup.go"
+      "internal/cli/ingest.go",
+      "internal/ingest/api.go",
+      "internal/ingest/docs.go",
+      "internal/ingest/ingest.go",
+      "internal/ingest/ingest_test.go",
+      "internal/ingest/owners.go",
+      "internal/ingest/schema.go",
+      "stacklit.json",
+      "stacklit.mmd",
+      "SKILL.md"
     ],
     "stable": [
       "Makefile",
       "SKILL.md",
       "internal/cli/hook.go",
+      "internal/cli/ingest.go",
       "internal/cli/setup.go",
       "internal/cli/version.go",
       "internal/cli/version_test.go",
-      "internal/setup/block.go",
-      "internal/setup/claude.go",
-      "internal/setup/git.go",
-      "internal/setup/hookcmd.go"
+      "internal/ingest/api.go",
+      "internal/ingest/docs.go",
+      "internal/ingest/ingest.go"
     ]
   },
   "hints": {

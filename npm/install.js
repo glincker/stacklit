@@ -2,6 +2,7 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
 // Read the version from package.json so the npm publish workflow's
@@ -36,24 +37,79 @@ function getDownloadUrl() {
   return `https://github.com/${REPO}/releases/download/v${VERSION}/${filename.replace('VERSION', VERSION)}`;
 }
 
-function download(url, dest) {
+const MAX_REDIRECTS = 5;
+
+function request(url, redirects = 0) {
   return new Promise((resolve, reject) => {
-    const follow = (url) => {
-      https.get(url, (res) => {
-        if (res.statusCode === 302 || res.statusCode === 301) {
-          return follow(res.headers.location);
-        }
-        if (res.statusCode !== 200) {
-          reject(new Error(`Download failed: HTTP ${res.statusCode}`));
+    if (!url.startsWith('https://')) {
+      reject(new Error(`Refusing non-HTTPS URL: ${url}`));
+      return;
+    }
+    https.get(url, (res) => {
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
+        res.resume();
+        if (redirects >= MAX_REDIRECTS) {
+          reject(new Error('Too many redirects'));
           return;
         }
-        const file = fs.createWriteStream(dest);
-        res.pipe(file);
-        file.on('finish', () => { file.close(); resolve(); });
-      }).on('error', reject);
-    };
-    follow(url);
+        resolve(request(new URL(res.headers.location, url).toString(), redirects + 1));
+        return;
+      }
+      if (res.statusCode !== 200) {
+        res.resume();
+        reject(new Error(`Download failed: HTTP ${res.statusCode}`));
+        return;
+      }
+      resolve(res);
+    }).on('error', reject);
   });
+}
+
+async function download(url, dest) {
+  const res = await request(url);
+  await new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(dest);
+    res.pipe(file);
+    file.on('finish', () => file.close(resolve));
+    file.on('error', reject);
+    res.on('error', reject);
+  });
+}
+
+async function fetchText(url) {
+  const res = await request(url);
+  let body = '';
+  res.setEncoding('utf8');
+  for await (const chunk of res) body += chunk;
+  return body;
+}
+
+function sha256File(file) {
+  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+}
+
+// checksums.txt lines look like "<sha256>  <filename>" (goreleaser format).
+function expectedChecksum(checksums, filename) {
+  for (const line of checksums.split('\n')) {
+    const [hash, name] = line.trim().split(/\s+/);
+    if (name === filename && /^[0-9a-f]{64}$/i.test(hash)) return hash.toLowerCase();
+  }
+  return null;
+}
+
+// Fails closed: a missing or mismatching checksum aborts the install.
+// STACKLIT_SKIP_CHECKSUM=1 is an explicit escape hatch for mirrors.
+async function verifyArchive(archivePath, url) {
+  if (process.env.STACKLIT_SKIP_CHECKSUM === '1') {
+    console.warn('Skipping checksum verification (STACKLIT_SKIP_CHECKSUM=1).');
+    return;
+  }
+  const filename = url.split('/').pop();
+  const sumsUrl = url.slice(0, url.lastIndexOf('/') + 1) + 'checksums.txt';
+  const want = expectedChecksum(await fetchText(sumsUrl), filename);
+  if (!want) throw new Error(`no checksum listed for ${filename}`);
+  const got = sha256File(archivePath);
+  if (got !== want) throw new Error(`checksum mismatch for ${filename}: expected ${want}, got ${got}`);
 }
 
 async function install() {
@@ -78,6 +134,16 @@ async function install() {
     console.error(`Failed to download: ${err.message}`);
     console.error('You can install manually: go install github.com/glincker/stacklit/cmd/stacklit@latest');
     // Don't fail the install — let the bin script show a helpful error
+    return;
+  }
+
+  try {
+    await verifyArchive(archivePath, url);
+  } catch (err) {
+    fs.rmSync(archivePath, { force: true });
+    console.error(`Checksum verification failed: ${err.message}`);
+    console.error('Refusing to install an unverified binary. Install manually: go install github.com/glincker/stacklit/cmd/stacklit@latest');
+    process.exitCode = 1;
     return;
   }
 
@@ -129,7 +195,9 @@ async function install() {
   console.log('stacklit installed successfully.');
 }
 
-install().catch((err) => {
+module.exports = { expectedChecksum, sha256File };
+
+if (require.main === module) install().catch((err) => {
   console.error('Installation failed:', err.message);
   console.error('You can install manually: go install github.com/glincker/stacklit/cmd/stacklit@latest');
   // Surface the failure to npm so postinstall doesn't appear to succeed when
