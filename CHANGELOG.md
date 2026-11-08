@@ -18,11 +18,15 @@ All notable changes, reconstructed from the git history and release tags. Dates 
 - The opt-in PreToolUse hook now answers a grepped identifier with its definition and top callers (max 120 tokens), and stays silent without a graph.
 - `init --hook` and `setup` also install quiet post-checkout, post-merge and post-rewrite refresh hooks.
 
+- Session lifecycle (#55, design in `docs/SESSIONS.md`): `setup --session-hook` now covers `SessionStart` for startup, resume, clear and compact plus `SubagentStart` for Explore and Plan, and injects a digest only when the project `CLAUDE.md` does not already hold the current one (otherwise a one-line status). `setup --refresh-hook` adds an async `PostToolUse` hook. New `stacklit refresh --files` updates the index and symbol graph for just the changed files (content-hash skip, lock and queue for concurrent sessions and worktrees, atomic writes), matching a full `generate` byte for byte in tests. New `stacklit digest [--check]` and a structure hash over module names, edges and exported names. Opt-in local usage log with `stacklit stats`. Three steering phrasings behind `steering` or `STACKLIT_STEERING`. A real-agent A/B harness in `bench/agent-ab/` that refuses to run without `--yes-spend`.
+
 ### Changed
 - `query` prints files in relevance order (numbered, best symbol score first, ties by path) with a `best match:` line, instead of sorting by path. `--order path` or `STACKLIT_QUERY_ORDER=path` keeps the old layout. `--json` adds `rank` and `score`. On the benchmark this took found@1 for `query --budget 1000` read top to bottom from 13% to 81% (bench/RESULTS.md). The budget guarantee and byte-stable output are unchanged.
 - `query` ranking demotes files under test, example and benchmark directories unless the question names them (`STACKLIT_AUX_PENALTY`) and boosts symbols named like an identifier in the question (`STACKLIT_IDENT_TOKEN_BOOST`).
 - Multi-line signatures and doc comments now print on one line in `query`, `explain` and `impact` output.
-### Changed
+- The generated digest no longer ranks modules by line count and carries a `map <hash>` token, so ordinary edits leave it byte-identical.
+- `setup --no-mcp` no longer skips the Claude Code hooks and skill.
+- The symbol graph file is written atomically.
 - `timestamps` and `git_activity` now default to off so a committed index is byte-stable. Opt in with the config keys or `STACKLIT_TIMESTAMPS=1` and `STACKLIT_GIT=1`.
 - Tree-sitter trees are released after extraction, parsers are reused, and concurrent parse memory is gated (`parse_memory_mb`, `STACKLIT_PARSE_MEMORY_MB`). Cold peak memory on the benchmark repos fell from 2.2 GB to 1.6 GB (flask) and from 2.4 GB to 0.9 GB (hono).
 - `init --workspace` now sets the directory to index. The `derive` help no longer promises a fixed token count, and `init --hook` is described as a post-commit hook.

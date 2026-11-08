@@ -37,6 +37,11 @@ type Config struct {
 	GitActivity    *bool    `json:"git_activity,omitempty"`     // include hot/recent files, default off
 	MapIcons       string   `json:"map_icons,omitempty"`        // "remote" (default) or "off" for the HTML map
 
+	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b" or "c").
+	Steering string `json:"steering,omitempty"`
+	// Stats turns on the local usage log (also STACKLIT_STATS=1). Default off.
+	Stats *bool `json:"stats,omitempty"`
+
 	// Check holds architecture rules evaluated by `stacklit check`.
 	Check *CheckConfig `json:"check,omitempty"`
 }
