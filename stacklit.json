@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T18:29:53Z",
+  "generated_at": "2026-11-08T18:39:50Z",
   "stacklit_version": "dev",
-  "merkle_hash": "55f33f1da76490c2d0bfaba310d6108fe9deb02cff070fcc23f7eae1e4e5a220",
+  "merkle_hash": "a6cd1b5a1df1448d231d2bddb5ae5e7affc284443aab10823a2d09f458085abf",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -13,72 +13,72 @@
     "primary_language": "go",
     "languages": {
       "c": {
-        "files": 1,
-        "lines": 16
+        "files": 4,
+        "lines": 29
       },
       "cpp": {
-        "files": 1,
-        "lines": 14
+        "files": 3,
+        "lines": 29
       },
       "csharp": {
-        "files": 1,
-        "lines": 21
+        "files": 3,
+        "lines": 46
       },
       "dart": {
-        "files": 1,
-        "lines": 44
+        "files": 3,
+        "lines": 63
       },
       "elixir": {
-        "files": 1,
-        "lines": 34
+        "files": 3,
+        "lines": 49
       },
       "go": {
-        "files": 212,
-        "lines": 28134
+        "files": 222,
+        "lines": 32309
       },
       "graphql": {
         "files": 1,
         "lines": 34
       },
       "java": {
-        "files": 1,
-        "lines": 16
+        "files": 3,
+        "lines": 37
       },
       "javascript": {
-        "files": 4,
-        "lines": 472
+        "files": 6,
+        "lines": 493
       },
       "kotlin": {
-        "files": 1,
-        "lines": 31
+        "files": 3,
+        "lines": 51
       },
       "lua": {
-        "files": 1,
-        "lines": 23
+        "files": 3,
+        "lines": 45
       },
       "php": {
-        "files": 1,
-        "lines": 21
+        "files": 3,
+        "lines": 47
       },
       "protobuf": {
         "files": 1,
         "lines": 24
       },
       "python": {
-        "files": 2,
-        "lines": 74
+        "files": 4,
+        "lines": 96
       },
       "ruby": {
-        "files": 1,
-        "lines": 25
+        "files": 3,
+        "lines": 45
       },
       "rust": {
-        "files": 1,
-        "lines": 19
+        "files": 3,
+        "lines": 41
       },
       "scala": {
-        "files": 1,
-        "lines": 25
+        "files": 3,
+        "lines": 47
       },
       "shell": {
         "files": 1,
@@ -89,16 +89,16 @@
         "lines": 32
       },
       "swift": {
-        "files": 1,
-        "lines": 23
+        "files": 3,
+        "lines": 41
       },
       "typescript": {
-        "files": 5,
-        "lines": 24
+        "files": 7,
+        "lines": 54
       },
       "unknown": {
-        "files": 4,
-        "lines": 84
+        "files": 6,
+        "lines": 100
       }
     },
     "frameworks": [
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 244,
-    "total_lines": 29207
+    "total_files": 289,
+    "total_lines": 33729
   },
   "modules": {
     "assets": {
@@ -227,7 +227,7 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 22,
-      "lines": 1709,
+      "lines": 1731,
       "file_list": [
         "check.go",
         "check_test.go",
@@ -565,8 +565,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 27,
-      "lines": 5572,
+      "files": 37,
+      "lines": 9719,
       "file_list": [
         "analysis.go",
         "community.go",
@@ -576,6 +576,8 @@
         "extract_ecma.go",
         "extract_go.go",
         "extract_java.go",
+        "extract_meta_test.go",
+        "extract_opts_test.go",
         "extract_py.go",
         "extract_rs.go",
         "extract_test.go",
@@ -583,11 +585,9 @@
         "graph_test.go",
         "htmldata.go",
         "impact.go",
-        "path.go",
-        "perf_test.go",
-        "query.go",
-        "rank.go",
-        "resolve.go"
+        "langs_fixture_test.go",
+        "main_test.go",
+        "mask_test.go"
       ],
       "exports": [
         "Build(files []*parser.FileInfo, opts BuildOptions) *Graph",
@@ -604,10 +604,10 @@
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int",
         "Community": "ID int, Label string, Files int, Nodes int, Top []string",
-        "Def": "Name string, Qual string, Kind string, Line int, End int, Doc string, Sig string, Recv string, Methods []string",
+        "Def": "Name string, Qual string, Kind string, Line int, End int, Doc string, Sig string, Decl bool, Vis string, Recv string, Methods []string",
         "Edge": "From string, To string, Count int",
         "EdgeRef": "From string, To string, Kind string, Conf string, Score float64",
-        "ExtractOptions": "IncludeTests bool, MaxFileBytes int",
+        "ExtractOptions": "IncludeTests bool, MaxFileBytes int, MaxParseBytes int, ParseTimeout time.Duration, MemoryBudget int64",
         "FileGroup": "File string, Symbols []SymLine",
         "FileSyms": "Path string, Lang string, Pkg string, Defs []Def, Imports []Import, Refs []Ref",
         "HTMLGraph": "Files []string, Kinds []string, Comms []Community, Nodes []HTMLNode, Edges [][]float64, Total int",
@@ -683,7 +683,7 @@
       "purpose": "MCP server for AI agents",
       "language": "go",
       "files": 3,
-      "lines": 409,
+      "lines": 415,
       "file_list": [
         "graph_tools.go",
         "graph_tools_test.go",
@@ -1445,6 +1445,9 @@
       "STACKLIT_CACHE_DIR",
       "STACKLIT_DIGEST_TOKENS",
       "STACKLIT_GIT",
+      "STACKLIT_GRAPH_INCLUDE_TESTS",
+      "STACKLIT_GRAPH_MAX_PARSE_BYTES",
+      "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
       "STACKLIT_MAX_FILE_SIZE",
       "STACKLIT_MAX_LINE_LEN",
