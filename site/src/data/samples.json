@@ -1,0 +1,30 @@
+{
+  "derive": "gin | go | 8 modules | 19,537 lines | Gin, GitHub Actions, net/http\ntest: go test ./... | env: PORT\n\nmodules:\n  .github             .github\n  .github/workflows   workflows\n  binding             binding | depends: bytesconv, json\n  ginS                gins\n  internal/bytesconv  bytesconv | depended-by: binding, render, root\n  internal/json       json | depended-by: binding, render, root\n  render              render | depends: bytesconv, json\n  root                root package | depends: binding, bytesconv, json, render\ndo-not-touch: .github/\n",
+  "query": "query \"how are route params bound to a handler\"\n60 seeds, 83 candidates\ncontext.go\n  404-406 func (c *Context) Param(key string) string  // Param returns the value of the URL param.\ngin.go\n  298-301 func (engine *Engine) NoRoute(handlers ...HandlerFunc)  // NoRoute adds handlers for NoRoute.\n  336-358 func (engine *Engine) addRoute(method, path string, handlers HandlersChain)\n      calls tree.go::node.addRoute E0.90\n  605-671 func (engine *Engine) handleHTTPRequest(c *Context)\nginS/gins.go\n  41-43 func NoRoute(handlers ...gin.HandlerFunc)  // NoRoute adds handlers for NoRoute.\n      calls gin.go::Engine.NoRoute I0.55\nroutergroup.go",
+  "question": "how are route params bound to a handler",
+  "diff": "Index is up to date. No source changes detected.",
+  "hashFirst": "03b6d695713b8088911157b95a0e5c2303a00007",
+  "hashSecond": "03b6d695713b8088911157b95a0e5c2303a00007",
+  "identical": true,
+  "moduleName": "render",
+  "module": {
+    "purpose": "Render",
+    "language": "go",
+    "files": 15,
+    "lines": 1304,
+    "exports": [
+      "type JSON",
+      "type IndentedJSON",
+      "type SecureJSON",
+      "type JsonpJSON"
+    ],
+    "depends_on": [
+      "internal/bytesconv",
+      "internal/json"
+    ],
+    "depended_by": [
+      "root"
+    ]
+  },
+  "generateOut": "[stacklit] found 101 files\n[stacklit] parsed 101 files (0 errors, 0 cached)\n[stacklit] done in 37ms -- wrote stacklit.json, DEPENDENCIES.md, stacklit.html"
+}

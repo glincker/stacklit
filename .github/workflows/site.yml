@@ -1,0 +1,67 @@
+name: site
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'site/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'bench/RESULTS.md'
+      - '.github/workflows/site.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'bench/RESULTS.md'
+      - '.github/workflows/site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+# Publishing stays off until the repository variable SITE_DEPLOY is set to true
+# (after Pages is enabled with the GitHub Actions source), so master is never red.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      # The demo maps are committed, so no Go toolchain is needed here.
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/configure-pages@v5.0.0
+        if: github.event_name != 'pull_request' && vars.SITE_DEPLOY == 'true'
+      - uses: actions/upload-pages-artifact@v3.0.1
+        if: github.event_name != 'pull_request' && vars.SITE_DEPLOY == 'true'
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && vars.SITE_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4.0.5
