@@ -1,19 +1,20 @@
 ---
 import Section from '../components/Section.astro';
+import UiIcon from '../components/UiIcon.astro';
 import SectionHead from '../components/SectionHead.astro';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
 const at = copy.agentTest;
 ---
 <Section id="helps" label="helps-title">
-  <SectionHead id="helps-title" n="08" label="Where it helps" title={copy.whereItHelps.title} />
+  <SectionHead id="helps-title" n="08" icon="list-checks" label="Where it helps" title={copy.whereItHelps.title} />
   <div class="reveal grid min-w-0 gap-12 md:grid-cols-2 md:gap-0">
     <div class="min-w-0 border-t border-ink pt-6 md:pe-10">
-      <h3 class="text-h2 font-bold text-accent-text">{at.helpsTitle}</h3>
+      <h3 class="flex items-center gap-3 text-h2 font-bold text-accent-text"><UiIcon name="circle-check" size={24} />{at.helpsTitle}</h3>
       <ul class="mt-4 max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">{at.helps.map((t) => <li>{fill(t)}</li>)}</ul>
     </div>
     <div class="min-w-0 border-t border-ink pt-6 md:border-s md:border-line md:ps-10">
-      <h3 class="text-h2 font-bold text-bad">{at.failsTitle}</h3>
+      <h3 class="flex items-center gap-3 text-h2 font-bold text-bad"><UiIcon name="triangle-alert" size={24} />{at.failsTitle}</h3>
       <ul class="mt-4 max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">{at.fails.map((t) => <li>{fill(t)}</li>)}</ul>
     </div>
   </div>

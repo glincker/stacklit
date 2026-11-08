@@ -1,0 +1,24 @@
+---
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+// theSVG UI icon, outline look (hairline, square ends, currentColor), inlined at build time: no request, no client code.
+// Decorative by default (aria-hidden). Pass label to expose it as an image with a name.
+interface Props { name: string; size?: number; weight?: number; label?: string; class?: string }
+const { name, size = 16, weight = 1.5, label, class: extra } = Astro.props;
+const dir = resolve(process.cwd(), 'node_modules/@thesvg/ui/dist/svg');
+const g = globalThis as { __uiIcons?: Map<string, string>; __uiIconN?: number };
+const cache = (g.__uiIcons ??= new Map<string, string>());
+let raw = cache.get(name);
+if (raw === undefined) {
+  try { raw = readFileSync(resolve(dir, name, 'outline.svg'), 'utf8'); } catch { throw new Error(`UiIcon: no icon named "${name}" in @thesvg/ui`); }
+  cache.set(name, raw);
+}
+// Masks inside an icon need ids that are unique on the page, so every use gets its own prefix.
+const n = (g.__uiIconN = (g.__uiIconN ?? 0) + 1);
+const a11y = label ? `role="img" aria-label="${label.replace(/"/g, '&quot;')}"` : 'aria-hidden="true" focusable="false"';
+const svg = raw
+  .replace(/(id="|url\(#)([^"')]+)/g, `$1u${n}-$2`)
+  .replace(/<svg [^>]*?viewBox="0 0 24 24"[^>]*>/, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" overflow="visible" class="shrink-0${extra ? ' ' + extra : ''}" ${a11y}>`)
+  .replace(/stroke-width="[^"]+"/g, `stroke-width="${weight}"`);
+---
+<Fragment set:html={svg} />

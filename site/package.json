@@ -22,6 +22,7 @@
     "@astrojs/starlight-tailwind": "5.0.0",
     "@tailwindcss/vite": "4.3.5",
     "@thesvg/astro": "4.0.4",
+    "@thesvg/ui": "^4.4.0",
     "astro": "7.4.7",
     "github-slugger": "2.0.0",
     "tailwindcss": "4.3.5"

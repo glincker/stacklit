@@ -1,0 +1,11 @@
+---
+import UiIcon from './UiIcon.astro';
+// Copy button: icon plus label. The page script (Landing layout) sets data-state="copied" and swaps the label for 1.6 s.
+interface Props { text: string; label?: string; size?: number; class?: string }
+const { text, label = 'Copy', size = 14, class: extra } = Astro.props;
+---
+<button type="button" data-copy={text} class:list={['group/copy inline-flex shrink-0 items-center gap-2 transition-colors duration-fast motion-reduce:transition-none', extra]}>
+  <UiIcon name="copy" size={size} class="group-data-[state=copied]/copy:hidden" />
+  <UiIcon name="check" size={size} class="hidden group-data-[state=copied]/copy:block" />
+  <span data-copy-label aria-live="polite">{label}</span>
+</button>

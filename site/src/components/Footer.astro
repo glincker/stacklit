@@ -1,19 +1,27 @@
 ---
 import Container from './Container.astro';
-const links = [
-  ['GitHub', 'https://github.com/glincker/stacklit'],
-  ['npm', 'https://www.npmjs.com/package/stacklit'],
-  ['MIT license', 'https://github.com/glincker/stacklit/blob/master/LICENSE'],
-  ['FAQ', '/docs/faq/'],
-  ['Privacy', '/docs/privacy/'],
-  ['Changelog', '/docs/changelog/'],
-  ['llms.txt', '/llms.txt'],
+import Logo from './Logo.astro';
+import UiIcon from './UiIcon.astro';
+// Brand links use the real mark (inlined), the site's own pages use a hairline UI icon.
+const links: { label: string; href: string; brand?: string; icon?: string }[] = [
+  { label: 'GitHub', href: 'https://github.com/glincker/stacklit', brand: 'github' },
+  { label: 'npm', href: 'https://www.npmjs.com/package/stacklit', brand: 'npm' },
+  { label: 'MIT license', href: 'https://github.com/glincker/stacklit/blob/master/LICENSE', icon: 'scale' },
+  { label: 'FAQ', href: '/docs/faq/', icon: 'circle-question-mark' },
+  { label: 'Privacy', href: '/docs/privacy/', icon: 'shield-check' },
+  { label: 'Changelog', href: '/docs/changelog/', icon: 'scroll-text' },
+  { label: 'llms.txt', href: '/llms.txt', icon: 'file-text' },
 ];
 ---
 <footer class="border-t border-line bg-paper pb-28 pt-10 md:pb-12">
   <Container>
     <ul class="flex flex-wrap gap-x-8 gap-y-1">
-      {links.map(([label, href]) => <li><a href={href} class="label-mono inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-4 hover:decoration-2">{label}</a></li>)}
+      {links.map((l) => (
+        <li><a href={l.href} class="label-mono group/f inline-flex min-h-11 items-center gap-2 text-ink underline decoration-1 underline-offset-4 hover:decoration-2">
+          {l.brand ? <Logo name={l.label} slug={l.brand} size={16} bare /> : <UiIcon name={l.icon ?? 'link'} size={16} class="text-muted transition-colors duration-fast group-hover/f:text-accent-text motion-reduce:transition-none" />}
+          {l.label}
+        </a></li>
+      ))}
     </ul>
     <p class="mt-4 max-w-measure text-caption text-muted">No cookies, no analytics, no third party scripts, fonts or images. This site makes no third party requests. The star count and release are read once, when the site is built.</p>
   </Container>

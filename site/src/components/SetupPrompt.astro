@@ -1,18 +1,20 @@
 ---
 import { setupPrompt } from '../data/setupPrompt';
+import CopyButton from './CopyButton.astro';
+import UiIcon from './UiIcon.astro';
 // One click copies a prompt for the visitor's own coding agent. The full text is readable in the disclosure below.
 interface Props { class?: string }
 const { class: extra } = Astro.props;
 ---
 <div class:list={['glow min-w-0 rounded-frame border border-line-strong bg-raised', extra]}>
   <div class="flex items-center justify-between gap-3 ps-5">
-    <p class="label-mono min-w-0 text-ink">Copy setup prompt</p>
-    <button type="button" data-copy={setupPrompt} class="m-1 inline-flex min-h-11 shrink-0 items-center rounded-full bg-accent px-5 text-caption font-semibold text-accent-ink transition-colors duration-fast hover:brightness-110 motion-reduce:transition-none">Copy prompt</button>
+    <p class="label-mono flex min-w-0 items-center gap-2 text-ink"><UiIcon name="sparkles" size={14} class="text-accent-text" />Copy setup prompt</p>
+    <CopyButton text={setupPrompt} label="Copy prompt" class="m-1 min-h-11 rounded-full bg-accent px-5 text-caption font-semibold text-accent-ink hover:brightness-110" />
   </div>
   <details class="group border-t border-line">
     <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-5 text-caption text-muted hover:text-ink [&::-webkit-details-marker]:hidden">
       <span>Paste it into Claude Code, Cursor, Codex or any agent. See what it says.</span>
-      <span class="shrink-0 group-open:hidden" aria-hidden="true">+</span><span class="hidden shrink-0 group-open:inline" aria-hidden="true">-</span>
+      <UiIcon name="chevron-down" size={16} class="transition-transform duration-fast group-open:rotate-180 motion-reduce:transition-none" />
     </summary>
     <div role="region" aria-label="Setup prompt text" tabindex="0" class="max-h-72 overflow-auto border-t border-line px-5 py-4 font-mono text-code text-ink whitespace-pre-wrap [overflow-wrap:anywhere]">{setupPrompt}</div>
   </details>

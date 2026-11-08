@@ -1,4 +1,5 @@
 ---
+import CopyButton from './CopyButton.astro';
 // Code never wraps: the block scrolls sideways and takes keyboard focus so it can be scrolled by key.
 interface Props { code: string; html?: string; label?: string; note?: string; copy?: boolean; inline?: boolean; prompt?: boolean; class?: string }
 const { code, html, label, note, copy = false, inline = false, prompt = false, class: extra } = Astro.props;
@@ -7,11 +8,11 @@ const { code, html, label, note, copy = false, inline = false, prompt = false, c
   {!inline && (label || copy) && (
     <div class="flex items-center justify-between gap-3 border-b border-line px-4 py-2 text-caption text-muted">
       <span class="min-w-0 truncate"><span class="font-mono">{label}</span>{note && <span>{label ? ', ' : ''}{note}</span>}</span>
-      {copy && <button type="button" data-copy={code} class="min-h-11 shrink-0 rounded-sm px-3 text-caption font-semibold text-accent-text hover:text-ink">Copy</button>}
+      {copy && <CopyButton text={code} class="min-h-11 rounded-sm px-3 text-caption font-semibold text-accent-text hover:text-ink" />}
     </div>
   )}
   <div class:list={['flex items-center', inline && 'gap-1']}>
     <pre tabindex="0" class:list={['min-w-0 flex-1 overflow-x-auto whitespace-pre font-mono text-code', inline ? 'ps-5 pe-2 py-2.5' : 'px-4 py-4']}><code>{prompt && <span class="select-none text-faint" aria-hidden="true">$ </span>}{html ? <Fragment set:html={html} /> : code}</code></pre>
-    {inline && copy && <button type="button" data-copy={code} class="mr-1 min-h-11 shrink-0 rounded-sm px-3 text-caption font-semibold text-accent-text hover:text-ink">Copy</button>}
+    {inline && copy && <CopyButton text={code} class="mr-1 min-h-11 rounded-sm px-3 text-caption font-semibold text-accent-text hover:text-ink" />}
   </div>
 </div>

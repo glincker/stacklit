@@ -1,22 +1,24 @@
 ---
+import UiIcon from '../components/UiIcon.astro';
 import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
 ---
 <Section id="faq" label="faq-title">
-  <SectionHead id="faq-title" n="11" label="Questions" title={copy.faq.title} />
+  <SectionHead id="faq-title" n="11" icon="circle-question-mark" label="Questions" title={copy.faq.title} />
   <div class="reveal border-t border-ink">
     {copy.faq.items.map((f) => (
       <details class="group border-b border-line">
         <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-6 py-5 text-h3 text-ink hover:text-accent-text [&::-webkit-details-marker]:hidden">
           <span class="min-w-0">{f.q}</span>
-          <span class="label-mono grid size-8 shrink-0 place-items-center rounded-full border border-line-strong text-muted group-open:hidden" aria-hidden="true">+</span>
-          <span class="label-mono hidden size-8 shrink-0 place-items-center rounded-full border border-line-strong text-muted group-open:grid" aria-hidden="true">-</span>
+          <span class="grid size-8 shrink-0 place-items-center rounded-full border border-line-strong text-muted transition-colors duration-fast group-hover:text-accent-text motion-reduce:transition-none">
+            <UiIcon name="plus" size={14} class="group-open:hidden" /><UiIcon name="minus" size={14} class="hidden group-open:block" />
+          </span>
         </summary>
         <p class="max-w-measure pb-6 text-body text-muted">{fill(f.a)}</p>
       </details>
     ))}
   </div>
-  <p class="mt-8"><a href="/docs/faq/" class="inline-flex min-h-11 items-center text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}</a></p>
+  <p class="mt-8"><a href="/docs/faq/" class="inline-flex min-h-11 items-center gap-1.5 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}<UiIcon name="arrow-right" size={14} /></a></p>
 </Section>

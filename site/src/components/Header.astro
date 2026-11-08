@@ -1,5 +1,6 @@
 ---
 import StarButton from './StarButton.astro';
+import UiIcon from './UiIcon.astro';
 // Three floating pills: the logo, the nav and the GitHub action. On phones the nav pill docks at the bottom of the
 // screen so nothing collapses behind a menu button. CSS only, every link is a real link.
 const { path = '/' } = Astro.props;
@@ -24,8 +25,8 @@ const ring = 'pill rounded-full border border-ring bg-raised';
   <div class:list={['pointer-events-auto flex items-center gap-1 justify-self-end p-1', ring]}>
     <StarButton variant="ghost" size="sm" label="GitHub" compact class="min-h-11" />
     <button type="button" data-theme-toggle class="grid size-11 place-items-center rounded-full text-ink transition-colors duration-fast hover:bg-sunk motion-reduce:transition-none" aria-label="Switch between light and dark theme">
-      <svg viewBox="0 0 24 24" class="size-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
-      <svg viewBox="0 0 24 24" class="hidden size-5 dark:block" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <UiIcon name="moon" size={20} class="dark:hidden" />
+      <UiIcon name="sun" size={20} class="hidden dark:block" />
     </button>
   </div>
 </header>

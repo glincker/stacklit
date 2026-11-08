@@ -94,9 +94,11 @@ const ld = {
         var b = e.target.closest && e.target.closest('[data-copy]');
         if (!b || !navigator.clipboard) return;
         navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () {
-          var t = b.textContent;
-          b.textContent = 'Copied';
-          setTimeout(function () { b.textContent = t; }, 1600);
+          var l = b.querySelector('[data-copy-label]') || b;
+          var t = l.textContent;
+          l.textContent = 'Copied';
+          b.setAttribute('data-state', 'copied');
+          setTimeout(function () { l.textContent = t; b.removeAttribute('data-state'); }, 1600);
         }, function () {});
       });
     </script>

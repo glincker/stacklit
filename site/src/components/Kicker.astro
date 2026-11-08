@@ -1,9 +1,10 @@
 ---
-// A section kicker: the circled index and a mono label, like a map reference. Metadata only.
-interface Props { n: string; label: string; class?: string }
-const { n, label, class: extra } = Astro.props;
+import UiIcon from './UiIcon.astro';
+// A section kicker: the circled index, a small icon and a mono label, like a map reference. Metadata only.
+interface Props { n: string; label: string; icon?: string; class?: string }
+const { n, label, icon, class: extra } = Astro.props;
 ---
 <p class:list={['label-mono flex items-center gap-3 text-muted', extra]}>
   <span class="grid size-8 shrink-0 place-items-center rounded-full border border-line-strong text-ink" aria-hidden="true">{n}</span>
-  <span><span class="sr-only">Section {n}, </span>{label}</span>
+  <span class="flex items-center gap-2">{icon && <UiIcon name={icon} size={16} class="text-accent-text" />}<span><span class="sr-only">Section {n}, </span>{label}</span></span>
 </p>

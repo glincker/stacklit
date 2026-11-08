@@ -1,13 +1,13 @@
 ---
 import Kicker from './Kicker.astro';
 // Kicker, a giant statement, then a two column intro: text on the left, the legend (spec table) on the right.
-interface Props { id: string; title: string; n: string; label: string; lead?: string }
-const { id, title, n, label, lead } = Astro.props;
+interface Props { id: string; title: string; n: string; label: string; icon?: string; lead?: string }
+const { id, title, n, label, icon, lead } = Astro.props;
 const hasText = Boolean(lead) || Astro.slots.has('default');
 const hasLegend = Astro.slots.has('legend');
 ---
 <header class="mb-12 min-w-0 sm:mb-16">
-  <Kicker n={n} label={label} class="reveal" />
+  <Kicker n={n} label={label} icon={icon} class="reveal" />
   <h2 id={id} class="reveal mt-8 max-w-[22ch] text-statement font-bold text-ink">{title}</h2>
   {(hasText || hasLegend) && (
     <div class="mt-10 grid min-w-0 gap-10 lg:grid-cols-12 lg:gap-12">

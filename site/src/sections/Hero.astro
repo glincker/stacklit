@@ -5,6 +5,7 @@ import Section from '../components/Section.astro';
 import Kicker from '../components/Kicker.astro';
 import Legend from '../components/Legend.astro';
 import Button from '../components/Button.astro';
+import UiIcon from '../components/UiIcon.astro';
 import StarButton from '../components/StarButton.astro';
 import CodeBlock from '../components/CodeBlock.astro';
 import CodeWindow from '../components/CodeWindow.astro';
@@ -37,19 +38,19 @@ const rows = [
 ];
 const deriveLines: Record<number, string> = { 1: 'ln-cmd', 2: 'ln-key', 5: 'ln-dim' };
 const tabs = [
-  { label: 'stacklit derive', lang: 'text', code: `$ stacklit derive\n${derive}`, copy: 'stacklit derive', classes: deriveLines, caption: `stacklit derive on gin, a Go web framework with 19,500 lines. The whole map is ${tokens} tokens, about ${Math.round(Number(tokens) * 0.75)} words.` },
-  { label: 'stacklit query', lang: 'text', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) }, caption: `A plain question, answered with a ranked list of files. Recorded on gin, ${q.tokens} tokens, under the ${ask.budget} we allowed.` },
-  { label: '.stacklitrc.json', lang: 'json', code: rc, highlight: [3], caption: 'This repo’s own .stacklitrc.json. Every key is optional. Line 3 moves the diagram file.' },
-  { label: 'claude plugin install', lang: 'bash', code: 'claude plugin marketplace add glincker/stacklit\nclaude plugin install stacklit@stacklit', caption: 'Two commands add the Claude Code plugin. It needs the stacklit program installed first.' },
+  { label: 'stacklit derive', icon: 'terminal', lang: 'text', code: `$ stacklit derive\n${derive}`, copy: 'stacklit derive', classes: deriveLines, caption: `stacklit derive on gin, a Go web framework with 19,500 lines. The whole map is ${tokens} tokens, about ${Math.round(Number(tokens) * 0.75)} words.` },
+  { label: 'stacklit query', icon: 'search', lang: 'text', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) }, caption: `A plain question, answered with a ranked list of files. Recorded on gin, ${q.tokens} tokens, under the ${ask.budget} we allowed.` },
+  { label: '.stacklitrc.json', icon: 'json-file', lang: 'json', code: rc, highlight: [3], caption: 'This repo’s own .stacklitrc.json. Every key is optional. Line 3 moves the diagram file.' },
+  { label: 'claude plugin install', icon: 'plug-2', lang: 'bash', code: 'claude plugin marketplace add glincker/stacklit\nclaude plugin install stacklit@stacklit', caption: 'Two commands add the Claude Code plugin. It needs the stacklit program installed first.' },
 ];
 ---
 <Section id="overview" label="hero-title" size="hero">
-  <Kicker n="01" label="Overview" class="reveal" />
+  <Kicker n="01" icon="map" label="Overview" class="reveal" />
   <h1 id="hero-title" class="mt-8 max-w-[19ch] text-display font-bold text-ink" set:html={headline} />
   <div class="mt-8 grid min-w-0 gap-10 lg:mt-10 lg:grid-cols-12 lg:gap-12">
     <div class="min-w-0 lg:col-span-7">
       <p class="max-w-measure text-lead text-ink">{fill(hero.sub)}</p>
-      <p class="mt-1"><a class="inline-flex min-h-11 items-center text-body font-semibold text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2" href={copy.hero.secondaryHref}>{copy.hero.secondaryCta}</a></p>
+      <p class="mt-1"><a class="inline-flex min-h-11 items-center gap-1.5 text-body font-semibold text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2" href={copy.hero.secondaryHref}>{copy.hero.secondaryCta}<UiIcon name="arrow-right" size={16} /></a></p>
       <div class="mt-6 max-w-measure space-y-4">
         <SetupPrompt />
         <div class="action-row">

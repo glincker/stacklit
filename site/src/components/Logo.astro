@@ -18,25 +18,44 @@ import Rust from '@thesvg/astro/rust';
 import Java from '@thesvg/astro/java';
 import Npm from '@thesvg/astro/npm';
 import Github from '@thesvg/astro/github';
+import Homebrew from '@thesvg/astro/homebrew';
+import JavaScript from '@thesvg/astro/javascript';
+import CSharp from '@thesvg/astro/csharp';
+import Kotlin from '@thesvg/astro/kotlin';
+import Swift from '@thesvg/astro/swift';
+import Php from '@thesvg/astro/php';
+import Ruby from '@thesvg/astro/ruby';
+import C from '@thesvg/astro/c';
+import Cpp from '@thesvg/astro/c-plusplus';
+import Scala from '@thesvg/astro/scala';
+import Dart from '@thesvg/astro/dart';
+import Elixir from '@thesvg/astro/elixir';
+import Lua from '@thesvg/astro/lua';
+import Zig from '@thesvg/astro/zig';
 
-interface Props { name: string; slug?: string; size?: number }
-const { name, slug, size = 24 } = Astro.props;
+interface Props { name: string; slug?: string; size?: number; bare?: boolean }
+const { name, slug, size = 24, bare = false } = Astro.props;
 // Marks drawn in fixed white sit on a dark tile; marks drawn in fixed near-black are inverted in the dark theme.
-const marks: Record<string, { C: any; darkInvert?: boolean; darkTile?: boolean }> = {
+const marks: Record<string, { C: any; darkInvert?: boolean; darkTile?: boolean; lightTile?: boolean }> = {
   'claude-code': { C: ClaudeCode }, cursor: { C: Cursor, darkTile: true }, codex: { C: Codex, darkInvert: true },
   'github-copilot': { C: GithubCopilot, darkTile: true }, 'google-gemini': { C: GoogleGemini }, windsurf: { C: Windsurf, darkTile: true },
   cline: { C: Cline, darkInvert: true }, opencode: { C: OpenCode }, zed: { C: Zed, darkTile: true }, junie: { C: Junie },
   go: { C: Go, darkTile: true }, typescript: { C: TypeScript }, python: { C: Python }, rust: { C: Rust, darkInvert: true },
   java: { C: Java }, npm: { C: Npm }, github: { C: Github, darkInvert: true },
+  homebrew: { C: Homebrew }, javascript: { C: JavaScript }, csharp: { C: CSharp }, kotlin: { C: Kotlin }, swift: { C: Swift },
+  php: { C: Php }, ruby: { C: Ruby }, c: { C: C }, 'c-plusplus': { C: Cpp }, scala: { C: Scala }, dart: { C: Dart },
+  elixir: { C: Elixir, lightTile: true }, lua: { C: Lua }, zig: { C: Zig },
 };
 const mark = slug ? marks[slug] : undefined;
 const Mark = mark?.C;
 ---
-<span class="inline-flex items-center gap-3">
-  <span class:list={['grid size-10 shrink-0 place-items-center rounded-md border', mark?.darkTile ? 'border-term-line bg-term text-term-text' : 'border-line bg-tile text-ink']}>
+{bare && Mark
+  ? <Mark size={size} aria-hidden="true" class:list={['shrink-0', mark?.darkInvert && 'dark:invert']} />
+  : <span class="inline-flex items-center gap-3">
+  <span class:list={['grid size-10 shrink-0 place-items-center rounded-md border', mark?.darkTile ? 'border-term-line bg-term text-term-text' : mark?.lightTile ? 'border-line bg-white text-ink' : 'border-line bg-tile text-ink']}>
     {Mark
       ? <Mark size={size} aria-hidden="true" class:list={[mark?.darkInvert && 'dark:invert']} />
       : <span class="text-body font-semibold" aria-hidden="true">{name[0]}</span>}
   </span>
   <span class="text-body text-ink">{name}</span>
-</span>
+</span>}

@@ -1,11 +1,14 @@
 ---
 import { Code } from 'astro:components';
 import { termHtml } from '../data/termHighlight';
+import CopyButton from './CopyButton.astro';
+import UiIcon from './UiIcon.astro';
 // One editor window with up to six tabs. Highlighted at build time (no client code), tabs are radio inputs, so
 // switching works without a script and with the arrow keys. Only the copy buttons use the page's small existing script.
 // Code never wraps: the frame scrolls sideways and takes keyboard focus.
 interface Tab {
   label: string;               // tab text: a filename or a command
+  icon?: string;               // optional @thesvg/ui icon name shown before the label
   code: string;
   lang?: string;               // shiki language, default text
   caption?: string;            // mono caption row
@@ -42,9 +45,9 @@ const transformersFor = (t: Tab) => [{
         <span class="size-2.5 rounded-full bg-line"></span><span class="size-2.5 rounded-full bg-line"></span><span class="size-2.5 rounded-full bg-line"></span>
       </div>
       {chips
-        ? <p class="label-mono flex min-w-0 items-center truncate pe-4 text-muted">{title}</p>
+        ? <p class="label-mono flex min-w-0 items-center gap-2 truncate pe-4 text-muted"><UiIcon name="terminal" size={14} />{title}</p>
         : <div class="flex min-w-0 overflow-x-auto">
-            {tabs.map((t, i) => <label for={`cw-${name}-${i}`} class="cw-tab flex min-h-11 shrink-0 cursor-pointer items-center whitespace-nowrap px-4 font-mono text-caption transition-colors duration-fast motion-reduce:transition-none">{t.label}</label>)}
+            {tabs.map((t, i) => <label for={`cw-${name}-${i}`} class="cw-tab flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap px-4 font-mono text-caption transition-colors duration-fast motion-reduce:transition-none">{t.icon && <UiIcon name={t.icon} size={14} />}{t.label}</label>)}
           </div>}
     </div>
     <div class="cw-panels">
@@ -56,7 +59,7 @@ const transformersFor = (t: Tab) => [{
           {t.note && <p class="border-t border-line px-5 py-3 text-body text-ink">{t.note}</p>}
           <div class="flex items-center justify-between gap-3 border-t border-line bg-surface ps-5">
             <p class="min-w-0 py-2 font-mono text-caption leading-snug text-muted">{t.caption}</p>
-            <button type="button" data-copy={t.copy ?? t.code} class="min-h-11 shrink-0 px-4 font-mono text-caption font-semibold text-accent-text hover:text-ink">Copy</button>
+            <CopyButton text={t.copy ?? t.code} class="min-h-11 px-4 font-mono text-caption font-semibold text-accent-text hover:text-ink" />
           </div>
         </div>
       ))}

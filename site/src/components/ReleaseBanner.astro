@@ -1,11 +1,12 @@
 ---
 import release from '../data/release.json';
+import UiIcon from './UiIcon.astro';
 // A slim line with the real current release, read from the GitHub release at build time.
 ---
 <aside aria-label="Latest release" class="border-b border-line bg-surface">
   <p class="mx-auto flex w-full max-w-site flex-wrap items-center justify-center gap-x-4 gap-y-1 px-gutter py-2 text-caption text-muted">
-    <span class="label-mono rounded-full border border-line-strong px-2 text-ink">v{release.version}</span>
+    <span class="label-mono inline-flex items-center gap-1.5 rounded-full border border-line-strong px-2 text-ink"><UiIcon name="tag" size={12} />v{release.version}</span>
     <span>Released {release.date}. Free, MIT, no telemetry.</span>
-    <a href="/docs/changelog/" class="min-h-6 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">Read the changelog</a>
+    <a href="/docs/changelog/" class="inline-flex min-h-6 items-center gap-1 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">Read the changelog<UiIcon name="arrow-right" size={12} /></a>
   </p>
 </aside>

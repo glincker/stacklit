@@ -10,7 +10,12 @@ const assistants: [string, string | undefined][] = [
   ['Gemini CLI', 'google-gemini'], ['Windsurf', 'windsurf'], ['Cline', 'cline'], ['OpenCode', 'opencode'],
   ['Zed', 'zed'], ['Junie', 'junie'], ['Aider', undefined],
 ];
-const languages: [string, string][] = [['Go', 'go'], ['TypeScript', 'typescript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java']];
+// Languages with call links, from the edge-kind table in the architecture notes.
+const languages: [string, string][] = [
+  ['Go', 'go'], ['TypeScript', 'typescript'], ['JavaScript', 'javascript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java'],
+  ['C#', 'csharp'], ['Kotlin', 'kotlin'], ['Swift', 'swift'], ['PHP', 'php'], ['Ruby', 'ruby'], ['C', 'c'],
+  ['C++', 'c-plusplus'], ['Scala', 'scala'], ['Dart', 'dart'], ['Elixir', 'elixir'], ['Lua', 'lua'], ['Zig', 'zig'],
+];
 const rows = [
   { key: 'Set up', value: '25 assistants, plus a generic AGENTS.md', href: '/docs/assistants/' },
   { key: 'MCP', value: 'Any client, via stacklit serve', href: '/docs/mcp/' },
@@ -19,7 +24,7 @@ const rows = [
 ];
 ---
 <Section id="works" label="works-title">
-  <SectionHead id="works-title" n="03" label="Works with" title={copy.assistants.title}>
+  <SectionHead id="works-title" n="03" icon="plug-2" label="Works with" title={copy.assistants.title}>
     <p class="max-w-measure text-body text-muted">{copy.assistants.note}</p>
     <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
   </SectionHead>
@@ -27,7 +32,7 @@ const rows = [
     {assistants.map(([name, slug]) => <li class="min-w-0"><Logo name={name} slug={slug} /></li>)}
   </ul>
   <p class="label-mono mb-5 mt-14 text-muted">Call links (who calls what) for 20 languages, including</p>
-  <ul class="reveal flex flex-wrap gap-x-8 gap-y-5">
-    {languages.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
+  <ul class="reveal grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+    {languages.map(([name, slug]) => <li class="min-w-0"><Logo name={name} slug={slug} /></li>)}
   </ul>
 </Section>
