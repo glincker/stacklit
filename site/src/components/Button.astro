@@ -11,4 +11,4 @@ const variants = {
 } as const;
 const sizes = { md: 'min-h-11 px-4 text-body', sm: 'min-h-9 px-3 text-caption' } as const;
 ---
-<a href={href} aria-label={ariaLabel} class:list={[base, variants[variant], variant !== 'link' && sizes[size], extra]}><slot /></a>
+<a href={href} aria-label={ariaLabel} class:list={[base, variants[variant], variant !== 'link' && sizes[size], 'active:brightness-95 aria-disabled:pointer-events-none aria-disabled:opacity-50', extra]}><slot /></a>

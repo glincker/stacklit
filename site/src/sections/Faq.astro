@@ -1,12 +1,13 @@
 ---
 import Section from '../components/Section.astro';
-import SectionHead from '../components/SectionHead.astro';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
 ---
 <Section tone="surface" label="faq-title">
-  <SectionHead id="faq-title" title={copy.faq.title} />
-  <div class="max-w-heading divide-y divide-line border-y border-line">
+  <div class="grid min-w-0 gap-8 lg:grid-cols-12 lg:gap-12">
+  <h2 id="faq-title" class="min-w-0 break-words text-h2 text-ink lg:col-span-4">{copy.faq.title}</h2>
+  <div class="min-w-0 lg:col-span-8">
+  <div class="divide-y divide-line border-y border-line">
     {copy.faq.items.map((f) => (
       <details class="group py-1">
         <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-h3 text-ink [&::-webkit-details-marker]:hidden">
@@ -19,4 +20,6 @@ import { fill } from '../data/agentAb';
     ))}
   </div>
   <p class="mt-6"><a href="/docs/faq/" class="text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}</a></p>
+  </div>
+  </div>
 </Section>
