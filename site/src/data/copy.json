@@ -126,7 +126,7 @@
   },
   "agentTest": {
     "title": "What happened in real agent sessions",
-    "intro": "We ran Claude Code on three public repos the model had not memorised, with and without Stacklit: {sessions} sessions, planned and published before the first run. Stacklit changed how the agent works. It did not lower the cost overall.",
+    "intro": "We ran Claude Code on three public repos the model had not memorised, with and without Stacklit: {sessions} sessions, with the plan written down before the first run. Stacklit changed how the agent works. It did not lower the cost overall.",
     "tableCaption": "Cost of a session with Stacklit divided by the same session without it, with a 95% interval. Below 1 means cheaper. 50 paired sessions per repo, {pairs} in all. Cost is the CLI's notional list price.",
     "pooledLabel": "All three repos",
     "behaviourTitle": "What changed in how the agent worked",
