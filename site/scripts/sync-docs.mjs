@@ -10,7 +10,7 @@ import GithubSlugger from 'github-slugger';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../..');
-const out = resolve(here, '../src/content/docs');
+const out = resolve(here, '../src/content/docs/docs');
 const GH = 'https://github.com/glincker/stacklit';
 
 class SyncError extends Error {}
@@ -104,7 +104,7 @@ const sec = (doc, title, level = 2, opts = {}) => part(doc, section(doc, title, 
 
 add('quickstart', 'Quickstart',
   'Install Stacklit and generate a codebase index in one command.', 1, 'docs/USAGE.md', [
-    sec(USAGE, 'Install', 2, { keepHeading: true }),
+    part(USAGE, 'One command maps your repo. Other install routes are on the [install page](/docs/install/).'),
     sec(USAGE, 'First run', 2, { keepHeading: true }),
     part(README, '## What you get\n\n' + section(README, 'What you get')),
   ]);
@@ -181,7 +181,10 @@ add('agent-test', 'Agent test',
     part(AB_CLAIMS, '## What we claim, and what we do not\n\n' + shift(whole(AB_CLAIMS), 1)),
   ]);
 
-add('changelog', 'Changelog', 'Release history for Stacklit.', 15, 'CHANGELOG.md', [part(CHANGELOG, whole(CHANGELOG))]);
+add('install', 'Install',
+  'Install Stacklit with npm, go install, a release binary or Homebrew.', 15, 'docs/USAGE.md', [sec(USAGE, 'Install', 2, { keepHeading: true })]);
+
+add('changelog', 'Changelog', 'Release history for Stacklit.', 16, 'CHANGELOG.md', [part(CHANGELOG, whole(CHANGELOG))]);
 
 // Anchor index: slug -> page, so USAGE cross-references land on the right page.
 const anchorPage = new Map();
@@ -261,13 +264,19 @@ for (const p of pages) {
     '---',
     `title: ${JSON.stringify(p.title)}`,
     `description: ${JSON.stringify(p.description)}`,
-    `order: ${p.order}`,
+    'sidebar:',
+    `  order: ${p.order}`,
     `source: ${JSON.stringify(p.source)}`,
     '---',
     '',
   ].join('\n');
   writeFileSync(resolve(out, `${p.slug}.md`), fm + body + '\n');
 }
+writeFileSync(resolve(out, 'index.md'), [
+  '---', 'title: "Documentation"', 'description: "Quickstart, commands, MCP tools, configuration, privacy, FAQ and benchmarks for Stacklit."', 'sidebar:', '  hidden: true', '---', '',
+  'Everything here is generated from the Markdown in the repository, so the site and the repo cannot drift apart.', '',
+  ...pages.map((p) => `- [${p.title}](/docs/${p.slug}/): ${p.description}`), '',
+].join('\n'));
 console.log(`synced ${pages.length} docs pages`);
 
 // Numbers for the home page come from the tables the benchmark harness generates
