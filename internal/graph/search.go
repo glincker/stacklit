@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 // Hit is one ranked search result.
@@ -265,13 +266,20 @@ func (g *SymGraph) Search(q string, limit int) []Hit {
 		}
 		pr := g.PageRank()
 		w := envFloat("STACKLIT_PAGERANK_WEIGHT", 0.15)
+		aux := envFloat("STACKLIT_AUX_PENALTY", 0.6)
+		wantAux := queryWantsAux(pq.terms)
 		for i, s := range bm {
 			v := s/maxBM + w*pr[i]
+			// Tests, examples and benchmarks rarely hold the answer to a "where is" question.
+			if !wantAux && aux < 1 && isAuxPath(g.Nodes[i].File) {
+				v *= aux
+			}
 			if v > score[i] && score[i] < 2 {
 				score[i] = v + score[i]/10
 			}
 		}
 	}
+	g.boostIdentTokens(q, score)
 	if len(pq.phrases) > 0 {
 		g.applyPhrases(pq.phrases, score)
 	}
@@ -288,6 +296,76 @@ func (g *SymGraph) Search(q string, limit int) []Hit {
 		hits[i] = Hit{id, score[id]}
 	}
 	return hits
+}
+
+// auxDirs are directory names whose files support the code rather than define it.
+var auxDirs = stemAll([]string{"test", "tests", "testdata", "example", "examples", "sample", "samples", "benchmark", "benchmarks", "bench", "fixtures", "e2e"})
+
+func isAuxPath(file string) bool {
+	for _, seg := range strings.Split(filepath.ToSlash(filepath.Dir(file)), "/") {
+		st := stem(strings.ToLower(seg))
+		for _, a := range auxDirs {
+			if st == a {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// queryWantsAux is true when the question itself names tests, examples or benchmarks.
+func queryWantsAux(terms []string) bool {
+	for _, t := range terms {
+		for _, a := range auxDirs {
+			if t == a {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// identTokens returns code-shaped words inside a prose question: camelCase,
+// PascalCase or snake_case spellings, which are almost always a symbol name.
+func identTokens(q string) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, f := range strings.FieldsFunc(q, func(r rune) bool {
+		return !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_')
+	}) {
+		hasLowerUpper := false
+		rs := []rune(f)
+		for i := 1; i < len(rs); i++ {
+			if unicode.IsLower(rs[i-1]) && unicode.IsUpper(rs[i]) {
+				hasLowerUpper = true
+			}
+		}
+		if (hasLowerUpper || strings.Contains(f, "_")) && len(f) >= 4 && !seen[f] {
+			seen[f] = true
+			out = append(out, f)
+		}
+	}
+	return out
+}
+
+// boostIdentTokens raises symbols named exactly like an identifier-shaped word
+// of the question, so "where is getCookie" finds the definition even when prose
+// terms match elsewhere.
+func (g *SymGraph) boostIdentTokens(q string, score map[int]float64) {
+	boost := envFloat("STACKLIT_IDENT_TOKEN_BOOST", 0.5)
+	for _, tok := range identTokens(q) {
+		ct := canon(tok)
+		for _, k := range g.nameKeys {
+			if canon(k) != ct {
+				continue
+			}
+			for _, id := range g.byName[k] {
+				if g.Nodes[id].Kind != KindFile {
+					score[id] += boost
+				}
+			}
+		}
+	}
 }
 
 // applyPhrases boosts nodes whose text holds a quoted phrase verbatim and, when
