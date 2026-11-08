@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "23bca45ab8ea1779cbb712ce8d9f8768dd3bc7f6d6aad613d82c07d5b6c704b4",
+  "merkle_hash": "2564b02eea72501f9695be64ba5edccb79164c73178e1273cdb7334a58956318",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -94,11 +94,11 @@
       },
       "javascript": {
         "files": 14,
-        "lines": 1116
+        "lines": 1128
       },
       "json": {
         "files": 496,
-        "lines": 23303
+        "lines": 23349
       },
       "julia": {
         "files": 1,
@@ -189,8 +189,8 @@
         "lines": 10
       },
       "typescript": {
-        "files": 12,
-        "lines": 110
+        "files": 13,
+        "lines": 237
       },
       "vue": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 897,
-    "total_lines": 68168
+    "total_files": 898,
+    "total_lines": 68353
   },
   "modules": {
     ".claude-plugin": {
@@ -1529,7 +1529,7 @@
       "purpose": "Scripts",
       "language": "javascript",
       "files": 6,
-      "lines": 624,
+      "lines": 636,
       "file_list": [
         "build-demos.mjs",
         "check-links.mjs",
@@ -1556,12 +1556,13 @@
     "site/src/data": {
       "purpose": "Data",
       "language": "typescript",
-      "files": 4,
-      "lines": 240,
+      "files": 5,
+      "lines": 413,
       "file_list": [
         "copy.json",
         "samples.json",
         "site.ts",
+        "agentAb.ts",
         "demos.json"
       ],
       "exports": [
