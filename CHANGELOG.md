@@ -2,10 +2,19 @@
 
 All notable changes, reconstructed from the git history and release tags. Dates are tag dates (UTC). Versions follow semantic versioning while below 1.0, so minor releases may include behavior changes.
 
-## Unreleased
+## Unreleased (0.5.0)
 
-- Docs: README rewritten around measured numbers, full command reference in USAGE.md, new ARCHITECTURE.md, CONTRIBUTING.md, SECURITY.md, ROADMAP.md, issue and PR templates.
-- Added a reproducible benchmark harness in `bench/` (three pinned repos, 30 navigation tasks, no LLM calls) and its results.
+### Added
+- Query layer: a symbol graph (`stacklit graph`) with `query` (token-budgeted subgraph for a question), `path`, `explain`, `impact`, `hubs`, `communities`, `report` and `slice`, an incremental `watch` command (fsnotify with a polling fallback), graph tools in the MCP server, and a Symbols tab in the visual map.
+- 48 languages and formats with tree-sitter extraction, including Elixir, Zig, Dart, Scala, Lua, shell, SQL, Vue, Svelte, Terraform, Protobuf, Haskell, OCaml, Clojure, R, Perl, Julia, Objective-C, Nim, Erlang, Groovy, F#, Fortran, Elm, Solidity, PowerShell, Gleam, CMake, Makefile, Dockerfile, YAML, TOML, JSON and GraphQL. Audited C#, Ruby, PHP, Swift, C and C++ and Kotlin extractors.
+- Integrations: `stacklit setup` for 26 AI assistants with dry-run, uninstall, marker blocks and optional Claude Code hooks; `stacklit ingest` for docs, ADRs, OpenAPI, SQL schemas and CODEOWNERS; a 300 to 500 token digest and `setup --report`; verified npm downloads, Homebrew tap, shell completions.
+- Stability: parallel parse pool with panic recovery, an on-disk incremental cache, safer walking (symlinks, size cap, nested ignore files, include globs, scan roots), `stacklit doctor`, stable exit codes, `schema_version`, atomic output writes, fuzz tests, monorepo package boundaries and a robust multi-repo index with cross-repo edges.
+- A reproducible benchmark harness in `bench/` with a third arm for the graph query path, plus rewritten README and USAGE, ARCHITECTURE.md, CONTRIBUTING.md, SECURITY.md, ROADMAP.md and issue and PR templates.
+
+### Changed
+- `timestamps` and `git_activity` now default to off so a committed index is byte-stable. Opt in with the config keys or `STACKLIT_TIMESTAMPS=1` and `STACKLIT_GIT=1`.
+- Tree-sitter trees are released after extraction, parsers are reused, and concurrent parse memory is gated (`parse_memory_mb`, `STACKLIT_PARSE_MEMORY_MB`). Cold peak memory on the benchmark repos fell from 2.2 GB to 1.6 GB (flask) and from 2.4 GB to 0.9 GB (hono).
+- `init --workspace` now sets the directory to index. The `derive` help no longer promises a fixed token count, and `init --hook` is described as a post-commit hook.
 
 ## 0.4.0 (2026-05-06)
 
