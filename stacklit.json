@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "c6eea312a2fc4cb8ffce39c74cffaaa5a491dc8676ffa23e56d38bdefcb5eabc",
+  "merkle_hash": "9711d96e1d9eecc2d8d89d7690d56a99c6bcd9b621bf6cae9d6218042e61340e",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -93,12 +93,12 @@
         "lines": 37
       },
       "javascript": {
-        "files": 14,
-        "lines": 1128
+        "files": 19,
+        "lines": 1393
       },
       "json": {
         "files": 501,
-        "lines": 24485
+        "lines": 24601
       },
       "julia": {
         "files": 1,
@@ -190,7 +190,7 @@
       },
       "typescript": {
         "files": 13,
-        "lines": 237
+        "lines": 256
       },
       "vue": {
         "files": 1,
@@ -198,7 +198,7 @@
       },
       "yaml": {
         "files": 13,
-        "lines": 519
+        "lines": 523
       },
       "zig": {
         "files": 3,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 912,
-    "total_lines": 71517
+    "total_files": 917,
+    "total_lines": 71921
   },
   "modules": {
     ".claude-plugin": {
@@ -259,7 +259,7 @@
       "purpose": "Workflows",
       "language": "yaml",
       "files": 5,
-      "lines": 236,
+      "lines": 240,
       "file_list": [
         "site.yml",
         "release.yml",
@@ -1512,7 +1512,7 @@
       "purpose": "Site",
       "language": "javascript",
       "files": 2,
-      "lines": 35,
+      "lines": 67,
       "file_list": [
         "package.json",
         "astro.config.mjs"
@@ -1531,14 +1531,19 @@
     "site/scripts": {
       "purpose": "Scripts",
       "language": "javascript",
-      "files": 6,
-      "lines": 636,
+      "files": 11,
+      "lines": 878,
       "file_list": [
         "build-demos.mjs",
+        "check-contrast.mjs",
+        "check-external.mjs",
+        "check-layout.mjs",
         "check-links.mjs",
+        "check-render.mjs",
         "fetch-stars.mjs",
         "make-og.mjs",
         "shoot-thumbs.mjs",
+        "strip-demo-icons.mjs",
         "sync-docs.mjs"
       ],
       "activity": "low"
@@ -1547,7 +1552,7 @@
       "purpose": "Src",
       "language": "typescript",
       "files": 1,
-      "lines": 15,
+      "lines": 9,
       "file_list": [
         "content.config.ts"
       ],
@@ -1560,7 +1565,7 @@
       "purpose": "Data",
       "language": "typescript",
       "files": 5,
-      "lines": 413,
+      "lines": 542,
       "file_list": [
         "copy.json",
         "samples.json",
@@ -1573,12 +1578,12 @@
         "hero",
         "cta",
         "assistants",
+        "sections",
         "problem",
         "steps",
         "proof",
         "trust",
-        "faq",
-        "final"
+        "faq"
       ],
       "depended_by": [
         "site/src/pages"
@@ -1589,7 +1594,7 @@
       "purpose": "Pages",
       "language": "typescript",
       "files": 3,
-      "lines": 36,
+      "lines": 39,
       "file_list": [
         "llms.txt.ts",
         "robots.txt.ts",
@@ -1944,6 +1949,8 @@
       "AGENT_AB_TRANSCRIPTS",
       "AGENT_BROWSER",
       "AGENT_BROWSER_BIN",
+      "CHROME_BIN",
+      "CI",
       "CLAUDE_PROJECT_DIR",
       "DEMO_MAX_BYTES",
       "GITHUB_TOKEN",
