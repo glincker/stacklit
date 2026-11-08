@@ -13,3 +13,4 @@ jobs:
       - uses: glincker/stacklit-action@v1
         with:
           mode: auto-commit
+          files: stacklit.json docs/DEPENDENCIES.md
