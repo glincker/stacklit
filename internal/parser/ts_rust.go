@@ -197,28 +197,46 @@ func rustUseTargets(text string) []string {
 		return []string{rustTwoSegs(text)}
 	}
 	prefix := strings.Trim(text[:idx], ": ")
-	if prefix == "" || strings.Contains(prefix, "::") {
+	items := rustSplitGroup(text[idx+1:])
+	if prefix == "" {
+		// `use { a::{b}, c };` is a group of independent paths.
+		var out []string
+		for _, item := range items {
+			out = append(out, rustUseTargets(item)...)
+		}
+		return out
+	}
+	if strings.Contains(prefix, "::") || (prefix != "crate" && prefix != "self" && prefix != "super") {
 		return []string{rustTwoSegs(prefix)}
 	}
-	if prefix != "crate" && prefix != "self" && prefix != "super" {
-		return []string{prefix}
-	}
-	body := text[idx+1:]
-	if end := strings.LastIndex(body, "}"); end >= 0 {
-		body = body[:end]
-	}
 	var out []string
-	depth, start := 0, 0
-	flush := func(end int) {
-		item := strings.TrimSpace(body[start:end])
-		if item == "" || strings.HasPrefix(item, "self") {
-			return
+	for _, item := range items {
+		if strings.HasPrefix(item, "self") {
+			continue
 		}
 		if i := strings.IndexAny(item, ": {"); i >= 0 {
 			item = item[:i]
 		}
 		if item != "" {
 			out = append(out, prefix+"::"+item)
+		}
+	}
+	if len(out) == 0 {
+		out = append(out, prefix)
+	}
+	return out
+}
+
+// rustSplitGroup splits the body of a use brace group on top-level commas.
+func rustSplitGroup(body string) []string {
+	if end := strings.LastIndex(body, "}"); end >= 0 {
+		body = body[:end]
+	}
+	var out []string
+	depth, start := 0, 0
+	add := func(end int) {
+		if item := strings.TrimSpace(body[start:end]); item != "" {
+			out = append(out, item)
 		}
 	}
 	for i, c := range body {
@@ -229,15 +247,12 @@ func rustUseTargets(text string) []string {
 			depth--
 		case ',':
 			if depth == 0 {
-				flush(i)
+				add(i)
 				start = i + 1
 			}
 		}
 	}
-	flush(len(body))
-	if len(out) == 0 {
-		out = append(out, prefix)
-	}
+	add(len(body))
 	return out
 }
 

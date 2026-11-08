@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 func TestRustParserParse_Imports(t *testing.T) {
 	p := &TreeSitterParser{}
 
@@ -122,6 +121,7 @@ func TestRustUseTargets(t *testing.T) {
 		"super::{self, util}":              {"super::util"},
 		"std::{ffi::OsString, io}":         {"std"},
 		"serde":                            {"serde"},
+		"{globset::{Glob, GlobSet}, regex_automata::util::pool::Pool}": {"globset", "regex_automata::util"},
 	}
 	for in, want := range cases {
 		got := rustUseTargets(in)
