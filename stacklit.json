@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T18:39:50Z",
+  "generated_at": "2026-11-08T18:52:40Z",
   "stacklit_version": "dev",
-  "merkle_hash": "a6cd1b5a1df1448d231d2bddb5ae5e7affc284443aab10823a2d09f458085abf",
+  "merkle_hash": "bbd1cb1a7f1c98cd4baf36c429cebb45b70f817cf10c0f45f08f200c1d7b238f",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 49
       },
       "go": {
-        "files": 222,
-        "lines": 32309
+        "files": 235,
+        "lines": 33710
       },
       "graphql": {
         "files": 1,
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 289,
-    "total_lines": 33729
+    "total_files": 302,
+    "total_lines": 35130
   },
   "modules": {
     "assets": {
@@ -226,8 +226,8 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 22,
-      "lines": 1731,
+      "files": 23,
+      "lines": 1881,
       "file_list": [
         "check.go",
         "check_test.go",
@@ -248,7 +248,7 @@
         "root.go",
         "serve.go",
         "setup.go",
-        "version.go"
+        "status.go"
       ],
       "exports": [
         "Error() string",
@@ -421,7 +421,7 @@
       "purpose": "Core orchestration engine",
       "language": "go",
       "files": 10,
-      "lines": 1684,
+      "lines": 1687,
       "file_list": [
         "bench_test.go",
         "engine.go",
@@ -533,31 +533,40 @@
     "internal/git": {
       "purpose": "Git integration",
       "language": "go",
-      "files": 5,
-      "lines": 422,
+      "files": 8,
+      "lines": 666,
       "file_list": [
         "activity.go",
         "activity_test.go",
         "hooks.go",
         "merkle.go",
-        "merkle_leaves.go"
+        "merkle_leaves.go",
+        "refresh_hooks.go",
+        "refresh_hooks_test.go",
+        "status.go"
       ],
       "exports": [
+        "CheckStale(root string, builtCommit string, builtAt time.Time, keep any) Stalene",
         "ComputeMerkle(files []string, contents map[string][]byte) string",
         "ComputeMerkleFromLeaves(leaves map[string][]byte) string",
         "GetActivity(root string, days int) (*Activity, error)",
+        "Head(root string) string",
         "InstallHook(root string) error",
-        "type Activity",
-        "type FileActivity"
+        "InstallRefreshHooks(root string) ([]string, error)",
+        "RefreshHooks",
+        "RemoveRefreshHooks(root string) ([]string, error)",
+        "type Activity"
       ],
       "type_defs": {
         "Activity": "HotFiles []FileActivity, RecentFiles []string, StableFiles []string",
-        "FileActivity": "Path string, Commits90d int"
+        "FileActivity": "Path string, Commits90d int",
+        "Staleness": "InRepo bool, Head string, CommitsBehind int, Changed []string"
       },
       "depended_by": [
         "internal/cli",
         "internal/doctor",
         "internal/engine",
+        "internal/graph",
         "internal/setup"
       ],
       "activity": "low"
@@ -565,10 +574,11 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 37,
-      "lines": 9719,
+      "files": 44,
+      "lines": 10452,
       "file_list": [
         "analysis.go",
+        "body.go",
         "community.go",
         "confidence.go",
         "explain.go",
@@ -581,25 +591,24 @@
         "extract_py.go",
         "extract_rs.go",
         "extract_test.go",
+        "gold_test.go",
         "graph.go",
         "graph_test.go",
         "htmldata.go",
         "impact.go",
-        "langs_fixture_test.go",
-        "main_test.go",
-        "mask_test.go"
+        "langs_fixture_test.go"
       ],
       "exports": [
         "Build(files []*parser.FileInfo, opts BuildOptions) *Graph",
         "BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph",
+        "ClampTokens(s string, budget int) string",
         "ComputeCommunities()",
         "ConfExact",
         "ConfExtracted",
         "ConfInferred",
         "DefaultExplainBudget",
         "DefaultImpactBudget",
-        "DefaultQueryBudget",
-        "DiscoverGoModules(root string, files []string) map[string]string"
+        "DefaultPointerTokens"
       ],
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int",
@@ -614,6 +623,7 @@
         "HTMLNode": "Name string, Kind string, File int, Line int, End int, Comm int, Sig string, Doc string"
       },
       "depends_on": [
+        "internal/git",
         "internal/parser",
         "internal/walker"
       ],
@@ -625,7 +635,8 @@
         "internal/mcp",
         "internal/merge",
         "internal/renderer",
-        "internal/scip"
+        "internal/scip",
+        "internal/setup"
       ],
       "activity": "low"
     },
@@ -682,15 +693,21 @@
     "internal/mcp": {
       "purpose": "MCP server for AI agents",
       "language": "go",
-      "files": 3,
-      "lines": 415,
+      "files": 5,
+      "lines": 647,
       "file_list": [
         "graph_tools.go",
         "graph_tools_test.go",
+        "minimal.go",
+        "profile_test.go",
         "server.go"
       ],
       "exports": [
-        "StartServer() error"
+        "NewServer(profile string) (*sdkmcp.Server, error)",
+        "ProfileFull",
+        "ProfileMinimal",
+        "StartServer() error",
+        "StartServerProfile(profile string) error"
       ],
       "depends_on": [
         "internal/config",
@@ -940,7 +957,7 @@
       "purpose": "Setup",
       "language": "go",
       "files": 11,
-      "lines": 1331,
+      "lines": 1370,
       "file_list": [
         "block.go",
         "claude.go",
@@ -977,6 +994,7 @@
       },
       "depends_on": [
         "internal/git",
+        "internal/graph",
         "internal/schema"
       ],
       "depended_by": [
@@ -1239,6 +1257,10 @@
       ],
       [
         "internal/graph",
+        "internal/git"
+      ],
+      [
+        "internal/graph",
         "internal/parser"
       ],
       [
@@ -1299,6 +1321,10 @@
       ],
       [
         "internal/setup",
+        "internal/graph"
+      ],
+      [
+        "internal/setup",
         "internal/schema"
       ],
       [
@@ -1314,9 +1340,9 @@
       "internal/schema",
       "internal/graph",
       "internal/config",
+      "internal/git",
       "internal/parser",
       "internal/walker",
-      "internal/git",
       "internal/fsutil",
       "internal/cache",
       "internal/renderer",
@@ -1449,11 +1475,14 @@
       "STACKLIT_GRAPH_MAX_PARSE_BYTES",
       "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_MAP_TOKENS",
       "STACKLIT_MAX_FILE_SIZE",
       "STACKLIT_MAX_LINE_LEN",
       "STACKLIT_MEMORY_LIMIT_MB",
+      "STACKLIT_MINIMAL_SCHEMA_TOKENS",
       "STACKLIT_NO_CACHE",
       "STACKLIT_NO_GIT",
+      "STACKLIT_NO_STALE",
       "STACKLIT_PARSE_MEMORY_MB",
       "STACKLIT_PARSE_TIMEOUT_MS",
       "STACKLIT_PPROF",

@@ -90,6 +90,7 @@ graph LR
   internal_engine --> internal_walker
   internal_export --> internal_graph
   internal_export --> internal_schema
+  internal_graph --> internal_git
   internal_graph --> internal_parser
   internal_graph --> internal_walker
   internal_ingest --> internal_graph
@@ -105,6 +106,7 @@ graph LR
   internal_renderer --> internal_schema
   internal_scip --> internal_graph
   internal_setup --> internal_git
+  internal_setup --> internal_graph
   internal_setup --> internal_schema
   internal_summary --> internal_schema
 ```
