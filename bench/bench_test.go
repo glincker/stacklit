@@ -20,10 +20,87 @@ func TestPathMatches(t *testing.T) {
 	}
 }
 
-func TestPrecisionRecallLoose(t *testing.T) {
-	p, r := precisionRecall([]string{"validator", "src"}, []string{"src/validator", "src/middleware/jwt"}, true)
-	if r != 0.5 || p != 0.5 {
-		t.Errorf("got precision %.2f recall %.2f", p, r)
+func TestGradeDependents(t *testing.T) {
+	task := Task{ExpectModules: []string{"src/validator", "src/middleware/jwt"}}
+	// Short names pass the lenient rule only.
+	a := ArmResult{Modules: []string{"validator", "jwt"}}
+	gradeDependents(&a, task, 2)
+	if !a.Lenient || a.Strict {
+		t.Errorf("short names: lenient=%v strict=%v", a.Lenient, a.Strict)
+	}
+	// Exact names with too many extras fail the strict rule.
+	a = ArmResult{Modules: []string{"src/validator", "src/middleware/jwt", "x", "y", "z"}}
+	gradeDependents(&a, task, 2)
+	if !a.Lenient || a.Strict || a.Extra != 3 {
+		t.Errorf("extras: lenient=%v strict=%v extra=%d", a.Lenient, a.Strict, a.Extra)
+	}
+	a = ArmResult{Modules: []string{"src/validator", "src/middleware/jwt", "x"}}
+	gradeDependents(&a, task, 2)
+	if !a.Strict {
+		t.Error("exact names with one extra should pass strict")
+	}
+	// A missing module fails both.
+	a = ArmResult{Modules: []string{"src/validator"}}
+	gradeDependents(&a, task, 2)
+	if a.Lenient || a.Strict {
+		t.Error("missing module must fail both rules")
+	}
+}
+
+func TestFinishLocalization(t *testing.T) {
+	sizes := RepoSizes{"a.go": {Bytes: 400}, "b.go": {Bytes: 800}, "c.go": {Bytes: 1200}}
+	task := Task{ExpectPaths: []string{"b.go"}}
+	a := ArmResult{Lookup: Cost{Bytes: 40}, Ranked: []string{"a.go", "b.go", "c.go"}}
+	finishLocalization(&a, task, sizes, 5)
+	if a.FirstGold != 2 || !a.Found(5) || a.Found(1) {
+		t.Errorf("rank %d", a.FirstGold)
+	}
+	if got := a.ToFound.Tokens(); got != 10+100+200 {
+		t.Errorf("to found %d", got)
+	}
+	miss := ArmResult{Lookup: Cost{Bytes: 40}, Ranked: []string{"a.go", "c.go"}}
+	finishLocalization(&miss, task, sizes, 5)
+	if miss.FirstGold != 0 || miss.ToFound.Tokens() != 10+100+300 {
+		t.Errorf("miss %d %d", miss.FirstGold, miss.ToFound.Tokens())
+	}
+}
+
+func TestBM25PrefersIdentifierFile(t *testing.T) {
+	files := []SourceFile{
+		{Rel: "tree.go", Lines: []string{"func getValue(path string) {}", "radix tree lookup"}},
+		{Rel: "other.go", Lines: []string{"func other() {}"}},
+	}
+	got := BuildBM25(files).Rank(queryTokens("Where is the radix tree route lookup (getValue) implemented?"), 5)
+	if len(got) == 0 || got[0] != "tree.go" {
+		t.Errorf("got %v", got)
+	}
+}
+
+func TestRepoMapDeterministicAndBudgeted(t *testing.T) {
+	files := []SourceFile{
+		{Rel: "a.go", Lines: []string{"package a", "func Alpha() {}", "func helperThing() { Beta() }"}},
+		{Rel: "b.go", Lines: []string{"package a", "func Beta() {}", "func Gamma() { Alpha(); Beta() }"}},
+	}
+	rm := BuildRepoMap(files)
+	t1, f1 := rm.Render("where is Alpha", 100)
+	t2, f2 := rm.Render("where is Alpha", 100)
+	if t1 != t2 || len(f1) != len(f2) || len(f1) == 0 {
+		t.Fatal("render is not deterministic or empty")
+	}
+	if CostOf(t1).Tokens() > 100 {
+		t.Error("map exceeds budget")
+	}
+	small, _ := rm.Render("where is Alpha", 5)
+	if CostOf(small).Tokens() > 5 {
+		t.Error("small map exceeds budget")
+	}
+}
+
+func TestBootstrapDeterministic(t *testing.T) {
+	v := []float64{1, 0, 1, 1, 0, 1, 1, 1}
+	a, b := bootstrapMean(v, 2000, 7), bootstrapMean(v, 2000, 7)
+	if a != b || a.Lo > a.Mean || a.Hi < a.Mean {
+		t.Errorf("%+v %+v", a, b)
 	}
 }
 
