@@ -210,7 +210,7 @@ func (w *walk) run(startAbs, _ string) error {
 		name := d.Name()
 
 		if d.IsDir() {
-			if alwaysIgnoreDirs[name] || w.ignored(rel, true) {
+			if isToolStateDir(name) || w.ignored(rel, true) {
 				return filepath.SkipDir
 			}
 			before := len(w.levels)
