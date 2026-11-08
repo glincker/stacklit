@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/glincker/stacklit/internal/graph"
 	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/glincker/stacklit/internal/schema"
 	"github.com/spf13/cobra"
@@ -25,7 +26,13 @@ var viewCmd = &cobra.Command{
 		}
 
 		htmlPath := "stacklit.html"
-		if err := renderer.WriteHTML(&idx, htmlPath); err != nil {
+		var err2 error
+		if g, gerr := graph.Load(graphFile); gerr == nil {
+			err2 = renderer.WriteHTMLWithGraph(&idx, g, htmlMaxNodes(), htmlPath)
+		} else {
+			err2 = renderer.WriteHTML(&idx, htmlPath)
+		}
+		if err := err2; err != nil {
 			return fmt.Errorf("writing HTML: %w", err)
 		}
 
