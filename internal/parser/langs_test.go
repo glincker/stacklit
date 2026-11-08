@@ -358,3 +358,21 @@ func containsSub(list []string, want string) bool {
 	}
 	return false
 }
+
+// The streaming JSON path must agree with the tree-sitter extractor.
+func TestJSONFastPathMatchesTreeSitter(t *testing.T) {
+	src := []byte(`{"name":"x","a":{"b":[1,2,{"c":3}]},"name":"dup","z":null,"e":""}`)
+	fast, err := (&TreeSitterParser{}).Parse("a.json", src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	jsonFastPath = false
+	defer func() { jsonFastPath = true }()
+	slow, err := (&TreeSitterParser{}).Parse("a.json", src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Join(fast.Exports, ",") != strings.Join(slow.Exports, ",") || len(fast.Exports) == 0 {
+		t.Fatalf("fast %v, tree-sitter %v", fast.Exports, slow.Exports)
+	}
+}

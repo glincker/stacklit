@@ -50,6 +50,9 @@ type ScanInfo struct {
 	SkippedSymlinks []string `json:"skipped_symlinks,omitempty"`
 	SkippedOther    []string `json:"skipped_other,omitempty"`
 	ParseErrors     []string `json:"parse_errors,omitempty"`
+	// Lightweight lists files indexed without tree-sitter ("path (reason)"):
+	// timeout, large, generated or minified. Their exports and imports are empty.
+	Lightweight []string `json:"lightweight,omitempty"`
 }
 
 type Architecture struct {
