@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-<p align="center"><b>Your AI starts every session already knowing your repo.</b></p>
+<p align="center"><b>A committed map of your codebase for AI coding agents. 137 tokens for a 19,500 line Go repo.</b></p>
 
 <p align="center">
   <a href="https://github.com/glincker/stacklit/actions/workflows/ci.yml"><img src="https://github.com/glincker/stacklit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -94,11 +94,11 @@ internal/graph/resolve.go
   <img src="https://thesvg.org/icons/amp/default.svg" alt="Amp" height="32">
 </p>
 
-`stacklit setup --list` shows all 26 targets, including Aider, Cline, Continue, OpenCode, Roo Code, Kiro and a generic `AGENTS.md`. Anything else can read `stacklit.json` directly.
+`stacklit setup` sets up 25 assistants, including Aider, Cline, Continue, OpenCode, Roo Code and Kiro, plus a generic `AGENTS.md` (`stacklit setup --list` shows all 26 targets). Anything else can read `stacklit.json` directly.
 
 ## Benchmark
 
-Three pinned repos, 30 navigation tasks, no model calls, tokens as bytes / 4. The index is 2,524 to 16,126 tokens and the derived map 137 to 1,372. This does **not** show a token saving over grep: when the exact symbol is known, grep is cheaper, and the grep and read baseline found the answer on 30 of 30 tasks against 27 for the map path. What it shows is cheap orientation. Method, misses and limits: [bench/RESULTS.md](bench/RESULTS.md).
+Six pinned repos in six languages, 58 tasks (47 where-is-X localization questions and 11 dependents questions), no model calls, tokens as bytes / 4. The derived map is 137 to 1,351 tokens. On the 47 localization questions one `stacklit query` with a 1,000 token budget put the right file first on 81% and in the top five on 96% (95% intervals 70 to 91 and 89 to 100). Grep with a hand written pattern did better, 89% first and 100% in the top five, and plain BM25 over the question did worse, 57% first. The 81% is in our benchmark, tuned after looking at failures, so treat it as an upper bound; on a separate 40 question set from this repo, not used for tuning, the right file was first on 28 and in the top five on 40 of 40. This does **not** show a token saving over grep or that an agent does better with the map. Method, misses and limits: [bench/RESULTS.md](bench/RESULTS.md).
 
 ## Docs
 

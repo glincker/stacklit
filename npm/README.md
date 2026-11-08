@@ -19,7 +19,7 @@ npx stacklit init
 
 ![Stacklit demo](https://raw.githubusercontent.com/glincker/stacklit/master/docs/assets/demo.gif)
 
-**Size:** on three pinned public repos the full `stacklit.json` was 2,045 to 11,814 tokens and the compact map from `stacklit derive` was 122 to 1,122 tokens (bytes/4 estimate). Both grow with module count. Method and limitations: [bench/RESULTS.md](https://github.com/glincker/stacklit/blob/master/bench/RESULTS.md).
+**Size:** on six pinned public repos the full `stacklit.json` was 2,391 to 16,022 tokens and the compact map from `stacklit derive` was 137 to 1,351 tokens (bytes/4 estimate). Both grow with module count. Method and limitations: [bench/RESULTS.md](https://github.com/glincker/stacklit/blob/master/bench/RESULTS.md).
 
 **Privacy:** runs locally, no network requests. The only opt-in exception is `stacklit init --summary`, which pipes an index snapshot to a command you configure.
 
