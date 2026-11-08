@@ -188,9 +188,9 @@ code, kbd, pre { font-family: var(--font-mono); }
 .hero-grid .lede { margin-top: 0; font-size: var(--fs-lg); }
 .hero-term pre { font-size: var(--fs-xs); }
 .prose img[src*="thesvg"] { display: inline-block; vertical-align: middle; margin: 0 4px 0 0; border-radius: 0; }
-.lang-fallback { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 4px; border-radius: var(--r-1); background: var(--sunk); color: var(--muted); font-size: var(--fs-xs); font-weight: 650; }
+.lang-fallback { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 4px; border-radius: var(--r-1); background: var(--sunk); color: var(--text); font-size: var(--fs-xs); font-weight: 650; }
 .prose-p { max-width: 38rem; color: var(--muted); }
-.cite-quote { margin: 0; padding-left: var(--s-4); border-left: 3px solid var(--accent); max-width: 38rem; }
+.cite-quote { margin: 0; padding: var(--s-4); border: 1px solid var(--line-strong); border-radius: var(--r-2); background: var(--surface); max-width: 38rem; }
 .cite-quote p { font-size: var(--fs-lg); line-height: 1.45; }
 .cite-quote footer { margin-top: var(--s-2); font-size: var(--fs-sm); color: var(--muted); }
 .cite-quote footer a { font-weight: 600; }
@@ -419,3 +419,6 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 @media print {
   .site-header, .site-footer, .docs-nav, .skip { display: none; }
 }
+
+html, body { overflow-x: clip; }
+h1, h2 { overflow-wrap: break-word; min-width: 0; }

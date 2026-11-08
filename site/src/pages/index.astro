@@ -12,6 +12,12 @@ import { fileURLToPath } from 'node:url';
 const hero = copy.hero.variants[copy.hero.active as keyof typeof copy.hero.variants];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Each sentence of the headline is its own line, and the numbers carry the accent.
+const headlineLines = hero.headline
+  .split(/(?<=\.)\s+/)
+  .map((line) => esc(line).replace(/\d[\d,]*k?/g, (n) => `<span class="n">${n}</span>`));
+const captionHtml = esc(copy.hero.caption).replace(esc(copy.hero.captionLink), `<a href="/docs/benchmarks/">${esc(copy.hero.captionLink)}</a>`);
+
 const deriveHtml = samples.derive
   .trimEnd()
   .split('\n')
@@ -58,16 +64,25 @@ const hasAb = existsSync(abPath);
 <Base title={copy.meta.title} description={copy.meta.description} path="/" jsonLd>
   <section class="hero">
     <div class="container">
-      <h1>{hero.headline}</h1>
-      <p class="lede">{hero.sub}</p>
-      <div class="hero-actions">
-        <InstallBox />
-        <div class="hero-buttons">
-          <StarLink />
-          <a class="btn" href="/demos/">{copy.cta.demo}</a>
+      <h1>{headlineLines.map((l) => <span class="line" set:html={l} />)}</h1>
+      <p class="hero-caption" set:html={captionHtml} />
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lede">{hero.sub}</p>
+          <div class="hero-actions">
+            <InstallBox />
+            <div class="hero-buttons">
+              <StarLink />
+              <a class="btn" href="/docs/benchmarks/">{copy.hero.secondaryCta}</a>
+            </div>
+          </div>
+          <p class="hint">{copy.cta.installNote}</p>
+        </div>
+        <div class="term hero-term">
+          <div class="term-head"><span>$ stacklit derive</span><span>gin v1.10.0, {bench.repos[0].deriveTokens} tokens</span></div>
+          <pre tabindex="0"><code set:html={deriveHtml} /></pre>
         </div>
       </div>
-      <p class="hint">{copy.cta.installHint}</p>
     </div>
   </section>
 
@@ -79,11 +94,17 @@ const hasAb = existsSync(abPath);
         <figcaption>{copy.cta.mapCaption} <a href="/demos/ripgrep/">{copy.cta.mapLink}</a></figcaption>
       </figure>
       <div class="works">
-        <h2>{copy.worksWith.title}</h2>
+        <h2>{copy.assistants.title}</h2>
         <ul class="logos">
           {assistants.map(([name, mono, colour]) => <li><Logo name={name} mono={mono ?? undefined} colour={colour ?? undefined} /></li>)}
         </ul>
-        <p class="note">{copy.worksWith.note}</p>
+        <p class="note">{copy.assistants.note}</p>
+        <div class="lang-row">
+          <span>Symbol graphs for 20 languages, including</span>
+          <ul class="logos small">
+            {languages.map(([name, slug]) => <li><Logo name={name} mono={`${slug}/${slug === 'java' ? 'default' : 'mono'}`} colour={`${slug}/default`} size={20} /></li>)}
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -93,7 +114,11 @@ const hasAb = existsSync(abPath);
       <h2>{copy.problem.title}</h2>
       <div class="sec-body">
         <p class="big">{copy.problem.body}</p>
-        <p class="cite"><a href={copy.problem.citeUrl} rel="noopener">{copy.problem.citeText}</a>. {copy.problem.caveat}</p>
+        <blockquote class="cite-quote">
+          <p>{copy.problem.citation.text}</p>
+          <footer><a href={copy.problem.citation.url} rel="noopener">{copy.problem.citation.source}</a></footer>
+        </blockquote>
+        <p class="cite">{copy.problem.citation.caveat}</p>
       </div>
     </div>
   </section>
@@ -115,32 +140,12 @@ const hasAb = existsSync(abPath);
     </div>
   </section>
 
-  <section class="sec">
-    <div class="container sec-grid">
-      <h2>{copy.get.title}</h2>
-      <div class="sec-body">
-        <dl class="defs">
-          {copy.get.items.map((g) => <div><dt>{g.name}</dt><dd>{g.text}</dd></div>)}
-        </dl>
-        <div class="term">
-          <div class="term-head"><span>$ stacklit derive</span><span>gin v1.10.0, {bench.repos[0].deriveTokens} tokens</span></div>
-          <pre tabindex="0"><code set:html={deriveHtml} /></pre>
-        </div>
-        <div class="lang-row">
-          <span>Symbol graphs for 20 languages, including</span>
-          <ul class="logos small">
-            {languages.map(([name, slug]) => <li><Logo name={name} mono={`${slug}/${slug === 'java' ? 'default' : 'mono'}`} colour={`${slug}/default`} size={20} /></li>)}
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section class="sec" id="proof">
     <div class="container sec-grid">
       <h2>{copy.proof.title}</h2>
       <div class="sec-body">
         <p class="big">{copy.proof.intro}</p>
+        <p class="prose-p">{copy.proof.note}</p>
         <p class="cite">{bench.localizationTasks} tasks across {bench.repoCount} pinned public repos in six languages, run {bench.date}. Intervals are 95% bootstrap intervals over tasks.</p>
         <div class="table-wrap">
           <table>
@@ -155,8 +160,8 @@ const hasAb = existsSync(abPath);
         <ul class="points">
           <li>Grep and read finds the file first more often, and its search pattern was written by someone who knew the answer. The query command’s gap to it is {bench.pairedQueryVsGrep.found1} percentage points at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
           <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact name, grep is cheaper than loading a map.</li>
-          <li>The derive map is {deriveMin} to {deriveMax} tokens on these repos, so it is cheap to hand an agent at the start of a session.</li>
-          <li>Scoring was tuned after looking at some failures, and there are limits we list on the benchmark page.</li>
+          <li>{copy.proof.sizes.replace('{range}', `${deriveMin} to ${deriveMax}`)}</li>
+          <li>Limits are listed on the benchmark page.</li>
         </ul>
         {hasAb && (
           <div class="ab">
@@ -172,7 +177,7 @@ const hasAb = existsSync(abPath);
   <section class="trust-strip" aria-label="Plain facts">
     <div class="container">
       <ul>
-        {copy.trust.items.map((t) => <li><strong>{t.name}</strong> <span>{t.text}</span></li>)}
+        {copy.trust.items.map((t) => <li>{t}</li>)}
       </ul>
     </div>
   </section>
