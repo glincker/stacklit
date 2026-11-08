@@ -27,4 +27,5 @@ func init() {
 	rootCmd.AddCommand(newDeriveCmd())
 	rootCmd.AddCommand(newSetupCmd())
 	rootCmd.AddCommand(newExportCmd())
+	addGraphCommands()
 }
