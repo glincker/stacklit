@@ -62,11 +62,25 @@ const ld = {
   </head>
   <body class="min-h-dvh overflow-x-clip">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-raised focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
+    <div class="progress" aria-hidden="true"></div>
     <ReleaseBanner />
     <Header path={path} />
     {rail && <ChapterRail />}
     <main id="main"><slot /></main>
     <Footer />
+    <script is:inline>
+      // Pointer light for the .glow frames: one listener, only where hover exists and motion is allowed.
+      (function () {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover)').matches) return;
+        document.addEventListener('pointermove', function (e) {
+          var t = e.target.closest && e.target.closest('.glow');
+          if (!t) return;
+          var r = t.getBoundingClientRect();
+          t.style.setProperty('--x', e.clientX - r.left + 'px');
+          t.style.setProperty('--y', e.clientY - r.top + 'px');
+        });
+      })();
+    </script>
     <script is:inline>
       document.addEventListener('click', function (e) {
         var tg = e.target.closest && e.target.closest('[data-theme-toggle]');

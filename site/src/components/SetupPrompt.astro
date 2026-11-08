@@ -4,7 +4,7 @@ import { setupPrompt } from '../data/setupPrompt';
 interface Props { class?: string }
 const { class: extra } = Astro.props;
 ---
-<div class:list={['min-w-0 rounded-frame border border-line-strong bg-raised', extra]}>
+<div class:list={['glow min-w-0 rounded-frame border border-line-strong bg-raised', extra]}>
   <div class="flex items-center justify-between gap-3 ps-5">
     <p class="label-mono min-w-0 text-ink">Copy setup prompt</p>
     <button type="button" data-copy={setupPrompt} class="m-1 inline-flex min-h-11 shrink-0 items-center rounded-full bg-accent px-5 text-caption font-semibold text-accent-ink transition-colors duration-fast hover:brightness-110 motion-reduce:transition-none">Copy prompt</button>

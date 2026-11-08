@@ -9,7 +9,7 @@ const items: [string, string, (p: string) => boolean][] = [
   ['Demos', '/demos/', (p) => p.startsWith('/demos')],
   ['Benchmarks', '/docs/benchmarks/', (p) => p.startsWith('/docs/benchmarks')],
 ];
-const ring = 'rounded-full border border-ring bg-raised';
+const ring = 'pill rounded-full border border-ring bg-raised';
 ---
 <header class="pointer-events-none sticky top-0 z-40 mx-auto grid w-full max-w-site grid-cols-[1fr_auto] items-center gap-3 px-gutter py-3 md:grid-cols-[1fr_auto_1fr]">
   <a href="/" class:list={['pointer-events-auto inline-flex min-h-11 items-center gap-2 justify-self-start px-4 text-body font-bold tracking-tight text-ink', ring]} aria-label="Stacklit home">

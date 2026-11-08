@@ -89,3 +89,21 @@
 .codewin:has(.cw-input:nth-of-type(4):focus-visible) .cw-chip:nth-of-type(4),
 .codewin:has(.cw-input:nth-of-type(5):focus-visible) .cw-chip:nth-of-type(5),
 .codewin:has(.cw-input:nth-of-type(6):focus-visible) .cw-chip:nth-of-type(6) { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Terminal roles, one class per meaning. Shell output has no line numbers and is plain selectable text. */
+.codewin pre.term .line::before { content: none; }
+.codewin pre.term .line { padding-inline: 1.25rem 1.5rem; }
+.codewin .t-prompt { color: var(--t-prompt); }
+.codewin .t-cmd { color: var(--t-cmd); font-weight: 600; }
+.codewin .t-flag { color: var(--t-flag); }
+.codewin .t-path { color: var(--t-path); }
+.codewin .t-sym { color: var(--t-sym); }
+.codewin .t-kw { color: var(--code-keyword); }
+.codewin .t-str { color: var(--t-str); }
+.codewin .t-num { color: var(--t-num); }
+.codewin .t-ok { color: var(--t-ok); }
+.codewin .t-warn { color: var(--t-warn); }
+.codewin .t-err { color: var(--t-err); }
+.codewin .t-dim { color: var(--t-dim); }
+.codewin .t-rank { color: var(--t-rank); font-weight: 650; }
+.codewin .t-score { color: var(--t-score); }

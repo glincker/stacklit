@@ -27,6 +27,8 @@ const pairs = [
   ['code-keyword', 'sunk'], ['code-fn', 'sunk'], ['code-comment', 'sunk'],
   ...['code-keyword', 'code-fn', 'code-comment', 'tok-string', 'tok-const', 'tok-punct', 'ink'].flatMap((fg) => ['tok-hl', 'tok-add', 'tok-del'].map((bg) => [fg, bg])),
   ...['tok-string', 'tok-const', 'tok-punct'].map((fg) => [fg, 'sunk']),
+  // Terminal roles, on the window body and on a highlighted line.
+  ...['t-prompt', 't-cmd', 't-flag', 't-path', 't-sym', 't-str', 't-num', 't-ok', 't-warn', 't-err', 't-dim', 't-rank', 't-score'].flatMap((fg) => ['sunk', 'tok-hl'].map((bg) => [fg, bg])),
 ];
 let bad = 0;
 for (const [name, t] of Object.entries(themes)) {
