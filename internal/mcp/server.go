@@ -225,6 +225,8 @@ func StartServer() error {
 		return textResult(idx.Hints)
 	})
 
+	registerGraphTools(s)
+
 	err := s.Run(context.Background(), &sdkmcp.StdioTransport{})
 	// EOF on stdin is normal shutdown — not an error to report.
 	if err != nil && strings.Contains(err.Error(), "EOF") {
