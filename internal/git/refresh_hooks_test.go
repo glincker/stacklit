@@ -3,6 +3,7 @@ package git
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -28,7 +29,8 @@ func TestRefreshHooksInstallIdempotentAndRemovable(t *testing.T) {
 	if !strings.Contains(string(pc), `"$3" = "1"`) || !strings.Contains(string(pc), "generate --quiet") {
 		t.Fatalf("post-checkout body: %s", pc)
 	}
-	if st, _ := os.Stat(filepath.Join(hooks, "post-rewrite")); st == nil || st.Mode()&0o100 == 0 {
+	// Windows has no execute permission bit, so only check it on Unix.
+	if st, _ := os.Stat(filepath.Join(hooks, "post-rewrite")); st == nil || (runtime.GOOS != "windows" && st.Mode()&0o100 == 0) {
 		t.Fatal("hook not executable")
 	}
 	if _, err := RemoveRefreshHooks(root); err != nil {
