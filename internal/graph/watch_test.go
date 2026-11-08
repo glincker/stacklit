@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/glincker/stacklit/internal/walker"
 )
 
 func waitFor(t *testing.T, out string, cond func(*SymGraph) bool) {
@@ -76,4 +78,38 @@ func TestWatchDirsOnlyCoverSources(t *testing.T) {
 	if strings.Join(dirs, ",") != strings.Join(want, ",") {
 		t.Fatalf("dirs = %v, want %v", dirs, want)
 	}
+}
+
+// An edit made after the first graph is written but before fsnotify is armed
+// raises no event, so the watcher has to catch up by itself.
+func TestWatchCatchesEditsMadeBeforeWatchesStart(t *testing.T) {
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "a.go"), []byte("package a\n\nfunc One() {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(root, "stacklit.graph.json")
+	w := &watcher{o: WatchOptions{Root: root, Out: out, Debounce: 30 * time.Millisecond, Log: func(string, ...any) {}}, syms: map[string]*FileSyms{}, stamps: map[string]fileStamp{}}
+	files, err := walker.Walk(root, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w.sync(files, nil)
+	if err := w.write(); err != nil {
+		t.Fatal(err)
+	}
+	// The gap: the file changes now, and no watch exists yet.
+	if err := os.WriteFile(filepath.Join(root, "a.go"), []byte("package a\n\nfunc One() {}\n\nfunc Two() {}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = w.runFSNotify(ctx, watchDirs(files)) }()
+	waitFor(t, out, func(g *SymGraph) bool {
+		for _, n := range g.Nodes {
+			if n.Name == "Two" {
+				return true
+			}
+		}
+		return false
+	})
 }
