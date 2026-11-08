@@ -44,6 +44,10 @@ Set `AGENT_AB_TRANSCRIPTS=<dir>` to keep raw streams outside the repo for hand c
 
 A session is correct when every `all_of` path and at least one `any_of` path is named in the answer (boundary-aware match). `correct_audited` in the analysis adds three documented fixes; see RESULTS.md. Differences and ratios of means are paired by repo, task and trial, with seeded bootstrap intervals (10,000 resamples); rates use Wilson intervals.
 
+## Famous repos study (pre-registered, not run)
+
+[PREREGISTRATION-famous.md](PREREGISTRATION-famous.md) describes a study on five famous repos (django, react, tokio, kafka, rails) with 50 tasks about code added after the model's training cutoff, a memory check that drops anything the model already knew, three arms and a decision rule for what may be claimed. `repos-famous.json` and `tasks-famous/` hold the pins and tasks; `famous.go` holds the preset (`-repo famous`), the claim report and index reuse. Plan without spending: `agent-ab -repo famous -dry-run`. Verify the answers: `AGENT_AB_CLONES=<dir> go test ./bench/agent-ab`, with one checkout per repo at its pinned SHA fetched with `--shallow-since=2026-05-01`.
+
 ## Limits
 
 One model, tasks written by us, small n, path-match correctness, notional cost. `seconds` includes clone and setup time. Details in RESULTS.md.

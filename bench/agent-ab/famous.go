@@ -18,7 +18,8 @@ const (
 	famousHarmLower        = 1.00 // a repo shows harm if the cost ratio's lower bound is above this
 	famousRepoCorrectLower = -0.10
 	famousPoolCorrectLower = -0.05
-	famousMinRepos         = 3 // repos that must show savings before a general claim is allowed
+	famousMinRepos         = 3    // repos that must show savings before a general claim is allowed
+	famousLargeFiles       = 5000 // tracked files above which a repo counts as large
 )
 
 // famousArms are the treatment arms of the study, each compared with control.
@@ -151,7 +152,7 @@ func famousReport(s summary, names []string, files map[string]int, excluded map[
 	b.WriteString("# Famous repos decision report\n\nGenerated from summary.json by the rule in PREREGISTRATION-famous.md. Every repo is listed; none is dropped except by the memorisation rule, and then it is still shown.\n\n")
 	for _, arm := range famousArms {
 		fmt.Fprintf(&b, "## Arm %s against control\n\n| repo | tracked files | memory check | tasks dropped | cost ratio [95%% CI] | correctness diff [95%% CI] | status | what may be said |\n|---|---|---|---|---|---|---|---|\n", arm)
-		saving := 0
+		saving, savingLarge := 0, 0
 		eligible := 0
 		var harmed []string
 		for _, r := range rows {
@@ -164,6 +165,9 @@ func famousReport(s summary, names []string, files map[string]int, excluded map[
 			}
 			if r.savings {
 				saving++
+				if r.files > famousLargeFiles {
+					savingLarge++
+				}
 			}
 			if r.harm {
 				harmed = append(harmed, r.repo)
@@ -186,6 +190,7 @@ func famousReport(s summary, names []string, files map[string]int, excluded map[
 		sort.Strings(harmed)
 		fmt.Fprintf(&b, "- Repos showing lower cost with correctness shown (rule R1): %d of %d eligible.\n", saving, eligible)
 		fmt.Fprintf(&b, "- General claim \"lower cost on famous repos\" (rule R2: at least %d repos and pooled upper bound below %.2f): %s.\n", famousMinRepos, famousCostUpper, yesNo(general))
+		fmt.Fprintf(&b, "- Wording \"on large famous repos\" (rule R2 holds and at least %d of the repos with savings have more than %d tracked files; %d do): %s.\n", famousMinRepos, famousLargeFiles, savingLarge, yesNo(general && savingLarge >= famousMinRepos))
 		fmt.Fprintf(&b, "- Claim \"no loss of correctness\" (rule R3: pooled lower bound above %+.0f points): %s.\n", 100*famousPoolCorrectLower, yesNo(noLoss))
 		fmt.Fprintf(&b, "- Repos with higher cost (rule R4, to be reported as harm): %s.\n\n", listOrNone(harmed))
 	}
