@@ -2,7 +2,9 @@ version: 2
 
 before:
   hooks:
-    - go mod tidy
+    # go mod tidy is not run here: it can dirty the tree and fail the release.
+    - go mod download
+    - sh -c 'rm -rf completions && mkdir completions && for sh in bash zsh fish; do go run ./cmd/stacklit completion $sh > completions/stacklit.$sh; done'
 
 builds:
   - id: stacklit
@@ -19,14 +21,19 @@ builds:
     goarch:
       - amd64
       - arm64
+    mod_timestamp: "{{ .CommitTimestamp }}"
 
 archives:
   - id: default
-    format: tar.gz
+    formats: [tar.gz]
     name_template: "stacklit_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+      - completions/*
 
 checksum:
   name_template: "checksums.txt"
@@ -43,3 +50,21 @@ release:
   github:
     owner: glincker
     name: stacklit
+
+brews:
+  - name: stacklit
+    repository:
+      owner: glincker
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://github.com/glincker/stacklit
+    description: Zero-config codebase index and map for AI coding agents
+    license: MIT
+    directory: Formula
+    install: |
+      bin.install "stacklit"
+      bash_completion.install "completions/stacklit.bash" => "stacklit"
+      zsh_completion.install "completions/stacklit.zsh" => "_stacklit"
+      fish_completion.install "completions/stacklit.fish"
+    test: |
+      assert_match version.to_s, shell_output("#{bin}/stacklit version")
