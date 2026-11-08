@@ -1,0 +1,14 @@
+{
+  "name": "stacklit",
+  "displayName": "Stacklit",
+  "version": "0.5.0",
+  "description": "Orientation map hooks, a query skill and a minimal MCP server for repos indexed with Stacklit. Needs the stacklit binary on PATH.",
+  "author": {
+    "name": "Glincker",
+    "url": "https://github.com/glincker"
+  },
+  "homepage": "https://github.com/glincker/stacklit",
+  "repository": "https://github.com/glincker/stacklit",
+  "license": "MIT",
+  "keywords": ["codebase-map", "mcp", "context", "repo-map", "dependency-graph"]
+}
