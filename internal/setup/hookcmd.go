@@ -6,9 +6,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+)
 
-	"github.com/glincker/stacklit/internal/derive"
-	"github.com/glincker/stacklit/internal/schema"
+// Nudge texts stay at or under 100 tokens (bytes/4); a test enforces it.
+const (
+	preToolNudge = "stacklit.json maps this repo's modules. Check it (or stacklit MCP find_module) before broad grep/glob."
+	sessionNudge = "This repo has a stacklit map: read stacklit.json or call stacklit MCP get_overview before broad searches."
 )
 
 type hookInput struct {
@@ -64,10 +67,11 @@ func PreToolHook(stdin io.Reader) string {
 	if _, err := os.Stat(filepath.Join(dir, "stacklit.json")); err != nil {
 		return ""
 	}
-	return hookJSON("PreToolUse", "This repo has stacklit.json (module map). Consult it, or the stacklit MCP tools, to pick the right module before broad grep or glob searches.")
+	return hookJSON("PreToolUse", preToolNudge)
 }
 
-// SessionHook returns SessionStart context: the compact map of the repo in cwd.
+// SessionHook returns a short, static SessionStart pointer. The digest is
+// already in the rules file, so this stays tiny and byte-identical per run.
 func SessionHook(stdin io.Reader) string {
 	var in hookInput
 	_ = json.NewDecoder(stdin).Decode(&in)
@@ -75,13 +79,8 @@ func SessionHook(stdin io.Reader) string {
 	if dir == "" {
 		dir = "."
 	}
-	data, err := os.ReadFile(filepath.Join(dir, "stacklit.json"))
-	if err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "stacklit.json")); err != nil {
 		return ""
 	}
-	var idx schema.Index
-	if json.Unmarshal(data, &idx) != nil {
-		return ""
-	}
-	return hookJSON("SessionStart", "Codebase map (stacklit). Prefer it over broad grep.\n"+derive.CompactMap(&idx))
+	return hookJSON("SessionStart", sessionNudge)
 }

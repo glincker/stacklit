@@ -1,25 +1,98 @@
 name: 'Update Stacklit Index'
-description: 'Generate or update stacklit.json codebase index'
+description: 'Generate stacklit.json and either fail when it is stale (check) or commit the refresh (auto-commit)'
+branding:
+  icon: map
+  color: blue
 inputs:
-  commit:
-    description: 'Auto-commit updated index files'
+  mode:
+    description: 'check: fail if the committed index is stale. auto-commit: commit and push the refreshed index. generate: only regenerate.'
     required: false
-    default: 'true'
+    default: 'auto-commit'
+  commit:
+    description: 'Deprecated. Use mode. "false" behaves like mode=generate.'
+    required: false
+    default: ''
+  version:
+    description: 'stacklit version to install (for example v0.4.0). Defaults to latest.'
+    required: false
+    default: 'latest'
+  working-directory:
+    description: 'Directory containing the repo to index'
+    required: false
+    default: '.'
+  files:
+    description: 'Space separated files to check or commit'
+    required: false
+    default: 'stacklit.json DEPENDENCIES.md'
+outputs:
+  changed:
+    description: 'true when generating changed any tracked index file'
+    value: ${{ steps.diff.outputs.changed }}
 runs:
   using: 'composite'
   steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+        cache: false
     - name: Install stacklit
       shell: bash
-      run: go install github.com/glincker/stacklit/cmd/stacklit@latest
+      env:
+        STACKLIT_VERSION: ${{ inputs.version }}
+      run: go install "github.com/glincker/stacklit/cmd/stacklit@${STACKLIT_VERSION}"
     - name: Generate index
       shell: bash
-      run: stacklit generate --quiet
-    - name: Commit changes
-      if: inputs.commit == 'true'
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        "$(go env GOPATH)/bin/stacklit" generate --quiet
+    - name: Detect changes
+      id: diff
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        FILES: ${{ inputs.files }}
+      run: |
+        # Untracked outputs count as changes too, so a first run is not reported clean.
+        # shellcheck disable=SC2086
+        if [ -n "$(git status --porcelain -- $FILES)" ]; then
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "changed=false" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Resolve mode
+      id: mode
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        COMMIT: ${{ inputs.commit }}
+      run: |
+        if [ "$COMMIT" = "false" ]; then MODE=generate; fi
+        case "$MODE" in
+          check|auto-commit|generate) echo "mode=$MODE" >> "$GITHUB_OUTPUT" ;;
+          *) echo "::error::unknown mode '$MODE' (use check, auto-commit or generate)"; exit 1 ;;
+        esac
+    - name: Fail if index is stale
+      if: steps.mode.outputs.mode == 'check' && steps.diff.outputs.changed == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        FILES: ${{ inputs.files }}
+      run: |
+        # shellcheck disable=SC2086
+        git --no-pager diff --stat -- $FILES || true
+        echo "::error::stacklit index is stale. Run 'stacklit generate' and commit the result."
+        exit 1
+    - name: Commit changes
+      if: steps.mode.outputs.mode == 'auto-commit' && steps.diff.outputs.changed == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        FILES: ${{ inputs.files }}
       run: |
         git config user.name "stacklit[bot]"
         git config user.email "stacklit[bot]@users.noreply.github.com"
-        git add stacklit.json DEPENDENCIES.md 2>/dev/null || true
-        git diff --staged --quiet || git commit -m "chore: update stacklit index"
-        git push || true
+        # shellcheck disable=SC2086
+        git add -- $FILES
+        git commit -m "chore: update stacklit index"
+        # A rejected push must fail the job; swallowing it hides a stale index.
+        git push

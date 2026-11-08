@@ -15,9 +15,9 @@ import (
 )
 
 type setupFlags struct {
-	all, dryRun, uninstall, global, list bool
-	noMCP, noGitHook                     bool
-	preTool, session, skill              bool
+	all, dryRun, uninstall, global, list, report bool
+	noMCP, noGitHook                             bool
+	preTool, session, skill                      bool
 }
 
 func newSetupCmd() *cobra.Command {
@@ -63,6 +63,7 @@ Examples:
 	fl.BoolVar(&f.uninstall, "uninstall", false, "Remove what setup added")
 	fl.BoolVar(&f.global, "global", false, "Allow writing to home-directory configs (Claude settings, Windsurf MCP)")
 	fl.BoolVar(&f.list, "list", false, "List supported tools and whether they were detected")
+	fl.BoolVar(&f.report, "report", false, "Print the always-on tokens each integration adds to an agent's context")
 	fl.BoolVar(&f.noMCP, "no-mcp", false, "Skip MCP server registration")
 	fl.BoolVar(&f.noGitHook, "no-git-hook", false, "Skip the post-commit git hook")
 	fl.BoolVar(&f.preTool, "pretool-hook", false, "Claude Code: add a PreToolUse hook that nudges toward the map on broad Grep/Glob")
@@ -106,6 +107,25 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 		return nil
 	}
 
+	if f.report {
+		idx, err := loadOrScan(true)
+		if err != nil {
+			return err
+		}
+		exe, _ := os.Executable()
+		rows := setup.Report(idx, tools, setup.MCPSchemaTokens(exe, root))
+		fmt.Fprintf(out, "%-48s %7s  %s\n", "integration", "tokens", "when")
+		for _, r := range rows {
+			tok := fmt.Sprintf("%d", r.Tokens)
+			if r.Tokens < 0 {
+				tok = "n/a"
+			}
+			fmt.Fprintf(out, "%-48s %7s  %s\n", r.Item, tok, r.Note)
+		}
+		fmt.Fprintln(out, "\ntokens = bytes/4 approximation. Rules rows load on every session of that tool.")
+		return nil
+	}
+
 	var idx *schema.Index
 	if !f.uninstall {
 		if idx, err = loadOrScan(f.dryRun); err != nil {
@@ -123,6 +143,10 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 	})
 	if err != nil {
 		return err
+	}
+	if idx != nil && !f.uninstall {
+		body := setup.MarkdownBody(idx)
+		fmt.Fprintf(out, "\ninjected digest: %d tokens (%d bytes, bytes/4)\n", setup.Tokens(body), len(body))
 	}
 	switch {
 	case f.dryRun:

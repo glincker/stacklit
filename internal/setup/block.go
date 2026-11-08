@@ -2,9 +2,6 @@ package setup
 
 import (
 	"strings"
-
-	"github.com/glincker/stacklit/internal/derive"
-	"github.com/glincker/stacklit/internal/schema"
 )
 
 // Marker styles. Markdown files use HTML comments, config files use hashes.
@@ -23,17 +20,6 @@ func markers(style string) (string, string) {
 		return "# stacklit:start", "# stacklit:end"
 	}
 	return "<!-- stacklit:start -->", "<!-- stacklit:end -->"
-}
-
-// MarkdownBody is the token-lean instruction block placed in agent rule files.
-func MarkdownBody(idx *schema.Index) string {
-	var b strings.Builder
-	b.WriteString("## Codebase map (stacklit)\n")
-	b.WriteString("Read `stacklit.json` or use the stacklit MCP tools before grep/glob. ")
-	b.WriteString("Refresh with `stacklit generate`.\n\n```\n")
-	b.WriteString(derive.CompactMap(idx))
-	b.WriteString("```\n")
-	return b.String()
 }
 
 // wrap surrounds body with the markers for style.

@@ -2,6 +2,7 @@ package setup
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -170,5 +171,42 @@ func TestUninstallPrunesEmptyDirs(t *testing.T) {
 	ents, _ := os.ReadDir(dir)
 	if len(ents) != 0 {
 		t.Fatalf("left behind: %v", ents)
+	}
+}
+
+func bigIdx() *schema.Index {
+	idx := testIdx()
+	for i := 0; i < 80; i++ {
+		idx.Modules[fmt.Sprintf("internal/mod%02d", i)] = schema.ModuleInfo{Purpose: "handles a fairly long description of things", Lines: i * 10, DependsOn: []string{"internal/a"}}
+	}
+	return idx
+}
+
+func TestDigestBudgetAndStability(t *testing.T) {
+	a, b := MarkdownBody(bigIdx()), MarkdownBody(bigIdx())
+	if a != b {
+		t.Fatal("digest not byte-identical across runs")
+	}
+	if n := Tokens(a); n > 520 || n < 100 {
+		t.Fatalf("digest %d tokens, want <= ~500", n)
+	}
+	if !strings.Contains(a, "more in stacklit.json") {
+		t.Fatal("truncation marker missing")
+	}
+}
+
+func TestNudgesAndSkillSmall(t *testing.T) {
+	if Tokens(preToolNudge) > 100 || Tokens(sessionNudge) > 100 {
+		t.Fatal("hook nudge over 100 tokens")
+	}
+	if len(SkillMD) > 1100 {
+		t.Fatalf("skill is %d bytes, want about 1KB", len(SkillMD))
+	}
+}
+
+func TestReportRows(t *testing.T) {
+	rows := Report(testIdx(), Registry(), 1234)
+	if len(rows) < 20 {
+		t.Fatalf("rows: %d", len(rows))
 	}
 }

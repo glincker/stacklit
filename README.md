@@ -115,18 +115,25 @@ Modules, dependencies, exports with signatures, type definitions, git activity h
 stacklit setup
 ```
 
-Auto-detects Claude Code, Cursor, and Aider. For each:
-- Injects a compact ~250-token codebase map into the tool's config file
-- Configures MCP server integration
+Auto-detects the assistants in use. For each:
+- Injects a 300 to 500 token orientation digest between `<!-- stacklit:start -->` markers (re-runs replace it, output is byte-identical so prompt caches stay warm)
+- Registers the MCP server where the tool supports project config
 - Installs a git hook to keep the map fresh on every commit
 
-Or configure a specific tool:
-
 ```bash
-stacklit setup claude   # updates CLAUDE.md + .mcp.json
-stacklit setup cursor   # updates .cursorrules + .cursor/mcp.json
-stacklit setup aider    # updates .aider.conf.yml
+stacklit setup --list                 # 26 supported tools, detected ones marked
+stacklit setup --all                  # every tool, not just detected
+stacklit setup claude codex gemini    # specific tools
+stacklit setup --all --dry-run        # preview, prints digest size
+stacklit setup --all --uninstall      # reverse everything
+stacklit setup --report               # always-on tokens each integration adds
 ```
+
+Supported: Claude Code, Cursor, Aider, Codex, Gemini CLI, GitHub Copilot, Windsurf, Cline, Zed, Continue, OpenCode, Amp, Roo Code, Kilo Code, Junie, JetBrains AI, Augment, Trae, Kiro, Goose, Warp, Crush, Qwen Code, Factory Droid, Replit, generic AGENTS.md.
+
+Claude Code extras are opt-in: `--pretool-hook` (nudge before broad Grep/Glob), `--session-hook`, `--skill` (`/stacklit`). Nothing outside the repo is written unless you pass `--global`.
+
+Add docs, ADRs, OpenAPI, SQL schemas and CODEOWNERS to a sidecar with `stacklit ingest`. Shell completions: `stacklit completion bash|zsh|fish`. Homebrew: `brew install glincker/tap/stacklit`.
 
 ### Compact navigation map
 
