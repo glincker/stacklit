@@ -125,3 +125,18 @@ func firstN(s []string, n int) []string {
 	}
 	return s
 }
+
+// repoGraphFresh rebuilds the repository graph, for determinism tests that must
+// not share one in-memory graph between runs.
+func repoGraphFresh(t testing.TB) *SymGraph {
+	t.Helper()
+	root, err := filepath.Abs("../..")
+	if err != nil {
+		t.Skip("repository root unavailable")
+	}
+	files, err := walker.Walk(root, config.Load(root).ScanIgnore())
+	if err != nil {
+		t.Skip("walk failed")
+	}
+	return BuildSymbols(root, files, ExtractOptions{})
+}

@@ -48,8 +48,14 @@ func queryTerms(q string) []string {
 	return out
 }
 
-// Query returns a budgeted, file-grouped subgraph for a natural language question.
+// Query returns a budgeted, file-grouped subgraph for a natural language question,
+// in the order set by STACKLIT_QUERY_ORDER (relevance by default).
 func (g *SymGraph) Query(q string, budget int, asJSON bool) string {
+	return g.QueryOrdered(q, budget, asJSON, DefaultOrder())
+}
+
+// QueryOrdered is Query with an explicit file order.
+func (g *SymGraph) QueryOrdered(q string, budget int, asJSON bool, order Order) string {
 	if budget <= 0 {
 		budget = DefaultQueryBudget
 	}
@@ -102,8 +108,8 @@ func (g *SymGraph) Query(q string, budget int, asJSON bool) string {
 	}
 	items := make([]item, len(ids))
 	for i, id := range ids {
-		items[i] = item{node: id}
+		items[i] = item{node: id, score: score[id]}
 	}
 	head := []string{fmt.Sprintf("%d seeds, %d candidates", len(seeds), len(ids))}
-	return g.FitView(viewSpec{title: title, head: head, items: items, edges: true, hint: hint}, budget, asJSON)
+	return g.FitView(viewSpec{title: title, head: head, items: items, edges: true, hint: hint, ranked: true, order: order}, budget, asJSON)
 }
