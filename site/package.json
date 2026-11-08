@@ -1,0 +1,21 @@
+{
+  "name": "stacklit-site",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "sync": "node scripts/sync-docs.mjs",
+    "demos": "node scripts/build-demos.mjs",
+    "dev": "npm run sync && astro dev",
+    "build": "npm run sync && astro build && node scripts/check-links.mjs",
+    "preview": "astro preview",
+    "check:links": "node scripts/check-links.mjs"
+  },
+  "dependencies": {
+    "astro": "6.4.8",
+    "github-slugger": "2.0.0"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}
