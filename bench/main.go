@@ -1,6 +1,6 @@
-// Command bench measures stacklit against a grep+read baseline on pinned
-// public repos. It makes no network calls except `git fetch` of the pinned
-// commits, and calls no LLM. See bench/README.md.
+// Command bench measures stacklit against several baselines on pinned public
+// repos. It makes no network calls except `git fetch` of the pinned commits,
+// and calls no LLM. See bench/README.md and bench/RESULTS.md.
 package main
 
 import (
@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -30,6 +31,9 @@ type RepoSpec struct {
 	SHA         string   `json:"sha"`
 	Exts        []string `json:"exts"`
 	TestMarkers []string `json:"test_markers"`
+	// StacklitIgnore is written to .stacklitrc.json in the checkout, only to
+	// keep generation from hanging on files the shell parser cannot handle.
+	StacklitIgnore []string `json:"stacklit_ignore,omitempty"`
 }
 
 // Task is one navigation question with a hand-verified answer.
@@ -43,14 +47,6 @@ type Task struct {
 	Target        string   `json:"target,omitempty"`
 	ExpectPaths   []string `json:"expect_paths"`
 	ExpectModules []string `json:"expect_modules"`
-}
-
-// TaskResult pairs both procedures for one task.
-type TaskResult struct {
-	Task     Task
-	Baseline BaselineResult
-	Stacklit StacklitResult
-	Query    QueryResult
 }
 
 // GenStats are the generation measurements for one repo.
@@ -68,46 +64,89 @@ type GenStats struct {
 
 // RepoResult is everything measured for one repo.
 type RepoResult struct {
-	Spec  RepoSpec
-	Gen   GenStats
-	Tasks []TaskResult
+	Spec          RepoSpec
+	Gen           GenStats
+	DumpCost      Cost    // all code files of the repo, tests included
+	RepoMapMs     float64 // single-run build time of the repo-map tags
+	BM25Ms        float64 // single-run build time of the BM25 index
+	Tasks         []TaskResult
+	CodeFiles     int
+	SearchedFiles int
+}
+
+// Opts are the harness knobs; each is a command line flag.
+type Opts struct {
+	Workdir, Binary, Only, WriteMD, JSONOut string
+	Runs, TopN, ReadCap, MaxExtra, Boot     int
+	Seed                                    int64
+	Baseline                                BaselineParams
+	QueryBudgets, MapBudgets                []int
+	BM25Listed, BM25Ranked                  int
+	ContextWindow                           int
+}
+
+func parseInts(s string) ([]int, error) {
+	var out []int
+	for _, p := range strings.Split(s, ",") {
+		if p = strings.TrimSpace(p); p == "" {
+			continue
+		}
+		v, err := strconv.Atoi(p)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, v)
+	}
+	return out, nil
 }
 
 func main() {
-	var (
-		workdir  = flag.String("workdir", "", "directory for clones (default: a new temp dir, removed on exit)")
-		binary   = flag.String("stacklit", "", "path to the stacklit binary (default: build from this checkout)")
-		runs     = flag.Int("runs", 5, "timed generate runs per repo")
-		only     = flag.String("only", "", "comma separated repo names to run (default: all)")
-		topN     = flag.Int("top", 3, "modules the stacklit path inspects per locate task")
-		writeMD  = flag.String("write", "", "update the generated block of this markdown file (for example bench/RESULTS.md)")
-		jsonOut  = flag.String("json", "", "write raw results to this JSON file")
-		maxLines = flag.Int("grep-lines", DefaultBaseline.MaxGrepLines, "baseline: grep output lines the agent sees")
-		readTop  = flag.Int("read-files", DefaultBaseline.ReadTopFiles, "baseline: files read in full after grepping")
-	)
-	qb := flag.Int("query-budget", 2000, "graph query arm: --budget passed to stacklit query (tokens)")
+	var o Opts
+	flag.StringVar(&o.Workdir, "workdir", "", "directory for clones (default: a new temp dir, removed on exit)")
+	flag.StringVar(&o.Binary, "stacklit", "", "path to the stacklit binary (default: build from this checkout)")
+	flag.IntVar(&o.Runs, "runs", 5, "timed generate runs per repo")
+	flag.StringVar(&o.Only, "only", "", "comma separated repo names to run (default: all)")
+	flag.IntVar(&o.TopN, "top", 3, "modules the stacklit map+lookup arm inspects per localization task")
+	flag.StringVar(&o.WriteMD, "write", "", "update the generated block of this markdown file (for example bench/RESULTS.md)")
+	flag.StringVar(&o.JSONOut, "json", "", "write raw results to this JSON file")
+	flag.IntVar(&o.Baseline.MaxGrepLines, "grep-lines", DefaultBaseline.MaxGrepLines, "grep arm: output lines the agent sees")
+	flag.IntVar(&o.ReadCap, "read-cap", 5, "files an arm may open, in rank order, before a task counts as missed")
+	flag.IntVar(&o.MaxExtra, "max-extra", 2, "dependents strict rule: most unexpected modules allowed")
+	flag.IntVar(&o.Boot, "boot", 10000, "bootstrap resamples for confidence intervals")
+	flag.Int64Var(&o.Seed, "seed", 20260101, "bootstrap seed")
+	flag.IntVar(&o.BM25Listed, "bm25-listed", 5, "BM25 arm: paths printed to the agent")
+	flag.IntVar(&o.BM25Ranked, "bm25-ranked", 10, "BM25 arm: ranked files kept for found@k")
+	flag.IntVar(&o.ContextWindow, "context-window", 200000, "tokens used to say whether a full dump fits")
+	qb := flag.String("query-budgets", "1000,2000", "stacklit query arm: --budget values (tokens), one arm each")
+	mb := flag.String("repomap-budgets", "1000,4000", "repo-map approximation arm: token budgets, one arm each")
 	flag.Parse()
-	queryBudget = strconv.Itoa(*qb)
-
-	if err := run(*workdir, *binary, *runs, *only, *topN, *writeMD, *jsonOut,
-		BaselineParams{MaxGrepLines: *maxLines, MaxLineChars: DefaultBaseline.MaxLineChars, ReadTopFiles: *readTop}); err != nil {
+	o.Baseline.MaxLineChars = DefaultBaseline.MaxLineChars
+	var err error
+	if o.QueryBudgets, err = parseInts(*qb); err == nil {
+		o.MapBudgets, err = parseInts(*mb)
+	}
+	if err == nil {
+		err = run(o)
+	}
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "bench:", err)
 		os.Exit(1)
 	}
 }
 
-func run(workdir, binary string, runs int, only string, topN int, writeMD, jsonOut string, bp BaselineParams) error {
+func run(o Opts) error {
 	repos, err := loadRepos()
 	if err != nil {
 		return err
 	}
 	keep := map[string]bool{}
-	for _, n := range strings.Split(only, ",") {
+	for _, n := range strings.Split(o.Only, ",") {
 		if n = strings.TrimSpace(n); n != "" {
 			keep[n] = true
 		}
 	}
 
+	workdir := o.Workdir
 	if workdir == "" {
 		workdir, err = os.MkdirTemp("", "stacklit-bench-")
 		if err != nil {
@@ -118,6 +157,7 @@ func run(workdir, binary string, runs int, only string, topN int, writeMD, jsonO
 		return err
 	}
 
+	binary := o.Binary
 	if binary == "" {
 		binary = filepath.Join(workdir, "stacklit-bin")
 		fmt.Fprintln(os.Stderr, "building stacklit from this checkout")
@@ -135,7 +175,7 @@ func run(workdir, binary string, runs int, only string, topN int, writeMD, jsonO
 			continue
 		}
 		fmt.Fprintf(os.Stderr, "== %s (%s @ %s)\n", spec.Name, spec.Ref, spec.SHA[:10])
-		r, err := benchRepo(workdir, binary, spec, runs, topN, bp)
+		r, err := benchRepo(workdir, binary, spec, o)
 		if err != nil {
 			return fmt.Errorf("%s: %w", spec.Name, err)
 		}
@@ -143,17 +183,17 @@ func run(workdir, binary string, runs int, only string, topN int, writeMD, jsonO
 	}
 
 	env := environment(binary)
-	md := RenderMarkdown(results, env, bp)
-	if writeMD != "" {
-		if err := spliceGenerated(writeMD, md); err != nil {
+	md := RenderMarkdown(results, env, o)
+	if o.WriteMD != "" {
+		if err := spliceGenerated(o.WriteMD, md); err != nil {
 			return err
 		}
 	} else {
 		fmt.Println(md)
 	}
-	if jsonOut != "" {
+	if o.JSONOut != "" {
 		b, _ := json.MarshalIndent(results, "", "  ")
-		if err := os.WriteFile(jsonOut, b, 0o644); err != nil {
+		if err := os.WriteFile(o.JSONOut, b, 0o644); err != nil {
 			return err
 		}
 	}
@@ -189,21 +229,47 @@ func repoRoot() string {
 	return dir
 }
 
-// queryBudget is the --budget value passed to stacklit query (tokens).
-var queryBudget = "2000"
+func armQuery(b int) string   { return fmt.Sprintf("stacklit query %d", b) }
+func armRepoMap(b int) string { return fmt.Sprintf("repo-map approx %d", b) }
 
-func benchRepo(workdir, binary string, spec RepoSpec, runs, topN int, bp BaselineParams) (RepoResult, error) {
+const (
+	armGrep     = "grep+read"
+	armBM25     = "bm25 top-k"
+	armDump     = "full dump"
+	armStacklit = "stacklit map+lookup"
+)
+
+// armOrder lists the arms in report order for the given options.
+func armOrder(o Opts) []string {
+	arms := []string{armGrep}
+	for _, b := range o.MapBudgets {
+		arms = append(arms, armRepoMap(b))
+	}
+	arms = append(arms, armBM25, armDump, armStacklit)
+	for _, b := range o.QueryBudgets {
+		arms = append(arms, armQuery(b))
+	}
+	return arms
+}
+
+func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error) {
 	dir := filepath.Join(workdir, spec.Name)
 	if err := checkout(dir, spec); err != nil {
 		return RepoResult{}, err
 	}
-	// Load sources before generating so stacklit outputs never enter the baseline.
-	sources, err := LoadSources(dir, spec)
+	if len(spec.StacklitIgnore) > 0 {
+		rc, _ := json.Marshal(map[string]any{"ignore": spec.StacklitIgnore})
+		if err := os.WriteFile(filepath.Join(dir, ".stacklitrc.json"), rc, 0o644); err != nil {
+			return RepoResult{}, err
+		}
+	}
+	// Load sources before generating so stacklit outputs never enter any arm.
+	sources, sizes, err := LoadSources(dir, spec)
 	if err != nil {
 		return RepoResult{}, err
 	}
 
-	gen, err := measureGenerate(binary, dir, runs)
+	gen, err := measureGenerate(binary, dir, o.Runs)
 	if err != nil {
 		return RepoResult{}, err
 	}
@@ -232,17 +298,109 @@ func benchRepo(workdir, binary string, spec RepoSpec, runs, topN int, bp Baselin
 	if err != nil {
 		return RepoResult{}, err
 	}
-	res := RepoResult{Spec: spec, Gen: gen}
+	if err := verifyGold(sources, sizes, iv.ModuleNames(), tasks, o.Baseline); err != nil {
+		return RepoResult{}, err
+	}
+
+	var dump Cost
+	for _, c := range sizes {
+		dump = dump.Add(c)
+	}
+	t0 := time.Now()
+	rm := BuildRepoMap(sources)
+	repoMapMs := float64(time.Since(t0).Microseconds()) / 1000
+	t0 = time.Now()
+	bm := BuildBM25(sources)
+	bm25Ms := float64(time.Since(t0).Microseconds()) / 1000
+
+	res := RepoResult{Spec: spec, Gen: gen, DumpCost: dump, RepoMapMs: repoMapMs, BM25Ms: bm25Ms,
+		CodeFiles: len(sizes), SearchedFiles: len(sources)}
+	modules := iv.ModuleNames()
 	for _, t := range tasks {
-		b, err := RunBaseline(sources, t, iv.ModuleNames(), bp)
+		tr := TaskResult{Task: t, Arms: map[string]ArmResult{}}
+		g, err := RunBaseline(armGrep, sources, t, modules, o.Baseline, sizes, o.ReadCap, o.MaxExtra)
 		if err != nil {
 			return res, err
 		}
-		s := RunStacklit(iv, gen.MapCost, dir, t, topN)
-		q := RunQuery(binary, dir, t, iv.ModuleNames(), queryBudget)
-		res.Tasks = append(res.Tasks, TaskResult{Task: t, Baseline: b, Stacklit: s, Query: q})
+		tr.Arms[armGrep] = g
+		for _, b := range o.MapBudgets {
+			tr.Arms[armRepoMap(b)] = RunRepoMap(armRepoMap(b), rm, t, b, sizes, o.ReadCap)
+		}
+		tr.Arms[armBM25] = RunBM25(armBM25, bm, t, o.BM25Listed, o.BM25Ranked, sizes, o.ReadCap)
+		tr.Arms[armDump] = ArmResult{Arm: armDump, CostOnly: true, Lookup: dump, ToFound: dump}
+		tr.Arms[armStacklit] = RunStacklit(armStacklit, iv, gen.MapCost, t, o.TopN, sizes, o.ReadCap, o.MaxExtra)
+		for _, b := range o.QueryBudgets {
+			tr.Arms[armQuery(b)] = RunQuery(armQuery(b), binary, dir, t, modules, strconv.Itoa(b), sizes, o.ReadCap, o.MaxExtra)
+		}
+		res.Tasks = append(res.Tasks, tr)
 	}
 	return res, nil
+}
+
+// verifyGold fails the run when a hand-written answer does not hold on the
+// pinned checkout: gold files must exist and match the grep pattern, and the
+// uncapped grep result for a dependents task must cover every expected module.
+func verifyGold(files []SourceFile, sizes RepoSizes, modules []string, tasks []Task, bp BaselineParams) error {
+	var bad []string
+	for _, t := range tasks {
+		pat := t.Pattern
+		if t.Word {
+			pat = `\b(?:` + pat + `)\b`
+		}
+		re, err := regexp.Compile(pat)
+		if err != nil {
+			bad = append(bad, fmt.Sprintf("%s: bad pattern: %v", t.ID, err))
+			continue
+		}
+		if t.Kind == "dependents" {
+			got := map[string]bool{}
+			for _, f := range files {
+				for _, l := range f.Lines {
+					if re.MatchString(l) {
+						got[moduleOfFile(f.Rel, modules)] = true
+						break
+					}
+				}
+			}
+			for _, e := range t.ExpectModules {
+				if !got[e] {
+					bad = append(bad, fmt.Sprintf("%s: expected module %q has no grep hit", t.ID, e))
+				}
+			}
+			continue
+		}
+		matched := false
+		for _, e := range t.ExpectPaths {
+			exists := false
+			for rel := range sizes {
+				if pathMatches(rel, e) {
+					exists = true
+				}
+			}
+			if !exists {
+				bad = append(bad, fmt.Sprintf("%s: gold path %q does not exist", t.ID, e))
+			}
+			for _, f := range files {
+				if !pathMatches(f.Rel, e) {
+					continue
+				}
+				for _, l := range f.Lines {
+					if re.MatchString(l) {
+						matched = true
+						break
+					}
+				}
+			}
+		}
+		if !matched {
+			bad = append(bad, fmt.Sprintf("%s: pattern %q matches no gold file", t.ID, t.Pattern))
+		}
+	}
+	if len(bad) > 0 {
+		sort.Strings(bad)
+		return fmt.Errorf("gold answers do not hold:\n  %s", strings.Join(bad, "\n  "))
+	}
+	return nil
 }
 
 func totals(raw []byte) (files, lines int) {

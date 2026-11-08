@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,12 +13,12 @@ import (
 type BaselineParams struct {
 	MaxGrepLines int // grep output lines the agent sees
 	MaxLineChars int // each output line is cut to this length
-	ReadTopFiles int // files read in full after grepping
 }
 
 // DefaultBaseline is deliberately generous to the baseline: test files are
-// excluded from the search and files are ranked by definition-like matches.
-var DefaultBaseline = BaselineParams{MaxGrepLines: 50, MaxLineChars: 200, ReadTopFiles: 3}
+// excluded from the search, the pattern is hand written per task, and files
+// are ranked by definition-like matches.
+var DefaultBaseline = BaselineParams{MaxGrepLines: 50, MaxLineChars: 200}
 
 // SourceFile is a searchable file of a checked-out repo.
 type SourceFile struct {
@@ -28,24 +27,21 @@ type SourceFile struct {
 	Size  int
 }
 
-// BaselineResult is the outcome of the grep+read procedure for one task.
-type BaselineResult struct {
-	GrepCost     Cost
-	ReadCost     Cost
-	HitFiles     []string // files surfaced by grep (after the line cap), ranked
-	ReadFiles    []string
-	FoundInGrep  bool
-	FoundInRead  bool
-	Modules      []string // dependents tasks: modules inferred from hit files
-	Precision    float64
-	Recall       float64
-	DependentsOK bool
+// skipDir lists directories no arm looks into.
+func skipDir(name string) bool {
+	switch name {
+	case ".git", "node_modules", "vendor", ".venv", "dist", "target":
+		return true
+	}
+	return false
 }
 
-// LoadSources reads all searchable source files of a repo, skipping tests,
-// vendored code and stacklit's own outputs.
-func LoadSources(root string, repo RepoSpec) ([]SourceFile, error) {
+// LoadSources reads the searchable (non-test) source files of a repo and the
+// size of every code file including tests. Run it before generating so the
+// stacklit outputs never enter any arm.
+func LoadSources(root string, repo RepoSpec) ([]SourceFile, RepoSizes, error) {
 	var out []SourceFile
+	sizes := RepoSizes{}
 	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -53,8 +49,7 @@ func LoadSources(root string, repo RepoSpec) ([]SourceFile, error) {
 		rel, _ := filepath.Rel(root, path)
 		rel = filepath.ToSlash(rel)
 		if d.IsDir() {
-			switch d.Name() {
-			case ".git", "node_modules", "vendor", ".venv", "dist":
+			if skipDir(d.Name()) {
 				return filepath.SkipDir
 			}
 			return nil
@@ -62,32 +57,25 @@ func LoadSources(root string, repo RepoSpec) ([]SourceFile, error) {
 		if !hasExt(rel, repo.Exts) {
 			return nil
 		}
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			return nil
+		}
+		sizes[rel] = CostOf(string(raw))
 		slashed := "/" + rel
 		for _, m := range repo.TestMarkers {
 			if strings.Contains(slashed, m) {
 				return nil
 			}
 		}
-		info, err := d.Info()
-		if err != nil || info.Size() > 1<<20 {
+		if len(raw) > 1<<20 {
 			return nil
 		}
-		f, err := os.Open(path)
-		if err != nil {
-			return nil
-		}
-		defer f.Close()
-		var lines []string
-		sc := bufio.NewScanner(f)
-		sc.Buffer(make([]byte, 1<<20), 1<<20)
-		for sc.Scan() {
-			lines = append(lines, sc.Text())
-		}
-		out = append(out, SourceFile{Rel: rel, Lines: lines, Size: int(info.Size())})
+		out = append(out, SourceFile{Rel: rel, Lines: strings.Split(string(raw), "\n"), Size: len(raw)})
 		return nil
 	})
 	sort.Slice(out, func(i, j int) bool { return out[i].Rel < out[j].Rel })
-	return out, err
+	return out, sizes, err
 }
 
 func hasExt(rel string, exts []string) bool {
@@ -108,105 +96,74 @@ func pathMatches(rel, expected string) bool {
 	return rel == expected
 }
 
-// RunBaseline simulates `grep -rn PATTERN`, then reading the best-ranked files.
-func RunBaseline(files []SourceFile, task Task, modules []string, p BaselineParams) (BaselineResult, error) {
+// RunBaseline simulates `grep -rn PATTERN`. The agent sees only the first
+// MaxGrepLines output lines, ranks the files visible there (definition-like
+// lines first, then match count) and reads them in that order.
+func RunBaseline(arm string, files []SourceFile, task Task, modules []string, p BaselineParams, sizes RepoSizes, readCap, maxExtra int) (ArmResult, error) {
 	pat := task.Pattern
 	if task.Word {
 		pat = `\b(?:` + pat + `)\b`
 	}
 	re, err := regexp.Compile(pat)
 	if err != nil {
-		return BaselineResult{}, fmt.Errorf("task %s pattern: %w", task.ID, err)
+		return ArmResult{}, fmt.Errorf("task %s pattern: %w", task.ID, err)
 	}
-	defRe := regexp.MustCompile(`\b(func|def|class|type|interface|const|let|var|function|struct|enum|trait)\b.*(?:` + task.Pattern + `)`)
+	defRe := regexp.MustCompile(`\b(func|def|class|type|interface|const|let|var|function|struct|enum|trait|fn|module|impl)\b.*(?:` + task.Pattern + `)`)
 
-	type hit struct {
-		file string
-		line string
-	}
-	var hits []hit
+	res := ArmResult{Arm: arm}
+	var out strings.Builder
 	score := map[string]int{}
+	seen := map[string]bool{}
+	var visible []string
+	n := 0
+scan:
 	for _, f := range files {
 		for i, line := range f.Lines {
 			if !re.MatchString(line) {
 				continue
 			}
+			if n >= p.MaxGrepLines {
+				break scan
+			}
+			n++
 			text := strings.TrimSpace(line)
 			if len(text) > p.MaxLineChars {
 				text = text[:p.MaxLineChars]
 			}
-			hits = append(hits, hit{f.Rel, fmt.Sprintf("%s:%d:%s", f.Rel, i+1, text)})
+			fmt.Fprintf(&out, "%s:%d:%s\n", f.Rel, i+1, text)
+			if !seen[f.Rel] {
+				seen[f.Rel] = true
+				visible = append(visible, f.Rel)
+			}
 			score[f.Rel]++
 			if defRe.MatchString(line) {
 				score[f.Rel] += 100
 			}
 		}
 	}
-
-	res := BaselineResult{}
-	var out strings.Builder
-	seen := map[string]bool{}
-	for i, h := range hits {
-		if i >= p.MaxGrepLines {
-			break
-		}
-		out.WriteString(h.line)
-		out.WriteString("\n")
-		if !seen[h.file] {
-			seen[h.file] = true
-			res.HitFiles = append(res.HitFiles, h.file)
-		}
-	}
-	res.GrepCost = CostOf(out.String())
+	res.Lookup = CostOf(out.String())
 
 	if task.Kind == "dependents" {
 		inferred := map[string]bool{}
-		for _, hf := range res.HitFiles {
+		for _, hf := range visible {
 			inferred[moduleOfFile(hf, modules)] = true
 		}
 		for m := range inferred {
 			res.Modules = append(res.Modules, m)
 		}
 		sort.Strings(res.Modules)
-		res.Precision, res.Recall = precisionRecall(res.Modules, task.ExpectModules, false)
-		res.DependentsOK = res.Recall == 1
+		gradeDependents(&res, task, maxExtra)
 		return res, nil
 	}
 
-	ranked := make([]string, 0, len(score))
-	for f := range score {
-		ranked = append(ranked, f)
-	}
-	sort.Slice(ranked, func(i, j int) bool {
-		if score[ranked[i]] != score[ranked[j]] {
-			return score[ranked[i]] > score[ranked[j]]
+	sort.SliceStable(visible, func(i, j int) bool {
+		if score[visible[i]] != score[visible[j]] {
+			return score[visible[i]] > score[visible[j]]
 		}
-		return ranked[i] < ranked[j]
+		return visible[i] < visible[j]
 	})
-	sizes := map[string]*SourceFile{}
-	for i := range files {
-		sizes[files[i].Rel] = &files[i]
-	}
-	for i, f := range ranked {
-		if i >= p.ReadTopFiles {
-			break
-		}
-		res.ReadFiles = append(res.ReadFiles, f)
-		sf := sizes[f]
-		res.ReadCost = res.ReadCost.Add(Cost{Bytes: sf.Size, Pieces: pieceCount(sf.Lines)})
-	}
-	for _, e := range task.ExpectPaths {
-		for _, f := range res.HitFiles {
-			if pathMatches(f, e) {
-				res.FoundInGrep = true
-			}
-		}
-		for _, f := range res.ReadFiles {
-			if pathMatches(f, e) {
-				res.FoundInRead = true
-			}
-		}
-	}
+	res.Ranked = visible
+	finishLocalization(&res, task, sizes, readCap)
 	return res, nil
 }
 
@@ -240,40 +197,4 @@ func moduleOfFile(rel string, modules []string) string {
 		}
 	}
 	return best
-}
-
-// precisionRecall compares found modules with expected ones. When loose is set,
-// index entries may be short names (a trailing path segment), as stacklit emits.
-func precisionRecall(found, expected []string, loose bool) (precision, recall float64) {
-	matches := func(f, e string) bool {
-		if f == e {
-			return true
-		}
-		if strings.HasSuffix(e, "/") && strings.HasPrefix(f, e) {
-			return true
-		}
-		return loose && strings.HasSuffix(e, "/"+f)
-	}
-	if len(found) == 0 {
-		return 0, 0
-	}
-	tp := 0
-	for _, f := range found {
-		for _, e := range expected {
-			if matches(f, e) {
-				tp++
-				break
-			}
-		}
-	}
-	hitE := 0
-	for _, e := range expected {
-		for _, f := range found {
-			if matches(f, e) {
-				hitE++
-				break
-			}
-		}
-	}
-	return float64(tp) / float64(len(found)), float64(hitE) / float64(len(expected))
 }
