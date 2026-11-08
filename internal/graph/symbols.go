@@ -40,15 +40,17 @@ const (
 
 // SymNode is a file or a symbol definition.
 type SymNode struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	File      string `json:"file"`
-	Line      int    `json:"line,omitempty"`
-	End       int    `json:"end,omitempty"`
-	Doc       string `json:"doc,omitempty"`
-	Lang      string `json:"lang,omitempty"`
-	Sig       string `json:"sig,omitempty"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Kind string `json:"kind"`
+	File string `json:"file"`
+	Line int    `json:"line,omitempty"`
+	End  int    `json:"end,omitempty"`
+	Doc  string `json:"doc,omitempty"`
+	Lang string `json:"lang,omitempty"`
+	Sig  string `json:"sig,omitempty"`
+	// Body holds a capped list of distinct body words used only for search.
+	Body      string `json:"body,omitempty"`
 	Community int    `json:"community"`
 	Repo      string `json:"repo,omitempty"`   // set when graphs from several repos are merged
 	Source    string `json:"source,omitempty"` // adapter or index that produced the node, empty for the built-in extractor
@@ -80,12 +82,17 @@ type SymGraph struct {
 	Nodes       []SymNode   `json:"nodes"`
 	Edges       []SymEdge   `json:"edges"`
 	Communities []Community `json:"communities,omitempty"`
+	// Built and Commit record when and at which HEAD the graph was written,
+	// so status and query can warn when it has gone stale.
+	Built  string `json:"built,omitempty"`
+	Commit string `json:"commit,omitempty"`
 
 	out, in  [][]int32
 	byName   map[string][]int
 	byID     map[string]int
 	nameKeys []string
 	pr       []float64
+	sx       *searchIndex
 }
 
 // Index builds adjacency lists and name lookups. It is safe to call twice.
@@ -106,7 +113,7 @@ func (g *SymGraph) Index() {
 		g.out[e.From] = append(g.out[e.From], int32(i))
 		g.in[e.To] = append(g.in[e.To], int32(i))
 	}
-	g.pr = nil
+	g.pr, g.sx = nil, nil
 	g.nameKeys = g.nameKeys[:0]
 	for k := range g.byName {
 		g.nameKeys = append(g.nameKeys, k)

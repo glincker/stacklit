@@ -915,5 +915,6 @@ func BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph {
 	fs := Extract(root, files, eo)
 	g := Resolve(fs, ResolveOptions{GoModules: DiscoverGoModules(root, files)})
 	g.Root = filepath.Base(root)
+	g.attachBodies(root)
 	return g
 }
