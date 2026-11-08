@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T16:44:30Z",
+  "generated_at": "2026-11-08T16:47:56Z",
   "stacklit_version": "dev",
-  "merkle_hash": "ec5054d8a1372fd6dc98e3edca5f2bbdb8f4a67aca0080ac9a68a6f62dab80de",
+  "merkle_hash": "4069d9f58349a993e019e593f0713d4928e5e423c3ca3022cfde3d98a90c6365",
   "project": {
     "name": "stacklit-integrations",
     "root": ".",
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 69,
-        "lines": 9476
+        "files": 78,
+        "lines": 10438
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 80,
-    "total_lines": 9719
+    "total_files": 89,
+    "total_lines": 10681
   },
   "modules": {
     "assets": {
@@ -84,13 +84,14 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 11,
-      "lines": 640,
+      "files": 12,
+      "lines": 694,
       "file_list": [
         "derive.go",
         "diff.go",
         "export.go",
         "generate.go",
+        "hook.go",
         "init.go",
         "root.go",
         "serve.go",
@@ -257,7 +258,8 @@
       },
       "depended_by": [
         "internal/cli",
-        "internal/engine"
+        "internal/engine",
+        "internal/setup"
       ],
       "activity": "low"
     },
@@ -438,13 +440,13 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
+        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
-        "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
+        "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
         "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
         "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
@@ -462,23 +464,42 @@
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 1,
-      "lines": 158,
+      "files": 9,
+      "lines": 1066,
       "file_list": [
-        "setup.go"
+        "block.go",
+        "claude.go",
+        "git.go",
+        "hookcmd.go",
+        "mcp.go",
+        "runner.go",
+        "setup.go",
+        "setup_test.go",
+        "tools.go"
       ],
       "exports": [
-        "ConfigureAider(idx *schema.Index) error",
-        "ConfigureClaude(idx *schema.Index, withMCP bool) error",
-        "ConfigureCursor(idx *schema.Index) error",
-        "DetectTools() []Tool",
-        "type Tool"
+        "ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error",
+        "Detected(root string) bool",
+        "Lookup(id string) (Tool, bool)",
+        "MarkdownBody(idx *schema.Index) string",
+        "PreToolHook(stdin io.Reader) string",
+        "Registry() []Tool",
+        "Run(r *Runner, o Options) error",
+        "SessionHook(stdin io.Reader) string",
+        "SkillMD",
+        "StyleCodexTOML"
       ],
       "type_defs": {
-        "Tool": "Name string, Detected bool"
+        "ClaudeOptions": "PreToolHook bool, SessionHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
+        "MCP": "Path string, Style MCPStyle, Global bool",
+        "Options": "Root string, Tools []Tool, Index *schema.Index, Uninstall bool, NoMCP bool, NoGitHook bool, Global bool, Claude ClaudeOptions",
+        "Rule": "Path string, Style string, Frontmatter string",
+        "Runner": "Root string, DryRun bool, Out io.Writer, Changed int",
+        "Tool": "ID string, Name string, Rules []Rule, MCP []MCP, Paths []string, Bins []string"
       },
       "depends_on": [
         "internal/derive",
+        "internal/git",
         "internal/schema"
       ],
       "depended_by": [
@@ -654,6 +675,10 @@
       ],
       [
         "internal/setup",
+        "internal/git"
+      ],
+      [
+        "internal/setup",
         "internal/schema"
       ],
       [
@@ -666,9 +691,9 @@
     ],
     "most_depended": [
       "internal/schema",
+      "internal/git",
       "internal/config",
       "internal/derive",
-      "internal/git",
       "internal/parser",
       "internal/renderer",
       "internal/walker",
@@ -688,30 +713,97 @@
         "commits_90d": 1
       },
       {
+        "path": "SKILL.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/cli/hook.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/cli/setup.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/cli/version.go",
         "commits_90d": 1
       },
       {
         "path": "internal/cli/version_test.go",
         "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/block.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/claude.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/git.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/hookcmd.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/mcp.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/runner.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/setup.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/setup_test.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/skill/SKILL.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/setup/tools.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "stacklit.json",
+        "commits_90d": 1
+      },
+      {
+        "path": "stacklit.mmd",
+        "commits_90d": 1
       }
     ],
     "recent": [
-      "Makefile",
-      "internal/cli/version.go",
-      "internal/cli/version_test.go",
-      "stacklit.json",
-      "npm/install.js",
-      "DEPENDENCIES.md",
-      ".github/workflows/ci.yml",
-      "README.md",
-      "USAGE.md",
-      "internal/cli/export.go"
+      "SKILL.md",
+      "internal/cli/hook.go",
+      "internal/cli/setup.go",
+      "internal/setup/block.go",
+      "internal/setup/claude.go",
+      "internal/setup/git.go",
+      "internal/setup/hookcmd.go",
+      "internal/setup/mcp.go",
+      "internal/setup/runner.go",
+      "internal/setup/setup.go"
     ],
     "stable": [
       "Makefile",
+      "SKILL.md",
+      "internal/cli/hook.go",
+      "internal/cli/setup.go",
       "internal/cli/version.go",
-      "internal/cli/version_test.go"
+      "internal/cli/version_test.go",
+      "internal/setup/block.go",
+      "internal/setup/claude.go",
+      "internal/setup/git.go",
+      "internal/setup/hookcmd.go"
     ]
   },
   "hints": {
