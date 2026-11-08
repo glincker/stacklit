@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "f46d98a0cfbce753a6935aab3e1a37f57d74aca5be8435c33c7bcb32b43f996d",
+  "merkle_hash": "3624ab62e4c7294c919e9fdb06d1d456716cfa7ea9b272639223d95ffa9a4917",
   "project": {
     "name": "stacklit",
     "root": ".",
