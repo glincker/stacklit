@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 
 // Def is one symbol definition found in a file.
@@ -64,6 +65,9 @@ type ExtractOptions struct {
 	// the line scanner where one exists, else contribute only their file node.
 	// 0 reads STACKLIT_GRAPH_MAX_PARSE_BYTES, then the built-in default.
 	MaxParseBytes int
+	// ParseTimeout stops a single parse that runs away; such a file falls back like an oversize one.
+	// 0 reads STACKLIT_GRAPH_PARSE_TIMEOUT_MS (default 3000).
+	ParseTimeout time.Duration
 	// MemoryBudget caps the estimated working set of concurrent tree-sitter
 	// parses in bytes. 0 reads STACKLIT_PARSE_MEMORY_MB (default 512), negative disables the cap.
 	MemoryBudget int64

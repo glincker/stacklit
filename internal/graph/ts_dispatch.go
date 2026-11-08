@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 // Parse cost model, matching the main scanner: the GLR parser holds roughly
@@ -18,6 +19,8 @@ const (
 	defaultMaxParseBytes = 192 << 10
 	// defaultParseMemoryMB bounds concurrent parses when nothing is configured.
 	defaultParseMemoryMB = 512
+	// defaultParseTimeout stops one tree-sitter parse that runs away.
+	defaultParseTimeout = 3 * time.Second
 )
 
 func maxParseBytes(o ExtractOptions) int {
@@ -28,6 +31,16 @@ func maxParseBytes(o ExtractOptions) int {
 		return v
 	}
 	return defaultMaxParseBytes
+}
+
+func parseTimeout(o ExtractOptions) time.Duration {
+	if o.ParseTimeout > 0 {
+		return o.ParseTimeout
+	}
+	if v, err := strconv.Atoi(os.Getenv("STACKLIT_GRAPH_PARSE_TIMEOUT_MS")); err == nil && v > 0 {
+		return time.Duration(v) * time.Millisecond
+	}
+	return defaultParseTimeout
 }
 
 func parseBudget(o ExtractOptions) int64 {
@@ -144,7 +157,7 @@ func extractFileWith(path string, src []byte, o ExtractOptions, gate *parseGate)
 	if spec != nil && len(src) <= maxParseBytes(o) {
 		cost := int64(parseFloorBytes) + int64(len(src))*parseBytesPerByte
 		gate.acquire(cost)
-		fs = extractTS(spec, grammarFor(lang, path, src), path, src)
+		fs = extractGuarded(spec, grammarFor(lang, path, src), path, src, parseTimeout(o))
 		gate.release(cost)
 	}
 	legacy := func() *FileSyms {
@@ -175,4 +188,18 @@ func extractFileWith(path string, src []byte, o ExtractOptions, gate *parseGate)
 		return old
 	}
 	return &FileSyms{Path: path, Lang: lang}
+}
+
+// extractGuarded runs extractTS with a hard deadline. The parser checks its own
+// timeout only between steps, and a few inputs stall inside grammar-specific
+// recovery, so the caller stops waiting after a grace period and falls back.
+func extractGuarded(spec *tsSpec, grammar, path string, src []byte, timeout time.Duration) *FileSyms {
+	done := make(chan *FileSyms, 1)
+	go func() { done <- extractTS(spec, grammar, path, src, timeout) }()
+	select {
+	case fs := <-done:
+		return fs
+	case <-time.After(timeout + timeout/2):
+		return nil
+	}
 }
