@@ -163,6 +163,52 @@ func RenderMarkdown(results []RepoResult, env Env, bp BaselineParams) string {
 		mean(overall.baseLookupP, overall.n), mean(overall.stkLookupP, overall.n), ratio(overall.baseLookupP, overall.stkLookupP),
 		mean(overall.baseE2EP, overall.n), mean(overall.stkE2EP, overall.n), ratio(overall.baseE2EP, overall.stkE2EP))
 
+	b.WriteString("\n### Graph query arm\n\n")
+	fmt.Fprintf(&b, "One `stacklit query \"<question>\" --budget %s` call per task, no derive map, no follow-up reads. Tokens are the full text output. Locate and where-to-add tasks count as found when a returned file matches the verified path; dependents tasks when every expected module has a returned file. The question text is used verbatim, not the hand-written terms.\n\n", queryBudget)
+	b.WriteString("| Scope | Tasks | query tokens (mean) | found | grep+read tokens (mean) | map+query+read tokens (mean) |\n|---|---:|---:|---:|---:|---:|\n")
+	qrow := func(label string, trs []TaskResult) {
+		var qt, bt, st, ok int
+		for _, tr := range trs {
+			qt += tr.Query.Cost.Tokens()
+			bt += tr.Baseline.GrepCost.Add(tr.Baseline.ReadCost).Tokens()
+			st += tr.Stacklit.MapCost.Add(tr.Stacklit.QueryCost).Add(tr.Stacklit.ConfirmCost).Tokens()
+			if tr.Query.Found {
+				ok++
+			}
+		}
+		fmt.Fprintf(&b, "| %s | %d | %d | %d/%d | %d | %d |\n", label, len(trs), mean(qt, len(trs)), ok, len(trs), mean(bt, len(trs)), mean(st, len(trs)))
+	}
+	var allTR []TaskResult
+	byKind := map[string][]TaskResult{}
+	for _, r := range results {
+		qrow(r.Spec.Name, r.Tasks)
+		allTR = append(allTR, r.Tasks...)
+		for _, tr := range r.Tasks {
+			byKind[tr.Task.Kind] = append(byKind[tr.Task.Kind], tr)
+		}
+	}
+	for _, k := range kinds {
+		if len(byKind[k]) > 0 {
+			qrow("all repos, "+k, byKind[k])
+		}
+	}
+	qrow("**all repos, all tasks**", allTR)
+	b.WriteString("\nQuery misses:\n\n")
+	var qmiss []string
+	for _, r := range results {
+		for _, tr := range r.Tasks {
+			if !tr.Query.Found {
+				qmiss = append(qmiss, fmt.Sprintf("- %s (%s): expected %v / %v, query returned %d files (%d tokens).", tr.Task.ID, tr.Task.Question, tr.Task.ExpectPaths, tr.Task.ExpectModules, len(tr.Query.Files), tr.Query.Cost.Tokens()))
+			}
+		}
+	}
+	sort.Strings(qmiss)
+	if len(qmiss) == 0 {
+		b.WriteString("None.\n")
+	} else {
+		b.WriteString(strings.Join(qmiss, "\n") + "\n")
+	}
+
 	b.WriteString("\n### Misses\n\n")
 	b.WriteString("Every task where either procedure did not reach the verified answer.\n\n")
 	var misses []string

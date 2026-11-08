@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -49,6 +50,7 @@ type TaskResult struct {
 	Task     Task
 	Baseline BaselineResult
 	Stacklit StacklitResult
+	Query    QueryResult
 }
 
 // GenStats are the generation measurements for one repo.
@@ -83,7 +85,9 @@ func main() {
 		maxLines = flag.Int("grep-lines", DefaultBaseline.MaxGrepLines, "baseline: grep output lines the agent sees")
 		readTop  = flag.Int("read-files", DefaultBaseline.ReadTopFiles, "baseline: files read in full after grepping")
 	)
+	qb := flag.Int("query-budget", 2000, "graph query arm: --budget passed to stacklit query (tokens)")
 	flag.Parse()
+	queryBudget = strconv.Itoa(*qb)
 
 	if err := run(*workdir, *binary, *runs, *only, *topN, *writeMD, *jsonOut,
 		BaselineParams{MaxGrepLines: *maxLines, MaxLineChars: DefaultBaseline.MaxLineChars, ReadTopFiles: *readTop}); err != nil {
@@ -185,6 +189,9 @@ func repoRoot() string {
 	return dir
 }
 
+// queryBudget is the --budget value passed to stacklit query (tokens).
+var queryBudget = "2000"
+
 func benchRepo(workdir, binary string, spec RepoSpec, runs, topN int, bp BaselineParams) (RepoResult, error) {
 	dir := filepath.Join(workdir, spec.Name)
 	if err := checkout(dir, spec); err != nil {
@@ -199,6 +206,12 @@ func benchRepo(workdir, binary string, spec RepoSpec, runs, topN int, bp Baselin
 	gen, err := measureGenerate(binary, dir, runs)
 	if err != nil {
 		return RepoResult{}, err
+	}
+	// Save the symbol graph once so query calls do not rebuild it each time.
+	graphCmd := exec.Command(binary, "graph")
+	graphCmd.Dir = dir
+	if out, err := graphCmd.CombinedOutput(); err != nil {
+		return RepoResult{}, fmt.Errorf("graph: %v: %s", err, out)
 	}
 	iv, err := LoadIndex(filepath.Join(dir, "stacklit.json"))
 	if err != nil {
@@ -226,7 +239,8 @@ func benchRepo(workdir, binary string, spec RepoSpec, runs, topN int, bp Baselin
 			return res, err
 		}
 		s := RunStacklit(iv, gen.MapCost, dir, t, topN)
-		res.Tasks = append(res.Tasks, TaskResult{Task: t, Baseline: b, Stacklit: s})
+		q := RunQuery(binary, dir, t, iv.ModuleNames(), queryBudget)
+		res.Tasks = append(res.Tasks, TaskResult{Task: t, Baseline: b, Stacklit: s, Query: q})
 	}
 	return res, nil
 }
@@ -279,7 +293,7 @@ func measureGenerate(binary, dir string, runs int) (GenStats, error) {
 	var times []float64
 	var maxRSS int64
 	for i := 0; i < runs; i++ {
-		for _, f := range []string{"stacklit.json", "DEPENDENCIES.md", "stacklit.html"} {
+		for _, f := range []string{"stacklit.json", "stacklit.graph.json", "DEPENDENCIES.md", "stacklit.html"} {
 			_ = os.Remove(filepath.Join(dir, f))
 		}
 		cmd := exec.Command(binary, "generate", "--quiet")

@@ -90,6 +90,7 @@ var skipBasenames = map[string]bool{
 	"npm-shrinkwrap.json": true,
 	"pnpm-lock.yaml":      true,
 	"stacklit.json":       true,
+	"stacklit.graph.json": true,
 	".stacklitrc.json":    true,
 }
 
