@@ -1,6 +1,5 @@
 ---
 import Section from '../components/Section.astro';
-import ActionRow from '../components/ActionRow.astro';
 import Button from '../components/Button.astro';
 import StarButton from '../components/StarButton.astro';
 import CodeBlock from '../components/CodeBlock.astro';
@@ -31,10 +30,10 @@ const deriveHtml = lines
       <h1 id="hero-title" class="max-w-heading text-hero font-bold tracking-tight text-ink" set:html={headline} />
       <p class="mt-6 max-w-measure text-lead text-muted">{fill(hero.sub)}</p>
       <div class="mt-8">
-        <ActionRow>
+        <div class="action-row">
           <CodeBlock inline copy prompt code={copy.hero.install} class="w-fit max-w-full" />
           <StarButton />
-        </ActionRow>
+        </div>
         <div class="mt-3"><Button href={copy.hero.secondaryHref} variant="link">{copy.hero.secondaryCta}</Button></div>
         <p class="mt-4 max-w-measure text-caption text-muted">{copy.hero.installNote}</p>
       </div>
