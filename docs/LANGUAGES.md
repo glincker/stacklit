@@ -52,6 +52,6 @@ Config files (YAML, TOML, JSON) report at most `STACKLIT_CONFIG_KEY_CAP` top-lev
 
 Any other language gets basic support (line count + language detection).
 
-The symbol graph (`stacklit graph`, `query`, `impact`, `slice`) currently covers Go, TypeScript and JavaScript, Python, Rust and Java on master. Wider symbol coverage is in progress; see [ROADMAP.md](ROADMAP.md).
+The symbol graph (`stacklit graph`, `query`, `impact`, `slice`) covers 20 languages; the per-language table is in [ARCHITECTURE.md](ARCHITECTURE.md#symbol-graph-extraction). The other languages still get the module index.
 
 Monorepos are detected automatically: pnpm, npm and yarn workspaces, Go workspaces, Turborepo, Nx, Lerna, Cargo workspaces, and `apps/`, `packages/`, `services/`, `libs/` conventions.
