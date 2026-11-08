@@ -3,9 +3,45 @@ package graph
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"os"
 	"sort"
 	"strings"
 )
+
+// Order says how a view lists its files.
+type Order string
+
+// Query output orders. Relevance is the default: an agent reads top to bottom,
+// so the best file must come first.
+const (
+	OrderRelevance Order = "relevance"
+	OrderPath      Order = "path"
+)
+
+// ParseOrder validates a --order value; empty means the environment default.
+func ParseOrder(s string) (Order, error) {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "":
+		return DefaultOrder(), nil
+	case "relevance":
+		return OrderRelevance, nil
+	case "path":
+		return OrderPath, nil
+	}
+	return "", fmt.Errorf("invalid order %q: want relevance or path", s)
+}
+
+// DefaultOrder reads STACKLIT_QUERY_ORDER; anything unrecognised means relevance.
+func DefaultOrder() Order {
+	if strings.EqualFold(strings.TrimSpace(os.Getenv("STACKLIT_QUERY_ORDER")), "path") {
+		return OrderPath
+	}
+	return OrderRelevance
+}
+
+// round3 keeps printed scores short and byte-stable.
+func round3(x float64) float64 { return math.Round(x*1000) / 1000 }
 
 // Default hard token budgets per command.
 const (
@@ -23,11 +59,14 @@ type SymLine struct {
 	Sig   string   `json:"sig,omitempty"`
 	Doc   string   `json:"doc,omitempty"`
 	Tags  []string `json:"tags,omitempty"`
+	Score float64  `json:"score,omitempty"`
 }
 
 // FileGroup holds the shown symbols of one file.
 type FileGroup struct {
 	File    string    `json:"file"`
+	Rank    int       `json:"rank,omitempty"`
+	Score   float64   `json:"score,omitempty"`
 	Symbols []SymLine `json:"symbols"`
 }
 
@@ -40,12 +79,14 @@ type View struct {
 	Shown   int         `json:"shown"`
 	Omitted int         `json:"omitted,omitempty"`
 	Notice  string      `json:"notice,omitempty"`
+	ranked  bool
 }
 
 // item is a ranked node with relation tags (caller, depth, edge confidence).
 type item struct {
-	node int
-	tags []string
+	node  int
+	tags  []string
+	score float64 // relevance; zero for views that do not rank
 }
 
 // viewSpec describes how to build a view from ranked items.
@@ -57,12 +98,16 @@ type viewSpec struct {
 	edges bool
 	// hint is the command prefix reused in the truncation notice.
 	hint string
+	// ranked marks items as scored and in rank order (query only).
+	ranked bool
+	order  Order
 }
 
-// buildView groups the first k items by file, in rank order of first appearance
-// sorted by file path so output is stable between runs.
+// buildView groups the first k items by file. Ranked views list files by their
+// best symbol score (ties by path) unless path order is asked for; all other
+// views sort by path. Both are stable between runs.
 func (g *SymGraph) buildView(sp viewSpec, k int) *View {
-	v := &View{Title: sp.title, Head: sp.head, Files: []FileGroup{}, Total: len(sp.items), Shown: k}
+	v := &View{Title: sp.title, Head: sp.head, Files: []FileGroup{}, Total: len(sp.items), Shown: k, ranked: sp.ranked && sp.order != OrderPath}
 	sel := map[int]bool{}
 	for _, it := range sp.items[:k] {
 		sel[it.node] = true
@@ -71,6 +116,9 @@ func (g *SymGraph) buildView(sp viewSpec, k int) *View {
 	for _, it := range sp.items[:k] {
 		n := &g.Nodes[it.node]
 		l := SymLine{Name: n.Name, Kind: n.Kind, Start: n.Line, End: n.End, Sig: n.Sig, Doc: n.Doc, Tags: append([]string(nil), it.tags...)}
+		if sp.ranked {
+			l.Score = round3(it.score)
+		}
 		if l.End < l.Start {
 			l.End = l.Start
 		}
@@ -97,14 +145,46 @@ func (g *SymGraph) buildView(sp viewSpec, k int) *View {
 		byFile[n.File] = append(byFile[n.File], l)
 	}
 	files := make([]string, 0, len(byFile))
-	for f := range byFile {
+	best := map[string]float64{}
+	for f, ls := range byFile {
 		files = append(files, f)
+		for _, l := range ls {
+			if l.Score > best[f] {
+				best[f] = l.Score
+			}
+		}
 	}
 	sort.Strings(files)
+	byScore := sp.ranked && sp.order != OrderPath
+	rankOf := map[string]int{}
+	if sp.ranked {
+		// Rank is by relevance even when files print in path order.
+		byRel := append([]string(nil), files...)
+		sort.SliceStable(byRel, func(a, b int) bool { return best[byRel[a]] > best[byRel[b]] })
+		for i, f := range byRel {
+			rankOf[f] = i + 1
+		}
+		if byScore {
+			files = byRel
+		}
+	}
 	for _, f := range files {
 		ls := byFile[f]
-		sort.SliceStable(ls, func(a, b int) bool { return ls[a].Start < ls[b].Start })
-		v.Files = append(v.Files, FileGroup{File: f, Symbols: ls})
+		if byScore {
+			sort.SliceStable(ls, func(a, b int) bool {
+				if ls[a].Score != ls[b].Score {
+					return ls[a].Score > ls[b].Score
+				}
+				return ls[a].Start < ls[b].Start
+			})
+		} else {
+			sort.SliceStable(ls, func(a, b int) bool { return ls[a].Start < ls[b].Start })
+		}
+		v.Files = append(v.Files, FileGroup{File: f, Rank: rankOf[f], Score: best[f], Symbols: ls})
+	}
+	if byScore && len(v.Files) > 0 && len(v.Files[0].Symbols) > 0 {
+		top := v.Files[0]
+		v.Head = append(append([]string(nil), v.Head...), fmt.Sprintf("best match: %s:%d %s", top.File, top.Symbols[0].Start, top.Symbols[0].Name))
 	}
 	v.Omitted = v.Total - k
 	if v.Omitted > 0 {
@@ -112,6 +192,8 @@ func (g *SymGraph) buildView(sp viewSpec, k int) *View {
 	}
 	return v
 }
+
+func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }
 
 // Text renders the view as indented, file-grouped lines.
 func (v *View) Text() string {
@@ -123,6 +205,9 @@ func (v *View) Text() string {
 		b.WriteByte('\n')
 	}
 	for _, f := range v.Files {
+		if v.ranked {
+			fmt.Fprintf(&b, "%d. ", f.Rank)
+		}
 		b.WriteString(f.File)
 		b.WriteByte('\n')
 		for _, s := range f.Symbols {
@@ -130,13 +215,14 @@ func (v *View) Text() string {
 			if s.End > s.Start {
 				rng = fmt.Sprintf("%d-%d", s.Start, s.End)
 			}
-			label := s.Sig
+			// One line per symbol: a multi-line signature or doc would read as a file path.
+			label := oneLine(s.Sig)
 			if label == "" {
 				label = s.Kind + " " + s.Name
 			}
 			line := "  " + rng + " " + label
 			if s.Doc != "" {
-				line += "  // " + s.Doc
+				line += "  // " + oneLine(s.Doc)
 			}
 			b.WriteString(line)
 			b.WriteByte('\n')

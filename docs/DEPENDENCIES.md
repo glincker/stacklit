@@ -19,9 +19,12 @@ graph LR
   classDef scala fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef swift fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef typescript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
-  assets["assets<br/>Static assets"]:::go
+  github_ISSUE_TEMPLATE[".github/ISSUE_TEMPLATE<br/>ISSUE TEMPLATE"]:::go
+  github_workflows[".github/workflows<br/>Workflows"]:::go
+  action["action<br/>Action"]:::go
   cmd_stacklit["cmd/stacklit<br/>Stacklit"]:::go
   examples_adapters["examples/adapters<br/>Adapters"]:::go
+  internal_assets["internal/assets<br/>Static assets"]:::go
   internal_cache["internal/cache<br/>Cache"]:::go
   internal_check["internal/check<br/>Check"]:::go
   internal_cli["internal/cli<br/>Command-line interface"]:::go
@@ -47,6 +50,7 @@ graph LR
   internal_walker["internal/walker<br/>File system walker"]:::go
   npm["npm<br/>Npm"]:::go
   npm_bin["npm/bin<br/>Bin"]:::go
+  root["root<br/>Root package"]:::go
   cmd_stacklit --> internal_cli
   internal_cache --> internal_fsutil
   internal_cache --> internal_parser
@@ -90,6 +94,7 @@ graph LR
   internal_engine --> internal_walker
   internal_export --> internal_graph
   internal_export --> internal_schema
+  internal_git --> internal_config
   internal_graph --> internal_git
   internal_graph --> internal_parser
   internal_graph --> internal_walker
@@ -100,7 +105,7 @@ graph LR
   internal_mcp --> internal_walker
   internal_merge --> internal_graph
   internal_merge --> internal_schema
-  internal_renderer --> assets
+  internal_renderer --> internal_assets
   internal_renderer --> internal_fsutil
   internal_renderer --> internal_graph
   internal_renderer --> internal_schema

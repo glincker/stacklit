@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T19:21:27Z",
+  "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "e6ac7dcc40fd18796e8ac6482d52b6e2212b93e1b4056c7fd1fb39cce40fef3b",
+  "merkle_hash": "ba40f3346445cc3a0eb067914447b846568637bca2b7d90d16d92faa16a68fc3",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -15,6 +15,14 @@
       "c": {
         "files": 4,
         "lines": 29
+      },
+      "clojure": {
+        "files": 1,
+        "lines": 21
+      },
+      "cmake": {
+        "files": 1,
+        "lines": 17
       },
       "cpp": {
         "files": 3,
@@ -28,17 +36,57 @@
         "files": 3,
         "lines": 63
       },
+      "dockerfile": {
+        "files": 1,
+        "lines": 9
+      },
       "elixir": {
         "files": 3,
         "lines": 49
       },
+      "elm": {
+        "files": 1,
+        "lines": 23
+      },
+      "erlang": {
+        "files": 1,
+        "lines": 14
+      },
+      "fortran": {
+        "files": 1,
+        "lines": 28
+      },
+      "fsharp": {
+        "files": 1,
+        "lines": 19
+      },
+      "gdscript": {
+        "files": 1,
+        "lines": 24
+      },
+      "gleam": {
+        "files": 1,
+        "lines": 17
+      },
       "go": {
-        "files": 246,
-        "lines": 35664
+        "files": 248,
+        "lines": 36224
       },
       "graphql": {
         "files": 1,
         "lines": 34
+      },
+      "groovy": {
+        "files": 1,
+        "lines": 20
+      },
+      "haskell": {
+        "files": 3,
+        "lines": 40
+      },
+      "hcl": {
+        "files": 1,
+        "lines": 32
       },
       "java": {
         "files": 3,
@@ -48,6 +96,14 @@
         "files": 7,
         "lines": 480
       },
+      "json": {
+        "files": 15,
+        "lines": 348
+      },
+      "julia": {
+        "files": 1,
+        "lines": 28
+      },
       "kotlin": {
         "files": 3,
         "lines": 51
@@ -56,9 +112,33 @@
         "files": 3,
         "lines": 45
       },
+      "make": {
+        "files": 2,
+        "lines": 43
+      },
+      "nim": {
+        "files": 1,
+        "lines": 21
+      },
+      "objective-c": {
+        "files": 1,
+        "lines": 18
+      },
+      "ocaml": {
+        "files": 3,
+        "lines": 32
+      },
+      "perl": {
+        "files": 1,
+        "lines": 20
+      },
       "php": {
         "files": 3,
         "lines": 47
+      },
+      "powershell": {
+        "files": 1,
+        "lines": 15
       },
       "protobuf": {
         "files": 1,
@@ -67,6 +147,10 @@
       "python": {
         "files": 4,
         "lines": 96
+      },
+      "r": {
+        "files": 1,
+        "lines": 15
       },
       "ruby": {
         "files": 3,
@@ -84,21 +168,41 @@
         "files": 1,
         "lines": 17
       },
+      "solidity": {
+        "files": 3,
+        "lines": 51
+      },
       "sql": {
         "files": 1,
         "lines": 32
+      },
+      "svelte": {
+        "files": 1,
+        "lines": 10
       },
       "swift": {
         "files": 3,
         "lines": 41
       },
+      "toml": {
+        "files": 1,
+        "lines": 10
+      },
       "typescript": {
         "files": 7,
         "lines": 54
       },
-      "unknown": {
-        "files": 6,
-        "lines": 100
+      "vue": {
+        "files": 1,
+        "lines": 18
+      },
+      "yaml": {
+        "files": 12,
+        "lines": 427
+      },
+      "zig": {
+        "files": 3,
+        "lines": 51
       }
     },
     "frameworks": [
@@ -111,28 +215,65 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 315,
-    "total_lines": 37252
+    "total_files": 372,
+    "total_lines": 39083
   },
   "modules": {
-    "assets": {
-      "purpose": "Static assets",
-      "language": "javascript",
+    ".github/ISSUE_TEMPLATE": {
+      "purpose": "ISSUE TEMPLATE",
+      "language": "yaml",
       "files": 4,
-      "lines": 252,
+      "lines": 100,
       "file_list": [
-        "embed.go",
-        "lang-icons.js",
-        "selftest.mjs",
-        "symbols.js"
+        "bug_report.yml",
+        "feature_request.yml",
+        "language_request.yml",
+        "config.yml"
       ],
       "exports": [
-        "LangIconsJS",
-        "SymbolsJS",
-        "TemplateHTML"
+        "name",
+        "description",
+        "labels",
+        "body",
+        "blank_issues_enabled",
+        "contact_links"
       ],
-      "depended_by": [
-        "internal/renderer"
+      "activity": "low"
+    },
+    ".github/workflows": {
+      "purpose": "Workflows",
+      "language": "yaml",
+      "files": 4,
+      "lines": 149,
+      "file_list": [
+        "release.yml",
+        "scorecard.yml",
+        "ci.yml",
+        "stacklit-index.yml"
+      ],
+      "exports": [
+        "name",
+        "on",
+        "permissions",
+        "jobs"
+      ],
+      "activity": "low"
+    },
+    "action": {
+      "purpose": "Action",
+      "language": "yaml",
+      "files": 1,
+      "lines": 98,
+      "file_list": [
+        "action.yml"
+      ],
+      "exports": [
+        "name",
+        "description",
+        "branding",
+        "inputs",
+        "outputs",
+        "runs"
       ],
       "activity": "low"
     },
@@ -164,6 +305,27 @@
       ],
       "activity": "low"
     },
+    "internal/assets": {
+      "purpose": "Static assets",
+      "language": "javascript",
+      "files": 4,
+      "lines": 252,
+      "file_list": [
+        "embed.go",
+        "lang-icons.js",
+        "selftest.mjs",
+        "symbols.js"
+      ],
+      "exports": [
+        "TemplateHTML",
+        "LangIconsJS",
+        "SymbolsJS"
+      ],
+      "depended_by": [
+        "internal/renderer"
+      ],
+      "activity": "low"
+    },
     "internal/cache": {
       "purpose": "Cache",
       "language": "go",
@@ -174,13 +336,13 @@
         "cache_test.go"
       ],
       "exports": [
-        "Get(key string) (*parser.FileInfo, bool)",
+        "type Store",
         "Open(root string) *Store",
         "Path(root string) string",
+        "Get(key string) (*parser.FileInfo, bool)",
         "Put(key string, info *parser.FileInfo)",
-        "Save() error",
         "Stats() int",
-        "type Store"
+        "Save() error"
       ],
       "depends_on": [
         "internal/fsutil",
@@ -202,14 +364,14 @@
         "check_test.go"
       ],
       "exports": [
+        "RuleForbidden",
         "RuleCycle",
         "RuleFanIn",
         "RuleFanOut",
-        "RuleForbidden",
         "RuleOrphan",
-        "Run(idx *schema.Index, cfg *config.CheckConfig) *Result",
+        "type Violation",
         "type Result",
-        "type Violation"
+        "Run(idx *schema.Index, cfg *config.CheckConfig) *Result"
       ],
       "type_defs": {
         "Result": "OK bool, Violations []Violation",
@@ -228,14 +390,15 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 23,
-      "lines": 1885,
+      "lines": 1891,
       "file_list": [
+        "errors.go",
+        "root.go",
         "check.go",
         "check_test.go",
         "derive.go",
         "diff.go",
         "doctor.go",
-        "errors.go",
         "errors_test.go",
         "export.go",
         "generate.go",
@@ -246,22 +409,24 @@
         "init.go",
         "mergegraphs.go",
         "profile.go",
-        "root.go",
         "serve.go",
         "setup.go",
-        "status.go"
+        "status.go",
+        "version.go",
+        "version_test.go",
+        "view.go"
       ],
       "exports": [
-        "Error() string",
-        "Execute() error",
-        "ExitCode(err error) int",
-        "ExitFailure",
         "ExitOK",
-        "ExitProblems",
+        "ExitFailure",
         "ExitUsage",
+        "ExitProblems",
+        "type ExitError",
+        "Error() string",
         "Unwrap() error",
+        "ExitCode(err error) int",
         "Version",
-        "type ExitError"
+        "Execute() error"
       ],
       "type_defs": {
         "ExitError": "Code int, Err error"
@@ -295,23 +460,23 @@
       "files": 5,
       "lines": 688,
       "file_list": [
+        "scan.go",
         "config.go",
         "config_test.go",
         "fuzz_test.go",
-        "scan.go",
         "scan_test.go"
       ],
       "exports": [
-        "CacheEnabled() bool",
-        "Check(root string) error",
-        "DefaultConfig() *Config",
         "DefaultMaxFileSize",
-        "DefaultMaxLineLen",
         "DefaultMaxModuleFiles",
-        "DefaultMemoryLimitMB",
         "DefaultModuleSplitFiles",
-        "DefaultParseMemoryMB",
-        "DefaultParseTimeoutMS"
+        "WorkerCount() int",
+        "CacheEnabled() bool",
+        "TimestampsEnabled() bool",
+        "GitActivityEnabled() bool",
+        "NormalizedRoots() []string",
+        "LoadStrict(root string) (*Config, error)",
+        "Validate() error"
       ],
       "type_defs": {
         "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
@@ -328,6 +493,7 @@
         "internal/cli",
         "internal/doctor",
         "internal/engine",
+        "internal/git",
         "internal/mcp"
       ],
       "activity": "low"
@@ -342,8 +508,8 @@
       ],
       "exports": [
         "CompactMap(idx *schema.Index) string",
-        "InjectIntoFile(path string, block string) error",
-        "InjectableBlock(idx *schema.Index) string"
+        "InjectableBlock(idx *schema.Index) string",
+        "InjectIntoFile(path string, block string) error"
       ],
       "depends_on": [
         "internal/schema"
@@ -359,19 +525,19 @@
       "files": 6,
       "lines": 743,
       "file_list": [
+        "framework_patterns.go",
         "envstream.go",
         "envvars.go",
-        "framework_patterns.go",
-        "framework_patterns_test.go",
         "frameworks.go",
+        "framework_patterns_test.go",
         "frameworks_test.go"
       ],
       "exports": [
-        "DetectEnvVars(root string, contents map[string][]byte) []string",
+        "type FrameworkPattern",
         "DetectFrameworkPatterns(root string) []FrameworkPattern",
-        "DetectFrameworks(root string, imports []string) []string",
         "FileEnvVars(content []byte) []string",
-        "type FrameworkPattern"
+        "DetectEnvVars(root string, contents map[string][]byte) []string",
+        "DetectFrameworks(root string, imports []string) []string"
       ],
       "type_defs": {
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string"
@@ -391,15 +557,15 @@
         "doctor_test.go"
       ],
       "exports": [
-        "Count(l Level) int",
-        "Error",
-        "Info",
-        "OK",
-        "Run(root string) (*Report, error)",
-        "Warn",
-        "type Finding",
         "type Level",
-        "type Report"
+        "OK",
+        "Info",
+        "Warn",
+        "Error",
+        "type Finding",
+        "type Report",
+        "Count(l Level) int",
+        "Run(root string) (*Report, error)"
       ],
       "type_defs": {
         "Finding": "Level Level, Check string, Message string, Fix string, Details []string",
@@ -424,10 +590,10 @@
       "files": 10,
       "lines": 1690,
       "file_list": [
-        "bench_test.go",
-        "engine.go",
-        "engine_test.go",
         "multi.go",
+        "engine.go",
+        "bench_test.go",
+        "engine_test.go",
         "multi_test.go",
         "packages.go",
         "packages_test.go",
@@ -437,13 +603,13 @@
       ],
       "exports": [
         "DefaultMultiOutput",
-        "ParseReposFile(file string) ([]string, error)",
-        "Run(opts Options) (*Result, error)",
-        "RunMulti(opts MultiOptions) (*MultiResult, error)",
         "type MultiOptions",
         "type MultiResult",
+        "ParseReposFile(file string) ([]string, error)",
+        "RunMulti(opts MultiOptions) (*MultiResult, error)",
         "type Options",
-        "type Result"
+        "type Result",
+        "Run(opts Options) (*Result, error)"
       ],
       "type_defs": {
         "MultiOptions": "ReposFile string, Output string, Quiet bool, Timestamps bool",
@@ -476,23 +642,23 @@
       "files": 5,
       "lines": 848,
       "file_list": [
+        "model.go",
         "export.go",
         "export_test.go",
         "formats.go",
-        "model.go",
         "notes.go"
       ],
       "exports": [
         "Formats",
-        "Render(format string, in Input, o Options) ([]File, error)",
         "ScopeModules",
         "ScopeSymbols",
-        "WriteStdout(w interface{}, files []File) error",
-        "WriteTo(out string, files []File) ([]string, error)",
-        "type Edge",
-        "type File",
         "type Input",
-        "type Model"
+        "type Options",
+        "type File",
+        "type Node",
+        "type Edge",
+        "type Model",
+        "Render(format string, in Input, o Options) ([]File, error)"
       ],
       "type_defs": {
         "Edge": "From string, To string, Kind string, Conf string, Score float64",
@@ -534,35 +700,39 @@
     "internal/git": {
       "purpose": "Git integration",
       "language": "go",
-      "files": 8,
-      "lines": 666,
+      "files": 9,
+      "lines": 692,
       "file_list": [
         "activity.go",
-        "activity_test.go",
+        "refresh_hooks.go",
+        "status.go",
         "hooks.go",
         "merkle.go",
         "merkle_leaves.go",
-        "refresh_hooks.go",
-        "refresh_hooks_test.go",
-        "status.go"
+        "activity_test.go",
+        "hooks_body_test.go",
+        "refresh_hooks_test.go"
       ],
       "exports": [
-        "CheckStale(root string, builtCommit string, builtAt time.Time, keep any) Stalene",
-        "ComputeMerkle(files []string, contents map[string][]byte) string",
-        "ComputeMerkleFromLeaves(leaves map[string][]byte) string",
+        "type FileActivity",
+        "type Activity",
         "GetActivity(root string, days int) (*Activity, error)",
-        "Head(root string) string",
-        "InstallHook(root string) error",
-        "InstallRefreshHooks(root string) ([]string, error)",
         "RefreshHooks",
+        "InstallRefreshHooks(root string) ([]string, error)",
         "RemoveRefreshHooks(root string) ([]string, error)",
-        "type Activity"
+        "type Staleness",
+        "Head(root string) string",
+        "CheckStale(root string, builtCommit string, builtAt time.Time, keep any) Stalene",
+        "HookBody(root string) string"
       ],
       "type_defs": {
         "Activity": "HotFiles []FileActivity, RecentFiles []string, StableFiles []string",
         "FileActivity": "Path string, Commits90d int",
         "Staleness": "InRepo bool, Head string, CommitsBehind int, Changed []string"
       },
+      "depends_on": [
+        "internal/config"
+      ],
       "depended_by": [
         "internal/cli",
         "internal/doctor",
@@ -575,15 +745,30 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 46,
-      "lines": 11027,
+      "files": 47,
+      "lines": 11475,
       "file_list": [
+        "symbols.go",
+        "view.go",
+        "graph.go",
+        "extract.go",
+        "path.go",
         "analysis.go",
-        "body.go",
+        "resolve.go",
+        "search.go",
+        "htmldata.go",
+        "pointer.go",
+        "stale.go",
+        "query.go",
+        "watch.go",
         "community.go",
         "confidence.go",
         "explain.go",
-        "extract.go",
+        "impact.go",
+        "rank.go",
+        "slice.go",
+        "ts_dispatch.go",
+        "body.go",
         "extract_ecma.go",
         "extract_go.go",
         "extract_java.go",
@@ -592,24 +777,19 @@
         "extract_py.go",
         "extract_rs.go",
         "extract_test.go",
-        "gold_test.go",
-        "graph.go",
-        "graph_test.go",
-        "htmldata.go",
-        "impact.go",
-        "langs_fixture_test.go"
+        "gold_test.go"
       ],
       "exports": [
-        "Build(files []*parser.FileInfo, opts BuildOptions) *Graph",
-        "BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph",
-        "ClampTokens(s string, budget int) string",
-        "ComputeCommunities()",
-        "ConfExact",
+        "SchemaVersion",
         "ConfExtracted",
         "ConfInferred",
-        "DefaultExplainBudget",
-        "DefaultImpactBudget",
-        "DefaultPointerTokens"
+        "KindFile",
+        "KindFunc",
+        "KindMethod",
+        "KindType",
+        "KindClass",
+        "KindInterface",
+        "KindEnum"
       ],
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int, Root string, SplitFiles int",
@@ -618,7 +798,7 @@
         "Edge": "From string, To string, Count int",
         "EdgeRef": "From string, To string, Kind string, Conf string, Score float64",
         "ExtractOptions": "IncludeTests bool, MaxFileBytes int, MaxParseBytes int, ParseTimeout time.Duration, MemoryBudget int64",
-        "FileGroup": "File string, Symbols []SymLine",
+        "FileGroup": "File string, Rank int, Score float64, Symbols []SymLine",
         "FileSyms": "Path string, Lang string, Pkg string, Defs []Def, Imports []Import, Refs []Ref",
         "HTMLGraph": "Files []string, Kinds []string, Comms []Community, Nodes []HTMLNode, Edges [][]float64, Total int",
         "HTMLNode": "Name string, Kind string, File int, Line int, End int, Comm int, Sig string, Doc string"
@@ -648,28 +828,28 @@
       "lines": 1256,
       "file_list": [
         "adapter.go",
+        "ingest.go",
+        "owners.go",
         "adapter_graph.go",
-        "adapter_test.go",
         "api.go",
         "docs.go",
-        "ingest.go",
+        "schema.go",
+        "adapter_test.go",
         "ingest_test.go",
-        "owners.go",
         "proc_unix.go",
-        "proc_windows.go",
-        "schema.go"
+        "proc_windows.go"
       ],
       "exports": [
-        "ApplyAdapter(ctx *Context, r *AdapterResult)",
-        "CarryAdapterOutput(ctx *Context, path string)",
         "ConfInferred",
-        "ContextFile",
+        "type Concept",
+        "type ConceptLink",
+        "type AdapterOptions",
+        "type AdapterResult",
         "DefaultAdapterName(command string) string",
-        "FilterFiles(files []string, globs []string) []string",
-        "KindConcept",
         "ListFiles(root string) []string",
-        "MergeIntoGraph(g *graph.SymGraph, r *AdapterResult) int",
-        "Run(o Options) (*Context, error)"
+        "FilterFiles(files []string, globs []string) []string",
+        "RunAdapter(parent context.Context, o AdapterOptions) (*AdapterResult, error)",
+        "Write(p []byte) (int, error)"
       ],
       "type_defs": {
         "API": "File string, Title string, Operations []Operation",
@@ -697,18 +877,18 @@
       "files": 5,
       "lines": 647,
       "file_list": [
+        "server.go",
+        "minimal.go",
         "graph_tools.go",
         "graph_tools_test.go",
-        "minimal.go",
-        "profile_test.go",
-        "server.go"
+        "profile_test.go"
       ],
       "exports": [
+        "StartServer() error",
+        "StartServerProfile(profile string) error",
         "NewServer(profile string) (*sdkmcp.Server, error)",
         "ProfileFull",
-        "ProfileMinimal",
-        "StartServer() error",
-        "StartServerProfile(profile string) error"
+        "ProfileMinimal"
       ],
       "depends_on": [
         "internal/config",
@@ -731,11 +911,11 @@
         "merge_test.go"
       ],
       "exports": [
-        "DefaultName(g *graph.SymGraph, file string) string",
-        "EdgeDependsOn",
         "KindRepo",
-        "Merge(inputs []Input, multi *schema.MultiIndex) (*graph.SymGraph, error)",
-        "type Input"
+        "EdgeDependsOn",
+        "type Input",
+        "DefaultName(g *graph.SymGraph, file string) string",
+        "Merge(inputs []Input, multi *schema.MultiIndex) (*graph.SymGraph, error)"
       ],
       "type_defs": {
         "Input": "Name string, Graph *graph.SymGraph"
@@ -755,17 +935,17 @@
       "files": 4,
       "lines": 734,
       "file_list": [
+        "manifest.go",
         "detect.go",
         "detect_test.go",
-        "manifest.go",
         "manifest_test.go"
       ],
       "exports": [
-        "Detect(root string) (*Result, error)",
-        "Matches(imp string) bool",
-        "ReadManifest(dir string) (Manifest, bool)",
         "type Manifest",
-        "type Result"
+        "ReadManifest(dir string) (Manifest, bool)",
+        "Matches(imp string) bool",
+        "type Result",
+        "Detect(root string) (*Result, error)"
       ],
       "type_defs": {
         "Manifest": "Name string, Kind string",
@@ -782,38 +962,48 @@
       "files": 60,
       "lines": 7610,
       "file_list": [
+        "pool.go",
+        "limits.go",
+        "parser.go",
+        "treesitter.go",
+        "generic.go",
+        "golang.go",
         "datarun.go",
         "fuzz_test.go",
-        "generic.go",
         "generic_test.go",
-        "golang.go",
         "golang_test.go",
         "java_test.go",
         "langs_test.go",
         "langs_wave2_test.go",
-        "limits.go",
         "limits_test.go",
-        "parser.go",
-        "pool.go",
         "pool_test.go",
         "python_test.go",
         "race_test.go",
         "ruby_datarun_test.go",
         "rust_test.go",
-        "treesitter.go",
-        "ts_build.go"
+        "ts_build.go",
+        "ts_c.go",
+        "ts_clojure.go",
+        "ts_common.go",
+        "ts_config.go",
+        "ts_csharp.go",
+        "ts_dart.go",
+        "ts_elixir.go",
+        "ts_elm.go",
+        "ts_erlang.go",
+        "ts_fortran.go"
       ],
       "exports": [
-        "CanParse(_ string) bool",
-        "CanParse(filename string) bool",
+        "type Cache",
+        "type PoolOptions",
+        "type Scanned",
+        "ParseContent(path string, content []byte) (*FileInfo, error)",
+        "ParseContentWith(path string, content []byte, lim Limits) (*FileInfo, error)",
+        "type PanicError",
         "Error() string",
-        "FallbackGenerated",
-        "FallbackLarge",
-        "FallbackMinified",
-        "FallbackTimeout",
-        "IsDataLanguage(lang string) bool",
         "LeafHash(path string, content []byte) []byte",
-        "Parse(path string, content []byte) (*FileInfo, error)"
+        "ScanFiles(files []string, o PoolOptions) []Scanned",
+        "FallbackTimeout"
       ],
       "type_defs": {
         "Cache": "interface{Get(), Put()}",
@@ -839,32 +1029,32 @@
       "files": 13,
       "lines": 1236,
       "file_list": [
+        "markdown.go",
+        "options.go",
         "html.go",
         "html_graph.go",
+        "json.go",
+        "mermaid.go",
         "html_graph_test.go",
         "html_icons_test.go",
-        "json.go",
         "json_test.go",
-        "markdown.go",
         "markdown_test.go",
-        "mermaid.go",
         "mermaid_test.go",
-        "options.go",
         "page.go",
         "stable.go"
       ],
       "exports": [
         "RenderMarkdown(idx *schema.Index) string",
-        "SetMapIcons(on bool)",
+        "WriteMarkdown(idx *schema.Index, path string) error",
         "SetTimestamps(on bool)",
+        "SetMapIcons(on bool)",
         "WriteHTML(idx *schema.Index, path string) error",
         "WriteHTMLWithGraph(idx *schema.Index, g *graph.SymGraph, maxNodes int, path stri",
         "WriteJSON(idx *schema.Index, path string) error",
-        "WriteMarkdown(idx *schema.Index, path string) error",
         "WriteMermaid(idx *schema.Index, path string) error"
       ],
       "depends_on": [
-        "assets",
+        "internal/assets",
         "internal/fsutil",
         "internal/graph",
         "internal/schema"
@@ -884,15 +1074,15 @@
         "schema.go"
       ],
       "exports": [
-        "CurrentSchemaVersion",
-        "type Architecture",
-        "type CrossRepoEdge",
-        "type Dependencies",
-        "type FrameworkPattern",
-        "type GitInfo",
-        "type Hints",
-        "type HotFile",
         "type Index",
+        "type PackageInfo",
+        "type PackageEdge",
+        "CurrentSchemaVersion",
+        "type ScanInfo",
+        "type Architecture",
+        "type Project",
+        "type Tech",
+        "type FrameworkPattern",
         "type LangStats"
       ],
       "type_defs": {
@@ -928,20 +1118,20 @@
       "files": 3,
       "lines": 510,
       "file_list": [
-        "confirm.go",
         "read.go",
+        "confirm.go",
         "scip_test.go"
       ],
       "exports": [
-        "Load(path string) (*Index, error)",
-        "Parse(data []byte) (*Index, error)",
         "RoleDefinition",
-        "SrcTag",
-        "Upgrade(g *graph.SymGraph, idx *Index) Stats",
+        "type Occurrence",
         "type Document",
         "type Index",
-        "type Occurrence",
-        "type Stats"
+        "Parse(data []byte) (*Index, error)",
+        "Load(path string) (*Index, error)",
+        "SrcTag",
+        "type Stats",
+        "Upgrade(g *graph.SymGraph, idx *Index) Stats"
       ],
       "type_defs": {
         "Document": "Path string, Occurrences []Occurrence",
@@ -961,31 +1151,31 @@
       "purpose": "Setup",
       "language": "go",
       "files": 11,
-      "lines": 1370,
+      "lines": 1384,
       "file_list": [
-        "block.go",
-        "claude.go",
-        "digest.go",
-        "git.go",
-        "hookcmd.go",
         "mcp.go",
+        "tools.go",
+        "claude.go",
         "report.go",
-        "runner.go",
+        "block.go",
+        "digest.go",
+        "hookcmd.go",
         "setup.go",
-        "setup_test.go",
-        "tools.go"
+        "runner.go",
+        "git.go",
+        "setup_test.go"
       ],
       "exports": [
-        "ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error",
-        "Detected(root string) bool",
-        "Lookup(id string) (Tool, bool)",
-        "MCPSchemaTokens(exe string, dir string) int",
-        "MarkdownBody(idx *schema.Index) string",
-        "PreToolHook(stdin io.Reader) string",
-        "Registry() []Tool",
-        "Report(idx *schema.Index, tools []Tool, mcpTokens int) []ReportRow",
-        "Run(r *Runner, o Options) error",
-        "SessionHook(stdin io.Reader) string"
+        "type MCPStyle",
+        "StyleMCPServers",
+        "StyleVSCode",
+        "StyleZed",
+        "StyleOpenCode",
+        "StyleCrush",
+        "StyleCodexTOML",
+        "StyleContinue",
+        "type Rule",
+        "type MCP"
       ],
       "type_defs": {
         "ClaudeOptions": "PreToolHook bool, SessionHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
@@ -1034,21 +1224,21 @@
       "lines": 807,
       "file_list": [
         "scan.go",
-        "scan_test.go",
         "walker.go",
+        "scan_test.go",
         "walker_test.go"
       ],
       "exports": [
-        "ReasonBrokenSymlink",
+        "type Options",
+        "type Skip",
         "ReasonLarge",
-        "ReasonMissingRoot",
-        "ReasonNotRegular",
-        "ReasonRootEscape",
-        "ReasonSymlinkDir",
+        "ReasonBrokenSymlink",
         "ReasonSymlinkEscape",
+        "ReasonSymlinkDir",
+        "ReasonNotRegular",
         "ReasonUnreadable",
-        "Walk(root string, extraIgnore []string) ([]string, error)",
-        "WalkWith(root string, o Options) (*Result, error)"
+        "ReasonMissingRoot",
+        "ReasonRootEscape"
       ],
       "type_defs": {
         "Options": "ExtraIgnore []string, Include []string, Roots []string, MaxFileSize int64",
@@ -1067,10 +1257,23 @@
     "npm": {
       "purpose": "Npm",
       "language": "javascript",
-      "files": 1,
-      "lines": 206,
+      "files": 2,
+      "lines": 258,
       "file_list": [
+        "package.json",
         "install.js"
+      ],
+      "exports": [
+        "name",
+        "version",
+        "description",
+        "bin",
+        "scripts",
+        "keywords",
+        "author",
+        "license",
+        "repository",
+        "homepage"
       ],
       "activity": "low"
     },
@@ -1081,6 +1284,29 @@
       "lines": 13,
       "file_list": [
         "stacklit.js"
+      ],
+      "activity": "low"
+    },
+    "root": {
+      "purpose": "Root package",
+      "language": "make",
+      "files": 2,
+      "lines": 96,
+      "file_list": [
+        ".goreleaser.yml",
+        "Makefile"
+      ],
+      "exports": [
+        "version",
+        "before",
+        "builds",
+        "archives",
+        "checksum",
+        "changelog",
+        "release",
+        "brews",
+        "install",
+        "build"
       ],
       "activity": "low"
     }
@@ -1260,6 +1486,10 @@
         "internal/schema"
       ],
       [
+        "internal/git",
+        "internal/config"
+      ],
+      [
         "internal/graph",
         "internal/git"
       ],
@@ -1301,7 +1531,7 @@
       ],
       [
         "internal/renderer",
-        "assets"
+        "internal/assets"
       ],
       [
         "internal/renderer",
@@ -1350,122 +1580,19 @@
       "internal/fsutil",
       "internal/cache",
       "internal/renderer",
-      "assets"
+      "internal/assets"
     ],
     "isolated": [
+      ".github/ISSUE_TEMPLATE",
+      ".github/workflows",
+      "action",
       "examples/adapters",
       "npm",
-      "npm/bin"
+      "npm/bin",
+      "root"
     ]
   },
-  "git": {
-    "hot_files": [
-      {
-        "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/ISSUE_TEMPLATE/config.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/ISSUE_TEMPLATE/language_request.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/PULL_REQUEST_TEMPLATE.md",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/ci.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/release.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/stacklit-index.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".gitignore",
-        "commits_90d": 1
-      },
-      {
-        "path": ".goreleaser.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "CHANGELOG.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "COMPARISON.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "CONTRIBUTING.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "DEPENDENCIES.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "LICENSE",
-        "commits_90d": 1
-      },
-      {
-        "path": "Makefile",
-        "commits_90d": 1
-      },
-      {
-        "path": "README.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "ROADMAP.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "SECURITY.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "SKILL.md",
-        "commits_90d": 1
-      }
-    ],
-    "recent": [
-      ".github/ISSUE_TEMPLATE/bug_report.yml",
-      ".github/ISSUE_TEMPLATE/config.yml",
-      ".github/ISSUE_TEMPLATE/feature_request.yml",
-      ".github/ISSUE_TEMPLATE/language_request.yml",
-      ".github/PULL_REQUEST_TEMPLATE.md",
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml"
-    ],
-    "stable": [
-      ".github/ISSUE_TEMPLATE/bug_report.yml",
-      ".github/ISSUE_TEMPLATE/config.yml",
-      ".github/ISSUE_TEMPLATE/feature_request.yml",
-      ".github/ISSUE_TEMPLATE/language_request.yml",
-      ".github/PULL_REQUEST_TEMPLATE.md",
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml"
-    ]
-  },
+  "git": {},
   "hints": {
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
@@ -1492,6 +1619,7 @@
       "STACKLIT_PARSE_MEMORY_MB",
       "STACKLIT_PARSE_TIMEOUT_MS",
       "STACKLIT_PPROF",
+      "STACKLIT_QUERY_ORDER",
       "STACKLIT_ROOTS",
       "STACKLIT_SCALE_BUDGET_S",
       "STACKLIT_SCIP_MAX_BYTES",

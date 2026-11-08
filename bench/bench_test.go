@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestCostTokens(t *testing.T) {
 	cases := map[int]int{0: 0, 1: 1, 4: 1, 5: 2, 400: 100}
@@ -122,5 +125,26 @@ func TestRankModulesDeterministic(t *testing.T) {
 	got := iv.RankModules([]string{"foo"})
 	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
 		t.Errorf("got %v", got)
+	}
+}
+
+func TestParseQueryText(t *testing.T) {
+	ranked := "query \"q\"\n3 seeds, 9 candidates\nbest match: b/x.go:4 Foo\n1. b/x.go\n  4-9 func Foo()  // does foo\n      calls Bar E1.00\n2. a/y.go\n  7 const Z\n[truncated: 2 of 9 omitted, lowest ranked first; raise it with: x]\n[stale: 1 source files changed]\n"
+	plain := "query \"q\"\n3 seeds, 9 candidates\na/y.go\n  7 const Z\nb/x.go\n  4-9 func Foo()\n"
+	for name, tc := range map[string]struct {
+		in   string
+		want []string
+	}{"ranked": {ranked, []string{"b/x.go", "a/y.go"}}, "path": {plain, []string{"a/y.go", "b/x.go"}}} {
+		doc := parseQueryText([]byte(tc.in))
+		var got []string
+		for _, f := range doc.Files {
+			got = append(got, f.File)
+		}
+		if strings.Join(got, ",") != strings.Join(tc.want, ",") {
+			t.Errorf("%s: files %v, want %v", name, got, tc.want)
+		}
+	}
+	if d := parseQueryText([]byte(ranked)); len(d.Files[0].Symbols) != 1 || d.Files[0].Symbols[0].Doc != "does foo" {
+		t.Errorf("symbols not parsed: %+v", d.Files[0].Symbols)
 	}
 }

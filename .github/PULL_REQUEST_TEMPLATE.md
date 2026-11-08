@@ -10,7 +10,7 @@
 
 ## Docs
 
-- [ ] README, USAGE.md or CHANGELOG.md updated if behavior changed
+- [ ] README, docs/USAGE.md or CHANGELOG.md updated if behavior changed
 - [ ] Any size or speed claim comes from `go run ./bench` output
 - [ ] Planned or unmerged features are not described as shipped
 

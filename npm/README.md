@@ -17,7 +17,7 @@ One command generates a JSON index that any AI agent can read. No server, no set
 npx stacklit init
 ```
 
-![Stacklit demo](https://raw.githubusercontent.com/glincker/stacklit/master/demo.gif)
+![Stacklit demo](https://raw.githubusercontent.com/glincker/stacklit/master/docs/assets/demo.gif)
 
 **Size:** on three pinned public repos the full `stacklit.json` was 2,045 to 11,814 tokens and the compact map from `stacklit derive` was 122 to 1,122 tokens (bytes/4 estimate). Both grow with module count. Method and limitations: [bench/RESULTS.md](https://github.com/glincker/stacklit/blob/master/bench/RESULTS.md).
 
@@ -33,7 +33,7 @@ npx stacklit init
 
 ## Visual map
 
-![Stacklit visual map](https://raw.githubusercontent.com/glincker/stacklit/master/stacklit-og.png)
+![Stacklit visual map](https://raw.githubusercontent.com/glincker/stacklit/master/docs/assets/map-overview.png)
 
 ## MCP server
 
@@ -70,7 +70,7 @@ stacklit serve                   # start MCP server
 
 Go (standard library AST), TypeScript, JavaScript, Python, Rust, Java, C#, Ruby, PHP, Kotlin, Swift, C and C++ (tree-sitter). Other source files are counted but not parsed.
 
-For a factual feature comparison with other context tools see [COMPARISON.md](https://github.com/glincker/stacklit/blob/master/COMPARISON.md).
+For a factual feature comparison with other context tools see [COMPARISON.md](https://github.com/glincker/stacklit/blob/master/docs/COMPARISON.md).
 
 ## Links
 
