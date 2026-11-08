@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T16:49:17Z",
+  "generated_at": "2026-11-08T16:49:45Z",
   "stacklit_version": "dev",
-  "merkle_hash": "f2c1f302f3ecd7214202542aca33ea5644d002c7a5daa1e0872c1dca6d40cb0a",
+  "merkle_hash": "3c8079e71e63cc1dd57bccfba2b6c3705f3d8588c3bc93589f321341a7c70256",
   "project": {
     "name": "stacklit-integrations",
     "root": ".",
@@ -22,7 +22,7 @@
       },
       "javascript": {
         "files": 3,
-        "lines": 164
+        "lines": 232
       },
       "python": {
         "files": 1,
@@ -47,7 +47,7 @@
       "cmd/stacklit/main.go"
     ],
     "total_files": 96,
-    "total_lines": 11490
+    "total_lines": 11558
   },
   "modules": {
     "assets": {
@@ -483,15 +483,15 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
-        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
+        "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
+        "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
+        "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
         "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
-        "Project": "Name string, Root string, Type string, Workspaces []string",
-        "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
-        "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
+        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string"
       },
       "depended_by": [
         "internal/cli",
@@ -593,7 +593,7 @@
       "purpose": "Npm",
       "language": "javascript",
       "files": 1,
-      "lines": 138,
+      "lines": 206,
       "file_list": [
         "install.js"
       ],
@@ -757,11 +757,11 @@
     "hot_files": [
       {
         "path": "stacklit.json",
-        "commits_90d": 2
+        "commits_90d": 3
       },
       {
         "path": "stacklit.mmd",
-        "commits_90d": 2
+        "commits_90d": 3
       },
       {
         "path": "Makefile",
@@ -837,16 +837,16 @@
       }
     ],
     "recent": [
+      "npm/install.js",
+      "stacklit.json",
+      "stacklit.mmd",
       "internal/cli/ingest.go",
       "internal/ingest/api.go",
       "internal/ingest/docs.go",
       "internal/ingest/ingest.go",
       "internal/ingest/ingest_test.go",
       "internal/ingest/owners.go",
-      "internal/ingest/schema.go",
-      "stacklit.json",
-      "stacklit.mmd",
-      "SKILL.md"
+      "internal/ingest/schema.go"
     ],
     "stable": [
       "Makefile",
@@ -865,7 +865,8 @@
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
-      "ANTHROPIC_API_KEY"
+      "ANTHROPIC_API_KEY",
+      "STACKLIT_SKIP_CHECKSUM"
     ],
     "do_not_touch": [
       ".github/"
