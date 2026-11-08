@@ -232,6 +232,13 @@ func Run(opts Options) (*Result, error) {
 	idx := assembleIndex(root, mono, files, parsed, g, activity, map[string][]byte{}, cfg)
 	idx.Hints.EnvVars = mergeEnvVars(root, sc.EnvVars)
 	idx.Scan = sc.Info
+	if mono.Type == "monorepo" {
+		names := make([]string, 0, len(idx.Modules))
+		for n := range idx.Modules {
+			names = append(names, n)
+		}
+		idx.Packages, idx.PackageEdges = buildPackages(root, mono.Workspaces, parsed, idx.Dependencies.Edges, names)
+	}
 	idx.MerkleHash = sc.MerkleHash
 	renderer.SetTimestamps(cfg.TimestampsEnabled())
 
