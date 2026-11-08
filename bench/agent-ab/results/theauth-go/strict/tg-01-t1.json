@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-01",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "I found the generator: `newUserCode` in `internal/as/device.go`. I'm not sure that's the only file involved.\n\ninternal/as/device.go",
+  "turns": 6,
+  "cost_usd": 0.040965600000000005,
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 570,
+    "cache_creation_input_tokens": 7465,
+    "cache_read_input_tokens": 53816
+  },
+  "tool_calls": {
+    "Bash": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 1,
+  "result_subtype": "success",
+  "seconds": 10.478683208,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"device login flow user code generation\" --budget 800",
+    "Bash stacklit query \"generate user_code for device authorization\" --budget 800 | head -30; grep -rn -i \"func.*usercode\\|func.*UserCode\" --include=*.go . | grep -v _t",
+    "Bash stacklit query \"func usercode func UserCode\" --budget 800",
+    "Bash grep -rn -i \"usercode\\|user_code\" --include=*.go internal/as | grep -v _test | grep -i \"gen\\|new\\|rand\\|alphabet\" | head",
+    "Bash grep -rn -i \"usercode\\|user_code\" --include='*.go' internal/as | grep -v _test | grep -i \"gen\\|new\\|rand\\|alphabet\" | head"
+  ],
+  "at": "2026-11-08T21:23:10Z",
+  "crawl_redirects": 1
+}

@@ -1,0 +1,34 @@
+{
+  "repo": "levelrail",
+  "task": "lr-06",
+  "kind": "impact",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/store/autoscale.go, internal/spec/autoscale.go, internal/deploy/autoscale.go, internal/apiclient/autoscale.go, internal/api/autoscale_signals.go, internal/api/autoscale.go, cmd/levelrail/boot_stages_workers.go, cmd/levelrail/boot_loaders.go",
+  "turns": 2,
+  "cost_usd": 0.022891299999999996,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 229,
+    "cache_creation_input_tokens": 4874,
+    "cache_read_input_tokens": 10973
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.363352458,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=internal/autoscale\""
+  ],
+  "at": "2026-11-08T20:36:48Z"
+}

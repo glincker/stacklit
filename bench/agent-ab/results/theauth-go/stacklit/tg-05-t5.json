@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-05",
+  "kind": "impact",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "config.go, internal/as/config.go, internal/as/dpop.go, internal/as/iotdevice.go, internal/as/oidc_userinfo.go, internal/as/service.go",
+  "turns": 3,
+  "cost_usd": 0.0264364,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 353,
+    "cache_creation_input_tokens": 5413,
+    "cache_read_input_tokens": 12464
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.148331167,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/dpop\" --budget 800",
+    "Grep pattern=\"[^\"]*/internal/dpop\""
+  ],
+  "at": "2026-11-08T20:59:55Z"
+}

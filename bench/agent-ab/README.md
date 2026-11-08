@@ -1,50 +1,49 @@
 # Real-agent A/B harness
 
-Measures what the earlier offline benchmark cannot: how many tokens and dollars a real Claude Code session uses on the same task with and without Stacklit. It calls the paid API, so it will not start without `--yes-spend`.
+Measures what the offline benchmark cannot: what a real Claude Code session does on the same task with and without Stacklit. Results of the first full run are in [RESULTS.md](RESULTS.md); the claims they support (and do not) are in [PROPOSED_CLAIMS.md](PROPOSED_CLAIMS.md); the plan fixed before running is [PREREGISTRATION.md](PREREGISTRATION.md).
 
-## What it does
+It uses real `claude -p` sessions, so it spends plan quota (the dollar figures Claude Code reports are notional). It will not start without `--yes-spend`, keeps an append-only `ledger.jsonl`, stops when the ledger plus one session cap would pass `--cap-usd` (default 60), and stops at once on a rate limit, usage limit or authentication error.
 
-For every pinned task (from `bench/tasks/<repo>.json`), trial and arm it:
+## Files
 
-1. Clones the pinned repo (`bench/repos.json`, full commit SHA) once, then makes a clean local clone per session in a temp dir that is deleted afterwards.
-2. Control arm: nothing added. Treatment arm: `stacklit generate --graph`, then `stacklit setup claude --session-hook --no-mcp --no-git-hook`, and `Bash(stacklit *)` allowed.
-3. Runs `claude -p "<question>" --output-format json --no-session-persistence --setting-sources project,local --max-turns N --max-budget-usd X` in the checkout. `--setting-sources` leaves your user settings out so personal hooks cannot leak into either arm. The harness also refuses to start if `~/.claude/settings.json` mentions stacklit.
-4. Reads the reported usage (`input_tokens`, `output_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`), `num_turns` and `total_cost_usd`, and checks whether the answer names an expected path (a heuristic that can miss a correct answer worded differently, equally in both arms).
+- `repos.json`: three public repos pinned by full SHA (levelrail, theauth-go, featuredrop). Chosen because the model cannot have memorised them.
+- `tasks/<repo>.json`: 10 tasks each (locate, trace, impact, add) with `all_of` and `any_of` expected paths and a rubric.
+- `results/<repo>/<arm>/<task>-t<trial>.json`: one raw record per session (usage, tool calls by tool, files read, bytes returned by Read, stacklit use, correctness, call log). `results/memory/` holds the all-tools-off check. Transcripts are not kept in the repo.
+- `ledger.jsonl`, `summary.json` (machine readable, for the site), `tables.md` (every table with intervals).
 
-Sessions are shuffled with `--seed`, so arms interleave and the order repeats. Use 3 or more trials: single runs are noisy. Raw results go to `--out` (default `agent-ab-results.json`); a per-arm table is printed.
+## Arms
+
+- `control`: tools Read, Grep, Glob.
+- `stacklit`: `stacklit generate --graph`, then `stacklit setup claude --session-hook --no-mcp --no-git-hook`; Bash is available but only `Bash(stacklit *)` is allowed.
+- `strict`: as `stacklit` plus `--crawl-guard=redirect` and `STACKLIT_STEERING=d`. Needs a stacklit binary built from a branch that has the crawl guard (pass it with `-stacklit`, and make sure a file named `stacklit` is what the hook finds on PATH).
+
+Sessions run with `--output-format stream-json --verbose --no-session-persistence --setting-sources project,local --strict-mcp-config --disable-slash-commands`. The last two flags matter: without them account connectors and skills add about 60,000 tokens to every session. The harness refuses to start if `~/.claude/settings.json` mentions stacklit.
 
 ## Run it
 
 ```bash
 go build -o /tmp/stacklit ./cmd/stacklit
+go build -o /tmp/agent-ab ./bench/agent-ab
 
-# 1. see the plan and the projected cost, runs nothing
-go run ./bench/agent-ab -repo gin -stacklit /tmp/stacklit -dry-run
+# plan only, runs nothing
+/tmp/agent-ab -repo theauth-go -stacklit /tmp/stacklit -dry-run
 
-# 2. smoke test: one task, one arm, cheap model
-go run ./bench/agent-ab -repo gin -stacklit /tmp/stacklit -arms stacklit \
-  -limit 1 -trials 1 -model haiku -max-turns 5 -max-budget-usd 0.25 -yes-spend
+# memorisation check: all tools off, first 6 tasks, results under results/memory
+/tmp/agent-ab -repo theauth-go -mode memory -limit 6 -results bench/agent-ab/results/memory -stacklit /tmp/stacklit -yes-spend
 
-# 3. the full run, after you have approved the spend
-go run ./bench/agent-ab -repo gin -stacklit /tmp/stacklit -trials 3 -yes-spend
+# a run (resumable: finished sessions are skipped)
+/tmp/agent-ab -repo theauth-go -trials 3 -stacklit /tmp/stacklit -yes-spend
+
+# analysis only: writes summary.json and tables.md next to the ledger
+/tmp/agent-ab -analyze
 ```
 
-Flags worth knowing: `-arms` (limit to one arm), `-limit` (first N tasks), `-model`, `-max-turns`, `-max-budget-usd` (hard per-session cap), `-seed`, and `-est-low/-est-mid/-est-high` for the projection.
+Set `AGENT_AB_TRANSCRIPTS=<dir>` to keep raw streams outside the repo for hand checks. Each session works in a fresh shallow clone under `-work` (default `/tmp/abreal/work`), deleted afterwards.
 
-## Cost
+## Grading and statistics
 
-The number of paid sessions is tasks x trials x arms. With the shipped task files (10 per repo) and 3 trials:
-
-| Scope | Sessions |
-|---|---|
-| one repo | 10 x 3 x 2 = 60 |
-| all three repos | 180 |
-
-The dollar figures printed by `-dry-run` use per-session assumptions (default $0.15, $0.40, $1.00 for low, middle, high), not measurements: one repo is therefore $9, $24 and $60, and all three repos $27, $72 and $180. The only measured figure is a smoke test on a tiny task with a small model, $0.003, which is not representative of a real task on a default model. Run step 2 with your real model on one real task first, then pass the observed cost as `-est-mid` to get a better projection. `-max-budget-usd` bounds each session; the worst case is sessions x that cap.
+A session is correct when every `all_of` path and at least one `any_of` path is named in the answer (boundary-aware match). `correct_audited` in the analysis adds three documented fixes; see RESULTS.md. Differences and ratios of means are paired by repo, task and trial, with seeded bootstrap intervals (10,000 resamples); rates use Wilson intervals.
 
 ## Limits
 
-- Tasks are navigation questions with a known file answer, the case Stacklit targets. They say little about editing tasks.
-- The correctness check is substring matching on the answer.
-- It does not confirm that a hook fired inside the `-p` session; check the transcript of a smoke run if that matters.
-- Cache effects: a session that reads a warm prompt cache costs less. Interleaving the arms spreads this across both.
+One model, tasks written by us, small n, path-match correctness, notional cost. `seconds` includes clone and setup time. Details in RESULTS.md.

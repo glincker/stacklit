@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-09",
+  "kind": "impact",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "./internal/scim/handlers/handlers.go, ./wiring.go, ./theauth.go, ./middleware.go, ./enterprise.go",
+  "turns": 3,
+  "cost_usd": 0.027212700000000003,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 327,
+    "cache_creation_input_tokens": 5433,
+    "cache_read_input_tokens": 21987
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.654090042,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/scim package\" --budget 800; grep -rn --include=*.go -E '\"[^\"]*/internal/scim\"' . | grep -v _test.go",
+    "Bash grep -rn --include='*.go' -E '\"[^\"]*/internal/scim\"' . | grep -v _test.go"
+  ],
+  "at": "2026-11-08T20:56:54Z"
+}

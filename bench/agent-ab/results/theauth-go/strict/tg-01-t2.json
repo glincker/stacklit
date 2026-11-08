@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-01",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/as/device.go, internal/apitokens/device.go",
+  "turns": 4,
+  "cost_usd": 0.035434,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 266,
+    "cache_creation_input_tokens": 7377,
+    "cache_read_input_tokens": 32500
+  },
+  "tool_calls": {
+    "Bash": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.303986042,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"device login flow user code generation\" --budget 800",
+    "Bash stacklit query \"generate user_code for device authorization endpoint\" --budget 800",
+    "Bash stacklit query \"newUserCode user code alphabet random generator in internal/as\" --budget 600"
+  ],
+  "at": "2026-11-08T21:22:35Z",
+  "crawl_redirects": 0
+}

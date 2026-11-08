@@ -1,0 +1,35 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-01",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/core.ts",
+  "turns": 2,
+  "cost_usd": 0.022350099999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 83,
+    "cache_creation_input_tokens": 5066,
+    "cache_read_input_tokens": 12481
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.423715916,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"which feature is new: release date, new duration, dismissed\" --budget 800"
+  ],
+  "at": "2026-11-08T21:03:57Z"
+}

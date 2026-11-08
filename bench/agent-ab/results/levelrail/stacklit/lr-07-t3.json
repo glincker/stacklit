@@ -1,0 +1,35 @@
+{
+  "repo": "levelrail",
+  "task": "lr-07",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/mcptools/server.go, internal/mcptools/classes.go",
+  "turns": 3,
+  "cost_usd": 0.0266768,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 273,
+    "cache_creation_input_tokens": 5435,
+    "cache_read_input_tokens": 21948
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 45.246779375,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"MCP tool registration groups and tool classification read mutate destructive\" --budget 800",
+    "Bash cd /private/tmp/abreal/work/ab-1133762422/co-2169474816/internal/mcptools \u0026\u0026 grep -ln \"registerPlanTools\" *.go; grep -n \"registerPlanTools\" *.go | head"
+  ],
+  "at": "2026-11-08T20:29:27Z"
+}

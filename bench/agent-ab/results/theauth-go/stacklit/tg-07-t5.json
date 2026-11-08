@@ -1,0 +1,35 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/slack/slack.go, provider/github/github.go",
+  "turns": 2,
+  "cost_usd": 0.022311,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 95,
+    "cache_creation_input_tokens": 5026,
+    "cache_read_input_tokens": 12490
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.815406042,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"social login OAuth provider implementations (github, google)\" --budget 800"
+  ],
+  "at": "2026-11-08T20:57:48Z"
+}

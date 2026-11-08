@@ -1,0 +1,36 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-09",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "src/analytics.ts",
+  "turns": 4,
+  "cost_usd": 0.022699999999999998,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 513,
+    "cache_creation_input_tokens": 3861,
+    "cache_read_input_tokens": 21100
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.84661825,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=posthog",
+    "Grep pattern=capture|posthog path=/private/tmp/abreal/work/ab-3295985379/co-3749436349/src",
+    "Grep pattern=capture|posthog path=/private/tmp/abreal/work/ab-3295985379/co-3749436349/src"
+  ],
+  "at": "2026-11-08T20:22:34Z"
+}

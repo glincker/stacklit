@@ -1,0 +1,36 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-05",
+  "kind": "impact",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/provider.tsx, src/angular/index.ts, src/remix/index.ts, src/vue/provider.ts, src/astro/index.ts, src/index.ts, src/renderer.ts, src/nuxt/index.ts, src/svelte/index.ts, src/helpers.ts, src/next/index.ts, src/solid/store.ts, src/web-components/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0291157,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 467,
+    "cache_creation_input_tokens": 5798,
+    "cache_read_input_tokens": 12457
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.990634,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"which files import src/core.ts\" --budget 800; ls src/core.ts",
+    "Grep pattern=from ['\"][^'\"]*\\/core(\\.js|\\.ts)?['\"]|from ['\"]\\./core(\\.js|\\.ts)?['\"]"
+  ],
+  "at": "2026-11-08T20:21:42Z"
+}

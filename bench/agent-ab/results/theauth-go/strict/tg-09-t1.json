@@ -1,0 +1,44 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-09",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.2,
+  "answer": "wiring.go",
+  "turns": 10,
+  "cost_usd": 0.062436399999999996,
+  "usage": {
+    "input_tokens": 20,
+    "output_tokens": 1185,
+    "cache_creation_input_tokens": 9948,
+    "cache_read_input_tokens": 107544
+  },
+  "tool_calls": {
+    "Bash": 9
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 6,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 3,
+  "result_subtype": "success",
+  "seconds": 21.938786416,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/scim package\" --budget 800",
+    "Bash stacklit impact internal/scim 2>&1 | head -40",
+    "Bash stacklit impact internal/scim/service.go 2>&1 | head -40",
+    "Bash grep -rlE --include=*.go '\"[^\"]*/internal/scim\"' . | grep -v '_test.go'",
+    "Bash grep -rlE --include=*.go '\"[^\"]*/internal/scim\"' . | grep -v '_test.go'",
+    "Bash stacklit query \"internal scim\" --budget 800",
+    "Bash grep -rlE --include=*.go '\"[^\"]*/internal/scim\"' . | grep -v '_test.go'",
+    "Bash stacklit query \"internal scim\" --budget 1600 | grep -E '^[0-9]+\\. '",
+    "Bash stacklit slice scimConfigFromRoot | head -20; sed -n 1,60p wiring.go | grep -n scim"
+  ],
+  "at": "2026-11-08T21:20:49Z",
+  "crawl_redirects": 3
+}

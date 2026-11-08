@@ -1,0 +1,40 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-06",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-tour.ts, src/react/hooks/use-tour-sequencer.ts, src/react/components/tour.tsx, src/react/components/checklist.tsx",
+  "turns": 5,
+  "cost_usd": 0.028923800000000003,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 557,
+    "cache_creation_input_tokens": 4869,
+    "cache_read_input_tokens": 38578
+  },
+  "tool_calls": {
+    "Bash": 3,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.320361083,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit impact tour-registry --budget 800 2>&1 | head -50",
+    "Bash stacklit impact src/react/tour-registry.ts --budget 800 2>&1 | head -50",
+    "Bash stacklit impact src/react/tour-registry.ts --budget 3000 --json 2>&1 | grep -o '\"file\": *\"[^\"]*\"' | sort -u",
+    "Grep pattern=tour-registry"
+  ],
+  "at": "2026-11-08T21:29:47Z",
+  "crawl_redirects": 0
+}

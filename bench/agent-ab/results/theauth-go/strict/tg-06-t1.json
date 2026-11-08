@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/as/handlers/handlers.go, internal/as/par.go, storage/memory/memory_par.go, storage/postgres/postgres_par.go, storage/sqlite/as_par.go",
+  "turns": 3,
+  "cost_usd": 0.0289375,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 232,
+    "cache_creation_input_tokens": 6105,
+    "cache_read_input_tokens": 21855
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.722760417,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"pushed authorization request PAR handler storage\" --budget 800",
+    "Bash stacklit query \"HTTP handler for PAR endpoint calling PushAuthorize\" --budget 600"
+  ],
+  "at": "2026-11-08T21:23:54Z",
+  "crawl_redirects": 0
+}

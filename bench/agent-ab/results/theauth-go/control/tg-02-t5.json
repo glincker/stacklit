@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-02",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "mcpresource/dpop.go, internal/dpop/service.go",
+  "turns": 3,
+  "cost_usd": 0.017329300000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 277,
+    "cache_creation_input_tokens": 3270,
+    "cache_read_input_tokens": 14673
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.197399167,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=htu",
+    "Grep pattern=\\.HTM|\\.HTU|Htm|Htu|\"htm\"|\"htu\""
+  ],
+  "at": "2026-11-08T21:00:57Z"
+}

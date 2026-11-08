@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-09",
+  "kind": "impact",
+  "trial": 5,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "wiring.go, theauth.go, middleware.go, internal/scim/handlers/handlers.go, enterprise.go",
+  "turns": 5,
+  "cost_usd": 0.0392942,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 471,
+    "cache_creation_input_tokens": 7555,
+    "cache_read_input_tokens": 43442
+  },
+  "tool_calls": {
+    "Bash": 3,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.035389625,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"which modules import internal/scim package\" --budget 800",
+    "Bash stacklit impact internal/scim --budget 800",
+    "Bash stacklit impact internal/scim/service.go --budget 1000",
+    "Grep pattern=\"[^\"]*/internal/scim\""
+  ],
+  "at": "2026-11-08T21:24:28Z",
+  "crawl_redirects": 0
+}

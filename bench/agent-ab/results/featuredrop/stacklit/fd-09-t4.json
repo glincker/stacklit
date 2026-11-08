@@ -1,0 +1,35 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-09",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "src/analytics.ts",
+  "turns": 2,
+  "cost_usd": 0.0225097,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 78,
+    "cache_creation_input_tokens": 5119,
+    "cache_read_input_tokens": 12457
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.445147458,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"forward feature events to PostHog\" --budget 800"
+  ],
+  "at": "2026-11-08T21:04:45Z"
+}

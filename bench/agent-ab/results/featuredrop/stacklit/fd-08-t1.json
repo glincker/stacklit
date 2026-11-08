@@ -1,0 +1,34 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-08",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-\u003cname\u003e.ts, src/react/hooks/index.ts, src/react/index.ts",
+  "turns": 2,
+  "cost_usd": 0.0291533,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 195,
+    "cache_creation_input_tokens": 6487,
+    "cache_read_input_tokens": 12473
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 17.311253083,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"where are react hooks defined and exported\" --budget 800; ls src/react/hooks; cat src/react/hooks/index.ts 2\u003e/dev/null | head -30; grep -n \"hook"
+  ],
+  "at": "2026-11-08T20:24:59Z"
+}

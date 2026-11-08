@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/as/handlers/handlers.go, internal/as/par.go, internal/as/jar.go, internal/as/authz.go, storage/memory/memory_par.go, storage/sqlite/as_par.go, storage/postgres/postgres_par.go",
+  "turns": 4,
+  "cost_usd": 0.032072500000000004,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 607,
+    "cache_creation_input_tokens": 5957,
+    "cache_read_input_tokens": 21585
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 16.146967625,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)pushed.?authori[sz]|\\bPAR\\b",
+    "Grep pattern=PushedAuthorizationRequest|PARStore|SavePAR|StorePAR",
+    "Grep pattern=func .*(PAR|Par)\\w*\\("
+  ],
+  "at": "2026-11-08T20:09:02Z"
+}

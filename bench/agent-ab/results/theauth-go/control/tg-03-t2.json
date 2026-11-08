@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-03",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/audit/chain.go, internal/audit/chainhash.go",
+  "turns": 5,
+  "cost_usd": 0.0406717,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 1145,
+    "cache_creation_input_tokens": 6480,
+    "cache_read_input_tokens": 32817
+  },
+  "tool_calls": {
+    "Grep": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 1124,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 17.290286125,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=hash.?chain|prev_hash|prevHash|previous_hash",
+    "Grep pattern=^func  path=/private/tmp/abreal/work/ab-1246330160/co-1054171199/internal/audit",
+    "Read /private/tmp/abreal/work/ab-1246330160/co-1054171199/internal/audit/chain.go",
+    "Grep pattern=^func  path=/private/tmp/abreal/work/ab-1246330160/co-1054171199/storage/sqlite/audit_chain."
+  ],
+  "at": "2026-11-08T20:16:06Z"
+}

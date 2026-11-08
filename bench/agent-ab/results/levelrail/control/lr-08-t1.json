@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr-08",
+  "kind": "add",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "cmd/levelrail-cli/apps.go, cmd/levelrail-cli/apps_\u003cname\u003e.go",
+  "turns": 4,
+  "cost_usd": 0.0409762,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 494,
+    "cache_creation_input_tokens": 8447,
+    "cache_read_input_tokens": 22362
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.596926042,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=sleep path=/private/tmp/abreal/work/ab-1133762422/co-1402535466/cmd/levelrail-cli",
+    "Glob pattern=cmd/levelrail-cli/*apps* path=/private/tmp/abreal/work/ab-1133762422/co-1402535466",
+    "Grep pattern=\"sleep\" path=/private/tmp/abreal/work/ab-1133762422/co-1402535466/cmd/levelrail-cli/apps.go"
+  ],
+  "at": "2026-11-08T20:30:50Z"
+}

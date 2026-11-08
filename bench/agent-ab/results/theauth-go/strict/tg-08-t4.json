@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-08",
+  "kind": "add",
+  "trial": 4,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/audit/events.go, audit/events.go",
+  "turns": 5,
+  "cost_usd": 0.0336427,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 433,
+    "cache_creation_input_tokens": 6286,
+    "cache_read_input_tokens": 41487
+  },
+  "tool_calls": {
+    "Bash": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 1507,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.260990375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"audit event name constants\" --budget 800",
+    "Bash grep -c \"Event.* = \\\"\" internal/audit/events.go audit/events.go",
+    "Bash grep -n \"= \\\"\\|= audit\\|= internal\\|const\" audit/events.go | head -20",
+    "Read /private/tmp/abreal/work/ab-3252267917/co-4074751999/audit/events.go"
+  ],
+  "at": "2026-11-08T21:22:50Z",
+  "crawl_redirects": 0
+}

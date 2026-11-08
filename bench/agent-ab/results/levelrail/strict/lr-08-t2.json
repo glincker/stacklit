@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr-08",
+  "kind": "add",
+  "trial": 2,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "cmd/levelrail-cli/apps.go, cmd/levelrail-cli/apps_<name>.go",
+  "turns": 3,
+  "cost_usd": 0.0271336,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 208,
+    "cache_creation_input_tokens": 5710,
+    "cache_read_input_tokens": 22016
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 20.815164,
+  "seven_day_utilization": 0.58,
+  "call_log": [
+    "Bash stacklit query \"CLI apps subcommand dispatch, apps sleep\" --budget 800",
+    "Bash stacklit impact runAppsSleep"
+  ],
+  "at": "2026-11-08T21:42:02Z",
+  "crawl_redirects": 0
+}

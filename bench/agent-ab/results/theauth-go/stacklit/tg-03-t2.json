@@ -1,0 +1,35 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-03",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/audit/chain.go, internal/audit/chainhash.go",
+  "turns": 3,
+  "cost_usd": 0.029498200000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 334,
+    "cache_creation_input_tokens": 5986,
+    "cache_read_input_tokens": 22022
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 14.481745125,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"audit log hash chain verify and compute hash\" --budget 800",
+    "Bash cd internal/audit \u0026\u0026 ls \u0026\u0026 grep -n \"^func\" chain.go chainhash.go"
+  ],
+  "at": "2026-11-08T20:17:07Z"
+}

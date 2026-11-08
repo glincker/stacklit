@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-08",
+  "kind": "add",
+  "trial": 3,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-<name>.ts, src/react/hooks/index.ts, src/react/index.ts",
+  "turns": 3,
+  "cost_usd": 0.026728599999999998,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 267,
+    "cache_creation_input_tokens": 5460,
+    "cache_read_input_tokens": 22066
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.88314575,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"where are react hooks defined and exported\" --budget 800",
+    "Bash grep -rn \"use-new-count\" src --include=*.ts --include=*.tsx -l; grep -n \"use-new-count\\|useNewCount\" src/react/index.ts src/react/hooks/index.ts 2>&1"
+  ],
+  "at": "2026-11-08T21:29:05Z",
+  "crawl_redirects": 0
+}

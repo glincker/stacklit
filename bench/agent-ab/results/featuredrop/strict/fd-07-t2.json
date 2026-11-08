@@ -1,0 +1,40 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-07",
+  "kind": "add",
+  "trial": 2,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/adapters/dynamodb.ts, src/adapters/index.ts",
+  "turns": 6,
+  "cost_usd": 0.041118,
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 711,
+    "cache_creation_input_tokens": 7178,
+    "cache_read_input_tokens": 52720
+  },
+  "tool_calls": {
+    "Bash": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.208247708,
+  "seven_day_utilization": 0.58,
+  "call_log": [
+    "Bash stacklit query \"storage adapters: where adapters live and where they are exported\" --budget 800",
+    "Bash grep -rln \"adapters/redis\" --include=*.json --include=*.ts --include=*.mjs --include=*.js . --exclude-dir=node_modules --exclude-dir=dist --exclude=stacklit* 2>",
+    "Bash grep -n \"redis\" package.json tsup.config.ts 2>&1 | head -20",
+    "Bash stacklit query \"where is RedisAdapter exported / re-exported for package consumers\" --budget 600; grep -n \"adapters\" package.json | head",
+    "Bash grep -n \"adapters\" tsup.config.ts; ls src/adapters | head -30; grep -n \"Redis\" src/adapters/index.ts src/adapters.ts 2>&1 | head"
+  ],
+  "at": "2026-11-08T21:33:04Z",
+  "crawl_redirects": 0
+}

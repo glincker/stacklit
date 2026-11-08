@@ -1,0 +1,36 @@
+{
+  "repo": "levelrail",
+  "task": "lr-03",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/components/AppAutoscaleCard.tsx, web/src/components/autoscale/AutoscaleForm.tsx, web/src/queries/autoscale.ts",
+  "turns": 4,
+  "cost_usd": 0.029882799999999998,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 315,
+    "cache_creation_input_tokens": 5877,
+    "cache_read_input_tokens": 32088
+  },
+  "tool_calls": {
+    "Bash": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 53.828785667,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"autoscale settings card form query in web\" --budget 800",
+    "Bash ls web/src/components web/src/queries | grep -i autoscal; grep -n \"^import\" web/src/components/AppAutoscaleCard.tsx",
+    "Bash ls web/src/components/autoscale; sed -n 13,17p web/src/components/AppAutoscaleCard.tsx"
+  ],
+  "at": "2026-11-08T20:46:56Z"
+}

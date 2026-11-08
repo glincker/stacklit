@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-07",
+  "kind": "add",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/adapters/dynamodb.ts, src/adapters/index.ts",
+  "turns": 5,
+  "cost_usd": 0.0249372,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 466,
+    "cache_creation_input_tokens": 4673,
+    "cache_read_input_tokens": 15732
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 2,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 1330,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.908050334,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)adapter",
+    "Glob pattern=**/*{storage,adapter}*/**",
+    "Read /private/tmp/abreal/work/ab-3295985379/co-378249819/src/adapters/index.ts",
+    "Grep pattern=adapters path=/private/tmp/abreal/work/ab-3295985379/co-378249819/tsup.config.ts"
+  ],
+  "at": "2026-11-08T20:26:53Z"
+}

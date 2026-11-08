@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-02",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/dpop/service.go, mcpresource/dpop.go",
+  "turns": 4,
+  "cost_usd": 0.022084000000000003,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 437,
+    "cache_creation_input_tokens": 4046,
+    "cache_read_input_tokens": 15180
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.362404166,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=htm|htu",
+    "Grep pattern=\\.HTM|\\.HTU|\\bHTM\\b|\\bHTU\\b|\"htm\"|\"htu\" path=/private/tmp/abreal/work/ab-1246330160/co-3628818679/internal/dpop",
+    "Grep pattern=htm|htu|HTM|HTU path=/private/tmp/abreal/work/ab-1246330160/co-3628818679/mcpresource/dpop.go"
+  ],
+  "at": "2026-11-08T20:17:40Z"
+}
