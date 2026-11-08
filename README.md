@@ -268,7 +268,7 @@ A dump is the full source. Stacklit is structure only: it is orders of magnitude
 - [ROADMAP.md](ROADMAP.md): what is planned and what is in progress
 - [CHANGELOG.md](CHANGELOG.md): release history
 - [COMPARISON.md](COMPARISON.md): feature comparison with other context tools
-- [SKILL.md](SKILL.md): instructions an agent can follow to use `stacklit.json`
+- [skills/stacklit/SKILL.md](skills/stacklit/SKILL.md): instructions an agent can follow to use `stacklit.json`
 - [examples/](examples/): sample outputs (generated with earlier versions)
 - [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md)
 
