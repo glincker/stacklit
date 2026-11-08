@@ -137,20 +137,20 @@ func RenderMarkdown(results []RepoResult, env Env, o Opts) string {
 	}
 
 	b.WriteString("### Repos and generation cost\n\n")
-	b.WriteString("| Repo | Lang | Pinned commit | Tasks | Code files | Lines | Modules | Full dump tokens | Fits in context | stacklit.json tokens | derive map tokens | generate first (ms) | generate median (ms) | peak RSS (MB) | repo-map build (ms) | BM25 build (ms) |\n")
-	b.WriteString("|---|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|\n")
+	b.WriteString("| Repo | Lang | Pinned commit | Tasks | Code files | Lines | Modules | Full dump tokens | Fits in context | stacklit.json tokens | derive map tokens | generate first (ms) | generate median (ms) | peak RSS (MB) | clean-index attempts | repo-map build (ms) | BM25 build (ms) |\n")
+	b.WriteString("|---|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
 	for _, r := range results {
 		g := r.Gen
 		rss := "n/a"
 		if g.MaxRSSMB > 0 {
 			rss = fmt.Sprintf("%.0f", g.MaxRSSMB)
 		}
-		fmt.Fprintf(&b, "| %s | %s | `%s` (%s) | %d | %d | %d | %d | %d | %s | %d | %d | %.0f | %.0f | %s | %.0f | %.0f |\n",
+		fmt.Fprintf(&b, "| %s | %s | `%s` (%s) | %d | %d | %d | %d | %d | %s | %d | %d | %.0f | %.0f | %s | %d | %.0f | %.0f |\n",
 			r.Spec.Name, r.Spec.Language, r.Spec.SHA[:10], r.Spec.Ref, len(r.Tasks), g.Files, g.Lines, g.Modules,
 			r.DumpCost.Tokens(), yn(r.DumpCost.Tokens() <= o.ContextWindow), g.IndexCost.Tokens(), g.MapCost.Tokens(),
-			g.FirstMs, g.MedianMs, rss, r.RepoMapMs, r.BM25Ms)
+			g.FirstMs, g.MedianMs, rss, g.Attempts, r.RepoMapMs, r.BM25Ms)
 	}
-	fmt.Fprintf(&b, "\n\"Fits in context\" compares the full dump with a %d token window. Generation time is wall clock for `stacklit generate --quiet` (%d runs per repo, cold parse cache, outputs deleted before each run), peak RSS is the largest resident set of the child process. Repo-map and BM25 build times are a single in-process run; their memory is not measured. Tokens are bytes/4.\n\n", o.ContextWindow, results[0].Gen.Runs)
+	fmt.Fprintf(&b, "\n\"Fits in context\" compares the full dump with a %d token window. Generation time is wall clock for `stacklit generate --quiet` (%d runs per repo, cold parse cache, outputs deleted before each run), peak RSS is the largest resident set of the child process. Clean-index attempts is how many `generate` runs it took to get an index with zero parse errors (the Rust parser panics on a varying set of files from run to run; the harness regenerates with one CPU until a run is clean and keeps that index so the stacklit arms are reproducible). Repo-map and BM25 build times are a single in-process run; their memory is not measured. Tokens are bytes/4.\n\n", o.ContextWindow, results[0].Gen.Runs)
 
 	total := 0
 	for _, r := range results {
