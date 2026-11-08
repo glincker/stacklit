@@ -1,11 +1,11 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T16:49:45Z",
+  "generated_at": "2026-05-07T02:35:01Z",
   "stacklit_version": "dev",
-  "merkle_hash": "3c8079e71e63cc1dd57bccfba2b6c3705f3d8588c3bc93589f321341a7c70256",
+  "merkle_hash": "b99fe2df208508d2562bc18f0950a25193578caecf4f05c492c8cc20033a728c",
   "project": {
-    "name": "stacklit-integrations",
+    "name": "stacklit",
     "root": ".",
     "type": "single"
   },
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 85,
-        "lines": 11247
+        "files": 67,
+        "lines": 9396
       },
       "java": {
         "files": 1,
@@ -22,7 +22,7 @@
       },
       "javascript": {
         "files": 3,
-        "lines": 232
+        "lines": 164
       },
       "python": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 96,
-    "total_lines": 11558
+    "total_files": 78,
+    "total_lines": 9639
   },
   "modules": {
     "assets": {
@@ -84,21 +84,17 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 13,
-      "lines": 775,
+      "files": 9,
+      "lines": 560,
       "file_list": [
         "derive.go",
         "diff.go",
         "export.go",
         "generate.go",
-        "hook.go",
-        "ingest.go",
         "init.go",
         "root.go",
         "serve.go",
         "setup.go",
-        "version.go",
-        "version_test.go",
         "view.go"
       ],
       "exports": [
@@ -110,7 +106,6 @@
         "internal/derive",
         "internal/engine",
         "internal/git",
-        "internal/ingest",
         "internal/mcp",
         "internal/renderer",
         "internal/schema",
@@ -260,8 +255,7 @@
       },
       "depended_by": [
         "internal/cli",
-        "internal/engine",
-        "internal/setup"
+        "internal/engine"
       ],
       "activity": "low"
     },
@@ -296,47 +290,6 @@
       ],
       "depended_by": [
         "internal/engine"
-      ],
-      "activity": "low"
-    },
-    "internal/ingest": {
-      "purpose": "Ingest",
-      "language": "go",
-      "files": 6,
-      "lines": 728,
-      "file_list": [
-        "api.go",
-        "docs.go",
-        "ingest.go",
-        "ingest_test.go",
-        "owners.go",
-        "schema.go"
-      ],
-      "exports": [
-        "ContextFile",
-        "Run(o Options) (*Context, error)",
-        "type API",
-        "type Context",
-        "type Doc",
-        "type ModuleOwners",
-        "type Operation",
-        "type Options",
-        "type OwnerRule",
-        "type Owners"
-      ],
-      "type_defs": {
-        "API": "File string, Title string, Operations []Operation",
-        "Context": "Version string, Docs []Doc, APIs []API, Tables []Table, Owners *Owners",
-        "Doc": "Path string, Kind string, Title string, Status string, Headings []string",
-        "ModuleOwners": "Module string, Codeowner []string, Authors []string",
-        "Operation": "Method string, Path string, ID string, Summary string",
-        "Options": "Root string, Docs bool, API bool, Schema bool, Owners bool, GitOwners bool, GitDays int, Modules []string",
-        "OwnerRule": "Pattern string, Owners []string",
-        "Owners": "Rules []OwnerRule, Modules []ModuleOwners",
-        "Table": "Name string, File string, Columns []string"
-      },
-      "depended_by": [
-        "internal/cli"
       ],
       "activity": "low"
     },
@@ -483,6 +436,7 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
+        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
@@ -490,8 +444,7 @@
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
-        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string"
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
       },
       "depended_by": [
         "internal/cli",
@@ -507,42 +460,23 @@
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 9,
-      "lines": 1066,
+      "files": 1,
+      "lines": 158,
       "file_list": [
-        "block.go",
-        "claude.go",
-        "git.go",
-        "hookcmd.go",
-        "mcp.go",
-        "runner.go",
-        "setup.go",
-        "setup_test.go",
-        "tools.go"
+        "setup.go"
       ],
       "exports": [
-        "ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error",
-        "Detected(root string) bool",
-        "Lookup(id string) (Tool, bool)",
-        "MarkdownBody(idx *schema.Index) string",
-        "PreToolHook(stdin io.Reader) string",
-        "Registry() []Tool",
-        "Run(r *Runner, o Options) error",
-        "SessionHook(stdin io.Reader) string",
-        "SkillMD",
-        "StyleCodexTOML"
+        "ConfigureAider(idx *schema.Index) error",
+        "ConfigureClaude(idx *schema.Index, withMCP bool) error",
+        "ConfigureCursor(idx *schema.Index) error",
+        "DetectTools() []Tool",
+        "type Tool"
       ],
       "type_defs": {
-        "ClaudeOptions": "PreToolHook bool, SessionHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
-        "MCP": "Path string, Style MCPStyle, Global bool",
-        "Options": "Root string, Tools []Tool, Index *schema.Index, Uninstall bool, NoMCP bool, NoGitHook bool, Global bool, Claude ClaudeOptions",
-        "Rule": "Path string, Style string, Frontmatter string",
-        "Runner": "Root string, DryRun bool, Out io.Writer, Changed int",
-        "Tool": "ID string, Name string, Rules []Rule, MCP []MCP, Paths []string, Bins []string"
+        "Tool": "Name string, Detected bool"
       },
       "depends_on": [
         "internal/derive",
-        "internal/git",
         "internal/schema"
       ],
       "depended_by": [
@@ -593,7 +527,7 @@
       "purpose": "Npm",
       "language": "javascript",
       "files": 1,
-      "lines": 206,
+      "lines": 138,
       "file_list": [
         "install.js"
       ],
@@ -631,10 +565,6 @@
       [
         "internal/cli",
         "internal/git"
-      ],
-      [
-        "internal/cli",
-        "internal/ingest"
       ],
       [
         "internal/cli",
@@ -722,10 +652,6 @@
       ],
       [
         "internal/setup",
-        "internal/git"
-      ],
-      [
-        "internal/setup",
         "internal/schema"
       ],
       [
@@ -738,9 +664,9 @@
     ],
     "most_depended": [
       "internal/schema",
-      "internal/git",
       "internal/config",
       "internal/derive",
+      "internal/git",
       "internal/parser",
       "internal/renderer",
       "internal/walker",
@@ -756,15 +682,43 @@
   "git": {
     "hot_files": [
       {
-        "path": "stacklit.json",
-        "commits_90d": 3
+        "path": ".github/workflows/ci.yml",
+        "commits_90d": 1
       },
       {
-        "path": "stacklit.mmd",
-        "commits_90d": 3
+        "path": ".github/workflows/release.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".github/workflows/stacklit-index.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".gitignore",
+        "commits_90d": 1
+      },
+      {
+        "path": ".goreleaser.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": "COMPARISON.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "DEPENDENCIES.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "LICENSE",
+        "commits_90d": 1
       },
       {
         "path": "Makefile",
+        "commits_90d": 1
+      },
+      {
+        "path": "README.md",
         "commits_90d": 1
       },
       {
@@ -772,101 +726,72 @@
         "commits_90d": 1
       },
       {
-        "path": "internal/cli/hook.go",
+        "path": "USAGE.md",
         "commits_90d": 1
       },
       {
-        "path": "internal/cli/ingest.go",
+        "path": "action/action.yml",
         "commits_90d": 1
       },
       {
-        "path": "internal/cli/setup.go",
+        "path": "assets/embed.go",
         "commits_90d": 1
       },
       {
-        "path": "internal/cli/version.go",
+        "path": "assets/lang-icons.js",
         "commits_90d": 1
       },
       {
-        "path": "internal/cli/version_test.go",
+        "path": "assets/template.html",
         "commits_90d": 1
       },
       {
-        "path": "internal/ingest/api.go",
+        "path": "cmd/stacklit/main.go",
         "commits_90d": 1
       },
       {
-        "path": "internal/ingest/docs.go",
+        "path": "demo.gif",
         "commits_90d": 1
       },
       {
-        "path": "internal/ingest/ingest.go",
+        "path": "demo.tape",
         "commits_90d": 1
       },
       {
-        "path": "internal/ingest/ingest_test.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/ingest/owners.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/ingest/schema.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/block.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/claude.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/git.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/hookcmd.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/setup/mcp.go",
+        "path": "docs/superpowers/plans/2026-04-12-growth-package.md",
         "commits_90d": 1
       }
     ],
     "recent": [
-      "npm/install.js",
-      "stacklit.json",
-      "stacklit.mmd",
-      "internal/cli/ingest.go",
-      "internal/ingest/api.go",
-      "internal/ingest/docs.go",
-      "internal/ingest/ingest.go",
-      "internal/ingest/ingest_test.go",
-      "internal/ingest/owners.go",
-      "internal/ingest/schema.go"
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      ".github/workflows/stacklit-index.yml",
+      ".gitignore",
+      ".goreleaser.yml",
+      "COMPARISON.md",
+      "DEPENDENCIES.md",
+      "LICENSE",
+      "Makefile",
+      "README.md"
     ],
     "stable": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      ".github/workflows/stacklit-index.yml",
+      ".gitignore",
+      ".goreleaser.yml",
+      "COMPARISON.md",
+      "DEPENDENCIES.md",
+      "LICENSE",
       "Makefile",
-      "SKILL.md",
-      "internal/cli/hook.go",
-      "internal/cli/ingest.go",
-      "internal/cli/setup.go",
-      "internal/cli/version.go",
-      "internal/cli/version_test.go",
-      "internal/ingest/api.go",
-      "internal/ingest/docs.go",
-      "internal/ingest/ingest.go"
+      "README.md"
     ]
   },
   "hints": {
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
-      "ANTHROPIC_API_KEY",
-      "STACKLIT_SKIP_CHECKSUM"
+      "ANTHROPIC_API_KEY"
     ],
     "do_not_touch": [
       ".github/"
