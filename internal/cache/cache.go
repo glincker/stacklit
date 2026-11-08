@@ -130,6 +130,9 @@ func (s *Store) Save() error {
 
 // fingerprint ties the cache to the running binary, so any parser change
 // (new release or a local rebuild) invalidates stale entries.
+// Fingerprint identifies the running binary's parser behavior.
+func Fingerprint() string { return fingerprint() }
+
 func fingerprint() string {
 	h := sha256.New()
 	fmt.Fprintf(h, "v%d", formatVersion)
