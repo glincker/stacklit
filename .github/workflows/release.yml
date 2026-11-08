@@ -24,8 +24,8 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # PAT with write access to glincker/homebrew-tap (GITHUB_TOKEN is repo scoped).
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          # Deploy key that can write only to glincker/homebrew-tap (GITHUB_TOKEN is repo scoped).
+          HOMEBREW_TAP_DEPLOY_KEY: ${{ secrets.HOMEBREW_TAP_DEPLOY_KEY }}
 
   npm-publish:
     needs: release

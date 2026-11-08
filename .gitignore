@@ -22,3 +22,7 @@ coverage.out
 # Local docs (research, plans, specs — not for public repo)
 docs-local/
 completions/
+
+# Local only planning docs, never pushed
+docs/superpowers/
+.superpowers/
