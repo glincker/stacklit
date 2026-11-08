@@ -266,6 +266,19 @@ func TestMoreLanguages(t *testing.T) {
 			exports:  []string{"type Query", "type User", "interface Node", "enum Role", "input NewUser", "union SearchResult", "scalar DateTime"},
 			typeDefs: map[string]string{"Query": "user(id: ID!): User", "Role": "ADMIN", "User": "name: String"},
 		},
+		{
+			name: "powershell", file: "sample.ps1", language: "powershell",
+			imports:  []string{"Az.Accounts", "./helpers.ps1"},
+			exports:  []string{"function Get-Thing", "class Widget"},
+			typeDefs: map[string]string{"Widget": "Run()"},
+		},
+		{
+			name: "gleam", file: "sample.gleam", language: "gleam",
+			imports:    []string{"gleam/io", "gleam/list"},
+			exports:    []string{"type Shape", "pub fn area(shape: Shape) -> Float", "const pi"},
+			notExports: []string{"private_helper"},
+			typeDefs:   map[string]string{"Shape": "Circle"},
+		},
 	}
 
 	p := &TreeSitterParser{}

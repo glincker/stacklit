@@ -61,6 +61,8 @@ var tsLangMap = map[string]func(root *gts.Node, lang *gts.Language, src []byte, 
 	"yaml":       extractYAML,
 	"toml":       extractTOML,
 	"graphql":    extractGraphQL,
+	"powershell": extractPowerShell,
+	"gleam":      extractGleam,
 }
 
 // skipExts are file extensions handled by other parsers or that we skip.
