@@ -24,7 +24,7 @@ Key facts:
 - [Skill for agents](https://github.com/glincker/stacklit/blob/master/skills/stacklit/SKILL.md)
 
 ## Optional
-- [Full docs in one file](https://github.com/glincker/stacklit/blob/master/llms-full.txt)
+- [Full docs in one file](https://stacklit.glinr.com/llms-full.txt)
 - [Comparison](https://github.com/glincker/stacklit/blob/master/docs/COMPARISON.md)
 - [Roadmap](https://github.com/glincker/stacklit/blob/master/docs/ROADMAP.md)
 - [Changelog](https://github.com/glincker/stacklit/blob/master/CHANGELOG.md)
@@ -838,10 +838,10 @@ curl -fsSL https://raw.githubusercontent.com/glincker/stacklit/master/scripts/in
 
 ## Docker
 
-The repository has a multi-stage `Dockerfile` (distroless final image, entrypoint `stacklit`). Build it yourself:
+The repository has a multi-stage `docker/Dockerfile` (distroless final image, entrypoint `stacklit`). Build it yourself:
 
 ```bash
-docker build -t stacklit .
+docker build -f docker/Dockerfile -t stacklit .
 docker run --rm -v "$PWD":/work stacklit init
 ```
 

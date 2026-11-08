@@ -30,7 +30,7 @@ CI runs vet and tests on Linux, macOS and Windows. Node is only needed for `npm/
 | `skills/stacklit/SKILL.md` | the skill; `internal/setup/skill/SKILL.md` and `plugins/stacklit/skills/stacklit/SKILL.md` must match it |
 | `plugins/stacklit`, `.claude-plugin/` | Claude Code plugin and marketplace |
 | `server.json`, `npm/` | MCP registry entry, npm wrapper |
-| `scripts/` | install.sh, llms-full.txt generator, sync helpers |
+| `scripts/` | install.sh, the llms-full.txt generator, sync helpers |
 | `docs/ARCHITECTURE.md` | pipeline detail |
 
 ## Rules
@@ -47,7 +47,7 @@ CI runs vet and tests on Linux, macOS and Windows. Node is only needed for `npm/
 ## Keeping copies in sync
 
 - Skill copies: `scripts/sync-plugin-skill.sh --check` (run without `--check` to fix).
-- `llms.txt` is hand written. `llms-full.txt` is generated: `sh scripts/gen-llms-full.sh`, and `--check` fails if it is stale.
+- `llms.txt` is hand written. `site/public/llms-full.txt` is generated: `sh scripts/gen-llms-full.sh`, and `--check` fails if it is stale.
 
 ## Using Stacklit on this repo
 

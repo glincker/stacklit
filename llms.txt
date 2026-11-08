@@ -24,7 +24,7 @@ Key facts:
 - [Skill for agents](https://github.com/glincker/stacklit/blob/master/skills/stacklit/SKILL.md)
 
 ## Optional
-- [Full docs in one file](https://github.com/glincker/stacklit/blob/master/llms-full.txt)
+- [Full docs in one file](https://stacklit.glinr.com/llms-full.txt)
 - [Comparison](https://github.com/glincker/stacklit/blob/master/docs/COMPARISON.md)
 - [Roadmap](https://github.com/glincker/stacklit/blob/master/docs/ROADMAP.md)
 - [Changelog](https://github.com/glincker/stacklit/blob/master/CHANGELOG.md)

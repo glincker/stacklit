@@ -59,10 +59,10 @@ curl -fsSL https://raw.githubusercontent.com/glincker/stacklit/master/scripts/in
 
 ## Docker
 
-The repository has a multi-stage `Dockerfile` (distroless final image, entrypoint `stacklit`). Build it yourself:
+The repository has a multi-stage `docker/Dockerfile` (distroless final image, entrypoint `stacklit`). Build it yourself:
 
 ```bash
-docker build -t stacklit .
+docker build -f docker/Dockerfile --build-arg VERSION=0.5.0 -t stacklit .
 docker run --rm -v "$PWD":/work stacklit init
 ```
 

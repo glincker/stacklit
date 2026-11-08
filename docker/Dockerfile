@@ -1,4 +1,4 @@
-# Build from source: docker build -t stacklit .
+# Build from source: docker build -f docker/Dockerfile --build-arg VERSION=0.5.0 -t stacklit .
 # Run on a repo:    docker run --rm -v "$PWD":/work ghcr.io/glincker/stacklit init
 FROM golang:1.25-alpine AS build
 ARG VERSION=dev
