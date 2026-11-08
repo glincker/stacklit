@@ -1,33 +1,60 @@
 package main
 
 import (
-	"encoding/json"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strings"
 )
 
-// queryDoc is the part of `stacklit query --json` the harness reads. The tool
-// prints files grouped and sorted by path; it exposes no per-file relevance
-// score, so relevance order cannot be read back from the output.
+// queryDoc is the printed `stacklit query` text, parsed back into files and
+// symbol lines. The harness reads the text, not --json, because the agent sees
+// the text and the two are cut to the same token budget at different sizes.
 type queryDoc struct {
 	Files []struct {
-		File    string `json:"file"`
-		Symbols []struct {
-			Name string `json:"name"`
-			Sig  string `json:"sig"`
-			Doc  string `json:"doc"`
-		} `json:"symbols"`
-	} `json:"files"`
+		File    string
+		Symbols []struct{ Name, Sig, Doc string }
+	}
+}
+
+var (
+	rankPrefix = regexp.MustCompile(`^\d+\. `)
+	symLine    = regexp.MustCompile(`^  \d+(?:-\d+)? (.*)$`)
+)
+
+// parseQueryText reads files in printed order. Unindented lines are file paths
+// (optionally "N. " ranked) except the title, head and bracketed notice lines.
+func parseQueryText(out []byte) queryDoc {
+	var doc queryDoc
+	for i, line := range strings.Split(string(out), "\n") {
+		switch {
+		case line == "" || i == 0:
+		case strings.HasPrefix(line, "      "):
+		case symLine.MatchString(line):
+			if n := len(doc.Files); n > 0 {
+				label, docText, _ := strings.Cut(symLine.FindStringSubmatch(line)[1], "  // ")
+				doc.Files[n-1].Symbols = append(doc.Files[n-1].Symbols, struct{ Name, Sig, Doc string }{label, label, docText})
+			}
+		case line[0] == '[' || strings.HasPrefix(line, "best match: ") || strings.Contains(line, " seeds, ") || line[0] == ' ':
+		default:
+			doc.Files = append(doc.Files, struct {
+				File    string
+				Symbols []struct{ Name, Sig, Doc string }
+			}{File: rankPrefix.ReplaceAllString(line, "")})
+		}
+	}
+	return doc
 }
 
 // RunQuery is the graph query arm: one `stacklit query --budget` call per
 // task with the question text verbatim, no derive map, no follow-up lookups.
-// It returns two results from the same call: the files opened in the order the
-// tool prints them (path order), and the files opened in an order a reader
-// picks from the printed text alone (see readerOrder).
-func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, budget string, sizes RepoSizes, readCap, maxExtra int) (ArmResult, ArmResult) {
+// It returns three results: files opened in the order the tool prints them by
+// default (relevance order), files opened in the order of `--order path` (the
+// tool's behaviour before ranked output, kept for comparison), and files opened
+// in an order a reader picks from the path-ordered text alone (see readerOrder).
+func RunQuery(arm, pathArm, readerArm, binary, dir string, task Task, modules []string, budget string, sizes RepoSizes, readCap, maxExtra int) (ArmResult, ArmResult, ArmResult) {
 	tool := ArmResult{Arm: arm}
+	byPath := ArmResult{Arm: pathArm}
 	reader := ArmResult{Arm: readerArm}
 	run := func(extra ...string) []byte {
 		args := append([]string{"query", task.Question, "--budget", budget}, extra...)
@@ -36,13 +63,11 @@ func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, b
 		out, _ := cmd.Output() // no match still exits cleanly; stderr notes are not read by the agent
 		return out
 	}
-	tool.Lookup = CostOf(string(run()))
-	reader.Lookup = tool.Lookup
+	text, pathText := run(), run("--order", "path")
+	tool.Lookup, byPath.Lookup = CostOf(string(text)), CostOf(string(pathText))
+	reader.Lookup = byPath.Lookup
 
-	var doc queryDoc
-	if err := json.Unmarshal(run("--json"), &doc); err != nil {
-		doc = queryDoc{}
-	}
+	doc, pathDoc := parseQueryText(text), parseQueryText(pathText)
 	if task.Kind == "dependents" {
 		mods := map[string]bool{}
 		for _, f := range doc.Files {
@@ -53,22 +78,38 @@ func RunQuery(arm, readerArm, binary, dir string, task Task, modules []string, b
 		}
 		sort.Strings(tool.Modules)
 		gradeDependents(&tool, task, maxExtra)
-		reader.NA = true
-		return tool, reader
-	}
-
-	seen := map[string]bool{}
-	for _, f := range doc.Files {
-		if !seen[f.File] {
-			seen[f.File] = true
-			tool.Ranked = append(tool.Ranked, f.File)
+		pm := map[string]bool{}
+		for _, f := range pathDoc.Files {
+			pm[moduleOfFile(f.File, modules)] = true
 		}
+		for m := range pm {
+			byPath.Modules = append(byPath.Modules, m)
+		}
+		sort.Strings(byPath.Modules)
+		gradeDependents(&byPath, task, maxExtra)
+		reader.NA = true
+		return tool, byPath, reader
 	}
-	finishLocalization(&tool, task, sizes, readCap)
 
-	reader.Ranked = readerOrder(doc, task.Question)
+	ranked := func(d queryDoc) []string {
+		seen := map[string]bool{}
+		var out []string
+		for _, f := range d.Files {
+			if !seen[f.File] {
+				seen[f.File] = true
+				out = append(out, f.File)
+			}
+		}
+		return out
+	}
+	tool.Ranked = ranked(doc)
+	finishLocalization(&tool, task, sizes, readCap)
+	byPath.Ranked = ranked(pathDoc)
+	finishLocalization(&byPath, task, sizes, readCap)
+
+	reader.Ranked = readerOrder(pathDoc, task.Question)
 	finishLocalization(&reader, task, sizes, readCap)
-	return tool, reader
+	return tool, byPath, reader
 }
 
 // readerOrder ranks the printed files from the question and the printed text

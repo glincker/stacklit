@@ -316,7 +316,7 @@ func pairedTable(b *strings.Builder, results []RepoResult, o Opts) {
 	q := o.QueryBudgets[0]
 	pairs := [][2]string{
 		{armQueryRD(q), armBM25}, {armQueryRD(q), armGrep},
-		{armQuery(q), armBM25}, {armQuery(q), armGrep},
+		{armQuery(q), armBM25}, {armQuery(q), armGrep}, {armQuery(q), armQueryPath(q)},
 		{armStacklit, armBM25}, {armStacklit, armGrep},
 		{armBM25, armGrep},
 	}

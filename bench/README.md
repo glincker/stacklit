@@ -48,7 +48,8 @@ Token counts, success rates and confidence intervals are deterministic: re-runni
 | `bm25 top-k` | BM25 over source files, question text as the query, top 5 paths printed | yes |
 | `full dump` | Cost of putting every code file in context | yes |
 | `stacklit map+lookup` | `stacklit derive` map, then module entries from `stacklit.json` picked with hand-written terms | yes |
-| `stacklit query N` | One `stacklit query "<question>" --budget N --json` call, question verbatim, files opened in the order the tool prints them (path order; the tool prints no relevance score) | yes |
+| `stacklit query N` | One `stacklit query "<question>" --budget N` call, question verbatim, files opened in the order the tool prints them (relevance order, the default) |
+| `stacklit query N path order` | Same call with `--order path`: files alphabetical by path, the behaviour before ranked output |
 | `stacklit query N + reader order` | Same call and output, files opened in an order picked from the printed text and the question only (harness policy, not a stacklit feature) | yes |
 
 Details and the grading rules are in RESULTS.md.
