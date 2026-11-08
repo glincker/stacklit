@@ -5,8 +5,14 @@
     "url": "https://github.com/gin-gonic/gin.git",
     "ref": "v1.10.0",
     "sha": "75ccf94d605a05fe24817fc2f166f6f2959d5cea",
-    "exts": [".go"],
-    "test_markers": ["_test.go", "/testdata/", "/examples/"]
+    "exts": [
+      ".go"
+    ],
+    "test_markers": [
+      "_test.go",
+      "/testdata/",
+      "/examples/"
+    ]
   },
   {
     "name": "flask",
@@ -14,8 +20,14 @@
     "url": "https://github.com/pallets/flask.git",
     "ref": "3.1.2",
     "sha": "2c1b30d0503cfb064f1cb252e6614a06915a362a",
-    "exts": [".py"],
-    "test_markers": ["/tests/", "/test_", "/conftest.py"]
+    "exts": [
+      ".py"
+    ],
+    "test_markers": [
+      "/tests/",
+      "/test_",
+      "/conftest.py"
+    ]
   },
   {
     "name": "hono",
@@ -23,7 +35,64 @@
     "url": "https://github.com/honojs/hono.git",
     "ref": "v4.6.0",
     "sha": "73ff6c0e82d66468e28ed439481220f56ab03882",
-    "exts": [".ts", ".tsx"],
-    "test_markers": [".test.ts", ".test.tsx", ".d.ts", "/runtime_tests/", "/perf-measures/"]
+    "exts": [
+      ".ts",
+      ".tsx"
+    ],
+    "test_markers": [
+      ".test.ts",
+      ".test.tsx",
+      ".d.ts",
+      "/runtime_tests/",
+      "/perf-measures/"
+    ]
+  },
+  {
+    "name": "ripgrep",
+    "language": "Rust",
+    "url": "https://github.com/BurntSushi/ripgrep.git",
+    "ref": "14.1.1",
+    "sha": "4649aa9700619f94cf9c66876e9549d83420e16c",
+    "exts": [
+      ".rs"
+    ],
+    "test_markers": [
+      "/tests/",
+      "/benches/",
+      "/examples/",
+      "/testutil.rs"
+    ]
+  },
+  {
+    "name": "gson",
+    "language": "Java",
+    "url": "https://github.com/google/gson.git",
+    "ref": "gson-parent-2.11.0",
+    "sha": "828a97be0f8d58108b140b77df8dc76b657f4a87",
+    "exts": [
+      ".java"
+    ],
+    "test_markers": [
+      "/src/test/",
+      "/examples/",
+      "/shrinker-test/",
+      "/graal-native-image-test/",
+      "/metrics/"
+    ]
+  },
+  {
+    "name": "rack",
+    "language": "Ruby",
+    "url": "https://github.com/rack/rack.git",
+    "ref": "v3.1.8",
+    "sha": "0eabeb73b3fb590e187dacfd9a890fbb7ffb9477",
+    "exts": [
+      ".rb"
+    ],
+    "test_markers": [
+      "/test/",
+      "/spec/",
+      "/contrib/"
+    ]
   }
 ]

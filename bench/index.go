@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -113,38 +111,28 @@ func (iv *IndexView) RankModules(terms []string) []string {
 	return out
 }
 
-// StacklitResult is the outcome of answering one task from the index.
-type StacklitResult struct {
-	MapCost     Cost
-	QueryCost   Cost
-	ConfirmCost Cost
-	TopModules  []string
-	ConfirmFile string
-	Found       bool
-	DependedBy  []string
-	Precision   float64
-	Recall      float64
-}
-
-// RunStacklit answers a task from the derived map plus targeted index lookups.
-func RunStacklit(iv *IndexView, mapCost Cost, repoDir string, task Task, topN int) StacklitResult {
-	res := StacklitResult{MapCost: mapCost}
+// RunStacklit answers a task from the derived map plus targeted index
+// lookups. Localization: modules are ranked on the hand-written terms, then
+// within each of the top modules the agent opens files whose name overlaps the
+// terms (else the first non-test file listed).
+func RunStacklit(arm string, iv *IndexView, mapCost Cost, task Task, topN int, sizes RepoSizes, readCap, maxExtra int) ArmResult {
+	res := ArmResult{Arm: arm, Lookup: mapCost}
 
 	if task.Kind == "dependents" {
 		mod, ok := iv.Modules[task.Target]
 		if !ok {
+			gradeDependents(&res, task, maxExtra)
 			return res
 		}
-		res.QueryCost = iv.entryCost(task.Target)
+		res.Lookup = res.Lookup.Add(iv.entryCost(task.Target))
 		if list, ok := mod["depended_by"].([]any); ok {
 			for _, x := range list {
 				if s, ok := x.(string); ok {
-					res.DependedBy = append(res.DependedBy, s)
+					res.Modules = append(res.Modules, s)
 				}
 			}
 		}
-		res.Precision, res.Recall = precisionRecall(res.DependedBy, task.ExpectModules, true)
-		res.Found = res.Recall == 1
+		gradeDependents(&res, task, maxExtra)
 		return res
 	}
 
@@ -152,24 +140,17 @@ func RunStacklit(iv *IndexView, mapCost Cost, repoDir string, task Task, topN in
 	if len(ranked) > topN {
 		ranked = ranked[:topN]
 	}
-	res.TopModules = ranked
 	for _, m := range ranked {
-		res.QueryCost = res.QueryCost.Add(iv.entryCost(m))
-		for _, e := range task.ExpectModules {
-			if m == e || (strings.HasSuffix(e, "/") && strings.HasPrefix(m, e)) {
-				res.Found = true
-			}
-		}
+		res.Lookup = res.Lookup.Add(iv.entryCost(m))
+		res.Ranked = append(res.Ranked, filesToOpen(iv, m, task.Terms)...)
+		res.Shown = append(res.Shown, listedFiles(iv, m)...)
 	}
-	if len(ranked) > 0 {
-		res.ConfirmFile, res.ConfirmCost = confirmRead(iv, repoDir, ranked[0], task.Terms)
-	}
+	finishLocalization(&res, task, sizes, readCap)
 	return res
 }
 
-// confirmRead picks one file of the best module (name overlap with the terms,
-// else the first non-test file) and measures reading it in full.
-func confirmRead(iv *IndexView, repoDir, module string, terms []string) (string, Cost) {
+// filesToOpen lists the files of one module an agent would open first.
+func filesToOpen(iv *IndexView, module string, terms []string) []string {
 	list, _ := iv.Modules[module]["file_list"].([]any)
 	var cands []string
 	for _, x := range list {
@@ -179,28 +160,39 @@ func confirmRead(iv *IndexView, repoDir, module string, terms []string) (string,
 		}
 		cands = append(cands, s)
 	}
-	if len(cands) == 0 {
-		return "", Cost{}
-	}
-	pick := cands[0]
-	for _, c := range cands {
-		lc := strings.ToLower(strings.TrimSuffix(c, path.Ext(c)))
-		for _, t := range terms {
-			if strings.Contains(lc, strings.ToLower(t)) {
-				pick = c
-				goto done
-			}
-		}
-	}
-done:
 	dir := module
 	if module == "root" {
 		dir = ""
 	}
-	full := filepath.Join(repoDir, filepath.FromSlash(dir), pick)
-	b, err := os.ReadFile(full)
-	if err != nil {
-		return fmt.Sprintf("%s (missing)", pick), Cost{}
+	var picked []string
+	for _, c := range cands {
+		lc := strings.ToLower(strings.TrimSuffix(c, path.Ext(c)))
+		for _, t := range terms {
+			if strings.Contains(lc, strings.ToLower(t)) {
+				picked = append(picked, path.Join(dir, c))
+				break
+			}
+		}
 	}
-	return path.Join(dir, pick), CostOf(string(b))
+	if len(picked) == 0 && len(cands) > 0 {
+		picked = append(picked, path.Join(dir, cands[0]))
+	}
+	return picked
+}
+
+// listedFiles are the file names the module entry prints (the index keeps at
+// most max_files names per module, so large modules show only a prefix).
+func listedFiles(iv *IndexView, module string) []string {
+	list, _ := iv.Modules[module]["file_list"].([]any)
+	dir := module
+	if module == "root" {
+		dir = ""
+	}
+	out := []string{}
+	for _, x := range list {
+		if s, _ := x.(string); s != "" {
+			out = append(out, path.Join(dir, s))
+		}
+	}
+	return out
 }
