@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "3624ab62e4c7294c919e9fdb06d1d456716cfa7ea9b272639223d95ffa9a4917",
+  "merkle_hash": "135b30e24f85aa285d3ecaf0b84fa7c9506075a92bd81c83b15f508489a5e2a6",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -69,8 +69,8 @@
         "lines": 17
       },
       "go": {
-        "files": 264,
-        "lines": 39034
+        "files": 272,
+        "lines": 40740
       },
       "graphql": {
         "files": 1,
@@ -215,8 +215,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 402,
-    "total_lines": 42735
+    "total_files": 410,
+    "total_lines": 44441
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -392,8 +392,8 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 26,
-      "lines": 2261,
+      "files": 28,
+      "lines": 2375,
       "file_list": [
         "errors.go",
         "root.go",
@@ -406,6 +406,8 @@
         "export.go",
         "generate.go",
         "graphcmds.go",
+        "guide.go",
+        "guide_test.go",
         "hook.go",
         "ingest.go",
         "ingest_ext.go",
@@ -466,7 +468,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 693,
+      "lines": 696,
       "file_list": [
         "scan.go",
         "config.go",
@@ -720,7 +722,7 @@
       "purpose": "Git integration",
       "language": "go",
       "files": 9,
-      "lines": 692,
+      "lines": 717,
       "file_list": [
         "activity.go",
         "refresh_hooks.go",
@@ -894,11 +896,12 @@
     "internal/mcp": {
       "purpose": "MCP server for AI agents",
       "language": "go",
-      "files": 5,
-      "lines": 647,
+      "files": 6,
+      "lines": 700,
       "file_list": [
         "server.go",
         "minimal.go",
+        "instructions.go",
         "graph_tools.go",
         "graph_tools_test.go",
         "profile_test.go"
@@ -908,7 +911,8 @@
         "StartServerProfile(profile string) error",
         "NewServer(profile string) (*sdkmcp.Server, error)",
         "ProfileFull",
-        "ProfileMinimal"
+        "ProfileMinimal",
+        "Instructions(profile string) string"
       ],
       "depends_on": [
         "internal/config",
@@ -1208,37 +1212,44 @@
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 13,
-      "lines": 1851,
+      "files": 18,
+      "lines": 3362,
       "file_list": [
+        "crawlguard.go",
         "mcp.go",
         "digest.go",
         "tools.go",
+        "guide.go",
         "claude.go",
         "report.go",
         "block.go",
         "session.go",
         "setup.go",
+        "crawldetect.go",
         "hookcmd.go",
         "runner.go",
+        "crawl_test.go",
         "git.go",
+        "guide_test.go",
         "session_test.go",
         "setup_test.go"
       ],
       "exports": [
-        "type MCPStyle",
-        "StyleMCPServers",
-        "StyleVSCode",
-        "StyleZed",
-        "StyleOpenCode",
-        "StyleCrush",
-        "StyleCodexTOML",
-        "StyleContinue",
-        "Tokens(s string) int",
-        "DefaultSteering"
+        "CrawlOff",
+        "CrawlNudge",
+        "CrawlRedirect",
+        "CrawlModes() []string",
+        "DetectBash(cmd string, root string) (Crawl, bool)",
+        "DetectGlob(pattern string, dir string, root string) (Crawl, bool)",
+        "DetectSubagent(prompt string) (Crawl, bool)",
+        "DetectRead(file string) (Crawl, bool)",
+        "DetectCrawl(in hookInput, root string) (Crawl, bool)",
+        "CrawlMode(root string, installed string) string"
       ],
       "type_defs": {
-        "ClaudeOptions": "PreToolHook bool, SessionHook bool, RefreshHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
+        "ClaudeOptions": "PreToolHook bool, SessionHook bool, RefreshHook bool, CrawlGuard string, Skill bool, GlobalScope bool, UninstallAll bool",
+        "Crawl": "Kind string, Ident string, Query string, Command string",
+        "GuideCommand": "Command string, Use string",
         "MCP": "Path string, Style MCPStyle, Global bool",
         "Options": "Root string, Tools []Tool, Index *schema.Index, Uninstall bool, NoMCP bool, NoGitHook bool, Global bool, Claude ClaudeOptions",
         "ReportRow": "Item string, Tokens int, Note string",
@@ -1833,6 +1844,13 @@
       "GOMEMLIMIT",
       "STACKLIT_BIN",
       "STACKLIT_CACHE_DIR",
+      "STACKLIT_CRAWL_FRESH_TTL",
+      "STACKLIT_CRAWL_GUARD",
+      "STACKLIT_CRAWL_MAX_DEPTH",
+      "STACKLIT_CRAWL_POINTER_MAX_BYTES",
+      "STACKLIT_CRAWL_PROMPT_CHARS",
+      "STACKLIT_CRAWL_REDIRECTS",
+      "STACKLIT_CRAWL_STATE_DAYS",
       "STACKLIT_DATA_RUN_LINES",
       "STACKLIT_DIGEST_TOKENS",
       "STACKLIT_GIT",
@@ -1840,6 +1858,7 @@
       "STACKLIT_GRAPH_MAX_PARSE_BYTES",
       "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_INSTRUCTIONS_TOKENS",
       "STACKLIT_LOCK_HELPER",
       "STACKLIT_LOCK_STALE_SEC",
       "STACKLIT_MAP_ICONS",
