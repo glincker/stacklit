@@ -57,6 +57,70 @@ This is deliberately approximate. It works from import text, not from a type-che
 
 Determinism is a design goal: files are walked in sorted order, maps are written with stable key order, and paths are normalized to forward slashes. The same source tree should produce the same index on any OS, which is what makes it safe to commit and to diff.
 
+## Symbol graph extraction
+
+`internal/graph` turns source files into symbols (functions, methods, types) and edges between them. Go uses the standard library AST. Every other language goes through one shared tree-sitter driver (`ts_driver.go`) that walks the parse tree once and is configured by a small table per language (`ts_lang_core.go`, `ts_lang_more.go`): which node types define symbols, which are calls, how imports and base types are read. Each symbol carries start and end line, a one-line signature, the first sentence of its doc comment and its visibility.
+
+Memory is bounded. Concurrent parses share a weighted gate (`STACKLIT_PARSE_MEMORY_MB`, default 512), and a file larger than `STACKLIT_GRAPH_MAX_PARSE_BYTES` (default 192 KiB) skips tree-sitter. Python, TypeScript/JavaScript, Rust and Java then fall back to the older line scanner; other languages keep only their file node. The line scanner also takes over when a Python tree contradicts the file's indentation, because the grammar runtime can silently drop a block. Test files are skipped unless `--include-tests` or `STACKLIT_GRAPH_INCLUDE_TESTS=1` is set.
+
+### Edge kinds by language
+
+`def` means symbols with spans, signature, doc and visibility. `typed` means receiver types are inferred from annotated parameters, typed locals, typed fields or constructor assignments, so `repo.find()` links to `Repo.find` instead of every `find`.
+
+| Language | def | calls | imports | inherits | implements | typed |
+| --- | --- | --- | --- | --- | --- | --- |
+| Go | yes | yes | yes | embedding | structural (inferred) | yes |
+| Python | yes | yes | yes | yes | no | yes |
+| TypeScript, JavaScript | yes | yes | yes (import, require, re-export) | yes | yes (TypeScript) | yes |
+| Rust | yes | yes | yes (use, mod) | trait bounds | impl Trait for | yes |
+| Java | yes | yes | yes | yes | yes | yes |
+| C# | yes | yes | yes (using) | yes | by position and I-prefix | yes |
+| Kotlin | yes | yes | yes | yes | yes | yes |
+| Swift | yes | yes | module imports | yes | by position | yes |
+| PHP | yes | yes | yes (use) | yes | yes | yes |
+| Ruby | yes | yes | yes (require, require_relative) | yes | include, extend | yes |
+| C | yes | yes | yes (#include, header and source pair) | no | no | yes |
+| C++ | yes | yes | yes (#include) | yes | no | yes |
+| Scala | yes | yes | yes | yes | yes | yes |
+| Dart | yes | yes | yes | yes | with, implements | yes |
+| Elixir | yes | yes | yes (alias, import, use, require) | no | no | no |
+| Lua | yes | yes | yes (require) | no | no | no |
+| Zig | yes | yes | yes (@import) | no | no | no |
+| Haskell | yes | yes | yes | no | no | no |
+| OCaml | yes | yes | yes (open, qualified paths) | no | no | no |
+| Solidity | yes | yes | yes | yes | by I-prefix | yes |
+
+Where a clause lists bases without saying which are classes (C#, Swift, Scala, Solidity), the first non-interface name is `inherits` and the rest, or any name shaped like `IName`, are `implements`.
+
+### Call resolution and confidence
+
+Resolution is one pass over hash maps built once, so cost grows linearly with references. A call is resolved in this order, and the first rule that matches wins:
+
+1. Same file, including the enclosing type's own methods.
+2. Names imported from a file in the repo, then the package or namespace of the file.
+3. Wildcard and namespace imports, in sorted order so output is stable.
+4. A typed receiver (`@Type`), then that type's ancestors, then (for `this`, `self`, `super`) the enclosing type and its ancestors.
+5. A qualifier bound to an import (`mod.fn`, `Alias.method`).
+6. Last resort, a name guess across the repo.
+
+A receiver whose type is known but lives outside the repo (`String`, a library class) links to nothing, rather than to a project method with the same name.
+
+| Score | Confidence | Meaning |
+| --- | --- | --- |
+| 1.00 | EXTRACTED | Same-file definition, or a unique type in the same file |
+| 0.95 | EXTRACTED | Imported name that resolves to one definition |
+| 0.90 | EXTRACTED | Qualified through an import, a wildcard import, a typed receiver or `this` |
+| 0.85 | EXTRACTED | Static call on a project type |
+| 0.80 | EXTRACTED | Method found on an ancestor type, or a member of a bound module whose owner name differs |
+| 0.60 | INFERRED | Base type found only by unique name |
+| 0.55 | INFERRED | Unknown receiver, one method of that name in the repo |
+| 0.50 | INFERRED | Unqualified name, one function of that name in the repo |
+| 0.45 | INFERRED | Receiver type is in the repo but no method was found on it |
+| 0.25 to 0.50 | INFERRED | Several candidates (at most four), the score is split by candidate count |
+| 0.30 | INFERRED | Generic names such as `get` or `close` with an unknown receiver |
+
+Prototype-only declarations (C and C++ headers) are dropped as call targets when a definition of the same name is also a candidate.
+
 ## Staleness detection
 
 `ComputeMerkle` hashes the sorted list of source files and their contents into a single root hash, stored as `merkle_hash`. `stacklit diff` recomputes it and compares. It covers only indexed source files, so edits to docs or configs do not make the index look stale.
