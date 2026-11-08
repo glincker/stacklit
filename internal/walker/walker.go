@@ -2,6 +2,8 @@
 // source files worth indexing from a given root directory.
 package walker
 
+import "strings"
+
 // sourceExtensions is the set of file extensions considered indexable source.
 var sourceExtensions = map[string]bool{
 	".go":         true,
@@ -112,6 +114,20 @@ var alwaysIgnoreDirs = map[string]bool{
 	"coverage":     true,
 	".cache":       true,
 	".turbo":       true,
+	// Agent and editor state: never source, often large, and rewritten by tools.
+	".claude":       true,
+	".agents":       true,
+	".cursor":       true,
+	".codex":        true,
+	".idea":         true,
+	".vscode":       true,
+	".svelte-kit":   true,
+	".parcel-cache": true,
+}
+
+// isToolStateDir also covers prefixed families such as .aider.chat.history.
+func isToolStateDir(name string) bool {
+	return alwaysIgnoreDirs[name] || strings.HasPrefix(name, ".aider")
 }
 
 // Walk traverses root and returns a sorted slice of relative paths for all

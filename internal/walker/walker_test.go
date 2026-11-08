@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/glincker/stacklit/internal/walker"
@@ -165,5 +166,30 @@ func TestWalkIncludesBuildFilesAndSkipsLockfiles(t *testing.T) {
 		if got[bad] {
 			t.Errorf("%s should be skipped", bad)
 		}
+	}
+}
+
+func TestToolStateDirsIgnored(t *testing.T) {
+	root := t.TempDir()
+	for _, rel := range []string{".claude/a.ts", ".cursor/b.ts", ".aider.cache/c.py", "src/d.ts", ".github/e.yml"} {
+		p := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte("x\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	files, err := walker.Walk(root, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range files {
+		if strings.HasPrefix(f, ".claude") || strings.HasPrefix(f, ".cursor") || strings.HasPrefix(f, ".aider") {
+			t.Errorf("tool-state file indexed: %s", f)
+		}
+	}
+	if len(files) == 0 {
+		t.Fatal("source files must be kept")
 	}
 }
