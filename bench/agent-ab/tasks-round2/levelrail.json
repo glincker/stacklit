@@ -1,0 +1,280 @@
+[
+ {
+  "id": "lr2-01",
+  "kind": "locate",
+  "question": "Where is the generator for six digit one-time passcodes that change every 30 seconds (the RFC 6238 algorithm) implemented?",
+  "all_of": [],
+  "any_of": [
+   "internal/totp/totp.go"
+  ],
+  "rubric": "internal/totp/totp.go holds the RFC 6238 generator.",
+  "check": [
+   {
+    "path": "internal/totp/totp.go",
+    "regex": "6238"
+   }
+  ]
+ },
+ {
+  "id": "lr2-02",
+  "kind": "locate",
+  "question": "Where does the platform keep a reserve file on disk, so that its SQLite database can still commit when the volume is completely full?",
+  "all_of": [],
+  "any_of": [
+   "internal/diskguard/diskguard.go"
+  ],
+  "rubric": "The reserve file lives in the diskguard package.",
+  "check": [
+   {
+    "path": "internal/diskguard/diskguard.go",
+    "regex": "(?i)reserve file"
+   }
+  ]
+ },
+ {
+  "id": "lr2-03",
+  "kind": "locate",
+  "question": "Where is the code that masks secrets in a stream of log lines even when one secret is split across two consecutive lines?",
+  "all_of": [],
+  "any_of": [
+   "internal/secretmask/linecarry.go"
+  ],
+  "rubric": "LineCarry in secretmask holds back trailing lines.",
+  "check": [
+   {
+    "path": "internal/secretmask/linecarry.go",
+    "regex": "type LineCarry"
+   }
+  ]
+ },
+ {
+  "id": "lr2-04",
+  "kind": "trace",
+  "question": "An operator runs the CLI command that prints the status of the outbound heartbeat ping. Name the files on that path: the CLI command, the API client method, the HTTP handler, and the service method that builds the status.",
+  "all_of": [
+   "cmd/levelrail-cli/settings_heartbeat.go",
+   "internal/apiclient/settings_heartbeat.go",
+   "internal/api/settings_heartbeat.go",
+   "internal/heartbeat/service.go"
+  ],
+  "any_of": [],
+  "rubric": "CLI settings heartbeat show, apiclient GetHeartbeat, api handler calling heartbeatSvc.Status, heartbeat.Service.Status.",
+  "check": [
+   {
+    "path": "cmd/levelrail-cli/settings_heartbeat.go",
+    "regex": "settings heartbeat show"
+   },
+   {
+    "path": "internal/apiclient/settings_heartbeat.go",
+    "regex": "func \\(c \\*Client\\) GetHeartbeat"
+   },
+   {
+    "path": "internal/api/settings_heartbeat.go",
+    "regex": "heartbeatSvc\\.Status"
+   },
+   {
+    "path": "internal/heartbeat/service.go",
+    "regex": "func \\(s \\*Service\\) Status"
+   }
+  ]
+ },
+ {
+  "id": "lr2-05",
+  "kind": "trace",
+  "question": "An external cron job calls a monitor's public heartbeat URL to say it is alive. Which three files take part: the HTTP handler that receives the call, the monitor engine method that evaluates it, and the store method that records it?",
+  "all_of": [
+   "internal/api/monitor_heartbeat.go",
+   "internal/monitor/heartbeat.go",
+   "internal/store/monitor_heartbeats.go"
+  ],
+  "any_of": [],
+  "rubric": "api handleHeartbeatPing, monitor.Service.Ping, store.RecordHeartbeat.",
+  "check": [
+   {
+    "path": "internal/api/monitor_heartbeat.go",
+    "regex": "func \\(rt \\*Router\\) handleHeartbeatPing"
+   },
+   {
+    "path": "internal/monitor/heartbeat.go",
+    "regex": "func \\(s \\*Service\\) Ping"
+   },
+   {
+    "path": "internal/store/monitor_heartbeats.go",
+    "regex": "func \\(db \\*DB\\) RecordHeartbeat"
+   }
+  ]
+ },
+ {
+  "id": "lr2-06",
+  "kind": "trace",
+  "question": "Which two dashboard (web) files draw the settings card for the outbound heartbeat ping and hold the query hooks that read and update it?",
+  "all_of": [
+   "web/src/components/settings/HeartbeatCard.tsx",
+   "web/src/queries/heartbeat.ts"
+  ],
+  "any_of": [],
+  "rubric": "HeartbeatCard and queries/heartbeat.",
+  "check": [
+   {
+    "path": "web/src/components/settings/HeartbeatCard.tsx",
+    "regex": "queries/heartbeat"
+   },
+   {
+    "path": "web/src/queries/heartbeat.ts",
+    "regex": "useUpdateHeartbeat"
+   }
+  ]
+ },
+ {
+  "id": "lr2-07",
+  "kind": "impact",
+  "question": "List the Go source files, tests excluded, that import the internal/diskguard package.",
+  "all_of": [
+   "cmd/levelrail/boot_storage_settings.go",
+   "cmd/levelrail/diskguard_wiring.go",
+   "internal/api/backups.go",
+   "internal/api/control_plane_backups.go",
+   "internal/api/deploys.go",
+   "internal/api/diagnose_stuck.go",
+   "internal/api/disk_history.go",
+   "internal/api/resilience_disk.go",
+   "internal/api/router.go",
+   "internal/apiclient/disk_resilience.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these ten files import internal/diskguard outside tests.",
+  "check": [
+   {
+    "path": "cmd/levelrail/boot_storage_settings.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "cmd/levelrail/diskguard_wiring.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/backups.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/control_plane_backups.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/deploys.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/diagnose_stuck.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/disk_history.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/resilience_disk.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/api/router.go",
+    "regex": "internal/diskguard\""
+   },
+   {
+    "path": "internal/apiclient/disk_resilience.go",
+    "regex": "internal/diskguard\""
+   }
+  ],
+  "verify": {
+   "include": [
+    ".go"
+   ],
+   "pattern": "/internal/diskguard\"",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "lr2-08",
+  "kind": "impact",
+  "question": "Which Go files outside the tests import the internal/tokenhash package?",
+  "all_of": [
+   "internal/api/auth.go",
+   "internal/api/gate_settings.go",
+   "internal/api/git_push_http.go",
+   "internal/api/git_push_remote.go",
+   "internal/desktopmode/token.go",
+   "internal/models/apikey.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these six files import internal/tokenhash outside tests.",
+  "check": [
+   {
+    "path": "internal/api/auth.go",
+    "regex": "internal/tokenhash\""
+   },
+   {
+    "path": "internal/api/gate_settings.go",
+    "regex": "internal/tokenhash\""
+   },
+   {
+    "path": "internal/api/git_push_http.go",
+    "regex": "internal/tokenhash\""
+   },
+   {
+    "path": "internal/api/git_push_remote.go",
+    "regex": "internal/tokenhash\""
+   },
+   {
+    "path": "internal/desktopmode/token.go",
+    "regex": "internal/tokenhash\""
+   },
+   {
+    "path": "internal/models/apikey.go",
+    "regex": "internal/tokenhash\""
+   }
+  ],
+  "verify": {
+   "include": [
+    ".go"
+   ],
+   "pattern": "/internal/tokenhash\"",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "lr2-09",
+  "kind": "add",
+  "question": "I want to add a new numbered SQL migration for the control plane database. Which Go file embeds and applies the migrations in order, and which directory does the new .sql file go in?",
+  "all_of": [
+   "internal/store/migrate.go"
+  ],
+  "any_of": [
+   "internal/store/migrations/"
+  ],
+  "rubric": "migrate.go embeds migrations/*.sql; new file in internal/store/migrations.",
+  "check": [
+   {
+    "path": "internal/store/migrate.go",
+    "regex": "go:embed migrations/\\*\\.sql"
+   }
+  ]
+ },
+ {
+  "id": "lr2-10",
+  "kind": "add",
+  "question": "I want to put a new settings card on the dashboard page where the heartbeat card appears. Which route file lists the cards on that page, and in which directory does a new card component belong?",
+  "all_of": [
+   "web/src/routes/settings/notification-channels.tsx"
+  ],
+  "any_of": [
+   "web/src/components/settings/"
+  ],
+  "rubric": "The notification-channels route renders HeartbeatCard; cards live in components/settings.",
+  "check": [
+   {
+    "path": "web/src/routes/settings/notification-channels.tsx",
+    "regex": "<HeartbeatCard"
+   }
+  ]
+ }
+]

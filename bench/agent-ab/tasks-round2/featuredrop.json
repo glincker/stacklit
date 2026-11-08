@@ -1,0 +1,274 @@
+[
+ {
+  "id": "fd2-01",
+  "kind": "locate",
+  "question": "Where does the library build an RSS feed from the feature manifest?",
+  "all_of": [],
+  "any_of": [
+   "src/rss.ts"
+  ],
+  "rubric": "generateRSS in src/rss.ts.",
+  "check": [
+   {
+    "path": "src/rss.ts",
+    "regex": "export function generateRSS"
+   }
+  ]
+ },
+ {
+  "id": "fd2-02",
+  "kind": "locate",
+  "question": "Where is the code that orders features so one that depends on another comes after it, and that detects dependency cycles?",
+  "all_of": [],
+  "any_of": [
+   "src/dependencies.ts"
+  ],
+  "rubric": "dependencies.ts.",
+  "check": [
+   {
+    "path": "src/dependencies.ts",
+    "regex": "export function hasDependencyCycle"
+   }
+  ]
+ },
+ {
+  "id": "fd2-03",
+  "kind": "locate",
+  "question": "Where does the library measure gzip size to check that a built bundle stays inside a budget?",
+  "all_of": [],
+  "any_of": [
+   "src/size-budget.ts"
+  ],
+  "rubric": "size-budget.ts.",
+  "check": [
+   {
+    "path": "src/size-budget.ts",
+    "regex": "gzipSync"
+   }
+  ]
+ },
+ {
+  "id": "fd2-04",
+  "kind": "trace",
+  "question": "Which three files make up the onboarding checklist in the React layer: the component, the hook, and the shared registry both use?",
+  "all_of": [
+   "src/react/components/checklist.tsx",
+   "src/react/hooks/use-checklist.ts",
+   "src/react/checklist-registry.ts"
+  ],
+  "any_of": [],
+  "rubric": "checklist component, use-checklist hook, checklist-registry.",
+  "check": [
+   {
+    "path": "src/react/components/checklist.tsx",
+    "regex": "checklist-registry"
+   },
+   {
+    "path": "src/react/hooks/use-checklist.ts",
+    "regex": "checklist-registry"
+   }
+  ]
+ },
+ {
+  "id": "fd2-05",
+  "kind": "trace",
+  "question": "Which three files implement the feature request flow in the React layer: the button, the form, and the store they share?",
+  "all_of": [
+   "src/react/components/feature-request-button.tsx",
+   "src/react/components/feature-request-form.tsx",
+   "src/react/feature-request-store.ts"
+  ],
+  "any_of": [],
+  "rubric": "feature-request button, form and store.",
+  "check": [
+   {
+    "path": "src/react/components/feature-request-button.tsx",
+    "regex": "feature-request-store"
+   },
+   {
+    "path": "src/react/components/feature-request-form.tsx",
+    "regex": "feature-request-store"
+   }
+  ]
+ },
+ {
+  "id": "fd2-06",
+  "kind": "trace",
+  "question": "Which three files in the engine folder score how well a feature is adopted, track what users do with features, and choose when to show an announcement?",
+  "all_of": [
+   "src/engine/adoption-scorer.ts",
+   "src/engine/behavior-tracker.ts",
+   "src/engine/timing-optimizer.ts"
+  ],
+  "any_of": [],
+  "rubric": "adoption-scorer, behavior-tracker, timing-optimizer.",
+  "check": [
+   {
+    "path": "src/engine/adoption-scorer.ts",
+    "regex": "(?i)adoption"
+   },
+   {
+    "path": "src/engine/behavior-tracker.ts",
+    "regex": "(?i)interaction"
+   },
+   {
+    "path": "src/engine/timing-optimizer.ts",
+    "regex": "(?i)timing"
+   }
+  ]
+ },
+ {
+  "id": "fd2-07",
+  "kind": "impact",
+  "question": "Which non-test files import the markdown module, src/markdown.ts?",
+  "all_of": [
+   "src/react/components/announcement-modal.tsx",
+   "src/react/components/banner.tsx",
+   "src/react/components/changelog-page.tsx",
+   "src/react/components/changelog-widget.tsx",
+   "src/react/components/smart-announcement.tsx",
+   "src/react/components/spotlight.tsx",
+   "src/react/components/toast.tsx",
+   "src/rss.ts",
+   "src/vue/components/banner.ts",
+   "src/vue/components/changelog-widget.ts",
+   "src/vue/components/spotlight.ts",
+   "src/vue/components/toast.ts"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these twelve files import src/markdown.ts.",
+  "check": [
+   {
+    "path": "src/react/components/announcement-modal.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/banner.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/changelog-page.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/changelog-widget.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/smart-announcement.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/spotlight.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/react/components/toast.tsx",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/rss.ts",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/vue/components/banner.ts",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/vue/components/changelog-widget.ts",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/vue/components/spotlight.ts",
+    "regex": "markdown"
+   },
+   {
+    "path": "src/vue/components/toast.ts",
+    "regex": "markdown"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".ts",
+    ".tsx"
+   ],
+   "pattern": "from\\s+[\"'](\\./|(\\.\\./)+)markdown(\\.js)?[\"']",
+   "exclude_tests": true,
+   "exclude_regex": "^(packages|apps|examples|registry)/"
+  }
+ },
+ {
+  "id": "fd2-08",
+  "kind": "impact",
+  "question": "Which non-test files import the i18n module, src/i18n.ts?",
+  "all_of": [
+   "src/react/components/changelog-page.tsx",
+   "src/react/components/changelog-widget.tsx",
+   "src/react/context.ts",
+   "src/react/provider.tsx"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these four files import src/i18n.ts.",
+  "check": [
+   {
+    "path": "src/react/components/changelog-page.tsx",
+    "regex": "i18n"
+   },
+   {
+    "path": "src/react/components/changelog-widget.tsx",
+    "regex": "i18n"
+   },
+   {
+    "path": "src/react/context.ts",
+    "regex": "i18n"
+   },
+   {
+    "path": "src/react/provider.tsx",
+    "regex": "i18n"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".ts",
+    ".tsx"
+   ],
+   "pattern": "from\\s+[\"'](\\./|(\\.\\./)+)i18n(\\.js)?[\"']",
+   "exclude_tests": true,
+   "exclude_regex": "^(packages|apps|examples|registry)/"
+  }
+ },
+ {
+  "id": "fd2-09",
+  "kind": "add",
+  "question": "I want to add a new announcement style in React, like the toast. Where does the component file go, and which file must re-export it so library users can import it?",
+  "all_of": [
+   "src/react/index.ts"
+  ],
+  "any_of": [
+   "src/react/components/"
+  ],
+  "rubric": "New component in src/react/components, exported from src/react/index.ts.",
+  "check": [
+   {
+    "path": "src/react/index.ts",
+    "regex": "components/toast"
+   }
+  ]
+ },
+ {
+  "id": "fd2-10",
+  "kind": "add",
+  "question": "I want to add a new command to the command line tool, next to generate-rss. Which file parses the arguments and dispatches each command?",
+  "all_of": [
+   "src/cli.ts"
+  ],
+  "any_of": [],
+  "rubric": "src/cli.ts dispatches by args.command.",
+  "check": [
+   {
+    "path": "src/cli.ts",
+    "regex": "args\\.command === \"generate-rss\""
+   }
+  ]
+ }
+]

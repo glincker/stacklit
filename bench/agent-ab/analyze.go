@@ -97,6 +97,7 @@ type rate struct {
 type scope struct {
 	Name           string           `json:"name"`
 	Arm            string           `json:"arm"`
+	Base           string           `json:"base"` // the arm it is compared with; the Correct maps key it as "control"
 	Pairs          int              `json:"n_pairs"`
 	Compare        []cmp            `json:"comparisons"`
 	Correct        map[string]rate  `json:"correctness"`
@@ -149,10 +150,16 @@ func loadTasks(dir, repoName string) map[string]task {
 	return m
 }
 
-func pairs(c config, repoName, arm string) []pair {
+// treatmentArms lists every arm that is compared with its base.
+var treatmentArms = []string{"stacklit", "strict", "stacklit-e", "stacklit-e-small"}
+
+func pairs(c config, repoName, arm string) []pair { return pairsAgainst(c, repoName, arm, "control") }
+
+// pairsAgainst pairs the records of arm with those of base by task and trial.
+func pairsAgainst(c config, repoName, arm, base string) []pair {
 	tasks := loadTasks(c.tasksDir, repoName)
 	ctl := map[string]record{}
-	for _, r := range loadRecords(c.resultsDir, repoName, "control") {
+	for _, r := range loadRecords(c.resultsDir, repoName, base) {
 		ctl[fmt.Sprintf("%s|%d", r.Task, r.Trial)] = r
 	}
 	var out []pair
@@ -230,7 +237,7 @@ func wilson(k, n int) rate {
 }
 
 func buildScope(name, arm string, ps []pair, rng *rand.Rand, resamples int) scope {
-	s := scope{Name: name, Arm: arm, Pairs: len(ps), Correct: map[string]rate{}, ByKind: map[string][]cmp{}}
+	s := scope{Name: name, Arm: arm, Base: "control", Pairs: len(ps), Correct: map[string]rate{}, ByKind: map[string][]cmp{}}
 	for _, m := range metrics {
 		if c, ok := compare(ps, m, rng, resamples); ok {
 			s.Compare = append(s.Compare, c)
@@ -289,7 +296,7 @@ func analyze(c config, repoNames []string) error {
 		sum.Metrics[m.Name] = m.Desc
 	}
 	var arms []string
-	for _, a := range []string{"stacklit", "strict"} {
+	for _, a := range treatmentArms {
 		for _, rn := range repoNames {
 			if len(loadRecords(c.resultsDir, rn, a)) > 0 {
 				arms = append(arms, a)
@@ -298,7 +305,7 @@ func analyze(c config, repoNames []string) error {
 		}
 	}
 	for _, rn := range repoNames {
-		for _, a := range []string{"control", "stacklit", "strict"} {
+		for _, a := range append([]string{"control"}, treatmentArms...) {
 			recs := loadRecords(c.resultsDir, rn, a)
 			sum.Sessions[a] += len(recs)
 			for _, r := range recs {
@@ -316,7 +323,7 @@ func analyze(c config, repoNames []string) error {
 		}
 		sum.Memorised[rn] = wilson(k, len(mem))
 	}
-	sum.Sessions["memory"] = 18
+	sum.Sessions["memory"] = countMemory(c.resultsDir, repoNames)
 	for _, a := range arms {
 		rng := rand.New(rand.NewSource(seed))
 		var all []pair
@@ -329,11 +336,43 @@ func analyze(c config, repoNames []string) error {
 		}
 		sum.Scopes = append(sum.Scopes, buildScope("pooled", a, all, rng, resamples))
 	}
+	// Routed wording against the default wording, on the same tasks and trials.
+	if hasArm(arms, "stacklit-e") && hasArm(arms, "stacklit") {
+		rng := rand.New(rand.NewSource(seed))
+		var all []pair
+		for _, rn := range repoNames {
+			ps := pairsAgainst(c, rn, "stacklit-e", "stacklit")
+			all = append(all, ps...)
+			if len(ps) > 0 {
+				sc := buildScope(rn, "stacklit-e", ps, rng, resamples)
+				sc.Base = "stacklit"
+				sum.Scopes = append(sum.Scopes, sc)
+			}
+		}
+		sc := buildScope("pooled", "stacklit-e", all, rng, resamples)
+		sc.Base = "stacklit"
+		sum.Scopes = append(sum.Scopes, sc)
+	}
 	b, _ := json.MarshalIndent(sum, "", "  ")
 	if err := os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "summary.json"), b, 0o644); err != nil {
 		return err
 	}
+	if hasArm(arms, "stacklit-e") {
+		rep := decisionReport(sum, repoFileCounts(c.reposFile))
+		if err := os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "decision-round2.md"), []byte(rep), 0o644); err != nil {
+			return err
+		}
+	}
 	return os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "tables.md"), []byte(tables(sum)), 0o644)
+}
+
+func hasArm(arms []string, a string) bool {
+	for _, x := range arms {
+		if x == a {
+			return true
+		}
+	}
+	return false
 }
 
 func f(v float64, name string) string {
@@ -362,20 +401,24 @@ func tables(s summary) string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "Model: %s. Bootstrap: %d resamples, seed %d, paired by task and trial. Ledger total: %.2f USD notional.\n\n", s.Model, s.Resamples, s.Seed, s.LedgerUSD)
 	for _, sc := range s.Scopes {
-		fmt.Fprintf(&b, "### %s: control vs %s (%d pairs)\n\n| metric | n | control | %s | diff (arm minus control) [95%% CI] | ratio (arm / control) [95%% CI] |\n|---|---|---|---|---|---|\n", sc.Name, sc.Arm, sc.Pairs, sc.Arm)
+		base := sc.Base
+		if base == "" {
+			base = "control"
+		}
+		fmt.Fprintf(&b, "### %s: %s vs %s (%d pairs)\n\n| metric | n | %s | %s | diff (arm minus %s) [95%% CI] | ratio (arm / %s) [95%% CI] |\n|---|---|---|---|---|---|\n", sc.Name, base, sc.Arm, sc.Pairs, base, sc.Arm, base, base)
 		for _, c := range sc.Compare {
 			b.WriteString(cmpRow(c))
 		}
-		fmt.Fprintf(&b, "\nCorrectness after audit fixes: control %s; %s %s.\n", pc(sc.CorrectAudited["control"]), sc.Arm, pc(sc.CorrectAudited[sc.Arm]))
-		fmt.Fprintf(&b, "\nCorrectness (pre-registered grader): control %s; %s %s. Stacklit commands used in %s of treatment sessions; session hook fired in %s.\n\n",
-			pc(sc.Correct["control"]), sc.Arm, pc(sc.Correct[sc.Arm]), pc(sc.StacklitUsed), pc(sc.HookFired))
+		fmt.Fprintf(&b, "\nCorrectness after audit fixes: %s %s; %s %s.\n", base, pc(sc.CorrectAudited["control"]), sc.Arm, pc(sc.CorrectAudited[sc.Arm]))
+		fmt.Fprintf(&b, "\nCorrectness (pre-registered grader): %s %s; %s %s. Stacklit commands used in %s of treatment sessions; session hook fired in %s.\n\n",
+			base, pc(sc.Correct["control"]), sc.Arm, pc(sc.Correct[sc.Arm]), pc(sc.StacklitUsed), pc(sc.HookFired))
 		kinds := make([]string, 0, len(sc.ByKind))
 		for k := range sc.ByKind {
 			kinds = append(kinds, k)
 		}
 		sort.Strings(kinds)
 		if len(kinds) > 0 {
-			fmt.Fprintf(&b, "By task kind (%s):\n\n| kind | metric | n | control | %s | diff [95%% CI] | ratio [95%% CI] |\n|---|---|---|---|---|---|---|\n", sc.Name, sc.Arm)
+			fmt.Fprintf(&b, "By task kind (%s):\n\n| kind | metric | n | %s | %s | diff [95%% CI] | ratio [95%% CI] |\n|---|---|---|---|---|---|---|\n", sc.Name, base, sc.Arm)
 			for _, k := range kinds {
 				for _, c := range sc.ByKind[k] {
 					row := cmpRow(c)
@@ -425,4 +468,37 @@ func gradeAudited(answer string, t task) bool {
 		}
 	}
 	return false
+}
+
+// gradeAuditedWithRecall is gradeAudited plus the recall of AllOf paths, with
+// no per-task fixes: round 2 tasks are written to need none.
+func gradeAuditedWithRecall(answer string, t task) (bool, float64) {
+	hit := 0
+	for _, p := range t.AllOf {
+		if auditedRe(p).MatchString(answer) {
+			hit++
+		}
+	}
+	recall := -1.0
+	if len(t.AllOf) > 0 {
+		recall = float64(hit) / float64(len(t.AllOf))
+	}
+	ok := hit == len(t.AllOf)
+	if ok && len(t.AnyOf) > 0 {
+		ok = false
+		for _, p := range t.AnyOf {
+			if auditedRe(p).MatchString(answer) {
+				ok = true
+			}
+		}
+	}
+	return ok, recall
+}
+
+func countMemory(resultsDir string, repoNames []string) int {
+	n := 0
+	for _, rn := range repoNames {
+		n += len(loadRecords(filepath.Join(resultsDir, "memory"), rn, "memory"))
+	}
+	return n
 }
