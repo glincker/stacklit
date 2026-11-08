@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-05-07T02:35:01Z",
+  "generated_at": "2026-11-08T17:50:28Z",
   "stacklit_version": "dev",
-  "merkle_hash": "b99fe2df208508d2562bc18f0950a25193578caecf4f05c492c8cc20033a728c",
+  "merkle_hash": "c0b7c7a38957d7272f891f19ff4045eb10cda97e9c8b432ebc9f933e9f02a176",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -12,29 +12,93 @@
   "tech": {
     "primary_language": "go",
     "languages": {
+      "c": {
+        "files": 1,
+        "lines": 16
+      },
+      "cpp": {
+        "files": 1,
+        "lines": 14
+      },
+      "csharp": {
+        "files": 1,
+        "lines": 21
+      },
+      "dart": {
+        "files": 1,
+        "lines": 44
+      },
+      "elixir": {
+        "files": 1,
+        "lines": 34
+      },
       "go": {
-        "files": 67,
-        "lines": 9396
+        "files": 186,
+        "lines": 24758
+      },
+      "graphql": {
+        "files": 1,
+        "lines": 34
       },
       "java": {
         "files": 1,
         "lines": 16
       },
       "javascript": {
-        "files": 3,
-        "lines": 164
+        "files": 4,
+        "lines": 472
+      },
+      "kotlin": {
+        "files": 1,
+        "lines": 31
+      },
+      "lua": {
+        "files": 1,
+        "lines": 23
+      },
+      "php": {
+        "files": 1,
+        "lines": 21
+      },
+      "protobuf": {
+        "files": 1,
+        "lines": 24
       },
       "python": {
         "files": 1,
         "lines": 20
       },
+      "ruby": {
+        "files": 1,
+        "lines": 25
+      },
       "rust": {
         "files": 1,
         "lines": 19
       },
+      "scala": {
+        "files": 1,
+        "lines": 25
+      },
+      "shell": {
+        "files": 1,
+        "lines": 17
+      },
+      "sql": {
+        "files": 1,
+        "lines": 32
+      },
+      "swift": {
+        "files": 1,
+        "lines": 23
+      },
       "typescript": {
         "files": 5,
         "lines": 24
+      },
+      "unknown": {
+        "files": 4,
+        "lines": 84
       }
     },
     "frameworks": [
@@ -46,21 +110,23 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 78,
-    "total_lines": 9639
+    "total_files": 217,
+    "total_lines": 25777
   },
   "modules": {
     "assets": {
       "purpose": "Static assets",
-      "language": "go",
-      "files": 2,
-      "lines": 22,
+      "language": "javascript",
+      "files": 3,
+      "lines": 265,
       "file_list": [
         "embed.go",
-        "lang-icons.js"
+        "lang-icons.js",
+        "symbols.js"
       ],
       "exports": [
         "LangIconsJS",
+        "SymbolsJS",
         "TemplateHTML"
       ],
       "depended_by": [
@@ -81,31 +147,81 @@
       ],
       "activity": "low"
     },
+    "internal/cache": {
+      "purpose": "Cache",
+      "language": "go",
+      "files": 2,
+      "lines": 202,
+      "file_list": [
+        "cache.go",
+        "cache_test.go"
+      ],
+      "exports": [
+        "Get(key string) (*parser.FileInfo, bool)",
+        "Open(root string) *Store",
+        "Path(root string) string",
+        "Put(key string, info *parser.FileInfo)",
+        "Save() error",
+        "Stats() int",
+        "type Store"
+      ],
+      "depends_on": [
+        "internal/fsutil",
+        "internal/parser"
+      ],
+      "depended_by": [
+        "internal/doctor",
+        "internal/engine"
+      ],
+      "activity": "low"
+    },
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 9,
-      "lines": 560,
+      "files": 17,
+      "lines": 1276,
       "file_list": [
         "derive.go",
         "diff.go",
+        "doctor.go",
+        "errors.go",
+        "errors_test.go",
         "export.go",
         "generate.go",
+        "graphcmds.go",
+        "hook.go",
+        "ingest.go",
         "init.go",
         "root.go",
         "serve.go",
         "setup.go",
+        "version.go",
+        "version_test.go",
         "view.go"
       ],
       "exports": [
+        "Error() string",
         "Execute() error",
-        "Version"
+        "ExitCode(err error) int",
+        "ExitFailure",
+        "ExitOK",
+        "ExitProblems",
+        "ExitUsage",
+        "Unwrap() error",
+        "Version",
+        "type ExitError"
       ],
+      "type_defs": {
+        "ExitError": "Code int, Err error"
+      },
       "depends_on": [
         "internal/config",
         "internal/derive",
+        "internal/doctor",
         "internal/engine",
         "internal/git",
+        "internal/graph",
+        "internal/ingest",
         "internal/mcp",
         "internal/renderer",
         "internal/schema",
@@ -120,26 +236,37 @@
     "internal/config": {
       "purpose": "Configuration management",
       "language": "go",
-      "files": 2,
-      "lines": 175,
+      "files": 5,
+      "lines": 472,
       "file_list": [
         "config.go",
-        "config_test.go"
+        "config_test.go",
+        "fuzz_test.go",
+        "scan.go",
+        "scan_test.go"
       ],
       "exports": [
+        "CacheEnabled() bool",
+        "Check(root string) error",
         "DefaultConfig() *Config",
+        "DefaultMaxFileSize",
+        "DefaultParseMemoryMB",
+        "Error() string",
+        "GitActivityEnabled() bool",
         "Load(root string) *Config",
-        "ScanIgnore() []string",
-        "type Config",
-        "type OutputConfig"
+        "LoadStrict(root string) (*Config, error)",
+        "NormalizedRoots() []string"
       ],
       "type_defs": {
-        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig",
+        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, Workers int, ParseMemoryMB int, Cache *boo...",
+        "Error": "Err error",
         "OutputConfig": "JSON string, Mermaid string, HTML string"
       },
       "depended_by": [
         "internal/cli",
-        "internal/engine"
+        "internal/doctor",
+        "internal/engine",
+        "internal/mcp"
       ],
       "activity": "low"
     },
@@ -160,17 +287,17 @@
         "internal/schema"
       ],
       "depended_by": [
-        "internal/cli",
-        "internal/setup"
+        "internal/cli"
       ],
       "activity": "low"
     },
     "internal/detect": {
       "purpose": "Framework and tool detection",
       "language": "go",
-      "files": 5,
-      "lines": 720,
+      "files": 6,
+      "lines": 743,
       "file_list": [
+        "envstream.go",
         "envvars.go",
         "framework_patterns.go",
         "framework_patterns_test.go",
@@ -181,6 +308,7 @@
         "DetectEnvVars(root string, contents map[string][]byte) []string",
         "DetectFrameworkPatterns(root string) []FrameworkPattern",
         "DetectFrameworks(root string, imports []string) []string",
+        "FileEnvVars(content []byte) []string",
         "type FrameworkPattern"
       ],
       "type_defs": {
@@ -191,16 +319,62 @@
       ],
       "activity": "low"
     },
+    "internal/doctor": {
+      "purpose": "Doctor",
+      "language": "go",
+      "files": 2,
+      "lines": 342,
+      "file_list": [
+        "doctor.go",
+        "doctor_test.go"
+      ],
+      "exports": [
+        "Count(l Level) int",
+        "Error",
+        "Info",
+        "OK",
+        "Run(root string) (*Report, error)",
+        "Warn",
+        "type Finding",
+        "type Level",
+        "type Report"
+      ],
+      "type_defs": {
+        "Finding": "Level Level, Check string, Message string, Fix string, Details []string",
+        "Report": "Root string, Findings []Finding"
+      },
+      "depends_on": [
+        "internal/cache",
+        "internal/config",
+        "internal/git",
+        "internal/parser",
+        "internal/schema",
+        "internal/walker"
+      ],
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
     "internal/engine": {
       "purpose": "Core orchestration engine",
       "language": "go",
-      "files": 2,
-      "lines": 697,
+      "files": 9,
+      "lines": 1590,
       "file_list": [
+        "bench_test.go",
         "engine.go",
-        "engine_test.go"
+        "engine_test.go",
+        "multi.go",
+        "multi_test.go",
+        "packages.go",
+        "packages_test.go",
+        "scan.go",
+        "stability_test.go"
       ],
       "exports": [
+        "DefaultMultiOutput",
+        "ParseReposFile(file string) ([]string, error)",
         "Run(opts Options) (*Result, error)",
         "RunMulti(opts MultiOptions) (*MultiResult, error)",
         "type MultiOptions",
@@ -209,14 +383,16 @@
         "type Result"
       ],
       "type_defs": {
-        "MultiOptions": "ReposFile string, Quiet bool",
-        "MultiResult": "OutputPath string, RepoCount int, Duration time.Duration",
-        "Options": "Root string, Workspace string, InstallHook bool, Quiet bool, Summary bool",
-        "Result": "JSONPath string, HTMLPath string, MermaidPath string, Index *schema.Index, Duration time.Duration"
+        "MultiOptions": "ReposFile string, Output string, Quiet bool, Timestamps bool",
+        "MultiResult": "OutputPath string, RepoCount int, Failed int, Duration time.Duration, Index *schema.MultiIndex",
+        "Options": "Root string, Workspace string, InstallHook bool, Quiet bool, Summary bool, NoWrite bool",
+        "Result": "JSONPath string, HTMLPath string, MermaidPath string, Index *schema.Index, Duration time.Duration, Imports map[string][]string, Provides []string"
       },
       "depends_on": [
+        "internal/cache",
         "internal/config",
         "internal/detect",
+        "internal/fsutil",
         "internal/git",
         "internal/graph",
         "internal/monorepo",
@@ -231,19 +407,41 @@
       ],
       "activity": "low"
     },
+    "internal/fsutil": {
+      "purpose": "Fsutil",
+      "language": "go",
+      "files": 2,
+      "lines": 100,
+      "file_list": [
+        "atomic.go",
+        "atomic_test.go"
+      ],
+      "exports": [
+        "WriteFileAtomic(path string, data []byte, perm os.FileMode) error",
+        "WriteFileIfChanged(path string, data []byte, perm os.FileMode) error"
+      ],
+      "depended_by": [
+        "internal/cache",
+        "internal/engine",
+        "internal/renderer"
+      ],
+      "activity": "low"
+    },
     "internal/git": {
       "purpose": "Git integration",
       "language": "go",
-      "files": 4,
-      "lines": 395,
+      "files": 5,
+      "lines": 422,
       "file_list": [
         "activity.go",
         "activity_test.go",
         "hooks.go",
-        "merkle.go"
+        "merkle.go",
+        "merkle_leaves.go"
       ],
       "exports": [
         "ComputeMerkle(files []string, contents map[string][]byte) string",
+        "ComputeMerkleFromLeaves(leaves map[string][]byte) string",
         "GetActivity(root string, days int) (*Activity, error)",
         "InstallHook(root string) error",
         "type Activity",
@@ -255,57 +453,134 @@
       },
       "depended_by": [
         "internal/cli",
-        "internal/engine"
+        "internal/doctor",
+        "internal/engine",
+        "internal/setup"
       ],
       "activity": "low"
     },
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 2,
-      "lines": 645,
+      "files": 26,
+      "lines": 5565,
       "file_list": [
+        "analysis.go",
+        "community.go",
+        "explain.go",
+        "extract.go",
+        "extract_ecma.go",
+        "extract_go.go",
+        "extract_java.go",
+        "extract_py.go",
+        "extract_rs.go",
+        "extract_test.go",
         "graph.go",
-        "graph_test.go"
+        "graph_test.go",
+        "htmldata.go",
+        "impact.go",
+        "path.go",
+        "perf_test.go",
+        "query.go",
+        "rank.go",
+        "resolve.go",
+        "resolve_test.go"
       ],
       "exports": [
         "Build(files []*parser.FileInfo, opts BuildOptions) *Graph",
-        "Edges() []Edge",
-        "Entrypoints() []string",
-        "Isolated() []string",
-        "Module(name string) *Module",
-        "Modules() []*Module",
-        "MostDepended() []string",
-        "type BuildOptions",
-        "type Edge",
-        "type Graph"
+        "BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph",
+        "ComputeCommunities()",
+        "ConfExtracted",
+        "ConfInferred",
+        "DefaultExplainBudget",
+        "DefaultImpactBudget",
+        "DefaultQueryBudget",
+        "DiscoverGoModules(root string, files []string) map[string]string",
+        "EdgeCalls"
       ],
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int",
+        "Community": "ID int, Label string, Files int, Nodes int, Top []string",
+        "Def": "Name string, Qual string, Kind string, Line int, End int, Doc string, Sig string, Recv string, Methods []string",
         "Edge": "From string, To string, Count int",
-        "Module": "Name string, FileCount int, Files []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Languages []string, PrimaryLanguage string, LineCount int"
+        "EdgeRef": "From string, To string, Kind string, Conf string, Score float64",
+        "ExtractOptions": "IncludeTests bool, MaxFileBytes int",
+        "FileGroup": "File string, Symbols []SymLine",
+        "FileSyms": "Path string, Lang string, Pkg string, Defs []Def, Imports []Import, Refs []Ref",
+        "HTMLGraph": "Files []string, Kinds []string, Comms []Community, Nodes []HTMLNode, Edges [][]float64, Total int",
+        "HTMLNode": "Name string, Kind string, File int, Line int, End int, Comm int, Sig string, Doc string"
       },
       "depends_on": [
-        "internal/parser"
+        "internal/parser",
+        "internal/walker"
       ],
       "depended_by": [
-        "internal/engine"
+        "internal/cli",
+        "internal/engine",
+        "internal/mcp",
+        "internal/renderer"
+      ],
+      "activity": "low"
+    },
+    "internal/ingest": {
+      "purpose": "Ingest",
+      "language": "go",
+      "files": 6,
+      "lines": 728,
+      "file_list": [
+        "api.go",
+        "docs.go",
+        "ingest.go",
+        "ingest_test.go",
+        "owners.go",
+        "schema.go"
+      ],
+      "exports": [
+        "ContextFile",
+        "Run(o Options) (*Context, error)",
+        "type API",
+        "type Context",
+        "type Doc",
+        "type ModuleOwners",
+        "type Operation",
+        "type Options",
+        "type OwnerRule",
+        "type Owners"
+      ],
+      "type_defs": {
+        "API": "File string, Title string, Operations []Operation",
+        "Context": "Version string, Docs []Doc, APIs []API, Tables []Table, Owners *Owners",
+        "Doc": "Path string, Kind string, Title string, Status string, Headings []string",
+        "ModuleOwners": "Module string, Codeowner []string, Authors []string",
+        "Operation": "Method string, Path string, ID string, Summary string",
+        "Options": "Root string, Docs bool, API bool, Schema bool, Owners bool, GitOwners bool, GitDays int, Modules []string",
+        "OwnerRule": "Pattern string, Owners []string",
+        "Owners": "Rules []OwnerRule, Modules []ModuleOwners",
+        "Table": "Name string, File string, Columns []string"
+      },
+      "depended_by": [
+        "internal/cli"
       ],
       "activity": "low"
     },
     "internal/mcp": {
       "purpose": "MCP server for AI agents",
       "language": "go",
-      "files": 1,
-      "lines": 234,
+      "files": 3,
+      "lines": 409,
       "file_list": [
+        "graph_tools.go",
+        "graph_tools_test.go",
         "server.go"
       ],
       "exports": [
         "StartServer() error"
       ],
       "depends_on": [
-        "internal/schema"
+        "internal/config",
+        "internal/graph",
+        "internal/schema",
+        "internal/walker"
       ],
       "depended_by": [
         "internal/cli"
@@ -315,17 +590,23 @@
     "internal/monorepo": {
       "purpose": "Monorepo detection",
       "language": "go",
-      "files": 2,
-      "lines": 599,
+      "files": 4,
+      "lines": 734,
       "file_list": [
         "detect.go",
-        "detect_test.go"
+        "detect_test.go",
+        "manifest.go",
+        "manifest_test.go"
       ],
       "exports": [
         "Detect(root string) (*Result, error)",
+        "Matches(imp string) bool",
+        "ReadManifest(dir string) (Manifest, bool)",
+        "type Manifest",
         "type Result"
       ],
       "type_defs": {
+        "Manifest": "Name string, Kind string",
         "Result": "Type string, Tool string, Workspaces []string"
       },
       "depended_by": [
@@ -336,47 +617,53 @@
     "internal/parser": {
       "purpose": "Source code parsers",
       "language": "go",
-      "files": 20,
-      "lines": 3267,
+      "files": 55,
+      "lines": 7017,
       "file_list": [
+        "fuzz_test.go",
         "generic.go",
         "generic_test.go",
         "golang.go",
         "golang_test.go",
         "java_test.go",
+        "langs_test.go",
+        "langs_wave2_test.go",
         "parser.go",
+        "pool.go",
+        "pool_test.go",
         "python_test.go",
         "rust_test.go",
         "treesitter.go",
+        "ts_build.go",
         "ts_c.go",
-        "ts_csharp.go",
-        "ts_java.go",
-        "ts_kotlin.go",
-        "ts_php.go",
-        "ts_python.go",
-        "ts_ruby.go",
-        "ts_rust.go",
-        "ts_swift.go",
-        "ts_typescript.go",
-        "typescript_test.go"
+        "ts_clojure.go",
+        "ts_common.go",
+        "ts_config.go",
+        "ts_csharp.go"
       ],
       "exports": [
         "CanParse(_ string) bool",
         "CanParse(filename string) bool",
+        "Error() string",
+        "IsDataLanguage(lang string) bool",
+        "LeafHash(path string, content []byte) []byte",
         "Parse(path string, content []byte) (*FileInfo, error)",
         "ParseAll(paths []string) ([]*FileInfo, []error)",
+        "ParseContent(path string, content []byte) (*FileInfo, error)",
         "ParseFile(path string) (*FileInfo, error)",
-        "type FileInfo",
-        "type GenericParser",
-        "type GoParser",
-        "type Parser",
-        "type TreeSitterParser"
+        "ScanFiles(files []string, o PoolOptions) []Scanned"
       ],
       "type_defs": {
+        "Cache": "interface{Get(), Put()}",
         "FileInfo": "Path string, Language string, Imports []string, Exports []string, TypeDefs map[string]string, LineCount int, IsEntrypoint bool",
-        "Parser": "interface{CanParse(), Parse()}"
+        "PanicError": "Path string, Value any, Stack string",
+        "Parser": "interface{CanParse(), Parse()}",
+        "PoolOptions": "Root string, Workers int, MaxFileSize int64, Cache Cache, Visit any, MemoryBudget int64",
+        "Scanned": "Path string, Info *FileInfo, Leaf []byte, Err error, Cached bool, Panicked bool"
       },
       "depended_by": [
+        "internal/cache",
+        "internal/doctor",
         "internal/engine",
         "internal/graph"
       ],
@@ -385,27 +672,34 @@
     "internal/renderer": {
       "purpose": "Output renderers",
       "language": "go",
-      "files": 8,
-      "lines": 1062,
+      "files": 11,
+      "lines": 1161,
       "file_list": [
         "html.go",
+        "html_graph.go",
+        "html_graph_test.go",
         "json.go",
         "json_test.go",
         "markdown.go",
         "markdown_test.go",
         "mermaid.go",
         "mermaid_test.go",
+        "options.go",
         "stable.go"
       ],
       "exports": [
         "RenderMarkdown(idx *schema.Index) string",
+        "SetTimestamps(on bool)",
         "WriteHTML(idx *schema.Index, path string) error",
+        "WriteHTMLWithGraph(idx *schema.Index, g *graph.SymGraph, maxNodes int, path stri",
         "WriteJSON(idx *schema.Index, path string) error",
         "WriteMarkdown(idx *schema.Index, path string) error",
         "WriteMermaid(idx *schema.Index, path string) error"
       ],
       "depends_on": [
         "assets",
+        "internal/fsutil",
+        "internal/graph",
         "internal/schema"
       ],
       "depended_by": [
@@ -418,37 +712,38 @@
       "purpose": "Data schema definitions",
       "language": "go",
       "files": 1,
-      "lines": 119,
+      "lines": 177,
       "file_list": [
         "schema.go"
       ],
       "exports": [
+        "CurrentSchemaVersion",
         "type Architecture",
+        "type CrossRepoEdge",
         "type Dependencies",
         "type FrameworkPattern",
         "type GitInfo",
         "type Hints",
         "type HotFile",
         "type Index",
-        "type LangStats",
-        "type ModuleInfo",
-        "type MultiIndex"
+        "type LangStats"
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
+        "CrossRepoEdge": "From string, To string, Weight int, Via []string",
         "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
-        "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
+        "Index": "Schema string, Version string, SchemaVersion int, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Depe...",
         "LangStats": "Files int, Lines int",
-        "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
+        "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string"
       },
       "depended_by": [
         "internal/cli",
         "internal/derive",
+        "internal/doctor",
         "internal/engine",
         "internal/mcp",
         "internal/renderer",
@@ -460,23 +755,44 @@
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 1,
-      "lines": 158,
+      "files": 11,
+      "lines": 1331,
       "file_list": [
-        "setup.go"
+        "block.go",
+        "claude.go",
+        "digest.go",
+        "git.go",
+        "hookcmd.go",
+        "mcp.go",
+        "report.go",
+        "runner.go",
+        "setup.go",
+        "setup_test.go",
+        "tools.go"
       ],
       "exports": [
-        "ConfigureAider(idx *schema.Index) error",
-        "ConfigureClaude(idx *schema.Index, withMCP bool) error",
-        "ConfigureCursor(idx *schema.Index) error",
-        "DetectTools() []Tool",
-        "type Tool"
+        "ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error",
+        "Detected(root string) bool",
+        "Lookup(id string) (Tool, bool)",
+        "MCPSchemaTokens(exe string, dir string) int",
+        "MarkdownBody(idx *schema.Index) string",
+        "PreToolHook(stdin io.Reader) string",
+        "Registry() []Tool",
+        "Report(idx *schema.Index, tools []Tool, mcpTokens int) []ReportRow",
+        "Run(r *Runner, o Options) error",
+        "SessionHook(stdin io.Reader) string"
       ],
       "type_defs": {
-        "Tool": "Name string, Detected bool"
+        "ClaudeOptions": "PreToolHook bool, SessionHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
+        "MCP": "Path string, Style MCPStyle, Global bool",
+        "Options": "Root string, Tools []Tool, Index *schema.Index, Uninstall bool, NoMCP bool, NoGitHook bool, Global bool, Claude ClaudeOptions",
+        "ReportRow": "Item string, Tokens int, Note string",
+        "Rule": "Path string, Style string, Frontmatter string",
+        "Runner": "Root string, DryRun bool, Out io.Writer, Changed int",
+        "Tool": "ID string, Name string, Rules []Rule, MCP []MCP, Paths []string, Bins []string"
       },
       "depends_on": [
-        "internal/derive",
+        "internal/git",
         "internal/schema"
       ],
       "depended_by": [
@@ -508,18 +824,37 @@
     "internal/walker": {
       "purpose": "File system walker",
       "language": "go",
-      "files": 2,
-      "lines": 294,
+      "files": 4,
+      "lines": 765,
       "file_list": [
+        "scan.go",
+        "scan_test.go",
         "walker.go",
         "walker_test.go"
       ],
       "exports": [
-        "Walk(root string, extraIgnore []string) ([]string, error)"
+        "ReasonBrokenSymlink",
+        "ReasonLarge",
+        "ReasonMissingRoot",
+        "ReasonNotRegular",
+        "ReasonRootEscape",
+        "ReasonSymlinkDir",
+        "ReasonSymlinkEscape",
+        "ReasonUnreadable",
+        "Walk(root string, extraIgnore []string) ([]string, error)",
+        "WalkWith(root string, o Options) (*Result, error)"
       ],
+      "type_defs": {
+        "Options": "ExtraIgnore []string, Include []string, Roots []string, MaxFileSize int64",
+        "Result": "Files []string, Skipped []Skip",
+        "Skip": "Path string, Reason string"
+      },
       "depended_by": [
         "internal/cli",
-        "internal/engine"
+        "internal/doctor",
+        "internal/engine",
+        "internal/graph",
+        "internal/mcp"
       ],
       "activity": "low"
     },
@@ -527,7 +862,7 @@
       "purpose": "Npm",
       "language": "javascript",
       "files": 1,
-      "lines": 138,
+      "lines": 206,
       "file_list": [
         "install.js"
       ],
@@ -551,6 +886,14 @@
         "internal/cli"
       ],
       [
+        "internal/cache",
+        "internal/fsutil"
+      ],
+      [
+        "internal/cache",
+        "internal/parser"
+      ],
+      [
         "internal/cli",
         "internal/config"
       ],
@@ -560,11 +903,23 @@
       ],
       [
         "internal/cli",
+        "internal/doctor"
+      ],
+      [
+        "internal/cli",
         "internal/engine"
       ],
       [
         "internal/cli",
         "internal/git"
+      ],
+      [
+        "internal/cli",
+        "internal/graph"
+      ],
+      [
+        "internal/cli",
+        "internal/ingest"
       ],
       [
         "internal/cli",
@@ -591,12 +946,44 @@
         "internal/schema"
       ],
       [
+        "internal/doctor",
+        "internal/cache"
+      ],
+      [
+        "internal/doctor",
+        "internal/config"
+      ],
+      [
+        "internal/doctor",
+        "internal/git"
+      ],
+      [
+        "internal/doctor",
+        "internal/parser"
+      ],
+      [
+        "internal/doctor",
+        "internal/schema"
+      ],
+      [
+        "internal/doctor",
+        "internal/walker"
+      ],
+      [
+        "internal/engine",
+        "internal/cache"
+      ],
+      [
         "internal/engine",
         "internal/config"
       ],
       [
         "internal/engine",
         "internal/detect"
+      ],
+      [
+        "internal/engine",
+        "internal/fsutil"
       ],
       [
         "internal/engine",
@@ -635,8 +1022,24 @@
         "internal/parser"
       ],
       [
+        "internal/graph",
+        "internal/walker"
+      ],
+      [
+        "internal/mcp",
+        "internal/config"
+      ],
+      [
+        "internal/mcp",
+        "internal/graph"
+      ],
+      [
         "internal/mcp",
         "internal/schema"
+      ],
+      [
+        "internal/mcp",
+        "internal/walker"
       ],
       [
         "internal/renderer",
@@ -644,11 +1047,19 @@
       ],
       [
         "internal/renderer",
+        "internal/fsutil"
+      ],
+      [
+        "internal/renderer",
+        "internal/graph"
+      ],
+      [
+        "internal/renderer",
         "internal/schema"
       ],
       [
         "internal/setup",
-        "internal/derive"
+        "internal/git"
       ],
       [
         "internal/setup",
@@ -664,15 +1075,15 @@
     ],
     "most_depended": [
       "internal/schema",
-      "internal/config",
-      "internal/derive",
-      "internal/git",
-      "internal/parser",
-      "internal/renderer",
       "internal/walker",
-      "assets",
-      "internal/cli",
-      "internal/detect"
+      "internal/config",
+      "internal/git",
+      "internal/graph",
+      "internal/parser",
+      "internal/fsutil",
+      "internal/cache",
+      "internal/renderer",
+      "assets"
     ],
     "isolated": [
       "npm",
@@ -681,6 +1092,26 @@
   },
   "git": {
     "hot_files": [
+      {
+        "path": ".github/ISSUE_TEMPLATE/bug_report.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".github/ISSUE_TEMPLATE/config.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".github/ISSUE_TEMPLATE/feature_request.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".github/ISSUE_TEMPLATE/language_request.yml",
+        "commits_90d": 1
+      },
+      {
+        "path": ".github/PULL_REQUEST_TEMPLATE.md",
+        "commits_90d": 1
+      },
       {
         "path": ".github/workflows/ci.yml",
         "commits_90d": 1
@@ -702,7 +1133,15 @@
         "commits_90d": 1
       },
       {
+        "path": "CHANGELOG.md",
+        "commits_90d": 1
+      },
+      {
         "path": "COMPARISON.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "CONTRIBUTING.md",
         "commits_90d": 1
       },
       {
@@ -722,76 +1161,60 @@
         "commits_90d": 1
       },
       {
+        "path": "ROADMAP.md",
+        "commits_90d": 1
+      },
+      {
+        "path": "SECURITY.md",
+        "commits_90d": 1
+      },
+      {
         "path": "SKILL.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "USAGE.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "action/action.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/embed.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/lang-icons.js",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/template.html",
-        "commits_90d": 1
-      },
-      {
-        "path": "cmd/stacklit/main.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.gif",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.tape",
-        "commits_90d": 1
-      },
-      {
-        "path": "docs/superpowers/plans/2026-04-12-growth-package.md",
         "commits_90d": 1
       }
     ],
     "recent": [
+      ".github/ISSUE_TEMPLATE/bug_report.yml",
+      ".github/ISSUE_TEMPLATE/config.yml",
+      ".github/ISSUE_TEMPLATE/feature_request.yml",
+      ".github/ISSUE_TEMPLATE/language_request.yml",
+      ".github/PULL_REQUEST_TEMPLATE.md",
       ".github/workflows/ci.yml",
       ".github/workflows/release.yml",
       ".github/workflows/stacklit-index.yml",
       ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
-      "DEPENDENCIES.md",
-      "LICENSE",
-      "Makefile",
-      "README.md"
+      ".goreleaser.yml"
     ],
     "stable": [
+      ".github/ISSUE_TEMPLATE/bug_report.yml",
+      ".github/ISSUE_TEMPLATE/config.yml",
+      ".github/ISSUE_TEMPLATE/feature_request.yml",
+      ".github/ISSUE_TEMPLATE/language_request.yml",
+      ".github/PULL_REQUEST_TEMPLATE.md",
       ".github/workflows/ci.yml",
       ".github/workflows/release.yml",
       ".github/workflows/stacklit-index.yml",
       ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
-      "DEPENDENCIES.md",
-      "LICENSE",
-      "Makefile",
-      "README.md"
+      ".goreleaser.yml"
     ]
   },
   "hints": {
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
-      "ANTHROPIC_API_KEY"
+      "ANTHROPIC_API_KEY",
+      "STACKLIT_CACHE_DIR",
+      "STACKLIT_DIGEST_TOKENS",
+      "STACKLIT_GIT",
+      "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_MAX_FILE_SIZE",
+      "STACKLIT_NO_CACHE",
+      "STACKLIT_NO_GIT",
+      "STACKLIT_PARSE_MEMORY_MB",
+      "STACKLIT_ROOTS",
+      "STACKLIT_SKIP_CHECKSUM",
+      "STACKLIT_TIMESTAMPS",
+      "STACKLIT_WORKERS"
     ],
     "do_not_touch": [
       ".github/"
