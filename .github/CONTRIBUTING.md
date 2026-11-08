@@ -47,7 +47,7 @@ See [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md). In short: `internal/parser`
 
 - One logical change per PR, with tests for behavior changes.
 - Commit messages: `<type>: <description>` where type is one of `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `chore`. Keep them short.
-- Keep generated files (`stacklit.json`, `DEPENDENCIES.md`) out of your PR unless the change is about them; CI refreshes them on the default branch.
+- Keep generated files (`stacklit.json`, `docs/DEPENDENCIES.md`) out of your PR unless the change is about them; CI refreshes them on the default branch.
 - Do not describe unmerged or planned features as shipped in docs.
 - Writing style in docs and comments: plain sentences, no marketing language, and no em dashes or en dashes.
 

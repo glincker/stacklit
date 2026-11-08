@@ -110,7 +110,7 @@ Scans the current directory, writes `stacklit.json`, `DEPENDENCIES.md` and `stac
 
 | Flag | Description |
 |------|-------------|
-| `--hook` | Install a git `post-commit` hook that runs `stacklit generate --quiet` and stages `stacklit.json` and `DEPENDENCIES.md`. An existing hook is appended to, never replaced. (The flag's built-in help text says "pre-commit"; the hook that is installed is `post-commit`.) |
+| `--hook` | Install a git `post-commit` hook that runs `stacklit generate --quiet` and stages `stacklit.json` and the configured mermaid file (`DEPENDENCIES.md` by default). An existing hook is appended to, never replaced. (The flag's built-in help text says "pre-commit"; the hook that is installed is `post-commit`.) |
 | `--summary` | Add an AI-written architecture narrative to the index. This is the only opt-in feature that sends data anywhere, see [Summary](#summary-opt-in). |
 | `--multi FILE` | Polyrepo mode: scan every repo path listed in FILE. See [Polyrepo scanning](#polyrepo-scanning). |
 | `--workspace PATH` | Accepted but currently has no effect on the scan. Monorepo workspaces are detected automatically. |
