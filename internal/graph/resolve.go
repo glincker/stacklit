@@ -961,7 +961,8 @@ func BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph {
 // come from c when it holds the file, so only changed files are re-read.
 func LinkSymbols(root string, files []string, fs []*FileSyms, c BodyCache) *SymGraph {
 	g := Resolve(fs, ResolveOptions{GoModules: DiscoverGoModules(root, files)})
-	g.Root = filepath.Base(root)
+	// A fixed value keeps a committed graph identical whatever the checkout folder is called.
+	g.Root = "."
 	g.AttachBodiesCached(root, c)
 	return g
 }
