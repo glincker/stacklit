@@ -45,7 +45,12 @@ const assistants = [
   [null, 'Aider'],
 ];
 const n = (s: string) => Number(s).toLocaleString('en-US');
-const ms = (s: string) => (Number(s) >= 1000 ? `${(Number(s) / 1000).toFixed(1)} s` : `${s} ms`);
+const armRows: [string, { found1: string; found5: string; tokens: string }][] = [
+  ['grep and read', bench.arms.grep],
+  ['BM25 over the question', bench.arms.bm25],
+  ['stacklit map plus lookup', bench.arms.map],
+  ['stacklit query 1000, read in printed order', bench.arms.query],
+];
 ---
 <Base
   title="Stacklit: a committed map of your codebase for AI agents"
@@ -203,24 +208,35 @@ Mermaid, an Obsidian vault, a markdown wiki</code></pre></div>
     <div class="container">
       <div class="section-head">
         <h2>What we measured</h2>
-        <p>Three pinned public repos, run on {bench.date}. These are index sizes and generation times, not a claim about agent quality.</p>
+        <p>{bench.localizationTasks} "where is this implemented?" tasks across {bench.repoCount} pinned public repos in six languages, run on {bench.date}. No model was involved, and tokens are bytes divided by four. Intervals are 95% bootstrap intervals over tasks.</p>
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Repo</th><th>Language</th><th class="num">Source lines</th><th class="num">Modules</th><th class="num">stacklit.json tokens</th><th class="num">derive map tokens</th><th class="num">Generate, median</th></tr></thead>
+          <thead><tr><th>Approach</th><th class="num">Found first</th><th class="num">Found in top 5</th><th class="num">Tokens to find</th></tr></thead>
           <tbody>
-            {bench.repos.map((r) => (
-              <tr><td>{r.repo}</td><td>{r.lang}</td><td class="num">{n(r.lines)}</td><td class="num">{r.modules}</td><td class="num">{n(r.indexTokens)}</td><td class="num">{n(r.deriveTokens)}</td><td class="num">{ms(r.genMedianMs)}</td></tr>
+            {armRows.map(([label, a]) => (
+              <tr><td>{label}</td><td class="num">{a.found1}</td><td class="num">{a.found5}</td><td class="num">{a.tokens}</td></tr>
             ))}
           </tbody>
         </table>
       </div>
       <ul class="bench-points">
-        <li>When you already know the exact symbol, grep is cheaper than loading a map.</li>
-        <li>On 30 navigation tasks, grep plus reading files reached the verified answer {bench.allTasks.grepFound} times and the map-and-lookup path {bench.allTasks.stacklitFound}. The misses are listed by name.</li>
-        <li>Tokens are bytes divided by four and no model was involved. It is a proxy, not an agent evaluation.</li>
+        <li>Grep and read leads on accuracy, and its search pattern was written by someone who knew the answer. The query command's gap to it, in percentage points with an interval, is {bench.pairedQueryVsGrep.found1} at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
+        <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact symbol, grep is cheaper than loading a map.</li>
+        <li>The query command used to print files sorted by path. Printed by relevance, the order an agent reads it, it beats BM25 on finding the right file first. It is a proxy, not an agent evaluation, and the scoring was tuned after looking at some benchmark failures.</li>
       </ul>
-      <p class="after-install"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with methodology and limitations.</p>
+      <p class="after-install">Index size on each repo. Generation times are on the benchmark page, where they are marked as upper bounds from a loaded machine.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Repo</th><th>Language</th><th class="num">Source lines</th><th class="num">Modules</th><th class="num">stacklit.json tokens</th><th class="num">derive map tokens</th></tr></thead>
+          <tbody>
+            {bench.repos.map((r) => (
+              <tr><td>{r.repo}</td><td>{r.lang}</td><td class="num">{n(r.lines)}</td><td class="num">{r.modules}</td><td class="num">{n(r.indexTokens)}</td><td class="num">{n(r.deriveTokens)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="after-install"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with {bench.totalTasks} tasks in all, methodology, the dependents results and limitations.</p>
     </div>
   </section>
   <script is:inline>

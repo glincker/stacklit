@@ -16,7 +16,7 @@ export async function GET() {
     '',
     `- [Demos](${SITE}/demos/): generated maps for gin, flask, hono, ripgrep, gson and rack`,
     `- [Source code](${REPO}): MIT license`,
-    `- [Security policy](${REPO}/blob/master/SECURITY.md)`,
+    `- [Security policy](${REPO}/blob/master/.github/SECURITY.md)`,
     '',
   ];
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
