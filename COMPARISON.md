@@ -98,8 +98,11 @@ Measured with the reproducible harness in [bench/](bench/) on pinned commits (to
 | gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens |
 | flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens |
 | hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens |
+| ripgrep 14.1.1 | Rust | 51,442 | 33 | 7,582 tokens | 368 tokens |
+| gson 2.11.0 | Java | 53,490 | 10 | 2,750 tokens | 187 tokens |
+| rack 3.1.8 | Ruby | 19,805 | 9 | 2,162 tokens | 126 tokens |
 
-Size follows the number of modules, not lines of code. See [bench/RESULTS.md](bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 30 navigation tasks, and limitations.
+Size follows the number of modules, not lines of code. See [bench/RESULTS.md](bench/RESULTS.md) for methodology, a comparison of grep, BM25, a repo-map approximation, a full dump and stacklit on 58 navigation tasks over six repos, and limitations. In that comparison the full code of the repos is 137,000 to 456,000 tokens.
 
 ## When to Use What
 
