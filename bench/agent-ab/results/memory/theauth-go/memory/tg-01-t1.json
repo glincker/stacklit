@@ -1,0 +1,30 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-01",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "I don't have reliable knowledge of this repository, so this is a best guess: device/device.go",
+  "turns": 1,
+  "cost_usd": 0.0095829,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 67,
+    "cache_creation_input_tokens": 2211,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 3.298855792,
+  "seven_day_utilization": 0.55,
+  "call_log": null,
+  "at": "2026-11-08T20:03:50Z"
+}

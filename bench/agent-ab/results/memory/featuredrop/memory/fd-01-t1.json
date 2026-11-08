@@ -1,0 +1,30 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-01",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/helpers.ts, src/storage.ts",
+  "turns": 1,
+  "cost_usd": 0.0108049,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 180,
+    "cache_creation_input_tokens": 2234,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.526701375,
+  "seven_day_utilization": 0.55,
+  "call_log": null,
+  "at": "2026-11-08T20:04:22Z"
+}

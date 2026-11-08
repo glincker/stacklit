@@ -1,0 +1,30 @@
+{
+  "repo": "levelrail",
+  "task": "lr-01",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "control-plane/internal/idle/conns_linux.go\n\nThis is a best guess. I don't have reliable knowledge of the glincker/levelrail repository, so the path is inferred from typical Go layout and Linux-specific file naming, not from the actual source.",
+  "turns": 1,
+  "cost_usd": 0.0106769,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 172,
+    "cache_creation_input_tokens": 2222,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.605412375,
+  "seven_day_utilization": 0.55,
+  "call_log": null,
+  "at": "2026-11-08T20:04:49Z"
+}

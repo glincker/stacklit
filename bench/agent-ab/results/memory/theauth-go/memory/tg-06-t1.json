@@ -1,0 +1,30 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "http/par.go, oauth2/par.go, store/memory/par.go, store/postgres/par.go, store/redis/par.go",
+  "turns": 1,
+  "cost_usd": 0.0116209,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 258,
+    "cache_creation_input_tokens": 2243,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.894616292,
+  "seven_day_utilization": 0.55,
+  "call_log": null,
+  "at": "2026-11-08T20:03:41Z"
+}
