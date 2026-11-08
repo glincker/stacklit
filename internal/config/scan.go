@@ -37,6 +37,11 @@ func (c *Config) applyEnv() {
 			c.Timestamps = &b
 		}
 	}
+	if v := os.Getenv("STACKLIT_GIT"); v != "" {
+		if b, err := strconv.ParseBool(v); err == nil {
+			c.GitActivity = &b
+		}
+	}
 	if v := os.Getenv("STACKLIT_NO_GIT"); v != "" {
 		off := false
 		c.GitActivity = &off
@@ -62,11 +67,11 @@ func (c *Config) WorkerCount() int {
 // CacheEnabled reports whether the incremental cache is on (default true).
 func (c *Config) CacheEnabled() bool { return c.Cache == nil || *c.Cache }
 
-// TimestampsEnabled reports whether generated_at should be written (default true).
-func (c *Config) TimestampsEnabled() bool { return c.Timestamps == nil || *c.Timestamps }
+// TimestampsEnabled reports whether generated_at should be written (default false so a committed index stays byte-stable).
+func (c *Config) TimestampsEnabled() bool { return c.Timestamps != nil && *c.Timestamps }
 
-// GitActivityEnabled reports whether git history feeds the index (default true).
-func (c *Config) GitActivityEnabled() bool { return c.GitActivity == nil || *c.GitActivity }
+// GitActivityEnabled reports whether git history feeds the index (default false, opt in with git_activity or STACKLIT_GIT).
+func (c *Config) GitActivityEnabled() bool { return c.GitActivity != nil && *c.GitActivity }
 
 // NormalizedRoots returns cleaned, slash-separated scan roots relative to the
 // repo root. Empty means "scan everything".

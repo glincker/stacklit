@@ -22,8 +22,8 @@ type Config struct {
 	MaxFileSize int64    `json:"max_file_size,omitempty"` // bytes; larger files are skipped with a warning
 	Workers     int      `json:"workers,omitempty"`       // parser pool size; 0 means NumCPU
 	Cache       *bool    `json:"cache,omitempty"`         // incremental cache, default on
-	Timestamps  *bool    `json:"timestamps,omitempty"`    // write generated_at, default on
-	GitActivity *bool    `json:"git_activity,omitempty"`  // include hot/recent files, default on
+	Timestamps  *bool    `json:"timestamps,omitempty"`    // write generated_at, default off
+	GitActivity *bool    `json:"git_activity,omitempty"`  // include hot/recent files, default off
 }
 
 // OutputConfig controls where output files are written.

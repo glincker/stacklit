@@ -34,8 +34,12 @@ var initCmd = &cobra.Command{
 			return nil
 		}
 
+		root := "."
+		if initWorkspace != "" {
+			root = initWorkspace
+		}
 		result, err := engine.Run(engine.Options{
-			Root:        ".",
+			Root:        root,
 			Workspace:   initWorkspace,
 			InstallHook: initHook,
 			Summary:     initSummary,
@@ -50,7 +54,7 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
-	initCmd.Flags().BoolVar(&initHook, "hook", false, "Install a git pre-commit hook")
+	initCmd.Flags().BoolVar(&initHook, "hook", false, "Install a git post-commit hook")
 	initCmd.Flags().StringVar(&initWorkspace, "workspace", "", "Path to workspace root (default: current directory)")
 	initCmd.Flags().BoolVar(&initSummary, "summary", false, "Generate a high-level summary during init")
 	initCmd.Flags().StringVar(&initMultiOut, "multi-output", "", "Where to write the multi-repo index (default stacklit-multi.json)")
