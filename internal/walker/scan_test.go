@@ -136,3 +136,10 @@ func TestMissingRootDir(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestNormalizeRootsWindowsStyle(t *testing.T) {
+	roots, esc, whole := normalizeRoots([]string{`src\app`, `src\app\sub`, `..\x`, "lib/"})
+	if whole || len(esc) != 1 || len(roots) != 2 || roots[0] != "lib" || roots[1] != "src/app" {
+		t.Fatalf("roots=%v esc=%v whole=%v", roots, esc, whole)
+	}
+}
