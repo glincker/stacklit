@@ -90,6 +90,7 @@ var skipBasenames = map[string]bool{
 	"npm-shrinkwrap.json": true,
 	"pnpm-lock.yaml":      true,
 	"stacklit.json":       true,
+	".stacklitrc.json":    true,
 }
 
 // alwaysIgnoreDirs contains directory names that are always skipped regardless
