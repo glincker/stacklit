@@ -3,8 +3,10 @@ package engine
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/glincker/stacklit/internal/cache"
 	"github.com/glincker/stacklit/internal/config"
@@ -43,6 +45,10 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		fmt.Printf("[stacklit] found %d files\n", len(walked.Files))
 	}
 
+	if lim := cfg.MemoryLimitBytes(); lim > 0 {
+		defer debug.SetMemoryLimit(debug.SetMemoryLimit(lim))
+	}
+
 	var store *cache.Store
 	var pc parser.Cache
 	if cfg.CacheEnabled() {
@@ -57,6 +63,7 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		Workers:      cfg.WorkerCount(),
 		MemoryBudget: cfg.ParseMemoryBytes(),
 		MaxFileSize:  cfg.MaxFileSize,
+		Limits:       cfg.ParseLimits(),
 		Cache:        pc,
 		Visit: func(_ string, content []byte) {
 			vars := detect.FileEnvVars(content)
@@ -83,6 +90,12 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 			}
 			continue
 		}
+		if r.Info.Fallback != "" {
+			out.Info.Lightweight = append(out.Info.Lightweight, r.Path+" ("+r.Info.Fallback+")")
+		}
+		if r.Dur >= traceSlow {
+			fmt.Fprintf(os.Stderr, "[stacklit trace] slow parse %s %s\n", r.Path, r.Dur.Round(time.Millisecond))
+		}
 		kept = append(kept, r.Path)
 		out.Parsed = append(out.Parsed, r.Info)
 		leaves[r.Path] = r.Leaf
@@ -104,6 +117,7 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		}
 	}
 	sort.Strings(out.Info.ParseErrors)
+	sort.Strings(out.Info.Lightweight)
 
 	for v := range envSeen {
 		out.EnvVars = append(out.EnvVars, v)
@@ -120,7 +134,7 @@ func scanRepo(root string, cfg *config.Config, quiet bool) (*scanResult, error) 
 		fmt.Printf("[stacklit] parsed %d files (%d errors, %d cached)\n", len(out.Parsed), out.ParseErrors, out.CacheHits)
 	}
 
-	if len(out.Info.SkippedLarge)+len(out.Info.SkippedSymlinks)+len(out.Info.SkippedOther)+len(out.Info.ParseErrors) == 0 {
+	if len(out.Info.SkippedLarge)+len(out.Info.SkippedSymlinks)+len(out.Info.SkippedOther)+len(out.Info.ParseErrors)+len(out.Info.Lightweight) == 0 {
 		out.Info = nil
 	}
 	return out, nil
@@ -142,3 +156,12 @@ func mergeEnvVars(root string, scanned []string) []string {
 	sort.Strings(out)
 	return out
 }
+
+// traceSlow is the parse time above which STACKLIT_TRACE reports a file; it
+// is 0 (never) unless tracing is on.
+var traceSlow = func() time.Duration {
+	if os.Getenv("STACKLIT_TRACE") == "" {
+		return 1 << 62
+	}
+	return 250 * time.Millisecond
+}()

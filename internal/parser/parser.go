@@ -15,6 +15,7 @@ type FileInfo struct {
 	TypeDefs     map[string]string `json:"type_defs,omitempty"` // type name -> brief definition
 	LineCount    int               `json:"line_count"`
 	IsEntrypoint bool              `json:"is_entrypoint,omitempty"`
+	Fallback     string            `json:"fallback,omitempty"` // why tree-sitter was skipped, see limits.go
 }
 
 // Parser extracts structured information from a source file.

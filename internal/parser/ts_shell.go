@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"regexp"
 	"strings"
 
 	gts "github.com/odvcencio/gotreesitter"
@@ -34,6 +35,41 @@ func extractShell(root *gts.Node, lang *gts.Language, src []byte, path string) *
 		}
 		return gts.WalkContinue
 	})
+	info.Imports = dedup(info.Imports)
+	info.Exports = dedup(info.Exports)
+	return info
+}
+
+var (
+	shellFuncRe   = regexp.MustCompile(`^\s*(?:function\s+)?([A-Za-z_][A-Za-z0-9_:.-]*)\s*\(\s*\)\s*(?:\{|$)|^\s*function\s+([A-Za-z_][A-Za-z0-9_:.-]*)\b`)
+	shellSourceRe = regexp.MustCompile(`^\s*(?:source|\.)\s+("[^"]+"|'[^']+'|[^\s;&|]+)`)
+)
+
+// scanShell is a line-based extractor for shell scripts. The bash grammar
+// costs about half a millisecond per byte in the pure-Go GLR parser (a 3 KB
+// script takes over a second), and the index only needs function names and
+// sourced files, which a line scan finds reliably.
+func scanShell(path string, content []byte) *FileInfo {
+	info := &FileInfo{Path: path, Language: "shell", LineCount: countLines(content)}
+	for _, line := range strings.Split(string(content), "\n") {
+		trim := strings.TrimSpace(line)
+		if trim == "" || strings.HasPrefix(trim, "#") {
+			continue
+		}
+		if m := shellSourceRe.FindStringSubmatch(line); m != nil {
+			info.Imports = append(info.Imports, stripQuotes(m[1]))
+			continue
+		}
+		if m := shellFuncRe.FindStringSubmatch(line); m != nil {
+			name := m[1]
+			if name == "" {
+				name = m[2]
+			}
+			if !strings.HasPrefix(name, "_") {
+				info.Exports = append(info.Exports, name+"()")
+			}
+		}
+	}
 	info.Imports = dedup(info.Imports)
 	info.Exports = dedup(info.Exports)
 	return info

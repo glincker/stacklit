@@ -15,6 +15,7 @@ var rootCmd = &cobra.Command{
 
 // Execute runs the root command.
 func Execute() error {
+	defer startProfile()()
 	return rootCmd.Execute()
 }
 
