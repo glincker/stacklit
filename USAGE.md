@@ -296,7 +296,14 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
 | `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
 | `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
-| `parse_memory_mb` | 512 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |
+| `parse_memory_mb` | 256 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |
+| `parse_timeout_ms` | 3000 | Wall-clock budget per file for tree-sitter. A file that exceeds it is indexed with line count only and listed in `scan.lightweight`. Env: `STACKLIT_PARSE_TIMEOUT_MS` (0 disables). |
+| `ts_max_bytes` | 131072 | Files larger than this skip tree-sitter (reason `large`). Env: `STACKLIT_TS_MAX_BYTES` (0 disables). |
+| `max_line_len` | 2000 | A line longer than this marks the file minified and skips tree-sitter. Env: `STACKLIT_MAX_LINE_LEN` (0 disables). |
+| `skip_generated` | true | Files named `.min.`, `.pb.`, `.gen.` or marked "generated" / "do not edit" in the first KB skip tree-sitter. Env: `STACKLIT_SKIP_GENERATED`. |
+| `memory_limit_mb` | 448 | Soft Go heap limit during a scan, to keep RSS near the live set. An explicit `GOMEMLIMIT` wins. Env: `STACKLIT_MEMORY_LIMIT_MB` (0 disables). |
+
+Diagnostics: `STACKLIT_TRACE=1` prints files whose parse took over 250 ms; `STACKLIT_PPROF=<dir>` writes `cpu.pprof`, `heap.pprof` and `heap-peak.pprof`.
 
 A file that is missing, unreadable or invalid JSON is ignored and the defaults are used.
 
