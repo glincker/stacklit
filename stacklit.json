@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T18:52:40Z",
+  "generated_at": "2026-11-08T18:56:34Z",
   "stacklit_version": "dev",
-  "merkle_hash": "bbd1cb1a7f1c98cd4baf36c429cebb45b70f817cf10c0f45f08f200c1d7b238f",
+  "merkle_hash": "735d17495650c0b538e98c283479a6e8b2c592e1ea32c05cfa640a3479a206fd",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 49
       },
       "go": {
-        "files": 235,
-        "lines": 33710
+        "files": 240,
+        "lines": 34643
       },
       "graphql": {
         "files": 1,
@@ -73,8 +73,8 @@
         "lines": 45
       },
       "rust": {
-        "files": 3,
-        "lines": 41
+        "files": 4,
+        "lines": 222
       },
       "scala": {
         "files": 3,
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 302,
-    "total_lines": 35130
+    "total_files": 308,
+    "total_lines": 36244
   },
   "modules": {
     "assets": {
@@ -292,7 +292,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 595,
+      "lines": 655,
       "file_list": [
         "config.go",
         "config_test.go",
@@ -306,15 +306,15 @@
         "DefaultConfig() *Config",
         "DefaultMaxFileSize",
         "DefaultMaxLineLen",
+        "DefaultMaxModuleFiles",
         "DefaultMemoryLimitMB",
+        "DefaultModuleSplitFiles",
         "DefaultParseMemoryMB",
-        "DefaultParseTimeoutMS",
-        "DefaultTSMaxBytes",
-        "Error() string"
+        "DefaultParseTimeoutMS"
       ],
       "type_defs": {
         "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
-        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, Workers int, ParseMemoryMB int, ParseTimeo...",
+        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, MaxModuleFiles int, ModuleSplitFiles int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, ...",
         "Error": "Err error",
         "ForbiddenEdge": "From string, To string, Reason string",
         "OutputConfig": "JSON string, Mermaid string, HTML string"
@@ -421,7 +421,7 @@
       "purpose": "Core orchestration engine",
       "language": "go",
       "files": 10,
-      "lines": 1687,
+      "lines": 1689,
       "file_list": [
         "bench_test.go",
         "engine.go",
@@ -574,8 +574,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 44,
-      "lines": 10452,
+      "files": 46,
+      "lines": 11027,
       "file_list": [
         "analysis.go",
         "body.go",
@@ -611,7 +611,7 @@
         "DefaultPointerTokens"
       ],
       "type_defs": {
-        "BuildOptions": "MaxDepth int, MaxModules int",
+        "BuildOptions": "MaxDepth int, MaxModules int, Root string, SplitFiles int",
         "Community": "ID int, Label string, Files int, Nodes int, Top []string",
         "Def": "Name string, Qual string, Kind string, Line int, End int, Doc string, Sig string, Decl bool, Vis string, Recv string, Methods []string",
         "Edge": "From string, To string, Count int",
@@ -778,9 +778,10 @@
     "internal/parser": {
       "purpose": "Source code parsers",
       "language": "go",
-      "files": 57,
-      "lines": 7314,
+      "files": 60,
+      "lines": 7610,
       "file_list": [
+        "datarun.go",
         "fuzz_test.go",
         "generic.go",
         "generic_test.go",
@@ -795,12 +796,11 @@
         "pool.go",
         "pool_test.go",
         "python_test.go",
+        "race_test.go",
+        "ruby_datarun_test.go",
         "rust_test.go",
         "treesitter.go",
-        "ts_build.go",
-        "ts_c.go",
-        "ts_clojure.go",
-        "ts_common.go"
+        "ts_build.go"
       ],
       "exports": [
         "CanParse(_ string) bool",
@@ -1469,6 +1469,7 @@
       "ANTHROPIC_API_KEY",
       "GOMEMLIMIT",
       "STACKLIT_CACHE_DIR",
+      "STACKLIT_DATA_RUN_LINES",
       "STACKLIT_DIGEST_TOKENS",
       "STACKLIT_GIT",
       "STACKLIT_GRAPH_INCLUDE_TESTS",
@@ -1491,6 +1492,7 @@
       "STACKLIT_SCIP_MAX_BYTES",
       "STACKLIT_SKIP_CHECKSUM",
       "STACKLIT_SKIP_GENERATED",
+      "STACKLIT_STRESS_DIR",
       "STACKLIT_TIMESTAMPS",
       "STACKLIT_TRACE",
       "STACKLIT_TS_MAX_BYTES",
