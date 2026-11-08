@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/\u003cname\u003e/\u003cname\u003e.go, provider/\u003cname\u003e/\u003cname\u003e_test.go, provider/\u003cname\u003e/doc.go, provider/github/github.go, provider/github/github_test.go, provider/github/doc.go\n\nSlack already exists at `provider/slack/slack.go`, `examples/oauth-slack/main.go` and `provider/slack/slack_test.go`. If you meant a different provider, replace `\u003cname\u003e` with it. You'd probably also add `examples/oauth-\u003cname\u003e/main.go`.",
+  "turns": 4,
+  "cost_usd": 0.026423000000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 571,
+    "cache_creation_input_tokens": 4796,
+    "cache_read_input_tokens": 15170
+  },
+  "tool_calls": {
+    "Glob": 2,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.663396917,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)(github|google|gitlab|discord)",
+    "Glob pattern=**/*{oauth,social,provider}*/**",
+    "Glob pattern=**/*{github,google}*.go"
+  ],
+  "at": "2026-11-08T20:18:42Z"
+}

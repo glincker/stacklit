@@ -1,0 +1,35 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-10",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/scim/filter.go",
+  "turns": 3,
+  "cost_usd": 0.014624300000000002,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 202,
+    "cache_creation_input_tokens": 2929,
+    "cache_read_input_tokens": 8803
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.324163834,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)scim.*filter|filter.*scim",
+    "Grep pattern=\\beq\\b.*\\bco\\b|\"eq\"|'eq'"
+  ],
+  "at": "2026-11-08T20:09:58Z"
+}

@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/slack/slack.go, provider/slack/slack_test.go, examples/oauth-slack/main.go, provider/github/github.go\n\nSlack already exists in this repo at those paths. For a different provider, copy `provider/github/github.go` into a new `provider/\u003cname\u003e/` directory.",
+  "turns": 4,
+  "cost_usd": 0.025325,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 626,
+    "cache_creation_input_tokens": 4384,
+    "cache_read_input_tokens": 15170
+  },
+  "tool_calls": {
+    "Glob": 2,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 14.025549709,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)(github|google|gitlab|discord)",
+    "Glob pattern=**/*{provider,oauth,social}*/**/*.go",
+    "Glob pattern=**/{github,google,discord,gitlab}*.go"
+  ],
+  "at": "2026-11-08T20:18:18Z"
+}

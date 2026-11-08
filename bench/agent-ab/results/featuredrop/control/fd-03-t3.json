@@ -1,0 +1,35 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-03",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/next/index.ts, src/nuxt/index.ts, src/remix/index.ts, src/astro/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0171877,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 263,
+    "cache_creation_input_tokens": 3271,
+    "cache_read_input_tokens": 14617
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.11535625,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=getNewFeaturesServer",
+    "Grep pattern=(function|const|let|var)\\s+getNewFeaturesServer|getNewFeaturesServer\\s*[:=(]"
+  ],
+  "at": "2026-11-08T20:22:15Z"
+}

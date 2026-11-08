@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-10",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/scim/filter.go, internal/scim/wire.go",
+  "turns": 4,
+  "cost_usd": 0.018166500000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 347,
+    "cache_creation_input_tokens": 3298,
+    "cache_read_input_tokens": 14925
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.170731958,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=(?i)scim.*filter|filter.*scim|\\beq\\b.*\\bco\\b|\"eq\"",
+    "Glob pattern=**/*scim*/**/*filter*",
+    "Grep pattern=func .*[Pp]arse.*[Ff]ilter|func [Pp]arse path=/private/tmp/abreal/work/ab-1246330160/co-1906211149/internal/scim"
+  ],
+  "at": "2026-11-08T20:13:00Z"
+}

@@ -1,0 +1,36 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-08",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/audit/events.go, audit/events.go",
+  "turns": 4,
+  "cost_usd": 0.0323003,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 339,
+    "cache_creation_input_tokens": 6431,
+    "cache_read_input_tokens": 31703
+  },
+  "tool_calls": {
+    "Bash": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.02961475,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"audit event name constants\" --budget 800",
+    "Bash grep -c 'Event.* = \"' internal/audit/events.go audit/events.go",
+    "Bash sed -n 1,50p audit/events.go; grep -rln 'Event[A-Za-z]* *= *\"' --include=*.go . | grep -v _test | head"
+  ],
+  "at": "2026-11-08T20:14:57Z"
+}

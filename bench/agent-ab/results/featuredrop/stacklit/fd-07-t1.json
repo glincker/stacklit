@@ -1,0 +1,35 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-07",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/adapters/dynamodb.ts, src/adapters/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0300235,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 286,
+    "cache_creation_input_tokens": 6234,
+    "cache_read_input_tokens": 22155
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.301064542,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"storage adapter pattern and where adapters are exported\" --budget 800; ls src/adapters",
+    "Bash cat src/adapters/index.ts | head -30; grep -n \"adapters\" package.json tsup.config.* 2\u003e/dev/null | head -30"
+  ],
+  "at": "2026-11-08T20:26:35Z"
+}

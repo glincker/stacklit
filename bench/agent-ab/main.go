@@ -69,6 +69,7 @@ type record struct {
 	ReadBytes     int            `json:"read_bytes"`
 	StacklitCalls int            `json:"stacklit_calls"`
 	HookEvents    int            `json:"hook_events"`
+	CrawlFired    bool           `json:"crawl_guard_fired"`
 	Denials       int            `json:"permission_denials"`
 	Subtype       string         `json:"result_subtype"`
 	Seconds       float64        `json:"seconds"`
@@ -82,7 +83,7 @@ type config struct {
 	repo, reposFile, tasksDir, stacklit, claude, model, resultsDir, ledger, arms, work, mode, only string
 	trials, limit, maxTurns                                                                        int
 	seed                                                                                           int64
-	yesSpend, dryRun                                                                               bool
+	yesSpend, dryRun, analysis                                                                     bool
 	maxBudget, cap, estMid                                                                         float64
 }
 
@@ -112,7 +113,15 @@ func main() {
 	flag.Float64Var(&c.estMid, "est-session-usd", 0.3, "assumed USD per session, for the dry-run projection only")
 	flag.BoolVar(&c.dryRun, "dry-run", false, "print the plan, run nothing")
 	flag.BoolVar(&c.yesSpend, "yes-spend", false, "required: confirm you accept the spend of real agent sessions")
+	flag.BoolVar(&c.analysis, "analyze", false, "analyze existing results into summary.json and tables.md, run nothing")
 	flag.Parse()
+	if c.analysis {
+		if err := analyze(c, []string{"levelrail", "theauth-go", "featuredrop"}); err != nil {
+			fmt.Fprintln(os.Stderr, "agent-ab:", err)
+			os.Exit(1)
+		}
+		return
+	}
 	if err := run(c); err != nil {
 		fmt.Fprintln(os.Stderr, "agent-ab:", err)
 		os.Exit(1)
@@ -375,7 +384,8 @@ func runUnit(c config, r repo, base string, u unit) (record, error) {
 			steps := [][]string{{"generate", "--graph", "--quiet"}}
 			setup := []string{"setup", "claude", "--no-mcp", "--no-git-hook", "--session-hook"}
 			if u.Arm == "strict" {
-				setup = append(setup, "--crawl-guard", "--steering", "d")
+				setup = append(setup, "--crawl-guard=redirect")
+				env = append(env, "STACKLIT_STEERING=d")
 			}
 			steps = append(steps, setup)
 			for _, args := range steps {
@@ -403,7 +413,9 @@ func runUnit(c config, r repo, base string, u unit) (record, error) {
 	cmd.Stdin = nil
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+	cacheDir := filepath.Join(base, "cache-"+u.Arm)
 	runErr := cmd.Run()
+	rec.CrawlFired = crawlFired(cacheDir, start)
 	rec.Seconds = time.Since(start).Seconds()
 	keepTranscript(base, u, stdout.Bytes())
 	p, perr := parseStream(stdout.Bytes())
@@ -468,4 +480,25 @@ func grade(answer string, t task) (bool, float64) {
 		}
 	}
 	return ok, recall
+}
+
+// crawlFired reports whether the crawl guard recorded a redirect for a
+// session that ran since start: its state file lives in the cache dir.
+func crawlFired(cacheDir string, since time.Time) bool {
+	files, _ := filepath.Glob(filepath.Join(cacheDir, "crawl-*.json"))
+	for _, f := range files {
+		st, err := os.Stat(f)
+		if err != nil || st.ModTime().Before(since) {
+			continue
+		}
+		b, _ := os.ReadFile(f)
+		var s struct {
+			N        int  `json:"n"`
+			Released bool `json:"released"`
+		}
+		if json.Unmarshal(b, &s) == nil && (s.N > 0 || s.Released) {
+			return true
+		}
+	}
+	return false
 }

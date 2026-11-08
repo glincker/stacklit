@@ -1,0 +1,36 @@
+{
+  "repo": "levelrail",
+  "task": "lr-08",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "cmd/levelrail-cli/apps.go, cmd/levelrail-cli/apps_\u003cname\u003e.go",
+  "turns": 3,
+  "cost_usd": 0.0273282,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 304,
+    "cache_creation_input_tokens": 5518,
+    "cache_read_input_tokens": 22042
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 37.665888209,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"CLI apps sleep subcommand dispatch\" --budget 800",
+    "Grep pattern=runAppsSleep\\( path=/private/tmp/abreal/work/ab-1133762422/co-3761063741/cmd/levelrail-cli"
+  ],
+  "at": "2026-11-08T20:44:14Z"
+}

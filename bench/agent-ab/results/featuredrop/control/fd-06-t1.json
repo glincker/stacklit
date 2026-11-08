@@ -1,0 +1,34 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-06",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-tour.ts, src/react/components/checklist.tsx, src/react/hooks/use-tour-sequencer.ts, src/react/components/tour.tsx",
+  "turns": 2,
+  "cost_usd": 0.013278300000000002,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 170,
+    "cache_creation_input_tokens": 2672,
+    "cache_read_input_tokens": 8823
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.737337167,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Grep pattern=tour-registry"
+  ],
+  "at": "2026-11-08T20:19:32Z"
+}

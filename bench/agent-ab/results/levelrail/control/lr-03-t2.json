@@ -1,0 +1,34 @@
+{
+  "repo": "levelrail",
+  "task": "lr-03",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/components/AppAutoscaleCard.tsx, web/src/components/autoscale/AutoscaleForm.tsx, web/src/queries/autoscale.ts",
+  "turns": 2,
+  "cost_usd": 0.0234415,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 215,
+    "cache_creation_input_tokens": 5046,
+    "cache_read_input_tokens": 10995
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.865821833,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=autoscal path=/private/tmp/abreal/work/ab-1133762422/co-2628908580/web/src"
+  ],
+  "at": "2026-11-08T20:46:49Z"
+}

@@ -1,0 +1,34 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-02",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/throttle.ts, src/react/provider.tsx",
+  "turns": 2,
+  "cost_usd": 0.0226085,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 99,
+    "cache_creation_input_tokens": 5091,
+    "cache_read_input_tokens": 12465
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.695087666,
+  "seven_day_utilization": 0.55,
+  "call_log": [
+    "Bash stacklit query \"rate limit / throttle / max announcements per time window in React layer\" --budget 800"
+  ],
+  "at": "2026-11-08T20:21:15Z"
+}

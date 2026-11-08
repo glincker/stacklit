@@ -1,0 +1,34 @@
+{
+  "repo": "levelrail",
+  "task": "lr-01",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/appsleep/conns_linux.go",
+  "turns": 2,
+  "cost_usd": 0.022423399999999996,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 96,
+    "cache_creation_input_tokens": 5053,
+    "cache_read_input_tokens": 12434
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 28.034456792,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"count established TCP connections /proc/net/tcp idle sleep\" --budget 800"
+  ],
+  "at": "2026-11-08T20:50:56Z"
+}

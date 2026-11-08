@@ -1,0 +1,34 @@
+{
+  "repo": "levelrail",
+  "task": "lr-09",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ingress/layer4.go",
+  "turns": 2,
+  "cost_usd": 0.0227784,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 101,
+    "cache_creation_input_tokens": 5129,
+    "cache_read_input_tokens": 12444
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 87.317998084,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"layer 4 TCP UDP reverse proxy handler embedded Caddy ingress\" --budget 800"
+  ],
+  "at": "2026-11-08T20:35:20Z"
+}
