@@ -88,6 +88,16 @@ The benchmark shows generation takes milliseconds on a Go repo but seconds and 0
 | More repos, more tasks, an agent-in-the-loop variant with real model runs | Planned |
 | Track benchmark results per release | Planned |
 
+## 8. Ecosystem and exports
+
+| Item | Status |
+|------|--------|
+| `export --format` graphml, cypher, json, dot, mermaid, obsidian and markdown-wiki over the module and symbol graphs | Unreleased (0.5.0) |
+| `merge-graphs` with repo-prefixed IDs and manifest-based cross-repo links | Unreleased (0.5.0) |
+| `ingest --adapter`: a JSONL contract for concepts from PDFs, images, audio and anything else, tagged INFERRED with a source | Unreleased (0.5.0) |
+| `check` rules in `.stacklitrc.json`: forbidden edges, cycles, fan-in and fan-out limits, orphans, exit code 3 | Unreleased (0.5.0) |
+| `ingest --scip`: upgrade INFERRED edges to EXACT from a SCIP index, with no new dependencies | Unreleased (0.5.0) |
+
 ## How to influence this
 
 Open a [feature request](https://github.com/glincker/stacklit/issues/new/choose), add a benchmark task that shows a gap, or send a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
