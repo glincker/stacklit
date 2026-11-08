@@ -123,7 +123,7 @@ func RenderMarkdown(results []RepoResult, env Env, bp BaselineParams) string {
 	}
 
 	b.WriteString("### Aggregate\n\n")
-	b.WriteString("Mean tokens per task. \"Query only\" excludes the derive map, which is a standing cost when it is injected into the agent's config file.\n\n")
+	b.WriteString("Mean tokens per task. \"Query only\" excludes the derive map, which is a standing cost when it is injected into the agent's config file. Ratios are grep tokens divided by stacklit tokens: above 1.0x stacklit is cheaper, below 1.0x it costs more.\n\n")
 	b.WriteString("| Scope | Tasks | grep lookup | grep+read | map+query lookup | query only | map+query+read | grep+read found | stacklit found | lookup ratio (grep / stacklit) | end-to-end ratio |\n")
 	b.WriteString("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
 	kinds := []string{"locate", "dependents", "where-to-add"}
