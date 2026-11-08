@@ -1,9 +1,7 @@
 ---
-import Base from '../layouts/Base.astro';
+import Landing from '../layouts/Landing.astro';
+import NotFound from '../sections/NotFound.astro';
 ---
-<Base title="Page not found | Stacklit" description="This page does not exist." path="/404/" noindex>
-  <div class="container page-head">
-    <h1>Page not found</h1>
-    <p>That address does not lead anywhere. Try the <a href="/docs/quickstart/">quickstart</a>, the <a href="/demos/">demos</a> or the <a href="/">home page</a>.</p>
-  </div>
-</Base>
+<Landing title="Page not found | Stacklit" description="This page does not exist." path="/404/" noindex>
+  <NotFound />
+</Landing>

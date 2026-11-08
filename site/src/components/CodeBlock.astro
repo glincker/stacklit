@@ -1,0 +1,17 @@
+---
+// Code never wraps: the block scrolls sideways and takes keyboard focus so it can be scrolled by key.
+interface Props { code: string; html?: string; label?: string; note?: string; copy?: boolean; inline?: boolean; prompt?: boolean; class?: string }
+const { code, html, label, note, copy = false, inline = false, prompt = false, class: extra } = Astro.props;
+---
+<div class:list={['min-w-0 max-w-full overflow-hidden rounded-lg border border-term-line bg-term text-term-text', extra]}>
+  {!inline && (label || copy) && (
+    <div class="flex items-center justify-between gap-3 border-b border-term-line px-4 py-2 text-caption text-term-dim">
+      <span class="min-w-0 truncate"><span class="font-mono">{label}</span>{note && <span>{label ? ', ' : ''}{note}</span>}</span>
+      {copy && <button type="button" data-copy={code} class="min-h-9 shrink-0 rounded-sm px-3 text-caption font-semibold text-term-accent hover:text-term-text">Copy</button>}
+    </div>
+  )}
+  <div class:list={['flex items-center', inline && 'gap-1']}>
+    <pre tabindex="0" class:list={['min-w-0 flex-1 overflow-x-auto whitespace-pre font-mono text-code', inline ? 'px-4 py-2.5' : 'px-4 py-4']}><code>{prompt && <span class="select-none text-term-dim" aria-hidden="true">$ </span>}{html ? <Fragment set:html={html} /> : code}</code></pre>
+    {inline && copy && <button type="button" data-copy={code} class="mr-1 min-h-9 shrink-0 rounded-sm px-3 text-caption font-semibold text-term-accent hover:text-term-text">Copy</button>}
+  </div>
+</div>

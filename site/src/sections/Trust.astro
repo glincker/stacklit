@@ -1,0 +1,10 @@
+---
+import Section from '../components/Section.astro';
+import copy from '../data/copy.json';
+---
+<Section size="md" label="trust-title">
+  <h2 id="trust-title" class="mb-6 text-h3 text-ink">Plain facts</h2>
+  <ul class="grid min-w-0 gap-x-8 gap-y-3 sm:grid-cols-2">
+    {copy.trust.items.map((t) => <li class="min-w-0 border-t border-line pt-3 text-body text-ink">{t}</li>)}
+  </ul>
+</Section>

@@ -1,0 +1,25 @@
+---
+import Section from '../components/Section.astro';
+import ActionRow from '../components/ActionRow.astro';
+import Button from '../components/Button.astro';
+import StarButton from '../components/StarButton.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import Logo from '../components/Logo.astro';
+import copy from '../data/copy.json';
+const sources: [string, string][] = [['npm', 'npm'], ['go install', 'go'], ['GitHub releases', 'github']];
+---
+<Section label="final-title">
+  <h2 id="final-title" class="max-w-heading text-h2 text-ink">{copy.final.title}</h2>
+  <p class="mt-4 max-w-measure text-lead text-muted">{copy.final.text}</p>
+  <div class="mt-8">
+    <ActionRow>
+      <CodeBlock inline copy prompt code={copy.cta.install} class="w-fit max-w-full" />
+      <StarButton />
+      <Button href="/docs/quickstart/" variant="secondary">Quickstart</Button>
+    </ActionRow>
+  </div>
+  <h3 class="mb-4 mt-10 text-h3 text-ink">Also available through</h3>
+  <ul class="flex flex-wrap gap-x-6 gap-y-4">
+    {sources.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
+  </ul>
+</Section>
