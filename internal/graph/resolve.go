@@ -607,6 +607,12 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 
 	q := ref.Qual
 	first := firstSeg(q)
+	if strings.HasPrefix(q, "@") {
+		if hit := r.methodsOf[q[1:]+"\x00"+name]; len(hit) > 0 {
+			return r.fanout(hit, ConfExtracted, 0.9, 0.45)
+		}
+		return r.methodGuess(name, 0.45)
+	}
 	switch first {
 	case "this", "self", "cls", "super", "Self":
 		if q == first && ownerRecv != "" {

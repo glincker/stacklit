@@ -99,6 +99,11 @@ func TestResolveEdges(t *testing.T) {
 		}, nil, []struct{ from, to, kind, conf string }{
 			{"A.go", "B.help", "calls", ConfExtracted},
 		}},
+		{"go typed local receiver", map[string]string{
+			"a/a.go": "package a\n\ntype T struct{}\n\nfunc (T) Run() {}\n\ntype U struct{}\n\nfunc (U) Run() {}\n\nfunc f() { t := &T{}; t.Run() }\n",
+		}, nil, []struct{ from, to, kind, conf string }{
+			{"a.go::f", "T.Run", "calls", ConfExtracted},
+		}},
 		{"unknown receiver is inferred", map[string]string{
 			"a.py": "def f(x):\n    x.frobnicate()\n",
 			"b.py": "class T:\n    def frobnicate(self):\n        pass\n",

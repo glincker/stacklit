@@ -76,9 +76,10 @@ func extractGo(file string, src []byte) *FileSyms {
 			if d.Body != nil {
 				idx := len(fs.Defs) - 1
 				seen := map[string]bool{}
+				vars := goVarTypes(d)
 				ast.Inspect(d.Body, func(n ast.Node) bool {
 					if c, ok := n.(*ast.CallExpr); ok {
-						addGoCall(fs, idx, c, recvVar, seen)
+						addGoCall(fs, idx, c, recvVar, vars, seen)
 					}
 					return true
 				})
@@ -166,7 +167,7 @@ func goEmbedded(e ast.Expr) (name, qual string) {
 	return "", ""
 }
 
-func addGoCall(fs *FileSyms, from int, c *ast.CallExpr, recvVar string, seen map[string]bool) {
+func addGoCall(fs *FileSyms, from int, c *ast.CallExpr, recvVar string, vars map[string]string, seen map[string]bool) {
 	var name, qual string
 	switch fn := c.Fun.(type) {
 	case *ast.Ident:
@@ -177,6 +178,8 @@ func addGoCall(fs *FileSyms, from int, c *ast.CallExpr, recvVar string, seen map
 			qual = x.Name
 			if recvVar != "" && qual == recvVar {
 				qual = "this"
+			} else if t, ok := vars[qual]; ok {
+				qual = "@" + t // receiver type known from a declaration
 			}
 		} else {
 			qual = "?"
@@ -198,3 +201,74 @@ func addGoCall(fs *FileSyms, from int, c *ast.CallExpr, recvVar string, seen map
 }
 
 var goBuiltins = wordSet("append cap clear close complex copy delete imag len make max min new panic print println real recover string int int8 int16 int32 int64 uint uint8 uint16 uint32 uint64 float32 float64 byte rune bool error any")
+
+// goVarTypes maps local names to their type name where it is evident from
+// parameters, var declarations and composite-literal assignments.
+func goVarTypes(d *ast.FuncDecl) map[string]string {
+	vars := map[string]string{}
+	addFields := func(fl *ast.FieldList) {
+		if fl == nil {
+			return
+		}
+		for _, f := range fl.List {
+			if t := goTypeName(f.Type); t != "" {
+				for _, n := range f.Names {
+					vars[n.Name] = t
+				}
+			} else if sel, ok := f.Type.(*ast.SelectorExpr); ok {
+				for _, n := range f.Names {
+					vars[n.Name] = sel.Sel.Name
+				}
+			}
+		}
+	}
+	addFields(d.Type.Params)
+	addFields(d.Type.Results)
+	litType := func(e ast.Expr) string {
+		if u, ok := e.(*ast.UnaryExpr); ok {
+			e = u.X
+		}
+		switch t := e.(type) {
+		case *ast.CompositeLit:
+			if n := goTypeName(t.Type); n != "" {
+				return n
+			}
+			if sel, ok := t.Type.(*ast.SelectorExpr); ok {
+				return sel.Sel.Name
+			}
+		case *ast.CallExpr:
+			if id, ok := t.Fun.(*ast.Ident); ok && id.Name == "new" && len(t.Args) == 1 {
+				return goTypeName(t.Args[0])
+			}
+		}
+		return ""
+	}
+	ast.Inspect(d.Body, func(n ast.Node) bool {
+		switch s := n.(type) {
+		case *ast.AssignStmt:
+			if len(s.Lhs) == len(s.Rhs) {
+				for i, l := range s.Lhs {
+					if id, ok := l.(*ast.Ident); ok {
+						if t := litType(s.Rhs[i]); t != "" {
+							vars[id.Name] = t
+						}
+					}
+				}
+			}
+		case *ast.ValueSpec:
+			if s.Type != nil {
+				t := goTypeName(s.Type)
+				if sel, ok := s.Type.(*ast.SelectorExpr); ok {
+					t = sel.Sel.Name
+				}
+				for _, n := range s.Names {
+					if t != "" {
+						vars[n.Name] = t
+					}
+				}
+			}
+		}
+		return true
+	})
+	return vars
+}

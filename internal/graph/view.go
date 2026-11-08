@@ -62,7 +62,7 @@ type viewSpec struct {
 // buildView groups the first k items by file, in rank order of first appearance
 // sorted by file path so output is stable between runs.
 func (g *SymGraph) buildView(sp viewSpec, k int) *View {
-	v := &View{Title: sp.title, Head: sp.head, Total: len(sp.items), Shown: k}
+	v := &View{Title: sp.title, Head: sp.head, Files: []FileGroup{}, Total: len(sp.items), Shown: k}
 	sel := map[int]bool{}
 	for _, it := range sp.items[:k] {
 		sel[it.node] = true
