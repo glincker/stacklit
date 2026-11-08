@@ -232,9 +232,10 @@ func repoRoot() string {
 	return dir
 }
 
-func armQuery(b int) string   { return fmt.Sprintf("stacklit query %d", b) }
-func armQueryRD(b int) string { return fmt.Sprintf("stacklit query %d + reader order", b) }
-func armRepoMap(b int) string { return fmt.Sprintf("repo-map approx %d", b) }
+func armQuery(b int) string     { return fmt.Sprintf("stacklit query %d", b) }
+func armQueryPath(b int) string { return fmt.Sprintf("stacklit query %d path order", b) }
+func armQueryRD(b int) string   { return fmt.Sprintf("stacklit query %d + reader order", b) }
+func armRepoMap(b int) string   { return fmt.Sprintf("repo-map approx %d", b) }
 
 const (
 	armGrep     = "grep+read"
@@ -251,7 +252,7 @@ func armOrder(o Opts) []string {
 	}
 	arms = append(arms, armBM25, armDump, armStacklit)
 	for _, b := range o.QueryBudgets {
-		arms = append(arms, armQuery(b), armQueryRD(b))
+		arms = append(arms, armQuery(b), armQueryPath(b), armQueryRD(b))
 	}
 	return arms
 }
@@ -328,7 +329,7 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 		tr.Arms[armDump] = ArmResult{Arm: armDump, CostOnly: true, Lookup: dump, ToFound: dump}
 		tr.Arms[armStacklit] = RunStacklit(armStacklit, iv, gen.MapCost, t, o.TopN, sizes, o.ReadCap, o.MaxExtra)
 		for _, b := range o.QueryBudgets {
-			tr.Arms[armQuery(b)], tr.Arms[armQueryRD(b)] = RunQuery(armQuery(b), armQueryRD(b), binary, dir, t, modules, strconv.Itoa(b), sizes, o.ReadCap, o.MaxExtra)
+			tr.Arms[armQuery(b)], tr.Arms[armQueryPath(b)], tr.Arms[armQueryRD(b)] = RunQuery(armQuery(b), armQueryPath(b), armQueryRD(b), binary, dir, t, modules, strconv.Itoa(b), sizes, o.ReadCap, o.MaxExtra)
 		}
 		res.Tasks = append(res.Tasks, tr)
 	}

@@ -46,3 +46,48 @@ func TestIsIdentifierQuery(t *testing.T) {
 		}
 	}
 }
+
+func TestIdentTokens(t *testing.T) {
+	got := identTokens("Where is fetchUserRow and load_all_rows defined? See TOML, Where and ab_")
+	if len(got) < 2 || got[0] != "fetchUserRow" || got[1] != "load_all_rows" {
+		t.Errorf("identTokens = %v", got)
+	}
+	for _, g := range got {
+		if g == "TOML" || g == "Where" {
+			t.Errorf("plain word %q taken as identifier", g)
+		}
+	}
+}
+
+func auxGraph() *SymGraph {
+	g := &SymGraph{Version: SchemaVersion, Nodes: []SymNode{
+		{ID: "src/lib.go::Render", Name: "Render", Kind: KindFunc, File: "src/lib.go", Line: 1, End: 9, Doc: "render output page"},
+		{ID: "examples/demo/main.go::Render", Name: "Render", Kind: KindFunc, File: "examples/demo/main.go", Line: 1, End: 9, Doc: "render output page"},
+		{ID: "src/other.go::renderHelper", Name: "renderHelper", Kind: KindFunc, File: "src/other.go", Line: 1, End: 9},
+	}}
+	g.Index()
+	return g
+}
+
+func TestAuxPathsDemotedUnlessAsked(t *testing.T) {
+	g := auxGraph()
+	if h := g.Search("render output page", 3); len(h) < 2 || g.Nodes[h[0].Node].File != "src/lib.go" {
+		t.Errorf("source file should beat the example: %v", h)
+	}
+	if h := g.Search("render output page in the examples", 3); len(h) == 0 {
+		t.Error("no hits when asking for examples")
+	} else if s0, s1 := g.Nodes[h[0].Node].File, g.Nodes[h[1].Node].File; s0 == s1 {
+		t.Errorf("same file twice: %v", h)
+	}
+}
+
+func TestIdentTokenInProseBoostsDefinition(t *testing.T) {
+	g := &SymGraph{Version: SchemaVersion, Nodes: []SymNode{
+		{ID: "a.go::fetchRow", Name: "fetchRow", Kind: KindFunc, File: "a.go", Line: 1, End: 3},
+		{ID: "b.go::Fetcher", Name: "Fetcher", Kind: KindType, File: "b.go", Line: 1, End: 3, Doc: "where rows are fetched, a row at a time, row by row"},
+	}}
+	g.Index()
+	if h := g.Search("where are rows fetched, fetchRow", 2); len(h) == 0 || g.Nodes[h[0].Node].Name != "fetchRow" {
+		t.Errorf("exact identifier in prose should rank first: %v", h)
+	}
+}
