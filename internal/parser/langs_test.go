@@ -232,6 +232,40 @@ func TestMoreLanguages(t *testing.T) {
 			notExports: []string{"_burn"},
 			typeDefs:   map[string]string{"Token": "function mint(address to, uint256 amount) public onlyOwner", "IToken": "function transfer"},
 		},
+		{
+			name: "cmake", file: "CMakeLists.txt", language: "cmake",
+			imports: []string{"CTest", "src", "Boost"},
+			exports: []string{"project demo", "library core", "executable app", "target docs", "function setup_target(name)", "macro my_macro(arg)"},
+		},
+		{
+			name: "makefile", file: "Makefile", language: "make",
+			imports:    []string{"config.mk", "local.mk"},
+			exports:    []string{"all: app", "app: main.o util.o", "clean"},
+			notExports: []string{".PHONY", "%.o"},
+		},
+		{
+			name: "dockerfile", file: "Dockerfile", language: "dockerfile",
+			imports: []string{"golang:1.22", "alpine:3.19"},
+			exports: []string{"stage builder from golang:1.22", "stage runtime from alpine:3.19", "expose 8080"},
+		},
+		{
+			name: "json", file: "sample.json", language: "json",
+			exports: []string{"name", "version", "scripts", "dependencies"},
+		},
+		{
+			name: "yaml", file: "sample.yaml", language: "yaml",
+			exports:    []string{"name", "version", "services"},
+			notExports: []string{"web", "image"},
+		},
+		{
+			name: "toml", file: "sample.toml", language: "toml",
+			exports: []string{"title", "[package]", "[[bin]]", "[dependencies]"},
+		},
+		{
+			name: "graphql", file: "sample.graphql", language: "graphql",
+			exports:  []string{"type Query", "type User", "interface Node", "enum Role", "input NewUser", "union SearchResult", "scalar DateTime"},
+			typeDefs: map[string]string{"Query": "user(id: ID!): User", "Role": "ADMIN", "User": "name: String"},
+		},
 	}
 
 	p := &TreeSitterParser{}
