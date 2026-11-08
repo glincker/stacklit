@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "stacklit": {
+      "command": "stacklit",
+      "args": ["serve", "--profile", "minimal"]
+    }
+  }
+}
