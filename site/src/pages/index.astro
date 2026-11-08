@@ -4,8 +4,6 @@ import samples from '../data/samples.json';
 import bench from '../data/bench.json';
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-// The binary prints a long dash in its progress line; this site does not use that character.
-const dashless = (s: string) => s.replace(/ — /g, ' -- ');
 
 const deriveHtml = samples.derive
   .trimEnd()
@@ -19,7 +17,7 @@ const deriveHtml = samples.derive
   })
   .join('\n');
 
-const genHtml = esc(dashless(samples.generateOut))
+const genHtml = esc(samples.generateOut)
   .split('\n')
   .map((l) => l.replace(/^(\[stacklit\])/, '<span class="d">$1</span>'))
   .join('\n');
@@ -43,7 +41,8 @@ const assistants = [
   ['continue', 'Continue'],
   ['opencode', 'OpenCode'],
   ['junie', 'Junie'],
-  ['aider', 'Aider'],
+  ['kilo-code', 'Kilo Code'],
+  [null, 'Aider'],
 ];
 const n = (s: string) => Number(s).toLocaleString('en-US');
 const ms = (s: string) => (Number(s) >= 1000 ? `${(Number(s) / 1000).toFixed(1)} s` : `${s} ms`);
@@ -132,7 +131,7 @@ const ms = (s: string) => (Number(s) >= 1000 ? `${(Number(s) / 1000).toFixed(1)}
         <div class="row split">
           <div class="copy-block">
             <h3>A small map to steer the agent</h3>
-            <p><code>stacklit derive</code> prints a compact map of a few hundred tokens. <code>stacklit setup</code> injects it into your assistant's config, so a new session starts oriented. The same graph answers token-budgeted queries, also exposed as MCP tools.</p>
+            <p><code>stacklit derive</code> prints a compact map of a few hundred tokens. <code>stacklit setup</code> injects it into the config of your assistant, so a new session starts oriented. The same graph answers token-budgeted queries, also exposed as MCP tools.</p>
             <p><a href="/docs/assistants/">Assistants and setup</a></p>
           </div>
           <div>
@@ -173,12 +172,12 @@ Mermaid, an Obsidian vault, a markdown wiki</code></pre></div>
     <div class="container">
       <div class="section-head">
         <h2>Works with</h2>
-        <p>Setup covers 26 assistants. These are some of them.</p>
+        <p>Setup covers 26 assistants. These are some of them. Aider has no logo on thesvg.org, so it keeps its letter.</p>
       </div>
       <ul class="works">
         {assistants.map(([slug, name]) => (
           <li>
-            <span class="wlogo" aria-hidden="true"><span>{name[0]}</span><img src={`https://thesvg.org/icons/${slug}/default.svg`} alt="" width="28" height="28" loading="lazy" decoding="async" referrerpolicy="no-referrer" /></span>
+            <span class="wlogo" aria-hidden="true"><span>{name[0]}</span>{slug && <img src={`https://thesvg.org/icons/${slug}/default.svg`} alt="" width="28" height="28" loading="lazy" decoding="async" referrerpolicy="no-referrer" />}</span>
             <span>{name}</span>
           </li>
         ))}
@@ -224,4 +223,10 @@ Mermaid, an Obsidian vault, a markdown wiki</code></pre></div>
       <p class="after-install"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with methodology and limitations.</p>
     </div>
   </section>
+  <script is:inline>
+    document.querySelectorAll('.wlogo img').forEach(function (i) {
+      var ok = function () { i.parentNode.classList.add('ok'); };
+      if (i.complete && i.naturalWidth) ok(); else i.addEventListener('load', ok);
+    });
+  </script>
 </Base>

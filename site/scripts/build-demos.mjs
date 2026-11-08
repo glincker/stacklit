@@ -131,7 +131,7 @@ for (const r of REPOS) {
         identical: h1 === h2,
         moduleName: 'render',
         module: { purpose: mod.purpose, language: mod.language, files: mod.files, lines: mod.lines, exports: (mod.exports || []).slice(0, 4), depends_on: mod.depends_on, depended_by: mod.depended_by },
-        generateOut: generate.trim(),
+        generateOut: generate.trim().replace(/ \u2014 /g, ' -- '), // the binary prints a long dash; the site avoids it
       }, null, 2) + '\n',
     );
   }
