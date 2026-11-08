@@ -37,8 +37,13 @@ type Config struct {
 	GitActivity    *bool    `json:"git_activity,omitempty"`     // include hot/recent files, default off
 	MapIcons       string   `json:"map_icons,omitempty"`        // "remote" (default) or "off" for the HTML map
 
-	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b", "c" or "d", the strict no-crawl wording).
+	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b", "c", "d" the strict no-crawl wording, or "e" the routed wording).
 	Steering string `json:"steering,omitempty"`
+	// SmallRepoFiles is the source file count below which the session hook and
+	// the rules block carry a one-line "grep is fine" note instead of the full
+	// digest. Nil uses DefaultSmallRepoFiles; 0 turns small repo mode off.
+	// Also STACKLIT_SMALL_REPO_FILES.
+	SmallRepoFiles *int `json:"small_repo_files,omitempty"`
 	// CrawlGuard sets the Claude Code crawl guard hook mode: "off", "nudge" or
 	// "redirect". Also STACKLIT_CRAWL_GUARD. Empty uses the mode setup installed.
 	CrawlGuard string `json:"crawl_guard,omitempty"`

@@ -2,6 +2,23 @@
 
 All notable changes, reconstructed from the git history and release tags. Dates are tag dates (UTC). Versions follow semantic versioning while below 1.0, so minor releases may include behavior changes.
 
+## Unreleased
+
+Follows the first real-agent A/B (bench/agent-ab, pull request #77), which found no overall cost saving and lower accuracy on questions whose answer is several files. Tracking issue #78. None of these changes is measured yet.
+
+### Added
+- Steering variant `e` (routed): use Stacklit when you do not know where something is or how things connect, grep or `stacklit impact <name>` for an exact name, and check neighbours with `explain` or `path` when the answer is several files. Opt in with `steering: "e"` or `STACKLIT_STEERING=e`; the default stays `a`.
+- `query` adds one line naming the next ranked files and the `explain` and `path` commands when the question words suggest a flow or chain, or the top files are scattered with flat scores. It stays inside the token budget and leaves single-answer queries unchanged. `STACKLIT_QUERY_NEXT` (0 turns it off), `STACKLIT_FLOW_WORDS`, `STACKLIT_QUERY_SPREAD_DIRS`, `STACKLIT_QUERY_SPREAD_TOP`, `STACKLIT_QUERY_FLATNESS`.
+- `impact` on a file or directory lists its importers as `path:line`, with the sources checked for script languages so the list matches a grep, and `--calls` for the previous call-level view. A Go package directory used to be an error. About 40 to 160 tokens for a package against 110 to 390 for `grep -rn` of the same import. `STACKLIT_IMPACT_SCAN`, `STACKLIT_IMPACT_SCAN_MAX`.
+- Small repo mode: below `small_repo_files` (default 600, `STACKLIT_SMALL_REPO_FILES`, 0 off) source files, the session hook, subagent hook and `setup` carry a one line note that grep is enough instead of the digest (about 60 tokens instead of 490).
+- A pre-registered second A/B round in `bench/agent-ab/tasks-round2/`, with a `stacklit-e` arm in the harness. It has not been run.
+
+### Changed
+- The MCP handshake instructions and `stacklit guide` use the routed wording instead of "source of truth, do not crawl" (about 100 tokens, was about 75). `STACKLIT_STEERING=d` keeps the earlier text for comparison.
+
+### Documentation
+- `docs/SESSIONS.md` and `docs/USAGE.md` report what the first A/B measured. `--crawl-guard` and steering `d` measured worse than no Stacklit (cost 1.12x, correct 82.7% against 94.0%): off by default, not recommended. Added a "When Stacklit helps" section: large repos and locate or add questions, not exact-name lookups or small repos.
+
 ## 0.5.0 (2026-11-08)
 
 ### Added

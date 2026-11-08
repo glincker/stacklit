@@ -37,13 +37,14 @@ var steering = map[string]string{
 		"- Need one function or type: `stacklit slice <symbol>`\n" +
 		"- Changing shared code: `stacklit impact <symbol>` lists what depends on it\n",
 	"d": strictRules,
+	"e": routedRules,
 }
 
 // DefaultSteering is the variant used when none is configured.
 const DefaultSteering = "a"
 
 // SteeringVariants lists the valid variant names.
-func SteeringVariants() []string { return []string{"a", "b", "c", "d"} }
+func SteeringVariants() []string { return []string{"a", "b", "c", "d", "e"} }
 
 func steeringText(variant string) string {
 	if t, ok := steering[strings.ToLower(strings.TrimSpace(variant))]; ok {
@@ -58,6 +59,41 @@ func SteeringFor(root string) string {
 		return v
 	}
 	return config.Load(root).Steering
+}
+
+// SourceFiles counts the indexed files across all languages.
+func SourceFiles(idx *schema.Index) int {
+	n := 0
+	for _, l := range idx.Tech.Languages {
+		n += l.Files
+	}
+	return n
+}
+
+// IsSmallRepo reports whether the repo is below the small repo threshold, so a
+// full digest would cost more than the exploration it saves. An empty index or
+// a threshold of 0 never counts as small.
+func IsSmallRepo(root string, idx *schema.Index) bool {
+	limit := config.Load(root).SmallRepoLimit()
+	n := SourceFiles(idx)
+	return limit > 0 && n > 0 && n < limit
+}
+
+// smallRepoLine is the only orientation a small repo gets. It is factual, not
+// imperative, like the other hook text.
+func smallRepoLine(idx *schema.Index) string {
+	return fmt.Sprintf("This repo is small (%d source files), so grep and reading files are enough. Stacklit is available if a question needs more: stacklit query \"<question>\".", SourceFiles(idx))
+}
+
+// BodyForRoot is BodyFor for a repo on disk: a small repo gets the short block
+// (the note plus the structure token, so the session hook still recognises it),
+// every other repo gets the full digest.
+func BodyForRoot(root string, idx *schema.Index, variant string) string {
+	if !IsSmallRepo(root, idx) {
+		return BodyFor(idx, variant)
+	}
+	return fmt.Sprintf("## Codebase map (stacklit)\n%s\n\n```\n%s | %s | %d modules | %s%s\n```\n",
+		smallRepoLine(idx), idx.Project.Name, idx.Tech.PrimaryLanguage, len(idx.Modules), StructureTag, session.StructureHash(idx))
 }
 
 func oneLine(s string, max int) string {

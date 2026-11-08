@@ -111,5 +111,9 @@ func (g *SymGraph) QueryOrdered(q string, budget int, asJSON bool, order Order) 
 		items[i] = item{node: id, score: score[id]}
 	}
 	head := []string{fmt.Sprintf("%d seeds, %d candidates", len(seeds), len(ids))}
-	return g.FitView(viewSpec{title: title, head: head, items: items, edges: true, hint: hint, ranked: true, order: order}, budget, asJSON)
+	next := 0
+	if n := nextFilesWanted(); n > 0 && (questionSuggestsFlow(q) || spreadsDirs(g.rankFiles(ids, func(i int) float64 { return score[i] }))) {
+		next = n
+	}
+	return g.FitView(viewSpec{title: title, head: head, items: items, edges: true, hint: hint, ranked: true, order: order, nextFiles: next}, budget, asJSON)
 }

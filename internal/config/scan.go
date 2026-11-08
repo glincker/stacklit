@@ -26,6 +26,19 @@ const (
 	DefaultModuleSplitFiles = 40
 )
 
+// DefaultSmallRepoFiles is the source file count under which a repo counts as
+// small. Override with small_repo_files in .stacklitrc.json or
+// STACKLIT_SMALL_REPO_FILES; 0 turns small repo mode off.
+const DefaultSmallRepoFiles = 600
+
+// SmallRepoLimit returns the effective small repo threshold (0 means off).
+func (c *Config) SmallRepoLimit() int {
+	if c.SmallRepoFiles == nil {
+		return DefaultSmallRepoFiles
+	}
+	return *c.SmallRepoFiles
+}
+
 // applyEnv lets environment variables override file config, so CI and hooks
 // can tune a run without editing the committed rc file.
 func (c *Config) applyEnv() {
@@ -47,6 +60,11 @@ func (c *Config) applyEnv() {
 			if n, err := strconv.Atoi(v); err == nil && n >= e.min {
 				*e.dst = n
 			}
+		}
+	}
+	if v := os.Getenv("STACKLIT_SMALL_REPO_FILES"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			c.SmallRepoFiles = &n
 		}
 	}
 	if v := os.Getenv("STACKLIT_WORKERS"); v != "" {
@@ -190,6 +208,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Workers < 0 {
 		problems = append(problems, "workers must not be negative")
+	}
+	if c.SmallRepoFiles != nil && *c.SmallRepoFiles < 0 {
+		problems = append(problems, "small_repo_files must not be negative")
 	}
 	if c.MapIcons != "" && c.MapIcons != "remote" && c.MapIcons != "off" {
 		problems = append(problems, `map_icons must be "remote" or "off"`)

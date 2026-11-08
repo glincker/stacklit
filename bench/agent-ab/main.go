@@ -7,6 +7,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -24,6 +26,9 @@ type repo struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 	SHA  string `json:"sha"`
+	// Files is the count of tracked files at SHA; the decision rule uses it
+	// to find the repos above its size threshold.
+	Files int `json:"files,omitempty"`
 }
 
 // task is one pinned question. A session is correct when every AllOf path and
@@ -35,6 +40,10 @@ type task struct {
 	AllOf    []string `json:"all_of"`
 	AnyOf    []string `json:"any_of"`
 	Rubric   string   `json:"rubric"`
+	// Check and Verify let a pinned checkout prove the answer with grep
+	// (see verify.go); the harness itself does not read them.
+	Check  []fileCheck `json:"check,omitempty"`
+	Verify *importScan `json:"verify,omitempty"`
 }
 
 type unit struct {
@@ -76,16 +85,21 @@ type record struct {
 	Seconds        float64        `json:"seconds"`
 	WeekUtil       float64        `json:"seven_day_utilization"`
 	Calls          []string       `json:"call_log"`
+	Binary         string         `json:"stacklit_bin,omitempty"`
 	Error          string         `json:"error,omitempty"`
 	At             string         `json:"at"`
 }
 
 type config struct {
 	repo, reposFile, tasksDir, stacklit, claude, model, resultsDir, ledger, arms, work, mode, only string
-	trials, limit, maxTurns                                                                        int
-	seed                                                                                           int64
-	yesSpend, dryRun, analysis                                                                     bool
-	maxBudget, cap, estMid                                                                         float64
+	// grader is "audited" or "prereg" (round 1). smallRepos lists the repos
+	// where the small repo arm runs; binSHA identifies the stacklit binary.
+	grader, smallRepos, binSHA string
+	smallFiles                 int
+	trials, limit, maxTurns    int
+	seed                       int64
+	yesSpend, dryRun, analysis bool
+	maxBudget, cap, estMid     float64
 }
 
 // errStop means a limit, auth or cap condition: the whole run must halt.
@@ -93,7 +107,7 @@ var errStop = errors.New("stop")
 
 func main() {
 	var c config
-	flag.StringVar(&c.repo, "repo", "theauth-go", "repo name from repos.json")
+	flag.StringVar(&c.repo, "repo", "theauth-go", "repo name from the repos file, or all")
 	flag.StringVar(&c.reposFile, "repos", "bench/agent-ab/repos.json", "pinned repos file")
 	flag.StringVar(&c.tasksDir, "tasks", "bench/agent-ab/tasks", "directory of <repo>.json task files")
 	flag.StringVar(&c.stacklit, "stacklit", "stacklit", "stacklit binary for the treatment arm(s)")
@@ -101,7 +115,10 @@ func main() {
 	flag.StringVar(&c.model, "model", "sonnet", "model alias passed to claude")
 	flag.StringVar(&c.resultsDir, "results", "bench/agent-ab/results", "directory for per-session JSON")
 	flag.StringVar(&c.ledger, "ledger", "bench/agent-ab/ledger.jsonl", "append-only cost ledger")
-	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run: control, stacklit, strict")
+	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run: control, stacklit, strict, stacklit-e, stacklit-e-small")
+	flag.StringVar(&c.grader, "grader", "audited", "answer matcher: audited (accepts ./path and absolute checkout paths, round 2) or prereg (round 1)")
+	flag.StringVar(&c.smallRepos, "small-repos", "featuredrop", "repos where the stacklit-e-small arm runs (the others are above the small repo limit)")
+	flag.IntVar(&c.smallFiles, "small-repo-files", 600, "STACKLIT_SMALL_REPO_FILES value for the stacklit-e-small arm")
 	flag.StringVar(&c.work, "work", "/tmp/abreal/work", "temp dir for clones (deleted afterwards)")
 	flag.StringVar(&c.mode, "mode", "run", "run, or memory (all tools disabled, answers from memory)")
 	flag.StringVar(&c.only, "only", "", "comma separated task ids to run (default all, or the first --limit)")
@@ -111,22 +128,107 @@ func main() {
 	flag.Int64Var(&c.seed, "seed", 1, "seed for the session order")
 	flag.Float64Var(&c.maxBudget, "max-budget-usd", 1.5, "per-session spend cap passed to claude")
 	flag.Float64Var(&c.cap, "cap-usd", 60, "total notional spend cap across the ledger")
-	flag.Float64Var(&c.estMid, "est-session-usd", 0.3, "assumed USD per session, for the dry-run projection only")
+	flag.Float64Var(&c.estMid, "est-session-usd", 0.03, "assumed USD per session, for the dry-run projection only (round 1 observed 0.027)")
 	flag.BoolVar(&c.dryRun, "dry-run", false, "print the plan, run nothing")
 	flag.BoolVar(&c.yesSpend, "yes-spend", false, "required: confirm you accept the spend of real agent sessions")
 	flag.BoolVar(&c.analysis, "analyze", false, "analyze existing results into summary.json and tables.md, run nothing")
 	flag.Parse()
 	if c.analysis {
-		if err := analyze(c, []string{"levelrail", "theauth-go", "featuredrop"}); err != nil {
+		names := []string{"levelrail", "theauth-go", "featuredrop"}
+		if n, err := repoNames(c.reposFile); err == nil && len(n) > 0 {
+			names = n
+		}
+		if err := analyze(c, names); err != nil {
 			fmt.Fprintln(os.Stderr, "agent-ab:", err)
 			os.Exit(1)
 		}
 		return
 	}
-	if err := run(c); err != nil {
+	runner := run
+	if c.repo == "all" {
+		runner = runAll
+	}
+	if err := runner(c); err != nil {
 		fmt.Fprintln(os.Stderr, "agent-ab:", err)
 		os.Exit(1)
 	}
+}
+
+// repoNames lists the repos of the repos file, in file order.
+func repoNames(file string) ([]string, error) {
+	b, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	var rs []repo
+	if err := json.Unmarshal(b, &rs); err != nil {
+		return nil, err
+	}
+	var names []string
+	for _, r := range rs {
+		names = append(names, r.Name)
+	}
+	return names, nil
+}
+
+// armsFor returns the arms to run on one repo. The small repo arm only runs
+// where the pre-registration says it applies.
+func armsFor(c config, repoName string) []string {
+	var arms []string
+	for _, a := range strings.Split(c.arms, ",") {
+		a = strings.TrimSpace(a)
+		if a == "stacklit-e-small" && !inList(c.smallRepos, repoName) {
+			continue
+		}
+		if a != "" {
+			arms = append(arms, a)
+		}
+	}
+	return arms
+}
+
+func inList(csv, name string) bool {
+	for _, x := range strings.Split(csv, ",") {
+		if strings.TrimSpace(x) == name {
+			return true
+		}
+	}
+	return false
+}
+
+// runAll runs (or plans) every repo of the repos file in order and prints the
+// projected total. The ledger cap applies across all of them.
+func runAll(c config) error {
+	names, err := repoNames(c.reposFile)
+	if err != nil {
+		return err
+	}
+	total := 0
+	for _, n := range names {
+		cc := c
+		cc.repo = n
+		tasks, _, err := load(cc)
+		if err != nil {
+			return err
+		}
+		total += len(plan(tasks, cc.trials, cc.seed, armsFor(cc, n)))
+		if err := run(cc); err != nil {
+			return err
+		}
+	}
+	fmt.Printf("all repos: %d sessions; assumed %.2f USD each = %.2f USD (assumption); total cap %.2f\n", total, c.estMid, c.estMid*float64(total), c.cap)
+	return nil
+}
+
+// binaryID is a short hash of the stacklit binary, written into every record
+// so a result can be tied to the build that produced it.
+func binaryID(path string) string {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	h := sha256.Sum256(b)
+	return hex.EncodeToString(h[:6])
 }
 
 func run(c config) error {
@@ -134,14 +236,15 @@ func run(c config) error {
 	if err != nil {
 		return err
 	}
-	arms := strings.Split(c.arms, ",")
+	arms := armsFor(c, c.repo)
 	if c.mode == "memory" {
 		arms = []string{"memory"}
 		c.trials = 1
 	}
+	c.binSHA = binaryID(c.stacklit)
 	units := plan(tasks, c.trials, c.seed, arms)
-	fmt.Printf("plan: %d tasks x %d trials x %d arm(s) = %d sessions; assumed %.2f USD each = %.2f USD (assumption); per-session cap %.2f, total cap %.2f\n",
-		len(tasks), c.trials, len(arms), len(units), c.estMid, c.estMid*float64(len(units)), c.maxBudget, c.cap)
+	fmt.Printf("plan %s: %d tasks x %d trials x %d arm(s) %v = %d sessions; assumed %.2f USD each = %.2f USD (assumption); per-session cap %.2f, total cap %.2f\n",
+		c.repo, len(tasks), c.trials, len(arms), arms, len(units), c.estMid, c.estMid*float64(len(units)), c.maxBudget, c.cap)
 	if c.dryRun {
 		return nil
 	}
@@ -353,6 +456,24 @@ func cloneBase(base string, r repo) error {
 
 const answerSuffix = " Answer with the file paths only, comma separated, on one line."
 
+// armEnv is the environment that distinguishes the treatment arms. It applies
+// to both setup and the session, so the hooks see the same values the rules
+// block was written with. Small repo mode is off (0) in every arm but
+// stacklit-e-small, so the arms differ in one thing each.
+func armEnv(c config, arm string) []string {
+	switch arm {
+	case "strict":
+		return []string{"STACKLIT_STEERING=d"}
+	case "stacklit", "stacklit-a":
+		return []string{"STACKLIT_STEERING=a", "STACKLIT_SMALL_REPO_FILES=0"}
+	case "stacklit-e":
+		return []string{"STACKLIT_STEERING=e", "STACKLIT_SMALL_REPO_FILES=0"}
+	case "stacklit-e-small":
+		return []string{"STACKLIT_STEERING=e", fmt.Sprintf("STACKLIT_SMALL_REPO_FILES=%d", c.smallFiles)}
+	}
+	return nil
+}
+
 func prompt(c config, r repo, t task) string {
 	if c.mode == "memory" {
 		return "You have no tools and no access to files. From your own knowledge of the open source repository github.com/glincker/" + r.Name + ", answer: " + t.Question + answerSuffix + " If you do not know, give your best guess."
@@ -386,8 +507,8 @@ func runUnit(c config, r repo, base string, u unit) (record, error) {
 			setup := []string{"setup", "claude", "--no-mcp", "--no-git-hook", "--session-hook"}
 			if u.Arm == "strict" {
 				setup = append(setup, "--crawl-guard=redirect")
-				env = append(env, "STACKLIT_STEERING=d")
 			}
+			env = append(env, armEnv(c, u.Arm)...)
 			steps = append(steps, setup)
 			for _, args := range steps {
 				cmd := exec.Command(stackBin, args...)
@@ -431,7 +552,8 @@ func runUnit(c config, r repo, base string, u unit) (record, error) {
 	if p.stop != "" {
 		return rec, fmt.Errorf("%w: %s", errStop, p.stop)
 	}
-	rec.Correct, rec.Recall = grade(rec.Answer, u.Task)
+	rec.Binary = c.binSHA
+	rec.Correct, rec.Recall = gradeWith(c.grader, rec.Answer, u.Task)
 	return rec, nil
 }
 
@@ -457,6 +579,16 @@ var limitText = regexp.MustCompile(`(?i)rate.?limit|usage limit|limit reached|ou
 // pathRe returns a matcher for a path that is not part of a longer path.
 func pathRe(p string) *regexp.Regexp {
 	return regexp.MustCompile(`(^|[^A-Za-z0-9_./-])` + regexp.QuoteMeta(p))
+}
+
+// gradeWith applies the named matcher. Round 2 uses audited from the start:
+// the same boundary-aware match, also accepting ./path and absolute paths
+// inside the checkout, which round 1 found it had to add after the fact.
+func gradeWith(grader, answer string, t task) (bool, float64) {
+	if grader == "prereg" {
+		return grade(answer, t)
+	}
+	return gradeAuditedWithRecall(answer, t)
 }
 
 // grade returns whether the answer is correct and the recall of AllOf paths.

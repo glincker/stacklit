@@ -68,8 +68,11 @@ func TestGuideTextAndJSON(t *testing.T) {
 	if g != GuideText() {
 		t.Fatal("guide not byte stable")
 	}
-	if !strings.Contains(g, strictRules) {
-		t.Fatal("guide must embed the rules text")
+	if !strings.Contains(g, guideRulesE) || strings.Contains(g, "source of truth") {
+		t.Fatal("guide must embed the shipped rules text")
+	}
+	if d := GuideTextFor("d"); !strings.Contains(d, strictRules) || d == g {
+		t.Fatal("variant d must keep the strict guide")
 	}
 	for _, c := range GuideCommands() {
 		if !strings.Contains(g, c.Command) {
@@ -87,16 +90,16 @@ func TestGuideTextAndJSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(GuideJSON()), &j); err != nil {
 		t.Fatal(err)
 	}
-	if j.Rules != strictRules || j.Text != g || len(j.Commands) != len(GuideCommands()) {
+	if j.Rules != guideRulesE || j.Text != g || len(j.Commands) != len(GuideCommands()) {
 		t.Fatal("json guide mismatch")
 	}
-	t.Logf("guide: %d tokens, rules text: %d tokens", Tokens(g), Tokens(strictRules))
+	t.Logf("guide: %d tokens, rules text: %d tokens", Tokens(g), Tokens(guideRulesE))
 }
 
 func TestInjectedTextSizes(t *testing.T) {
 	sizes := map[string]string{
 		"nudge sample": crawlNudgeSample, "deny sample": crawlDenySample,
-		"guide": GuideText(), "strict rules": strictRules,
+		"guide": GuideText(), "strict rules": strictRules, "variant e rules": routedRules,
 	}
 	for name, s := range sizes {
 		t.Logf("%s: %d tokens (%d bytes)", name, Tokens(s), len(s))
@@ -107,5 +110,30 @@ func TestInjectedTextSizes(t *testing.T) {
 	limit := 120 // matches graph.DefaultPointerTokens, the cap for hook pointers
 	if Tokens(crawlNudgeSample) > limit || Tokens(crawlDenySample) > limit {
 		t.Error("hook text over the pointer cap")
+	}
+}
+
+func TestRoutedVariantE(t *testing.T) {
+	e := steeringText("e")
+	for _, want := range []string{
+		"do not know where something is", "how things connect", `stacklit query "<question>" --budget 800`,
+		"exact name", "grep", "stacklit impact <name>", "several files", "stacklit explain <symbol>",
+		"stacklit path <from> <to>", "One query is a lead, not the answer.", "stacklit slice <symbol>",
+	} {
+		if !strings.Contains(e, want) {
+			t.Errorf("variant e lacks %q", want)
+		}
+	}
+	if !noDashes(e) || strings.Contains(e, "source of truth") || strings.Contains(e, "Do not crawl") {
+		t.Error("variant e must be dash free and must not forbid grep")
+	}
+	if got := Tokens(e); got > 110 {
+		t.Errorf("variant e rules %d tokens, want <= 110", got)
+	}
+	if DefaultSteering != "a" {
+		t.Errorf("default steering changed to %s", DefaultSteering)
+	}
+	if steeringText("e") == steeringText("d") {
+		t.Error("e collapsed into d")
 	}
 }

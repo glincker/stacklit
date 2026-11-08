@@ -24,7 +24,7 @@ func TestGuideCommand(t *testing.T) {
 	var j struct {
 		Rules string `json:"rules"`
 	}
-	if err := json.Unmarshal([]byte(out), &j); err != nil || !strings.Contains(j.Rules, "Do not crawl") {
+	if err := json.Unmarshal([]byte(out), &j); err != nil || !strings.Contains(j.Rules, "lead, not the answer") {
 		t.Fatalf("bad json guide: %v %q", err, out)
 	}
 	// Flags persist on the shared root command, so reset for later tests.

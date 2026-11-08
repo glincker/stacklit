@@ -13,15 +13,17 @@ func newGuideCmd() *cobra.Command {
 		Use:   "guide",
 		Short: "Print the agent usage guide (paste it into any AI tool)",
 		Long: `Prints the rules and command list an AI agent should follow when a Stacklit
-index exists: answer structure questions from the index, read code with slice,
-and do not crawl the repo. It is the same text the rules block uses.`,
+index exists: use query to find where things are, grep or impact for exact
+names, check the neighbours when the answer is several files, and read code with
+slice. The steering key (or STACKLIT_STEERING=d) selects the older strict
+no-crawl wording for comparison.`,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if asJSON {
-				fmt.Fprint(cmd.OutOrStdout(), setup.GuideJSON())
+				fmt.Fprint(cmd.OutOrStdout(), setup.GuideJSONFor(setup.SteeringFor(".")))
 				return nil
 			}
-			fmt.Fprint(cmd.OutOrStdout(), setup.GuideText())
+			fmt.Fprint(cmd.OutOrStdout(), setup.GuideTextFor(setup.SteeringFor(".")))
 			return nil
 		},
 	}

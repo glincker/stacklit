@@ -103,7 +103,8 @@ func digestPayload(idx *schema.Index) string {
 }
 
 // SessionHook answers a SessionStart payload for every source (startup,
-// resume, clear, compact, fork). When the project's CLAUDE.md already holds a
+// resume, clear, compact, fork). A small repo (see IsSmallRepo) gets one line
+// saying grep is enough, plus the status line, never the digest. Otherwise, when the project's CLAUDE.md already holds a
 // digest of the current structure it adds only the status line, because Claude
 // Code re-reads that file itself, including after compaction. Otherwise it
 // injects the digest. Any failure or a missing index yields no output.
@@ -117,7 +118,10 @@ func SessionHook(stdin io.Reader) string {
 	}
 	hash := session.StructureHash(idx)
 	var parts []string
-	if rulesHash(root) != hash {
+	switch {
+	case IsSmallRepo(root, idx):
+		parts = append(parts, smallRepoLine(idx))
+	case rulesHash(root) != hash:
 		parts = append(parts, strings.TrimRight(digestPayload(idx), "\n"))
 	}
 	if sl := statusLine(root, idx, hash); sl != "" {
@@ -172,6 +176,9 @@ func SubagentHook(stdin io.Reader) string {
 	idx, err := session.LoadIndex(root)
 	if err != nil {
 		return ""
+	}
+	if IsSmallRepo(root, idx) {
+		return hookJSON("SubagentStart", smallRepoLine(idx))
 	}
 	return hookJSON("SubagentStart", strings.TrimRight(digestPayload(idx), "\n"))
 }

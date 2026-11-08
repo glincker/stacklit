@@ -1,0 +1,277 @@
+[
+ {
+  "id": "ta-01",
+  "kind": "locate",
+  "question": "Where does the library check a password against the Have I Been Pwned breach list, sending only a short hash prefix?",
+  "all_of": [],
+  "any_of": [
+   "packages/core/src/auth/hibp.ts"
+  ],
+  "rubric": "hibp.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/hibp.ts",
+    "regex": "k-anonymity"
+   }
+  ]
+ },
+ {
+  "id": "ta-02",
+  "kind": "locate",
+  "question": "Where is the server side verification of a captcha token for Turnstile, hCaptcha or reCAPTCHA done?",
+  "all_of": [],
+  "any_of": [
+   "packages/core/src/auth/captcha.ts"
+  ],
+  "rubric": "captcha.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/captcha.ts",
+    "regex": "(?i)turnstile"
+   }
+  ]
+ },
+ {
+  "id": "ta-03",
+  "kind": "locate",
+  "question": "Where is the small CBOR decoder that reads passkey attestation objects, with limits on input size and nesting depth?",
+  "all_of": [],
+  "any_of": [
+   "packages/core/src/auth/cbor.ts"
+  ],
+  "rubric": "cbor.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/cbor.ts",
+    "regex": "Maximum nesting depth"
+   }
+  ]
+ },
+ {
+  "id": "ta-04",
+  "kind": "trace",
+  "question": "Which three files make up the resumable account erasure in the core package: the delete step, the anonymisation step and the progress marker?",
+  "all_of": [
+   "packages/core/src/auth/gdpr-delete.ts",
+   "packages/core/src/auth/gdpr-anon.ts",
+   "packages/core/src/auth/gdpr-progress.ts"
+  ],
+  "any_of": [],
+  "rubric": "gdpr-delete, gdpr-anon, gdpr-progress.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/gdpr-progress.ts",
+    "regex": "ERASURE_MARKER_KEY"
+   },
+   {
+    "path": "packages/core/src/auth/gdpr-delete.ts",
+    "regex": "gdpr-progress"
+   },
+   {
+    "path": "packages/core/src/auth/gdpr-anon.ts",
+    "regex": "(?i)anon"
+   }
+  ]
+ },
+ {
+  "id": "ta-05",
+  "kind": "trace",
+  "question": "The command line tool signs a user in with the device authorization flow. Which three files take part: the CLI flow that polls for the token, the CLI token cache it saves into, and the core module that serves the device endpoints?",
+  "all_of": [
+   "packages/cli/src/auth/device-flow.ts",
+   "packages/cli/src/auth/token-cache.ts",
+   "packages/core/src/auth/device-auth.ts"
+  ],
+  "any_of": [],
+  "rubric": "CLI device-flow, CLI token-cache, core device-auth.",
+  "check": [
+   {
+    "path": "packages/cli/src/auth/device-flow.ts",
+    "regex": "token-cache"
+   },
+   {
+    "path": "packages/core/src/auth/device-auth.ts",
+    "regex": "RFC 8628"
+   }
+  ]
+ },
+ {
+  "id": "ta-06",
+  "kind": "trace",
+  "question": "Which two files hold the magic link feature in the core package: the module with the sign in logic and the plugin that exposes it?",
+  "all_of": [
+   "packages/core/src/auth/magic-link.ts",
+   "packages/core/src/auth/magic-link-plugin.ts"
+  ],
+  "any_of": [],
+  "rubric": "magic-link.ts and magic-link-plugin.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/magic-link-plugin.ts",
+    "regex": "magic-link"
+   }
+  ]
+ },
+ {
+  "id": "ta-07",
+  "kind": "impact",
+  "question": "Which non-test files import the email normalising helper, packages/core/src/auth/normalize-email.ts?",
+  "all_of": [
+   "packages/core/src/auth/email-otp-plugin.ts",
+   "packages/core/src/auth/email-otp.ts",
+   "packages/core/src/auth/email-password.ts",
+   "packages/core/src/auth/email-verification.ts",
+   "packages/core/src/auth/magic-link-plugin.ts",
+   "packages/core/src/auth/magic-link.ts",
+   "packages/core/src/auth/oauth/plugin.ts",
+   "packages/core/src/auth/one-tap.ts",
+   "packages/core/src/auth/organization-plugin.ts",
+   "packages/core/src/auth/password-reset.ts",
+   "packages/core/src/hooks/database-hooks.ts",
+   "packages/core/src/user/user.ts"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these twelve files import normalize-email.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/email-otp-plugin.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/email-otp.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/email-password.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/email-verification.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/magic-link-plugin.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/magic-link.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/oauth/plugin.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/one-tap.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/organization-plugin.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/auth/password-reset.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/hooks/database-hooks.ts",
+    "regex": "normalize-email"
+   },
+   {
+    "path": "packages/core/src/user/user.ts",
+    "regex": "normalize-email"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".ts",
+    ".tsx"
+   ],
+   "pattern": "from\\s+[\"'][^\"']*normalize-email(\\.js)?[\"']",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "ta-08",
+  "kind": "impact",
+  "question": "Which non-test files import or re-export from the login lockout module, packages/core/src/auth/login-lockout.ts?",
+  "all_of": [
+   "packages/core/src/auth/email-password-http.ts",
+   "packages/core/src/auth/email-password.ts",
+   "packages/core/src/auth/index.ts",
+   "packages/core/src/auth/username-http.ts",
+   "packages/core/src/auth/username.ts"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these five files import or re-export login-lockout.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/email-password-http.ts",
+    "regex": "login-lockout"
+   },
+   {
+    "path": "packages/core/src/auth/email-password.ts",
+    "regex": "login-lockout"
+   },
+   {
+    "path": "packages/core/src/auth/index.ts",
+    "regex": "login-lockout"
+   },
+   {
+    "path": "packages/core/src/auth/username-http.ts",
+    "regex": "login-lockout"
+   },
+   {
+    "path": "packages/core/src/auth/username.ts",
+    "regex": "login-lockout"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".ts",
+    ".tsx"
+   ],
+   "pattern": "from\\s+[\"'][^\"']*login-lockout(\\.js)?[\"']",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "ta-09",
+  "kind": "add",
+  "question": "I want to add a new authentication plugin to the core package, following the magic link plugin. Where does the plugin file go, and which index file must export it?",
+  "all_of": [
+   "packages/core/src/auth/index.ts"
+  ],
+  "any_of": [
+   "packages/core/src/auth/magic-link-plugin.ts",
+   "packages/core/src/auth/email-otp-plugin.ts",
+   "packages/core/src/auth/admin-plugin.ts",
+   "packages/core/src/auth/"
+  ],
+  "rubric": "New *-plugin.ts beside the others in packages/core/src/auth, exported from auth/index.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/auth/index.ts",
+    "regex": "magic-link-plugin"
+   }
+  ]
+ },
+ {
+  "id": "ta-10",
+  "kind": "add",
+  "question": "I want to add a new language, for example Italian, to the core package's built-in messages. Which file exports the locales, and in which directory does the new locale file go?",
+  "all_of": [
+   "packages/core/src/i18n/index.ts"
+  ],
+  "any_of": [
+   "packages/core/src/i18n/locales/"
+  ],
+  "rubric": "New locale in i18n/locales, exported from i18n/index.ts.",
+  "check": [
+   {
+    "path": "packages/core/src/i18n/index.ts",
+    "regex": "locales/de"
+   }
+  ]
+ }
+]
