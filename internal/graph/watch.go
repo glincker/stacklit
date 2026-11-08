@@ -25,7 +25,9 @@ type WatchOptions struct {
 	MaxWatches   int
 	PollInterval time.Duration // polling cadence, 0 reads STACKLIT_WATCH_POLL_MS (default 2000)
 	ForcePoll    bool
-	Log          func(format string, args ...any)
+	// Extract tunes parsing, including whether test files are tracked.
+	Extract ExtractOptions
+	Log     func(format string, args ...any)
 }
 
 type fileStamp struct {
@@ -112,7 +114,7 @@ func (w *watcher) sync(files []string, dirty map[string]bool) bool {
 	changed := false
 	present := make(map[string]bool, len(files))
 	for _, f := range files {
-		if LangOf(f) == "" || isTestFile(f) {
+		if LangOf(f) == "" || (!w.o.Extract.IncludeTests && isTestFile(f)) {
 			continue
 		}
 		present[f] = true
@@ -124,7 +126,11 @@ func (w *watcher) sync(files []string, dirty map[string]bool) bool {
 		if old, ok := w.stamps[f]; ok && old == stamp && !dirty[f] {
 			continue
 		}
-		fs := ExtractPath(w.o.Root, f, 1<<20)
+		eo := w.o.Extract
+		if eo.MaxFileBytes == 0 {
+			eo.MaxFileBytes = 1 << 20
+		}
+		fs := extractPath(w.o.Root, f, eo, nil)
 		if fs == nil {
 			delete(w.syms, f)
 		} else {

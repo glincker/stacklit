@@ -542,7 +542,9 @@ func assignField(w *tsw, left string, right *gts.Node) {
 	}
 	typ := w.valueType(right)
 	if typ == "" {
-		typ = w.locals[w.text(right)]
+		if q := normQual(w.text(right)); q != "" && !strings.Contains(q, ".") {
+			typ = w.locals[q]
+		}
 	}
 	if typ != "" {
 		w.fields[w.typ+"\x00"+rest] = typ

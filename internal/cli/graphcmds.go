@@ -19,25 +19,42 @@ import (
 const graphFile = "stacklit.graph.json"
 
 type graphFlags struct {
-	file string
-	root string
-	json bool
+	file  string
+	root  string
+	json  bool
+	tests bool
 }
 
 func (f *graphFlags) bind(c *cobra.Command) {
 	c.Flags().StringVar(&f.file, "graph", graphFile, "Path to the symbol graph file")
 	c.Flags().StringVar(&f.root, "root", ".", "Project root")
 	c.Flags().BoolVar(&f.json, "json", false, "Output JSON")
+	c.Flags().BoolVar(&f.tests, "include-tests", false, "Include test files when building the graph (or set STACKLIT_GRAPH_INCLUDE_TESTS=1)")
+}
+
+// graphExtractOptions combines environment settings with the project's parse memory budget.
+func graphExtractOptions(cfg *config.Config) graph.ExtractOptions {
+	eo := graph.OptionsFromEnv()
+	if b := cfg.ParseMemoryBytes(); b > 0 {
+		eo.MemoryBudget = b
+	} else {
+		eo.MemoryBudget = -1
+	}
+	return eo
 }
 
 // buildSymbolGraph scans root with the project's ignore rules and links symbols.
-func buildSymbolGraph(root string) (*graph.SymGraph, error) {
+func buildSymbolGraph(root string, includeTests ...bool) (*graph.SymGraph, error) {
 	cfg := config.Load(root)
 	files, err := walker.Walk(root, cfg.ScanIgnore())
 	if err != nil {
 		return nil, err
 	}
-	return graph.BuildSymbols(root, files, graph.ExtractOptions{}), nil
+	eo := graphExtractOptions(cfg)
+	for _, b := range includeTests {
+		eo.IncludeTests = eo.IncludeTests || b
+	}
+	return graph.BuildSymbols(root, files, eo), nil
 }
 
 // load reads the graph file, or builds one in memory when it does not exist.
@@ -54,7 +71,7 @@ func (f *graphFlags) load(cmd *cobra.Command) (*graph.SymGraph, error) {
 		return nil, err
 	}
 	fmt.Fprintf(cmd.ErrOrStderr(), "%s not found, building in memory (run 'stacklit graph' to save it)\n", f.file)
-	return buildSymbolGraph(f.root)
+	return buildSymbolGraph(f.root, f.tests)
 }
 
 // htmlMaxNodes caps symbols embedded in stacklit.html; STACKLIT_HTML_MAX_NODES overrides it.
@@ -71,7 +88,7 @@ func newGraphCmd() *cobra.Command {
 		Use:   "graph",
 		Short: "Build the symbol graph (stacklit.graph.json)",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g, err := buildSymbolGraph(f.root)
+			g, err := buildSymbolGraph(f.root, f.tests)
 			if err != nil {
 				return err
 			}
@@ -297,6 +314,11 @@ trees never exhaust inotify. STACKLIT_WATCH_POLL_MS sets the polling interval.`,
 			cfg := config.Load(f.root)
 			return graph.Watch(ctx, graph.WatchOptions{
 				Root: f.root, Out: f.file, Ignore: cfg.ScanIgnore(),
+				Extract: func() graph.ExtractOptions {
+					eo := graphExtractOptions(cfg)
+					eo.IncludeTests = eo.IncludeTests || f.tests
+					return eo
+				}(),
 				Log: func(format string, a ...any) { fmt.Fprintf(cmd.ErrOrStderr(), "[stacklit] "+format+"\n", a...) },
 			})
 		},
