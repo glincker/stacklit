@@ -45,7 +45,7 @@ Adding a language means adding an extractor and registering it in `tsLangMap`; s
 
 ## Modules and dependency resolution
 
-A module is a directory. A file's module is its parent directory, collapsed to at most `max_depth` path segments; files at the repo root belong to `root`. Directories named like tests, fixtures or examples are skipped. When the module count would exceed `max_modules`, deeper modules fold into their parents.
+A module is a directory. A file's module is its parent directory, collapsed to at most `max_depth` path segments; files at the repo root belong to `root`. Modules with a path segment named `test`, `tests`, `__tests__`, `testdata`, `fixtures`, `e2e`, `benchmarks`, `bench` or `docs_src` are left out of the graph. When the module count would exceed `max_modules`, deeper modules fold into their parents.
 
 Edges are built from import statements: each import string is matched against the known module names, preferring the longest match. Relative imports are resolved against the importing file's directory; Python dot-style imports are normalized first; Go imports are matched on the module path. Anything that matches no module is treated as external and dropped.
 

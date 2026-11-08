@@ -250,7 +250,7 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 
 A file that is missing, unreadable or invalid JSON is ignored and the defaults are used.
 
-Only files with recognised source extensions are scanned. Test directories are filtered out of the module list, and each module lists up to about 20 file names.
+Only files with recognised source extensions are scanned. Directories named `test`, `tests`, `testdata`, `fixtures`, `e2e`, `bench` or `benchmarks` are left out of the module list, and each module lists up to about 20 file names.
 
 ---
 
