@@ -45,7 +45,9 @@ graph LR
   internal_renderer["internal/renderer<br/>Output renderers"]:::go
   internal_schema["internal/schema<br/>Data schema definitions"]:::go
   internal_scip["internal/scip<br/>Scip"]:::go
+  internal_session["internal/session<br/>Session"]:::go
   internal_setup["internal/setup<br/>Setup"]:::go
+  internal_stats["internal/stats<br/>Stats"]:::go
   internal_summary["internal/summary<br/>AI-powered codebase summaries"]:::go
   internal_walker["internal/walker<br/>File system walker"]:::go
   npm["npm<br/>Npm"]:::go
@@ -70,7 +72,9 @@ graph LR
   internal_cli --> internal_renderer
   internal_cli --> internal_schema
   internal_cli --> internal_scip
+  internal_cli --> internal_session
   internal_cli --> internal_setup
+  internal_cli --> internal_stats
   internal_cli --> internal_walker
   internal_config --> internal_parser
   internal_derive --> internal_schema
@@ -90,11 +94,13 @@ graph LR
   internal_engine --> internal_parser
   internal_engine --> internal_renderer
   internal_engine --> internal_schema
+  internal_engine --> internal_session
   internal_engine --> internal_summary
   internal_engine --> internal_walker
   internal_export --> internal_graph
   internal_export --> internal_schema
   internal_git --> internal_config
+  internal_graph --> internal_fsutil
   internal_graph --> internal_git
   internal_graph --> internal_parser
   internal_graph --> internal_walker
@@ -110,8 +116,13 @@ graph LR
   internal_renderer --> internal_graph
   internal_renderer --> internal_schema
   internal_scip --> internal_graph
+  internal_session --> internal_fsutil
+  internal_session --> internal_schema
+  internal_setup --> internal_config
   internal_setup --> internal_git
   internal_setup --> internal_graph
   internal_setup --> internal_schema
+  internal_setup --> internal_session
+  internal_stats --> internal_config
   internal_summary --> internal_schema
 ```

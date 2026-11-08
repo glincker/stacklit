@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "ba40f3346445cc3a0eb067914447b846568637bca2b7d90d16d92faa16a68fc3",
+  "merkle_hash": "fcb08bdf2ebf7fd1a802c46cc6d7ef01233fcb6e5b8536cb2bcffd9a74ce02f5",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -69,8 +69,8 @@
         "lines": 17
       },
       "go": {
-        "files": 248,
-        "lines": 36224
+        "files": 264,
+        "lines": 39034
       },
       "graphql": {
         "files": 1,
@@ -215,8 +215,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 372,
-    "total_lines": 39083
+    "total_files": 388,
+    "total_lines": 41893
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -330,7 +330,7 @@
       "purpose": "Cache",
       "language": "go",
       "files": 2,
-      "lines": 202,
+      "lines": 205,
       "file_list": [
         "cache.go",
         "cache_test.go"
@@ -342,7 +342,8 @@
         "Get(key string) (*parser.FileInfo, bool)",
         "Put(key string, info *parser.FileInfo)",
         "Stats() int",
-        "Save() error"
+        "Save() error",
+        "Fingerprint() string"
       ],
       "depends_on": [
         "internal/fsutil",
@@ -389,8 +390,8 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 23,
-      "lines": 1891,
+      "files": 26,
+      "lines": 2261,
       "file_list": [
         "errors.go",
         "root.go",
@@ -409,8 +410,11 @@
         "init.go",
         "mergegraphs.go",
         "profile.go",
+        "refresh.go",
         "serve.go",
+        "session_test.go",
         "setup.go",
+        "stats.go",
         "status.go",
         "version.go",
         "version_test.go",
@@ -446,7 +450,9 @@
         "internal/renderer",
         "internal/schema",
         "internal/scip",
+        "internal/session",
         "internal/setup",
+        "internal/stats",
         "internal/walker"
       ],
       "depended_by": [
@@ -458,7 +464,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 688,
+      "lines": 693,
       "file_list": [
         "scan.go",
         "config.go",
@@ -494,7 +500,9 @@
         "internal/doctor",
         "internal/engine",
         "internal/git",
-        "internal/mcp"
+        "internal/mcp",
+        "internal/setup",
+        "internal/stats"
       ],
       "activity": "low"
     },
@@ -587,16 +595,18 @@
     "internal/engine": {
       "purpose": "Core orchestration engine",
       "language": "go",
-      "files": 10,
-      "lines": 1690,
+      "files": 12,
+      "lines": 2375,
       "file_list": [
         "multi.go",
+        "refresh.go",
         "engine.go",
         "bench_test.go",
         "engine_test.go",
         "multi_test.go",
         "packages.go",
         "packages_test.go",
+        "refresh_test.go",
         "scale_test.go",
         "scan.go",
         "stability_test.go"
@@ -607,14 +617,18 @@
         "type MultiResult",
         "ParseReposFile(file string) ([]string, error)",
         "RunMulti(opts MultiOptions) (*MultiResult, error)",
-        "type Options",
-        "type Result",
-        "Run(opts Options) (*Result, error)"
+        "GraphFile",
+        "type RefreshOptions",
+        "type RefreshResult",
+        "Refresh(o RefreshOptions) (*RefreshResult, error)",
+        "type Options"
       ],
       "type_defs": {
         "MultiOptions": "ReposFile string, Output string, Quiet bool, Timestamps bool",
         "MultiResult": "OutputPath string, RepoCount int, Failed int, Duration time.Duration, Index *schema.MultiIndex",
         "Options": "Root string, Workspace string, InstallHook bool, Quiet bool, Summary bool, NoWrite bool",
+        "RefreshOptions": "Root string, Paths []string, Debounce time.Duration",
+        "RefreshResult": "Status string, Parsed int, Removed int, Bootstrapped bool, StructureHash string, StructureChanged bool, Duration time.Duration",
         "Result": "JSONPath string, HTMLPath string, MermaidPath string, Index *schema.Index, Duration time.Duration, Imports map[string][]string, Provides []string"
       },
       "depends_on": [
@@ -628,6 +642,7 @@
         "internal/parser",
         "internal/renderer",
         "internal/schema",
+        "internal/session",
         "internal/summary",
         "internal/walker"
       ],
@@ -693,7 +708,9 @@
       "depended_by": [
         "internal/cache",
         "internal/engine",
-        "internal/renderer"
+        "internal/graph",
+        "internal/renderer",
+        "internal/session"
       ],
       "activity": "low"
     },
@@ -745,8 +762,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 47,
-      "lines": 11475,
+      "files": 48,
+      "lines": 11538,
       "file_list": [
         "symbols.go",
         "view.go",
@@ -759,6 +776,7 @@
         "htmldata.go",
         "pointer.go",
         "stale.go",
+        "body.go",
         "query.go",
         "watch.go",
         "community.go",
@@ -768,7 +786,6 @@
         "rank.go",
         "slice.go",
         "ts_dispatch.go",
-        "body.go",
         "extract_ecma.go",
         "extract_go.go",
         "extract_java.go",
@@ -804,6 +821,7 @@
         "HTMLNode": "Name string, Kind string, File int, Line int, End int, Comm int, Sig string, Doc string"
       },
       "depends_on": [
+        "internal/fsutil",
         "internal/git",
         "internal/parser",
         "internal/walker"
@@ -1107,6 +1125,7 @@
         "internal/mcp",
         "internal/merge",
         "internal/renderer",
+        "internal/session",
         "internal/setup",
         "internal/summary"
       ],
@@ -1147,22 +1166,61 @@
       ],
       "activity": "low"
     },
+    "internal/session": {
+      "purpose": "Session",
+      "language": "go",
+      "files": 4,
+      "lines": 545,
+      "file_list": [
+        "lock.go",
+        "structure.go",
+        "root.go",
+        "session_test.go"
+      ],
+      "exports": [
+        "LockStale() time.Duration",
+        "type Lock",
+        "TryLock(dir string) (*Lock, error)",
+        "Touch()",
+        "Unlock()",
+        "Enqueue(dir string, paths []string) error",
+        "Drain(dir string) []string",
+        "HasPending(dir string) bool",
+        "StructureHash(idx *schema.Index) string",
+        "type Injected"
+      ],
+      "type_defs": {
+        "Injected": "Latest string, Sessions map[string]string"
+      },
+      "depends_on": [
+        "internal/fsutil",
+        "internal/schema"
+      ],
+      "depended_by": [
+        "internal/cli",
+        "internal/engine",
+        "internal/setup"
+      ],
+      "activity": "low"
+    },
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 11,
-      "lines": 1384,
+      "files": 13,
+      "lines": 1851,
       "file_list": [
         "mcp.go",
+        "digest.go",
         "tools.go",
         "claude.go",
         "report.go",
         "block.go",
-        "digest.go",
-        "hookcmd.go",
+        "session.go",
         "setup.go",
+        "hookcmd.go",
         "runner.go",
         "git.go",
+        "session_test.go",
         "setup_test.go"
       ],
       "exports": [
@@ -1174,11 +1232,11 @@
         "StyleCrush",
         "StyleCodexTOML",
         "StyleContinue",
-        "type Rule",
-        "type MCP"
+        "Tokens(s string) int",
+        "DefaultSteering"
       ],
       "type_defs": {
-        "ClaudeOptions": "PreToolHook bool, SessionHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
+        "ClaudeOptions": "PreToolHook bool, SessionHook bool, RefreshHook bool, Skill bool, GlobalScope bool, UninstallAll bool",
         "MCP": "Path string, Style MCPStyle, Global bool",
         "Options": "Root string, Tools []Tool, Index *schema.Index, Uninstall bool, NoMCP bool, NoGitHook bool, Global bool, Claude ClaudeOptions",
         "ReportRow": "Item string, Tokens int, Note string",
@@ -1187,9 +1245,44 @@
         "Tool": "ID string, Name string, Rules []Rule, MCP []MCP, Paths []string, Bins []string"
       },
       "depends_on": [
+        "internal/config",
         "internal/git",
         "internal/graph",
-        "internal/schema"
+        "internal/schema",
+        "internal/session"
+      ],
+      "depended_by": [
+        "internal/cli"
+      ],
+      "activity": "low"
+    },
+    "internal/stats": {
+      "purpose": "Stats",
+      "language": "go",
+      "files": 2,
+      "lines": 251,
+      "file_list": [
+        "stats.go",
+        "stats_test.go"
+      ],
+      "exports": [
+        "type Entry",
+        "Enabled(root string) bool",
+        "LogPath() string",
+        "Tokens(s string) int",
+        "ReplacedEstimate(root string, text string) int",
+        "Record(root string, cmd string, output string)",
+        "type CmdTotals",
+        "type Summary",
+        "Read(since time.Time) (Summary, error)"
+      ],
+      "type_defs": {
+        "CmdTotals": "Cmd string, Calls int, Served int, ReplacedEst int",
+        "Entry": "TS string, Cmd string, Repo string, Served int, ReplacedEst int, Files int",
+        "Summary": "Since string, Calls int, Served int, ReplacedEst int, ByCmd []CmdTotals"
+      },
+      "depends_on": [
+        "internal/config"
       ],
       "depended_by": [
         "internal/cli"
@@ -1391,7 +1484,15 @@
       ],
       [
         "internal/cli",
+        "internal/session"
+      ],
+      [
+        "internal/cli",
         "internal/setup"
+      ],
+      [
+        "internal/cli",
+        "internal/stats"
       ],
       [
         "internal/cli",
@@ -1471,6 +1572,10 @@
       ],
       [
         "internal/engine",
+        "internal/session"
+      ],
+      [
+        "internal/engine",
         "internal/summary"
       ],
       [
@@ -1488,6 +1593,10 @@
       [
         "internal/git",
         "internal/config"
+      ],
+      [
+        "internal/graph",
+        "internal/fsutil"
       ],
       [
         "internal/graph",
@@ -1550,6 +1659,18 @@
         "internal/graph"
       ],
       [
+        "internal/session",
+        "internal/fsutil"
+      ],
+      [
+        "internal/session",
+        "internal/schema"
+      ],
+      [
+        "internal/setup",
+        "internal/config"
+      ],
+      [
         "internal/setup",
         "internal/git"
       ],
@@ -1560,6 +1681,14 @@
       [
         "internal/setup",
         "internal/schema"
+      ],
+      [
+        "internal/setup",
+        "internal/session"
+      ],
+      [
+        "internal/stats",
+        "internal/config"
       ],
       [
         "internal/summary",
@@ -1574,13 +1703,13 @@
       "internal/schema",
       "internal/graph",
       "internal/config",
+      "internal/fsutil",
       "internal/git",
       "internal/parser",
       "internal/walker",
-      "internal/fsutil",
+      "internal/session",
       "internal/cache",
-      "internal/renderer",
-      "internal/assets"
+      "internal/renderer"
     ],
     "isolated": [
       ".github/ISSUE_TEMPLATE",
@@ -1598,6 +1727,7 @@
     "test_command": "go test ./...",
     "env_vars": [
       "ANTHROPIC_API_KEY",
+      "CLAUDE_PROJECT_DIR",
       "GOMEMLIMIT",
       "STACKLIT_CACHE_DIR",
       "STACKLIT_DATA_RUN_LINES",
@@ -1607,6 +1737,8 @@
       "STACKLIT_GRAPH_MAX_PARSE_BYTES",
       "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_LOCK_HELPER",
+      "STACKLIT_LOCK_STALE_SEC",
       "STACKLIT_MAP_ICONS",
       "STACKLIT_MAP_TOKENS",
       "STACKLIT_MAX_FILE_SIZE",
@@ -1625,7 +1757,10 @@
       "STACKLIT_SCIP_MAX_BYTES",
       "STACKLIT_SKIP_CHECKSUM",
       "STACKLIT_SKIP_GENERATED",
+      "STACKLIT_STATS",
+      "STACKLIT_STEERING",
       "STACKLIT_STRESS_DIR",
+      "STACKLIT_SUBAGENT_TYPES",
       "STACKLIT_TIMESTAMPS",
       "STACKLIT_TRACE",
       "STACKLIT_TS_MAX_BYTES",
