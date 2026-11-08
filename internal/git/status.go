@@ -80,7 +80,9 @@ func CheckStale(root, builtCommit string, builtAt time.Time, keep func(string) b
 	untrackedRes := start("ls-files", "--others", "--exclude-standard")
 	var logRes, countRes func() res
 	if builtCommit == "" && !builtAt.IsZero() {
-		since := "--since=" + strconv.FormatInt(builtAt.Unix(), 10)
+		// git's --since includes the boundary second, so a post-commit hook that
+		// regenerates within the commit's own second would see that commit as newer.
+		since := "--since=" + strconv.FormatInt(builtAt.Unix()+1, 10)
 		logRes = start("log", since, "--relative", "--name-only", "--pretty=format:")
 		countRes = start("rev-list", "--count", since, "HEAD")
 	}
