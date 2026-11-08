@@ -3,7 +3,8 @@ package schema
 type Index struct {
 	Schema          string                `json:"$schema"`
 	Version         string                `json:"version"`
-	GeneratedAt     string                `json:"generated_at"`
+	SchemaVersion   int                   `json:"schema_version"`
+	GeneratedAt     string                `json:"generated_at,omitempty"`
 	StacklitVersion string                `json:"stacklit_version"`
 	MerkleHash      string                `json:"merkle_hash,omitempty"`
 	Project         Project               `json:"project"`
@@ -14,10 +15,45 @@ type Index struct {
 	Git             GitInfo               `json:"git,omitempty"`
 	Hints           Hints                 `json:"hints,omitempty"`
 	Architecture    Architecture          `json:"architecture,omitempty"`
+	Scan            *ScanInfo             `json:"scan,omitempty"`
+	Packages        []PackageInfo         `json:"packages,omitempty"`
+	PackageEdges    []PackageEdge         `json:"package_edges,omitempty"`
+}
+
+// PackageInfo is one workspace package in a monorepo: a hard boundary that
+// groups modules and owns its manifest identity.
+type PackageInfo struct {
+	Name       string   `json:"name"`           // manifest name, or the path when none
+	Path       string   `json:"path"`           // slash-separated, relative to the repo root
+	Kind       string   `json:"kind,omitempty"` // npm, go, cargo, python
+	Files      int      `json:"files"`
+	Lines      int      `json:"lines"`
+	Modules    []string `json:"modules,omitempty"`
+	DependsOn  []string `json:"depends_on,omitempty"` // other package names
+	DependedBy []string `json:"depended_by,omitempty"`
+}
+
+// PackageEdge is a dependency from one package to another.
+type PackageEdge struct {
+	From   string `json:"from"`
+	To     string `json:"to"`
+	Weight int    `json:"weight"` // number of import sites backing the edge
+}
+
+// CurrentSchemaVersion is bumped on any breaking change to the index layout.
+const CurrentSchemaVersion = 1
+
+// ScanInfo records what a run deliberately left out, so readers can tell a
+// partial index from a complete one. All lists are sorted for stable diffs.
+type ScanInfo struct {
+	SkippedLarge    []string `json:"skipped_large,omitempty"`
+	SkippedSymlinks []string `json:"skipped_symlinks,omitempty"`
+	SkippedOther    []string `json:"skipped_other,omitempty"`
+	ParseErrors     []string `json:"parse_errors,omitempty"`
 }
 
 type Architecture struct {
-	Pattern string `json:"pattern,omitempty"`   // e.g. "Clean Architecture"
+	Pattern string `json:"pattern,omitempty"`    // e.g. "Clean Architecture"
 	Summary string `json:"ai_summary,omitempty"` // AI-generated narrative
 }
 
@@ -97,14 +133,32 @@ type Hints struct {
 }
 
 type MultiIndex struct {
-	Schema      string        `json:"$schema"`
-	Version     string        `json:"version"`
-	Type        string        `json:"type"` // "polyrepo"
-	GeneratedAt string        `json:"generated_at"`
-	TotalFiles  int           `json:"total_files"`
-	TotalLines  int           `json:"total_lines"`
-	TotalModules int          `json:"total_modules"`
-	Repos       []RepoSummary `json:"repos"`
+	Schema        string          `json:"$schema"`
+	Version       string          `json:"version"`
+	SchemaVersion int             `json:"schema_version"`
+	Type          string          `json:"type"` // "polyrepo"
+	GeneratedAt   string          `json:"generated_at,omitempty"`
+	TotalFiles    int             `json:"total_files"`
+	TotalLines    int             `json:"total_lines"`
+	TotalModules  int             `json:"total_modules"`
+	Repos         []RepoSummary   `json:"repos"`
+	CrossEdges    []CrossRepoEdge `json:"cross_repo_edges,omitempty"`
+	Failed        []RepoFailure   `json:"failed,omitempty"`
+}
+
+// CrossRepoEdge says that FromRepo imports something FromRepo does not own
+// but ToRepo provides (matched through manifest names).
+type CrossRepoEdge struct {
+	From   string   `json:"from"`
+	To     string   `json:"to"`
+	Weight int      `json:"weight"`
+	Via    []string `json:"via,omitempty"` // importing modules in From, capped
+}
+
+// RepoFailure records a repo that could not be scanned.
+type RepoFailure struct {
+	Path  string `json:"path"`
+	Error string `json:"error"`
 }
 
 type RepoSummary struct {
@@ -113,7 +167,11 @@ type RepoSummary struct {
 	PrimaryLanguage string                `json:"primary_language"`
 	TotalFiles      int                   `json:"total_files"`
 	TotalLines      int                   `json:"total_lines"`
+	MerkleHash      string                `json:"merkle_hash,omitempty"`
+	Provides        []string              `json:"provides,omitempty"` // manifest names this repo publishes
 	Modules         map[string]ModuleInfo `json:"modules"`
+	Packages        []PackageInfo         `json:"packages,omitempty"`
+	PackageEdges    []PackageEdge         `json:"package_edges,omitempty"`
 	Frameworks      []string              `json:"frameworks,omitempty"`
 	Entrypoints     []string              `json:"entrypoints,omitempty"`
 }

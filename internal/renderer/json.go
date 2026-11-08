@@ -3,6 +3,7 @@ package renderer
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/glincker/stacklit/internal/fsutil"
 	"os"
 	"time"
 
@@ -16,9 +17,14 @@ var version = "dev"
 // WriteJSON populates metadata fields on idx and writes it as indented JSON to path.
 func WriteJSON(idx *schema.Index, path string) error {
 	idx.Schema = schemaURL
-	idx.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
+	idx.SchemaVersion = schema.CurrentSchemaVersion
 	idx.StacklitVersion = version
-	preserveGeneratedAtIfUnchanged(idx, path)
+	if timestampsEnabled {
+		idx.GeneratedAt = time.Now().UTC().Format(time.RFC3339)
+		preserveGeneratedAtIfUnchanged(idx, path)
+	} else {
+		idx.GeneratedAt = ""
+	}
 
 	data, err := json.MarshalIndent(idx, "", "  ")
 	if err != nil {
@@ -29,5 +35,5 @@ func WriteJSON(idx *schema.Index, path string) error {
 		return nil
 	}
 
-	return os.WriteFile(path, data, 0644)
+	return fsutil.WriteFileAtomic(path, data, 0644)
 }

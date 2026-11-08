@@ -14,6 +14,16 @@ type Config struct {
 	MaxModules int          `json:"max_modules,omitempty"`
 	MaxExports int          `json:"max_exports,omitempty"`
 	Output     OutputConfig `json:"output,omitempty"`
+
+	// Scan controls (see scan.go for env overrides and validation).
+	Roots       []string `json:"roots,omitempty"`         // scan only these subdirectories
+	Include     []string `json:"include,omitempty"`       // gitignore-style globs; when set only matches are kept
+	Exclude     []string `json:"exclude,omitempty"`       // gitignore-style globs always skipped
+	MaxFileSize int64    `json:"max_file_size,omitempty"` // bytes; larger files are skipped with a warning
+	Workers     int      `json:"workers,omitempty"`       // parser pool size; 0 means NumCPU
+	Cache       *bool    `json:"cache,omitempty"`         // incremental cache, default on
+	Timestamps  *bool    `json:"timestamps,omitempty"`    // write generated_at, default on
+	GitActivity *bool    `json:"git_activity,omitempty"`  // include hot/recent files, default on
 }
 
 // OutputConfig controls where output files are written.
@@ -26,9 +36,10 @@ type OutputConfig struct {
 // DefaultConfig returns a Config populated with sensible defaults.
 func DefaultConfig() *Config {
 	return &Config{
-		MaxDepth:   4,
-		MaxModules: 200,
-		MaxExports: 10,
+		MaxDepth:    4,
+		MaxModules:  200,
+		MaxExports:  10,
+		MaxFileSize: DefaultMaxFileSize,
 		Output: OutputConfig{
 			JSON:    "stacklit.json",
 			Mermaid: "DEPENDENCIES.md",
@@ -41,6 +52,7 @@ func DefaultConfig() *Config {
 // If the file does not exist or cannot be parsed, defaults are returned.
 func Load(root string) *Config {
 	cfg := DefaultConfig()
+	defer cfg.applyEnv()
 
 	path := filepath.Join(root, ".stacklitrc.json")
 	data, err := os.ReadFile(path)
@@ -70,6 +82,9 @@ func Load(root string) *Config {
 	if cfg.Output.HTML == "" {
 		cfg.Output.HTML = "stacklit.html"
 	}
+	if cfg.MaxFileSize <= 0 {
+		cfg.MaxFileSize = DefaultMaxFileSize
+	}
 
 	return cfg
 }
@@ -78,8 +93,11 @@ func Load(root string) *Config {
 // never feed back into the next scan. All patterns are normalized to forward slashes
 // so they match the walker's normalized paths on every OS.
 func (c *Config) ScanIgnore() []string {
-	ignore := make([]string, 0, len(c.Ignore)+3)
+	ignore := make([]string, 0, len(c.Ignore)+len(c.Exclude)+3)
 	for _, pat := range c.Ignore {
+		ignore = append(ignore, toSlash(pat))
+	}
+	for _, pat := range c.Exclude {
 		ignore = append(ignore, toSlash(pat))
 	}
 	for _, out := range []string{c.Output.JSON, c.Output.Mermaid, c.Output.HTML} {

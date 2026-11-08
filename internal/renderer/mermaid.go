@@ -3,6 +3,7 @@ package renderer
 import (
 	"bytes"
 	"fmt"
+	"github.com/glincker/stacklit/internal/fsutil"
 	"os"
 	"sort"
 	"strings"
@@ -132,5 +133,5 @@ func WriteMermaid(idx *schema.Index, path string) error {
 	if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, data) {
 		return nil
 	}
-	return os.WriteFile(path, data, 0644)
+	return fsutil.WriteFileAtomic(path, data, 0644)
 }

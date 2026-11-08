@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,7 +17,6 @@ import (
 	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/glincker/stacklit/internal/schema"
 	"github.com/glincker/stacklit/internal/summary"
-	"github.com/glincker/stacklit/internal/walker"
 )
 
 // Options configures an engine Run.
@@ -28,6 +26,9 @@ type Options struct {
 	InstallHook bool
 	Quiet       bool
 	Summary     bool
+	// NoWrite builds the index in memory only (used by multi-repo scans so
+	// member repos are never modified).
+	NoWrite bool
 }
 
 // Result holds the output paths and assembled index from a Run.
@@ -37,6 +38,11 @@ type Result struct {
 	MermaidPath string
 	Index       *schema.Index
 	Duration    time.Duration
+	// Imports maps module name to its sorted unique import strings. Only
+	// filled when Options.NoWrite is set.
+	Imports map[string][]string
+	// Provides lists manifest names (root and workspaces) this repo publishes.
+	Provides []string
 }
 
 // purposeMap maps common directory names to human-readable descriptions.
@@ -193,6 +199,9 @@ func Run(opts Options) (*Result, error) {
 	}
 
 	// 1a. Load config (best-effort; uses defaults if absent).
+	if err := config.Check(root); err != nil {
+		return nil, err
+	}
 	cfg := config.Load(root)
 
 	// 2. Detect monorepo layout.
@@ -205,20 +214,12 @@ func Run(opts Options) (*Result, error) {
 		fmt.Printf("[stacklit] monorepo detected: %s (%d workspaces)\n", mono.Tool, len(mono.Workspaces))
 	}
 
-	// 3. Walk the filesystem, honouring extra ignore patterns from config.
-	files, err := walker.Walk(root, cfg.ScanIgnore())
+	// 3-4, 7, 9. Walk, parse in parallel (with cache) and hash.
+	sc, err := scanRepo(root, cfg, opts.Quiet)
 	if err != nil {
-		return nil, fmt.Errorf("walking %s: %w", root, err)
+		return nil, err
 	}
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] found %d files\n", len(files))
-	}
-
-	// 4. Parse all files.
-	parsed, parseErrs := parser.ParseAll(files)
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] parsed %d files (%d errors)\n", len(parsed), len(parseErrs))
-	}
+	files, parsed := sc.Files, sc.Parsed
 
 	// 5. Build dependency graph with config-driven limits.
 	g := graph.Build(parsed, graph.BuildOptions{
@@ -226,27 +227,27 @@ func Run(opts Options) (*Result, error) {
 		MaxModules: cfg.MaxModules,
 	})
 
-	// 6. Get git activity.
-	activity, err := git.GetActivity(root, 90)
-	if err != nil {
-		// Non-fatal.
-		activity = &git.Activity{}
-	}
-
-	// 7. Read file contents (needed for Merkle and env var detection).
-	contents := make(map[string][]byte, len(files))
-	for _, f := range files {
-		data, readErr := os.ReadFile(f)
-		if readErr == nil {
-			contents[f] = data
+	// 6. Get git activity (optional: it is the main source of churn in a committed index).
+	activity := &git.Activity{}
+	if cfg.GitActivityEnabled() {
+		if a, gerr := git.GetActivity(root, 90); gerr == nil {
+			activity = a
 		}
 	}
 
 	// 8. Assemble schema.Index.
-	idx := assembleIndex(root, mono, files, parsed, g, activity, contents, cfg)
-
-	// 9. Compute Merkle hash.
-	idx.MerkleHash = git.ComputeMerkle(files, contents)
+	idx := assembleIndex(root, mono, files, parsed, g, activity, map[string][]byte{}, cfg)
+	idx.Hints.EnvVars = mergeEnvVars(root, sc.EnvVars)
+	idx.Scan = sc.Info
+	if mono.Type == "monorepo" {
+		names := make([]string, 0, len(idx.Modules))
+		for n := range idx.Modules {
+			names = append(names, n)
+		}
+		idx.Packages, idx.PackageEdges = buildPackages(root, mono.Workspaces, parsed, idx.Dependencies.Edges, names)
+	}
+	idx.MerkleHash = sc.MerkleHash
+	renderer.SetTimestamps(cfg.TimestampsEnabled())
 
 	// 10. Generate AI summary if requested.
 	if opts.Summary {
@@ -261,11 +262,20 @@ func Run(opts Options) (*Result, error) {
 		}
 	}
 
-	// 11. Write outputs using config-driven paths.
 	jsonPath := filepath.Join(root, cfg.Output.JSON)
 	mmdPath := filepath.Join(root, cfg.Output.Mermaid)
 	htmlPath := filepath.Join(root, cfg.Output.HTML)
 
+	if opts.NoWrite {
+		return &Result{
+			Index:    idx,
+			Duration: time.Since(start),
+			Imports:  importsByModule(parsed, idx.Modules),
+			Provides: repoProvides(root, mono),
+		}, nil
+	}
+
+	// 11. Write outputs using config-driven paths.
 	if err := renderer.WriteJSON(idx, jsonPath); err != nil {
 		return nil, fmt.Errorf("writing JSON: %w", err)
 	}
@@ -299,104 +309,6 @@ func Run(opts Options) (*Result, error) {
 		Index:       idx,
 		Duration:    dur,
 	}, nil
-}
-
-// MultiOptions configures a RunMulti call.
-type MultiOptions struct {
-	ReposFile string
-	Quiet     bool
-}
-
-// MultiResult holds the output of a RunMulti call.
-type MultiResult struct {
-	OutputPath string
-	RepoCount  int
-	Duration   time.Duration
-}
-
-// RunMulti reads a repos file, scans each repo, and writes a combined stacklit-multi.json.
-func RunMulti(opts MultiOptions) (*MultiResult, error) {
-	start := time.Now()
-
-	// 1. Read repos file.
-	data, err := os.ReadFile(opts.ReposFile)
-	if err != nil {
-		return nil, fmt.Errorf("reading repos file: %w", err)
-	}
-
-	// 2. Parse lines (skip empty lines and comments).
-	var repos []string
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		repos = append(repos, line)
-	}
-
-	// 3. Run stacklit on each repo.
-	var indices []*schema.Index
-	for _, repo := range repos {
-		if !opts.Quiet {
-			fmt.Printf("[stacklit] scanning %s...\n", repo)
-		}
-		result, err := Run(Options{Root: repo, Quiet: true})
-		if err != nil {
-			fmt.Printf("[stacklit] warning: failed to scan %s: %v\n", repo, err)
-			continue
-		}
-		indices = append(indices, result.Index)
-	}
-
-	// 4. Generate cross-repo summary.
-	multi := buildMultiIndex(indices)
-
-	// 5. Write to stacklit-multi.json in current directory.
-	outputPath := "stacklit-multi.json"
-	multiData, err := json.MarshalIndent(multi, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("marshaling multi-index: %w", err)
-	}
-	if err := os.WriteFile(outputPath, append(multiData, '\n'), 0644); err != nil {
-		return nil, fmt.Errorf("writing %s: %w", outputPath, err)
-	}
-
-	dur := time.Since(start)
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] multi-repo scan done in %s — %d repos, %d modules, %d files\n",
-			dur.Round(time.Millisecond), len(indices), multi.TotalModules, multi.TotalFiles)
-	}
-
-	return &MultiResult{OutputPath: outputPath, RepoCount: len(indices), Duration: dur}, nil
-}
-
-// buildMultiIndex assembles a MultiIndex from individual repo indices.
-func buildMultiIndex(indices []*schema.Index) *schema.MultiIndex {
-	multi := &schema.MultiIndex{
-		Schema:      "https://stacklit.dev/schema/v1-multi.json",
-		Version:     "1",
-		Type:        "polyrepo",
-		GeneratedAt: time.Now().UTC().Format(time.RFC3339),
-	}
-
-	for _, idx := range indices {
-		multi.TotalFiles += idx.Structure.TotalFiles
-		multi.TotalLines += idx.Structure.TotalLines
-		multi.TotalModules += len(idx.Modules)
-
-		multi.Repos = append(multi.Repos, schema.RepoSummary{
-			Name:            idx.Project.Name,
-			Path:            idx.Project.Root,
-			PrimaryLanguage: idx.Tech.PrimaryLanguage,
-			TotalFiles:      idx.Structure.TotalFiles,
-			TotalLines:      idx.Structure.TotalLines,
-			Modules:         idx.Modules,
-			Frameworks:      idx.Tech.Frameworks,
-			Entrypoints:     idx.Structure.Entrypoints,
-		})
-	}
-
-	return multi
 }
 
 // assembleIndex builds a schema.Index from the pipeline outputs.
@@ -449,7 +361,7 @@ func assembleIndex(
 	primaryLang := ""
 	primaryCount := 0
 	for lang, ls := range langStats {
-		if ls.Files > primaryCount {
+		if ls.Files > primaryCount || (ls.Files == primaryCount && lang < primaryLang) {
 			primaryCount = ls.Files
 			primaryLang = lang
 		}
