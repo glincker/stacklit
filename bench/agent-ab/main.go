@@ -29,6 +29,23 @@ type repo struct {
 	// Files is the count of tracked files at SHA; the decision rule uses it
 	// to find the repos above its size threshold.
 	Files int `json:"files,omitempty"`
+	// Ref, ShallowSince and Est* are only used by the famous repos study:
+	// the branch the SHA was taken from, the history window the answers were
+	// verified against, and the per-session cost model for the dry-run.
+	Ref          string   `json:"ref,omitempty"`
+	ShallowSince string   `json:"shallow_since,omitempty"`
+	Est          *costEst `json:"est_session_usd,omitempty"`
+	// SourceFiles, License and Stars are provenance for the reader of the file.
+	SourceFiles int    `json:"source_files,omitempty"`
+	License     string `json:"license,omitempty"`
+	Stars       int    `json:"stars,omitempty"`
+}
+
+// costEst is a per-session notional cost range for one repo, in USD.
+type costEst struct {
+	Low  float64 `json:"low"`
+	Mid  float64 `json:"mid"`
+	High float64 `json:"high"`
 }
 
 // task is one pinned question. A session is correct when every AllOf path and
@@ -96,11 +113,21 @@ type config struct {
 	// where the small repo arm runs; binSHA identifies the stacklit binary.
 	grader, smallRepos, binSHA string
 	smallFiles                 int
+	// famous selects the famous repos preset (see famous.go); excludeMem drops
+	// tasks the model answered from memory when analysing it.
+	famous, excludeMem, includeMem bool
+	// reuseIndex generates the stacklit index once per arm and repo and copies
+	// it into each session's checkout (set by the famous preset).
+	reuseIndex                 bool
 	trials, limit, maxTurns    int
 	seed                       int64
 	yesSpend, dryRun, analysis bool
 	maxBudget, cap, estMid     float64
 }
+
+// memoryEstUSD is the notional cost of one session with every tool off: a
+// single short turn (round 1 observed about 0.01).
+const memoryEstUSD = 0.012
 
 // errStop means a limit, auth or cap condition: the whole run must halt.
 var errStop = errors.New("stop")
@@ -131,8 +158,15 @@ func main() {
 	flag.Float64Var(&c.estMid, "est-session-usd", 0.03, "assumed USD per session, for the dry-run projection only (round 1 observed 0.027)")
 	flag.BoolVar(&c.dryRun, "dry-run", false, "print the plan, run nothing")
 	flag.BoolVar(&c.yesSpend, "yes-spend", false, "required: confirm you accept the spend of real agent sessions")
+	flag.BoolVar(&c.includeMem, "include-memorised", false, "famous preset only: keep tasks the model answered from memory in the analysis (default drops them)")
+	flag.BoolVar(&c.reuseIndex, "reuse-index", false, "generate the index once per arm and repo and copy it into later sessions (famous preset turns it on)")
 	flag.BoolVar(&c.analysis, "analyze", false, "analyze existing results into summary.json and tables.md, run nothing")
 	flag.Parse()
+	if c.repo == "famous" {
+		set := map[string]bool{}
+		flag.Visit(func(f *flag.Flag) { set[f.Name] = true })
+		applyFamousPreset(&c, set)
+	}
 	if c.analysis {
 		names := []string{"levelrail", "theauth-go", "featuredrop"}
 		if n, err := repoNames(c.reposFile); err == nil && len(n) > 0 {
@@ -145,7 +179,7 @@ func main() {
 		return
 	}
 	runner := run
-	if c.repo == "all" {
+	if c.repo == "all" || c.famous {
 		runner = runAll
 	}
 	if err := runner(c); err != nil {
@@ -204,17 +238,39 @@ func runAll(c config) error {
 		return err
 	}
 	total := 0
+	var low, mid, high float64
+	ranged := true
 	for _, n := range names {
 		cc := c
 		cc.repo = n
-		tasks, _, err := load(cc)
+		tasks, r, err := load(cc)
 		if err != nil {
 			return err
 		}
-		total += len(plan(tasks, cc.trials, cc.seed, armsFor(cc, n)))
+		arms := armsFor(cc, n)
+		if c.mode == "memory" {
+			arms = []string{"memory"}
+		}
+		trials := cc.trials
+		if c.mode == "memory" {
+			trials = 1
+		}
+		k := len(plan(tasks, trials, cc.seed, arms))
+		total += k
+		if r.Est != nil && c.mode == "memory" {
+			low, mid, high = low+memoryEstUSD*float64(k), mid+memoryEstUSD*float64(k), high+memoryEstUSD*float64(k)
+		} else if r.Est != nil {
+			low, mid, high = low+r.Est.Low*float64(k), mid+r.Est.Mid*float64(k), high+r.Est.High*float64(k)
+		} else {
+			ranged = false
+		}
 		if err := run(cc); err != nil {
 			return err
 		}
+	}
+	if ranged && total > 0 {
+		fmt.Printf("all repos: %d sessions; projected %.2f USD (range %.2f to %.2f, from the per-repo cost model); total cap %.2f\n", total, mid, low, high, c.cap)
+		return nil
 	}
 	fmt.Printf("all repos: %d sessions; assumed %.2f USD each = %.2f USD (assumption); total cap %.2f\n", total, c.estMid, c.estMid*float64(total), c.cap)
 	return nil
@@ -243,8 +299,17 @@ func run(c config) error {
 	}
 	c.binSHA = binaryID(c.stacklit)
 	units := plan(tasks, c.trials, c.seed, arms)
-	fmt.Printf("plan %s: %d tasks x %d trials x %d arm(s) %v = %d sessions; assumed %.2f USD each = %.2f USD (assumption); per-session cap %.2f, total cap %.2f\n",
-		c.repo, len(tasks), c.trials, len(arms), arms, len(units), c.estMid, c.estMid*float64(len(units)), c.maxBudget, c.cap)
+	if r.Est != nil && c.mode == "memory" {
+		fmt.Printf("plan %s (memory check, all tools off): %d tasks x 1 trial = %d sessions; projected %.2f USD at %.3f per session (no tool output is read); total cap %.2f\n",
+			c.repo, len(tasks), len(units), memoryEstUSD*float64(len(units)), memoryEstUSD, c.cap)
+	} else if r.Est != nil {
+		n := float64(len(units))
+		fmt.Printf("plan %s (%d files): %d tasks x %d trials x %d arm(s) %v = %d sessions; projected %.2f USD (range %.2f to %.2f at %.3f, %.3f, %.3f per session); per-session cap %.2f, total cap %.2f\n",
+			c.repo, r.Files, len(tasks), c.trials, len(arms), arms, len(units), r.Est.Mid*n, r.Est.Low*n, r.Est.High*n, r.Est.Low, r.Est.Mid, r.Est.High, c.maxBudget, c.cap)
+	} else {
+		fmt.Printf("plan %s: %d tasks x %d trials x %d arm(s) %v = %d sessions; assumed %.2f USD each = %.2f USD (assumption); per-session cap %.2f, total cap %.2f\n",
+			c.repo, len(tasks), c.trials, len(arms), arms, len(units), c.estMid, c.estMid*float64(len(units)), c.maxBudget, c.cap)
+	}
 	if c.dryRun {
 		return nil
 	}
@@ -476,9 +541,19 @@ func armEnv(c config, arm string) []string {
 
 func prompt(c config, r repo, t task) string {
 	if c.mode == "memory" {
-		return "You have no tools and no access to files. From your own knowledge of the open source repository github.com/glincker/" + r.Name + ", answer: " + t.Question + answerSuffix + " If you do not know, give your best guess."
+		return "You have no tools and no access to files. From your own knowledge of the open source repository github.com/" + repoSlug(r) + ", answer: " + t.Question + answerSuffix + " If you do not know, give your best guess."
 	}
 	return t.Question + answerSuffix
+}
+
+// repoSlug is owner/name taken from the clone URL, so the memory check names
+// the real repository whichever organisation owns it.
+func repoSlug(r repo) string {
+	s := strings.TrimSuffix(strings.TrimPrefix(r.URL, "https://github.com/"), ".git")
+	if s == "" || strings.Contains(s, ":") {
+		return "glincker/" + r.Name
+	}
+	return s
 }
 
 func runUnit(c config, r repo, base string, u unit) (record, error) {
@@ -504,18 +579,37 @@ func runUnit(c config, r repo, base string, u unit) (record, error) {
 		}
 		if u.Arm != "control" {
 			steps := [][]string{{"generate", "--graph", "--quiet"}}
+			// The index of one commit is identical in every session of an arm,
+			// so with -reuse-index it is generated once and copied afterwards.
+			genDir := filepath.Join(base, "gen-"+u.Arm)
+			reused := false
+			if c.reuseIndex {
+				if _, err := os.Stat(genDir); err == nil {
+					if err := copyTree(genDir, dir); err != nil {
+						rec.Error = "reuse index: " + err.Error()
+						return rec, nil
+					}
+					steps, reused = nil, true
+				}
+			}
 			setup := []string{"setup", "claude", "--no-mcp", "--no-git-hook", "--session-hook"}
 			if u.Arm == "strict" {
 				setup = append(setup, "--crawl-guard=redirect")
 			}
 			env = append(env, armEnv(c, u.Arm)...)
 			steps = append(steps, setup)
-			for _, args := range steps {
+			for i, args := range steps {
 				cmd := exec.Command(stackBin, args...)
 				cmd.Dir, cmd.Env = dir, env
 				if out, err := cmd.CombinedOutput(); err != nil {
 					rec.Error = fmt.Sprintf("stacklit %v: %v %s", args, err, out)
 					return rec, nil
+				}
+				if i == 0 && c.reuseIndex && !reused {
+					if err := saveGenerated(dir, genDir); err != nil {
+						rec.Error = "save index: " + err.Error()
+						return rec, nil
+					}
 				}
 			}
 			tools += ",Bash"
