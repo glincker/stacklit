@@ -26,7 +26,7 @@ Token figures are bytes/4 measured on the three repos in the table below (263, 1
 
 | Event | What Stacklit does | Tokens | Failure behavior |
 |---|---|---|---|
-| `SessionStart` (startup, resume, clear, fork) | Reads `stacklit.json`. If the project `CLAUDE.md` already holds a digest of the current structure, injects only one status line. Otherwise injects the digest plus a tools line, then the status line. Records the structure hash it handed out. | 23 (status only), 290 to 515 (full) | No index: silent, except one `stacklit init` hint per worktree on `startup`. Bad input or any error: no output, exit 0. |
+| `SessionStart` (startup, resume, clear, fork) | Reads `stacklit.json`. A small repo (below `small_repo_files`, see below) gets one line saying grep is enough, then the status line. Otherwise, if the project `CLAUDE.md` already holds a digest of the current structure, injects only one status line; if not, the digest plus a tools line, then the status line. Records the structure hash it handed out. | 23 (status only), about 60 (small repo), 290 to 515 (full) | No index: silent, except one `stacklit init` hint per worktree on `startup`. Bad input or any error: no output, exit 0. |
 | `SessionStart` (compact) | Same logic. `CLAUDE.md` comes back from disk by itself, so normally only the status line is added. If the structure moved since `CLAUDE.md` was written, the fresh digest is injected. | 23 to 515 | Same. |
 | `SubagentStart` (Explore, Plan) | Injects the digest and tools line, because these agents skip `CLAUDE.md`. Other agent types get nothing (they already load `CLAUDE.md`). Override the list with `STACKLIT_SUBAGENT_TYPES`. | 264 to 491 | Silent on any error. |
 | `PostToolUse` (Edit, Write, MultiEdit, NotebookEdit), async | Runs `stacklit hook posttool`, which calls `stacklit refresh` for the edited file. Never prints, never fails the edit. | 0 | Index missing: does nothing. Lock held: queues the path for the holder. |
@@ -75,24 +75,51 @@ Exports are capped per module (`max_exports`), so a change to a symbol beyond th
 
 ## Steering text
 
-The `CLAUDE.md` or `AGENTS.md` block opens with short rules. Four phrasings are available through `"steering": "a" | "b" | "c" | "d"` in `.stacklitrc.json` or `STACKLIT_STEERING`:
+The `CLAUDE.md` or `AGENTS.md` block opens with short rules. Five phrasings are available through `"steering": "a" | "b" | "c" | "d" | "e"` in `.stacklitrc.json` or `STACKLIT_STEERING`:
 
 - `a` (default): three imperative lines, query before grep, slice instead of whole-file reads, impact before editing shared code.
 - `b`: the same three rules on one line.
 - `c`: a one-line rationale and three bullets.
-- `d`: strict. States that Stacklit is the source of truth for structure and tells the agent not to crawl: structure questions go to `stacklit query ... --budget 800` and `explain`, `impact` or `path`; no recursive listings, `find`, `tree` or repo wide grep to learn structure; open a file only after the map points to it and read it with `stacklit slice`; refresh or regenerate when stacklit reports a stale index or a missing symbol; subagents follow the same rules. `stacklit guide` prints this text plus the command list.
+- `d`: strict, not recommended (measured worse, see below). States that Stacklit is the source of truth for structure and tells the agent not to crawl: structure questions go to `stacklit query ... --budget 800` and `explain`, `impact` or `path`; no recursive listings, `find`, `tree` or repo wide grep to learn structure; open a file only after the map points to it and read it with `stacklit slice`; refresh or regenerate when stacklit reports a stale index or a missing symbol; subagents follow the same rules.
+- `e`: routed. Use Stacklit when you do not know where something is or how things connect; when you know the exact name, use grep or `stacklit impact <name>`; when the answer is several files (a flow, a chain), check the neighbours with `stacklit explain` or `stacklit path` before answering, because one query is a lead, not the answer. It does not forbid grep. It was written after the first A/B (below) and has not been measured yet; the default stays `a` until a second round says otherwise.
 
-Each is byte-stable, and the whole block stays under `STACKLIT_DIGEST_TOKENS` (default 500). The variants exist so they can be compared with the agent harness. There is no evidence yet that one wording beats another.
+Each is byte-stable, and the whole block stays under `STACKLIT_DIGEST_TOKENS` (default 500). `stacklit guide` and the MCP handshake use the `e` wording; steering `d` (or `STACKLIT_STEERING=d`) selects the older strict wording for both, kept for comparison.
+
+## What the first real-agent A/B measured
+
+Pull request #77 (`bench/agent-ab/`) ran 450 Claude Code sessions (model claude-sonnet-5-5, three repos of about 16,000, 1,300 and 400 files, 30 tasks, 5 trials, notional cost about 0.03 USD per session). With steering `a` and the session hook:
+
+- Pooled cost ratio 1.00 [0.93, 1.07]: no overall saving. Tool calls 0.68, Grep and Glob calls 0.18.
+- Locate and add questions got cheaper (cost ratio 0.88 and 0.78). The 16,000 file repo got cheaper (0.78); the 1,300 and 400 file repos did not (1.10 and 1.23).
+- "Who imports X" questions cost 1.59x: one exact grep answers them in about 1.2 calls, and the stacklit arm ran `stacklit query` first and grepped anyway.
+- Trace questions (the answer is a set of files) were less often right, 97.5% to 82.5%. In the clearest case the agent ran one `stacklit query` and answered with the top file, missing a second file that ranked lower.
+- Correctness overall: 94.0% to 88.0% with the pre-registered grader, 98.0% to 95.3% after three documented grading fixes.
+
+Steering `d` with `--crawl-guard=redirect` did worse still: cost ratio 1.12 [1.02, 1.24], tokens 1.37x, correct 82.7% (89.3% audited). It was not interleaved with the control arm, and the guard itself fired in only 8 of 150 sessions, so the result is mostly about the strict wording. Both are off by default and are not recommended. The changes in steering `e`, the flow line in `query`, importer lists in `impact` and small repo mode follow from these results. They are not yet measured; a second round is pre-registered in `bench/agent-ab/` but has not run.
+
+## When Stacklit helps
+
+Based on that one A/B, one model and one task set written by us:
+
+- Helps: large repos (the 16,000 file repo cost 22 percent less per session) and questions where you do not know where something lives (locate, add a feature following a pattern). The agent used about 0.4x the tool calls.
+- Does not help: exact-name lookups such as "who imports X", where one grep is already enough; and small repos (a few hundred files), where the map is overhead. On the 400 file repo cost went up 23 percent.
+- Needs care: questions whose answer is several files. A single query can list one plausible file and look final.
+
+## Small repos
+
+A repo with fewer source files than `small_repo_files` (default 600, `.stacklitrc.json`; env `STACKLIT_SMALL_REPO_FILES`; 0 turns the mode off) does not need a map. In that case the session hook and `setup` write one factual line ("This repo is small (N source files), so grep and reading files are enough. Stacklit is available if a question needs more") instead of the digest, about 60 tokens instead of 490, with the status line after it. The count is the number of indexed files across all languages in `stacklit.json`. Subagents get the same line. The line is not a prohibition: `query`, `impact` and the other commands still work.
 
 ## Source of truth
 
-Three layers push an agent to answer structure questions from the index instead of crawling the repo.
+Three layers push an agent to answer structure questions from the index instead of crawling the repo. The first A/B suggests that pushing hard does not pay (see above), so the shipped wording is the routed one.
 
-1. MCP handshake. `stacklit serve` returns an `instructions` string in the initialize result (both profiles, about 75 tokens, byte stable). It says the index and graph are the source of truth, to use query, explain, impact and path (query, impact and map on the minimal profile) before searching, to read code with slice, and to refresh when stale.
-2. Rules block. Steering variant `d` above, set with `steering` or `STACKLIT_STEERING=d`. The default stays `a` until the A/B run says otherwise.
-3. Crawl guard. Opt in, below.
+1. MCP handshake. `stacklit serve` returns an `instructions` string in the initialize result (both profiles, about 100 tokens, byte stable). It says to use query when you do not know where something is (and explain or path to see how things connect), grep or impact when you know the exact name, to check the neighbours when the answer is several files because one query is a lead and not the answer, to read code with slice, and to refresh when stale. `STACKLIT_STEERING=d` returns the earlier wording, which called the index the source of truth and said not to crawl.
+2. Rules block. Steering variant `e` above, set with `steering` or `STACKLIT_STEERING=e`. The default stays `a`.
+3. Crawl guard. Opt in, below, and not recommended.
 
 ## Crawl guard
+
+Not recommended. In the real-agent A/B (pull request #77) the strict arm, which paired `--crawl-guard=redirect` with steering `d`, cost more than no Stacklit at all (cost ratio 1.12, total tokens 1.37x) and was right less often (82.7% against 94.0%). The guard fired in only 8 of 150 sessions; the loss came mostly from the stronger rules text sending exact-name questions through `stacklit` first. It stays off by default.
 
 `stacklit setup claude --crawl-guard[=nudge|redirect|off]` adds a `PreToolUse` hook (`stacklit hook crawl <mode>`) matching `Bash|Glob|Read|Agent|Task`. Mode precedence: `STACKLIT_CRAWL_GUARD`, then `crawl_guard` in `.stacklitrc.json`, then the mode the hook was installed with. With nothing set the guard is off.
 
