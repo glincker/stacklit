@@ -56,6 +56,7 @@
   --term-text: #ece9df;
   --term-dim: #a29e92;
   --term-accent: #5fd0b5;
+  --copy-hover: #34322b;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -190,7 +191,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 .install-box .p, .cmd .p { color: var(--term-accent); }
 .copy { display: none; flex: none; min-width: 5rem; padding: 0 var(--s-4); border: 0; border-left: 1px solid var(--line-strong); border-radius: 0; background: transparent; color: var(--term-text); cursor: pointer; font-size: var(--fs-sm); font-weight: 600; transition: background-color var(--dur-1) var(--ease); }
 .js .copy { display: inline-flex; align-items: center; justify-content: center; }
-.copy:hover { background: rgb(255 255 255 / 0.1); }
+.copy:hover { background: var(--copy-hover); }
 .copy:focus-visible { outline-offset: -3px; }
 .copy[data-state="done"] { color: var(--term-accent); }
 
@@ -287,7 +288,7 @@ code, kbd, pre { font-family: var(--font-mono); }
 /* Proof */
 .points { margin: 0; padding-left: 1.2em; max-width: 40rem; }
 .points li { margin-top: var(--s-3); }
-.ab { padding-left: var(--s-4); border-left: 3px solid var(--accent); }
+.ab { padding: var(--s-4); border: 1px solid var(--line-strong); border-radius: var(--r-2); }
 .ab h3 { font-size: var(--fs-lg); }
 .ab p { margin-top: var(--s-1); color: var(--muted); }
 

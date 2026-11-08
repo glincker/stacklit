@@ -75,7 +75,7 @@ const hasAb = existsSync(abPath);
     <div class="container">
       <figure class="map-shot">
         <img class="shot-light" src="/img/map-ripgrep-light.webp" alt="The Stacklit map of ripgrep: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" decoding="async" />
-        <img class="shot-dark" src="/img/map-ripgrep-dark.webp" alt="The Stacklit map of ripgrep in the dark theme: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" decoding="async" />
+        <img class="shot-dark" src="/img/map-ripgrep-dark.webp" alt="The Stacklit map of ripgrep in the dark theme: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" loading="lazy" decoding="async" />
         <figcaption>{copy.cta.mapCaption} <a href="/demos/ripgrep/">{copy.cta.mapLink}</a></figcaption>
       </figure>
       <div class="works">
@@ -153,7 +153,7 @@ const hasAb = existsSync(abPath);
           </table>
         </div>
         <ul class="points">
-          <li>Grep and read finds the file first more often, and its search pattern was written by someone who knew the answer. The query command's gap to it is {bench.pairedQueryVsGrep.found1} percentage points at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
+          <li>Grep and read finds the file first more often, and its search pattern was written by someone who knew the answer. The query command’s gap to it is {bench.pairedQueryVsGrep.found1} percentage points at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
           <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact name, grep is cheaper than loading a map.</li>
           <li>The derive map is {deriveMin} to {deriveMax} tokens on these repos, so it is cheap to hand an agent at the start of a session.</li>
           <li>Scoring was tuned after looking at some failures, and there are limits we list on the benchmark page.</li>
