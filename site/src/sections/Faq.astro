@@ -1,0 +1,22 @@
+---
+import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import copy from '../data/copy.json';
+import { fill } from '../data/agentAb';
+---
+<Section tone="surface" label="faq-title">
+  <SectionHead id="faq-title" title={copy.faq.title} />
+  <div class="max-w-heading divide-y divide-line border-y border-line">
+    {copy.faq.items.map((f) => (
+      <details class="group py-1">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-h3 text-ink [&::-webkit-details-marker]:hidden">
+          <span class="min-w-0">{f.q}</span>
+          <span class="shrink-0 text-muted group-open:hidden" aria-hidden="true">+</span>
+          <span class="hidden shrink-0 text-muted group-open:inline" aria-hidden="true">-</span>
+        </summary>
+        <p class="max-w-measure pb-4 text-body text-muted">{fill(f.a)}</p>
+      </details>
+    ))}
+  </div>
+  <p class="mt-6"><a href="/docs/faq/" class="text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}</a></p>
+</Section>

@@ -63,9 +63,9 @@ typography:
     letterSpacing: -0.02em
   code:
     fontFamily: ui-monospace
-    fontSize: 0.875rem
+    fontSize: 0.8125rem
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.65
 rounded:
   sm: 4px
   md: 8px
@@ -122,11 +122,11 @@ Dark theme keeps the same roles: paper becomes #151410, ink #ece9df and the acce
 
 ## Typography
 
-System fonts only, so the site loads no font files and makes no third party request. The stack starts at Avenir Next and Segoe UI Variable. Sizes step on a fixed scale: caption 14px, body 16px, lead up to 22px, h3 20px, h2 up to 40px, hero up to 64px, stat 36px. Headings are one weight and one colour. Labels are body type, sentence case, never tracked capitals. Code is 14px mono and never wraps.
+System fonts only, so the site loads no font files and makes no third party request. The stack starts at Avenir Next and Segoe UI Variable. Sizes step on a fixed scale: caption 14px, body 16px, lead up to 22px, h3 20px, h2 up to 40px, hero up to 64px, stat 36px. Headings are one weight and one colour. Labels are body type, sentence case, never tracked capitals. Code is 13px mono and never wraps.
 
 ## Layout
 
-One container for every section: 72rem wide, centred, with a gutter of 16px that grows to 40px. Backgrounds can run full width, content never does. Vertical rhythm comes from one section padding token (64px growing to 112px) and the 4px spacing scale. Text blocks stop at 40rem and headings at 48rem. Grid children carry min-width 0 so code and tables cannot widen a column. Button rows wrap as a row and never stack at odd widths.
+One container for every section: 76rem wide, centred, with a gutter of 16px that grows to 40px. Backgrounds can run full width, content never does. Vertical rhythm comes from one section padding token (64px growing to 112px) and the 4px spacing scale. Text blocks stop at 40rem and headings at 48rem. Grid children carry min-width 0 so code and tables cannot widen a column. Button rows wrap as a row and never stack at odd widths.
 
 ## Elevation and Depth
 
@@ -139,7 +139,7 @@ Radii are 4px for inline code, 8px for buttons and inputs, 12px for panels and c
 ## Components
 
 - **Button:** one component, 44px high, two variants (primary, secondary) and one quiet link form. Labels never wrap inside a button.
-- **Code block:** dark surface, mono 14px, horizontal scroll, copy button, keyboard focusable. Never wraps.
+- **Code block:** dark surface, mono 13px, horizontal scroll, copy button, keyboard focusable. Never wraps.
 - **Stat row:** a big number, a small label and a source link. Favourable, neutral and unfavourable results are shown at the same size.
 - **Section and Container:** the only way to place content on a page. A lint script fails the build when a landing section skips them.
 

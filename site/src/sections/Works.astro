@@ -1,0 +1,23 @@
+---
+import Section from '../components/Section.astro';
+import Logo from '../components/Logo.astro';
+import copy from '../data/copy.json';
+
+const assistants: [string, string | undefined][] = [
+  ['Claude Code', 'claude-code'], ['Cursor', 'cursor'], ['Codex', 'codex'], ['GitHub Copilot', 'github-copilot'],
+  ['Gemini CLI', 'google-gemini'], ['Windsurf', 'windsurf'], ['Cline', 'cline'], ['OpenCode', 'opencode'],
+  ['Zed', 'zed'], ['Junie', 'junie'], ['Aider', undefined],
+];
+const languages: [string, string][] = [['Go', 'go'], ['TypeScript', 'typescript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java']];
+---
+<Section label="works-title">
+  <h2 id="works-title" class="max-w-heading text-h2 text-ink">{copy.assistants.title}</h2>
+  <ul class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+    {assistants.map(([name, slug]) => <li class="min-w-0"><Logo name={name} slug={slug} /></li>)}
+  </ul>
+  <p class="mt-6 max-w-measure text-body text-muted">{copy.assistants.note}</p>
+  <h3 class="mb-4 mt-10 text-h3 text-ink">Symbol graphs for 20 languages, including</h3>
+  <ul class="flex flex-wrap gap-x-6 gap-y-4">
+    {languages.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
+  </ul>
+</Section>

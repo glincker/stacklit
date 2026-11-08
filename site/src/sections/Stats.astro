@@ -1,0 +1,15 @@
+---
+import Section from '../components/Section.astro';
+import StatRow from '../components/StatRow.astro';
+import copy from '../data/copy.json';
+import { fill } from '../data/agentAb';
+
+const f = (items: typeof copy.hero.statRow) => items.map((i) => ({ ...i, polarity: i.polarity as 'good' | 'neutral' | 'bad', number: fill(i.number), label: fill(i.label), source: fill(i.source) }));
+---
+<Section tone="surface" size="md" label="stats-title">
+  <h2 id="stats-title" class="mb-6 max-w-heading text-h3 text-ink">What our test of {fill('{sessions}')} Claude Code sessions measured</h2>
+  <StatRow items={f(copy.hero.statRow)} cols={4} />
+  <p class="mb-3 mt-8 text-caption font-semibold text-muted">More results, by repo size and question type</p>
+  <StatRow items={f(copy.hero.statRowExtra)} cols={3} />
+  <p class="mt-6 max-w-measure text-caption text-muted">{copy.hero.statRowNote}</p>
+</Section>

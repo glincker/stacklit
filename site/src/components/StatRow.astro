@@ -1,0 +1,19 @@
+---
+// Results side by side: favourable, neutral and unfavourable cells share one size and one style.
+interface Item { polarity: 'good' | 'neutral' | 'bad'; number: string; label: string; source: string; href: string }
+interface Props { items: Item[]; cols?: 3 | 4; class?: string }
+const { items, cols = 4, class: extra } = Astro.props;
+const word = { good: 'In its favour', neutral: 'No change', bad: 'Against it' } as const;
+const tone = { good: 'text-accent-text', neutral: 'text-ink', bad: 'text-bad' } as const;
+const grid = { 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' } as const;
+---
+<ul class:list={['grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line', grid[cols], extra]}>
+  {items.map((it) => (
+    <li class="flex min-w-0 flex-col gap-2 bg-surface p-5">
+      <span class:list={['text-caption font-semibold', tone[it.polarity]]}>{word[it.polarity]}</span>
+      <span class:list={['text-stat font-bold tracking-tight', tone[it.polarity]]}>{it.number}</span>
+      <span class="text-body text-ink">{it.label}</span>
+      <a href={it.href} class="mt-auto pt-1 text-caption text-muted underline decoration-1 underline-offset-4 hover:text-ink">{it.source}</a>
+    </li>
+  ))}
+</ul>

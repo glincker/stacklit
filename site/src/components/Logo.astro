@@ -1,14 +1,42 @@
 ---
-// A thesvg.org logo by URL. Falls back to a letter when the slug is missing or the image is blocked.
-const { name, mono, colour, size = 24 } = Astro.props;
-const base = 'https://thesvg.org/icons/';
-const img = { width: size, height: size, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' } as const;
+// Brand marks from @thesvg/astro, inlined at build time: no image request, no file in the repo.
+// A name with no mark in the package gets a letter tile instead.
+import ClaudeCode from '@thesvg/astro/claude-code';
+import Cursor from '@thesvg/astro/cursor';
+import Codex from '@thesvg/astro/codex';
+import GithubCopilot from '@thesvg/astro/github-copilot';
+import GoogleGemini from '@thesvg/astro/google-gemini';
+import Windsurf from '@thesvg/astro/windsurf';
+import Cline from '@thesvg/astro/cline';
+import OpenCode from '@thesvg/astro/opencode';
+import Zed from '@thesvg/astro/zed';
+import Junie from '@thesvg/astro/junie';
+import Go from '@thesvg/astro/go';
+import TypeScript from '@thesvg/astro/typescript';
+import Python from '@thesvg/astro/python';
+import Rust from '@thesvg/astro/rust';
+import Java from '@thesvg/astro/java';
+import Npm from '@thesvg/astro/npm';
+import Github from '@thesvg/astro/github';
+
+interface Props { name: string; slug?: string; size?: number }
+const { name, slug, size = 24 } = Astro.props;
+// Marks drawn in fixed white sit on a dark tile; marks drawn in fixed near-black are inverted in the dark theme.
+const marks: Record<string, { C: any; darkInvert?: boolean; darkTile?: boolean }> = {
+  'claude-code': { C: ClaudeCode }, cursor: { C: Cursor, darkTile: true }, codex: { C: Codex, darkInvert: true },
+  'github-copilot': { C: GithubCopilot, darkTile: true }, 'google-gemini': { C: GoogleGemini }, windsurf: { C: Windsurf, darkTile: true },
+  cline: { C: Cline, darkInvert: true }, opencode: { C: OpenCode }, zed: { C: Zed, darkTile: true }, junie: { C: Junie },
+  go: { C: Go, darkTile: true }, typescript: { C: TypeScript }, python: { C: Python }, rust: { C: Rust, darkInvert: true },
+  java: { C: Java }, npm: { C: Npm }, github: { C: Github, darkInvert: true },
+};
+const mark = slug ? marks[slug] : undefined;
+const Mark = mark?.C;
 ---
-<span class="lg">
-  <span class="lg-mark">
-    {mono && <img class="lg-m" src={`${base}${mono}.svg`} alt={name} {...img} onerror="this.hidden=true" />}
-    {mono && colour && <img class="lg-c" src={`${base}${colour}.svg`} alt="" {...img} onerror="this.hidden=true" />}
-    <span class:list={['lg-letter', !mono && 'on']} role={mono ? undefined : 'img'} aria-label={mono ? undefined : name}><span aria-hidden="true">{name[0]}</span></span>
+<span class="inline-flex items-center gap-3">
+  <span class:list={['grid size-10 shrink-0 place-items-center rounded-md border', mark?.darkTile ? 'border-term-line bg-term text-term-text' : 'border-line bg-tile text-ink']}>
+    {Mark
+      ? <Mark size={size} aria-hidden="true" class:list={[mark?.darkInvert && 'dark:invert']} />
+      : <span class="text-body font-semibold" aria-hidden="true">{name[0]}</span>}
   </span>
-  <span class="lg-name" aria-hidden={mono ? 'true' : undefined}>{name}</span>
+  <span class="text-body text-ink">{name}</span>
 </span>

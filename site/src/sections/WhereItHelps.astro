@@ -1,0 +1,20 @@
+---
+import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import copy from '../data/copy.json';
+import { fill } from '../data/agentAb';
+const at = copy.agentTest;
+---
+<Section label="helps-title">
+  <SectionHead id="helps-title" title={copy.whereItHelps.title} />
+  <div class="grid min-w-0 gap-8 md:grid-cols-2 md:gap-12">
+    <div class="min-w-0">
+      <h3 class="text-h3 text-accent-text">{at.helpsTitle}</h3>
+      <ul class="mt-4 max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">{at.helps.map((t) => <li>{fill(t)}</li>)}</ul>
+    </div>
+    <div class="min-w-0">
+      <h3 class="text-h3 text-bad">{at.failsTitle}</h3>
+      <ul class="mt-4 max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">{at.fails.map((t) => <li>{fill(t)}</li>)}</ul>
+    </div>
+  </div>
+</Section>
