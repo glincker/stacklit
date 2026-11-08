@@ -56,9 +56,14 @@ brews:
     repository:
       owner: glincker
       name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      branch: main
+      # Pushed over SSH with a deploy key that can write only to the tap repo.
+      git:
+        url: "git@github.com:glincker/homebrew-tap.git"
+        private_key: "{{ .Env.HOMEBREW_TAP_DEPLOY_KEY }}"
+        ssh_command: "ssh -i {{ .KeyPath }} -o StrictHostKeyChecking=accept-new -F /dev/null"
     homepage: https://github.com/glincker/stacklit
-    description: Zero-config codebase index and map for AI coding agents
+    description: A committed map of your codebase for AI coding agents
     license: MIT
     directory: Formula
     install: |
