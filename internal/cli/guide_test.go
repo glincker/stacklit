@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -56,7 +57,8 @@ func TestSetupRejectsBadCrawlMode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out, ".claude/settings.json") {
+	// Windows prints the path with a backslash.
+	if !strings.Contains(filepath.ToSlash(out), ".claude/settings.json") {
 		t.Fatalf("bare --crawl-guard should plan a settings change:\n%s", out)
 	}
 }
