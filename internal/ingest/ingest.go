@@ -34,6 +34,11 @@ type Context struct {
 	APIs    []API   `json:"apis,omitempty"`
 	Tables  []Table `json:"tables,omitempty"`
 	Owners  *Owners `json:"owners,omitempty"`
+
+	// Concepts and Links come from external adapters (see adapter.go). They are
+	// always INFERRED and carry the adapter name in Source.
+	Concepts []Concept     `json:"concepts,omitempty"`
+	Links    []ConceptLink `json:"concept_links,omitempty"`
 }
 
 var skipDirs = map[string]bool{
