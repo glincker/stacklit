@@ -49,6 +49,7 @@ type SymNode struct {
 	Doc       string `json:"doc,omitempty"`
 	Lang      string `json:"lang,omitempty"`
 	Sig       string `json:"sig,omitempty"`
+	Vis       string `json:"vis,omitempty"`
 	Community int    `json:"community"`
 	Repo      string `json:"repo,omitempty"`   // set when graphs from several repos are merged
 	Source    string `json:"source,omitempty"` // adapter or index that produced the node, empty for the built-in extractor

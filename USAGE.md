@@ -242,7 +242,7 @@ stacklit slice <symbol>                 # only that symbol's source, with line n
 stacklit watch                          # keep the graph current as files change
 ```
 
-All of them accept `--root`, `--graph` and (except `watch`) `--json`. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
+All of them accept `--root`, `--graph`, `--include-tests` (keep test files in the graph; also `STACKLIT_GRAPH_INCLUDE_TESTS=1`) and (except `watch`) `--json`. Twenty languages produce symbols and call, import and inheritance edges; the per-language table is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#symbol-graph-extraction). `STACKLIT_GRAPH_MAX_PARSE_BYTES` (default 196608) sets the largest file parsed with tree-sitter, and `STACKLIT_PARSE_MEMORY_MB` bounds concurrent parse memory. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
 
 ### stacklit doctor
 
