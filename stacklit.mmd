@@ -1,32 +1,38 @@
 graph LR
+  classDef scala fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef c fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef cpp fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef rust fill:#a5b3bf,color:#0d1117,stroke:#a5b3bf
   classDef elixir fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef php fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef javascript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
+  classDef typescript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
   classDef python fill:#b1bac4,color:#0d1117,stroke:#b1bac4
+  classDef java fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef csharp fill:#8b949e,color:#0d1117,stroke:#8b949e
+  classDef ruby fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef kotlin fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef go fill:#e6edf3,color:#0d1117,stroke:#e6edf3
-  classDef java fill:#8b949e,color:#0d1117,stroke:#8b949e
-  classDef scala fill:#8b949e,color:#0d1117,stroke:#8b949e
-  classDef typescript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
-  classDef rust fill:#a5b3bf,color:#0d1117,stroke:#a5b3bf
-  classDef javascript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
-  internal_git["internal/git\nGit integration"]:::go
-  internal_monorepo["internal/monorepo\nMonorepo detection"]:::go
-  npm_bin["npm/bin\nBin"]:::go
-  internal_cli["internal/cli\nCommand-line interface"]:::go
-  internal_graph["internal/graph\nDependency graph"]:::go
-  internal_setup["internal/setup\nSetup"]:::go
-  internal_walker["internal/walker\nFile system walker"]:::go
-  internal_mcp["internal/mcp\nMCP server for AI agents"]:::go
-  internal_summary["internal/summary\nAI-powered codebase summaries"]:::go
-  assets["assets\nStatic assets"]:::go
-  internal_derive["internal/derive\nDerive"]:::go
-  internal_parser["internal/parser\nSource code parsers"]:::go
-  internal_renderer["internal/renderer\nOutput renderers"]:::go
-  internal_schema["internal/schema\nData schema definitions"]:::go
-  npm["npm\nNpm"]:::go
+  classDef swift fill:#8b949e,color:#0d1117,stroke:#8b949e
   cmd_stacklit["cmd/stacklit\nStacklit"]:::go
+  internal_cli["internal/cli\nCommand-line interface"]:::go
+  internal_engine["internal/engine\nCore orchestration engine"]:::go
+  npm_bin["npm/bin\nBin"]:::go
+  internal_setup["internal/setup\nSetup"]:::go
+  internal_summary["internal/summary\nAI-powered codebase summaries"]:::go
+  internal_walker["internal/walker\nFile system walker"]:::go
+  internal_derive["internal/derive\nDerive"]:::go
+  internal_monorepo["internal/monorepo\nMonorepo detection"]:::go
+  internal_renderer["internal/renderer\nOutput renderers"]:::go
+  npm["npm\nNpm"]:::go
+  assets["assets\nStatic assets"]:::go
   internal_config["internal/config\nConfiguration management"]:::go
   internal_detect["internal/detect\nFramework and tool detection"]:::go
-  internal_engine["internal/engine\nCore orchestration engine"]:::go
+  internal_git["internal/git\nGit integration"]:::go
+  internal_graph["internal/graph\nDependency graph"]:::go
+  internal_mcp["internal/mcp\nMCP server for AI agents"]:::go
+  internal_parser["internal/parser\nSource code parsers"]:::go
+  internal_schema["internal/schema\nData schema definitions"]:::go
   cmd_stacklit --> internal_cli
   internal_cli --> internal_config
   internal_cli --> internal_derive

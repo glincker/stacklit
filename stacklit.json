@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T16:48:13Z",
+  "generated_at": "2026-11-08T16:51:21Z",
   "stacklit_version": "dev",
-  "merkle_hash": "cd2137b04f3b639f31e4545461d38395430be3b103651f01cb7a02353d68ecf1",
+  "merkle_hash": "346dc1de0d7e966d9bb5e2a39faa4a36f4f4f1e264d9c2d50bee4fce6a9a7c52",
   "project": {
     "name": "stacklit-langs",
     "root": ".",
@@ -12,6 +12,18 @@
   "tech": {
     "primary_language": "go",
     "languages": {
+      "c": {
+        "files": 1,
+        "lines": 16
+      },
+      "cpp": {
+        "files": 1,
+        "lines": 14
+      },
+      "csharp": {
+        "files": 1,
+        "lines": 21
+      },
       "dart": {
         "files": 1,
         "lines": 44
@@ -22,7 +34,7 @@
       },
       "go": {
         "files": 80,
-        "lines": 10689
+        "lines": 10852
       },
       "java": {
         "files": 1,
@@ -40,6 +52,10 @@
         "files": 1,
         "lines": 23
       },
+      "php": {
+        "files": 1,
+        "lines": 21
+      },
       "protobuf": {
         "files": 1,
         "lines": 24
@@ -47,6 +63,10 @@
       "python": {
         "files": 1,
         "lines": 20
+      },
+      "ruby": {
+        "files": 1,
+        "lines": 25
       },
       "rust": {
         "files": 1,
@@ -63,6 +83,10 @@
       "sql": {
         "files": 1,
         "lines": 16
+      },
+      "swift": {
+        "files": 1,
+        "lines": 23
       },
       "typescript": {
         "files": 5,
@@ -82,8 +106,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 102,
-    "total_lines": 11209
+    "total_files": 108,
+    "total_lines": 11492
   },
   "modules": {
     "assets": {
@@ -299,7 +323,7 @@
       "purpose": "Dependency graph",
       "language": "go",
       "files": 2,
-      "lines": 645,
+      "lines": 662,
       "file_list": [
         "graph.go",
         "graph_test.go"
@@ -373,7 +397,7 @@
       "purpose": "Source code parsers",
       "language": "go",
       "files": 33,
-      "lines": 4556,
+      "lines": 4702,
       "file_list": [
         "generic.go",
         "generic_test.go",
@@ -471,14 +495,14 @@
         "type MultiIndex"
       ],
       "type_defs": {
-        "Architecture": "Pattern string, Summary string",
         "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
-        "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
-        "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
+        "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
         "LangStats": "Files int, Lines int",
+        "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
         "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "Project": "Name string, Root string, Type string, Workspaces []string",
         "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
         "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
@@ -719,14 +743,26 @@
     "hot_files": [
       {
         "path": "stacklit.json",
-        "commits_90d": 2
-      },
-      {
-        "path": "internal/parser/generic.go",
-        "commits_90d": 1
+        "commits_90d": 3
       },
       {
         "path": "internal/parser/langs_test.go",
+        "commits_90d": 2
+      },
+      {
+        "path": "stacklit.mmd",
+        "commits_90d": 2
+      },
+      {
+        "path": "internal/graph/graph.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/graph/graph_test.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/generic.go",
         "commits_90d": 1
       },
       {
@@ -734,7 +770,15 @@
         "commits_90d": 1
       },
       {
+        "path": "internal/parser/ts_c.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/parser/ts_common.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_csharp.go",
         "commits_90d": 1
       },
       {
@@ -762,65 +806,45 @@
         "commits_90d": 1
       },
       {
+        "path": "internal/parser/ts_php.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/parser/ts_proto.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_ruby.go",
         "commits_90d": 1
       },
       {
         "path": "internal/parser/ts_scala.go",
         "commits_90d": 1
-      },
-      {
-        "path": "internal/parser/ts_sfc.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/parser/ts_shell.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/parser/ts_sql.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/parser/ts_zig.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "internal/walker/walker.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "stacklit.mmd",
-        "commits_90d": 1
-      },
-      {
-        "path": "testdata/langs/sample.dart",
-        "commits_90d": 1
       }
     ],
     "recent": [
+      "internal/graph/graph.go",
+      "internal/graph/graph_test.go",
       "internal/parser/langs_test.go",
-      "internal/parser/treesitter.go",
-      "internal/parser/ts_common.go",
-      "internal/parser/ts_dart.go",
-      "internal/parser/ts_elixir.go",
-      "internal/parser/ts_gdscript.go",
-      "internal/parser/ts_hcl.go",
-      "internal/parser/ts_lua.go",
-      "internal/parser/ts_proto.go",
-      "internal/parser/ts_scala.go"
+      "internal/parser/ts_c.go",
+      "internal/parser/ts_csharp.go",
+      "internal/parser/ts_php.go",
+      "internal/parser/ts_ruby.go",
+      "internal/parser/ts_swift.go",
+      "stacklit.json",
+      "stacklit.mmd"
     ],
     "stable": [
+      "internal/graph/graph.go",
+      "internal/graph/graph_test.go",
       "internal/parser/generic.go",
-      "internal/parser/langs_test.go",
       "internal/parser/treesitter.go",
+      "internal/parser/ts_c.go",
       "internal/parser/ts_common.go",
+      "internal/parser/ts_csharp.go",
       "internal/parser/ts_dart.go",
       "internal/parser/ts_elixir.go",
-      "internal/parser/ts_gdscript.go",
-      "internal/parser/ts_hcl.go",
-      "internal/parser/ts_kotlin.go",
-      "internal/parser/ts_lua.go"
+      "internal/parser/ts_gdscript.go"
     ]
   },
   "hints": {
