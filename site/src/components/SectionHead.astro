@@ -1,0 +1,9 @@
+---
+// Heading plus optional lead. Fixed sizes so every section starts the same way.
+interface Props { id: string; title: string; lead?: string }
+const { id, title, lead } = Astro.props;
+---
+<div class="mb-10 min-w-0 sm:mb-12">
+  <h2 id={id} class="max-w-heading text-h2 text-ink">{title}</h2>
+  {lead && <p class="mt-4 max-w-measure text-lead text-muted">{lead}</p>}
+</div>

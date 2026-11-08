@@ -1,0 +1,6 @@
+---
+// The only way content is centred and capped. Full-bleed backgrounds live on Section, never here.
+interface Props { as?: 'div' | 'header' | 'footer' | 'nav' | 'main'; class?: string }
+const { as: Tag = 'div', class: extra } = Astro.props;
+---
+<Tag class:list={['mx-auto w-full max-w-site px-gutter', extra]}><slot /></Tag>

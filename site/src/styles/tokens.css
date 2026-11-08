@@ -1,0 +1,155 @@
+/* Hallmark · shape: Plain-column landing (redesign) · genre: modern-minimal · theme: custom · job: try · idea: "A small committed map of a codebase, shown with its real output." · vibe: "warm paper, one deep green accent, plain tools"
+ * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack (Avenir Next first) · body: system UI stack · hero: head, one sentence and actions left, real derive output right · nav: wordmark left, text links, star and theme toggle right · footer: one row of links and a privacy line · imagery: the product, real maps and real command output · signature: the 137 token map of gin as terminal output
+ * axes: warm-paper/system/green · posture: split · contrast: pass (npm run check:contrast) · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the page has no photography by design, the real command output and real maps carry it */
+/* Single source of every colour, font, size, space, radius and motion value on the site.
+ * DESIGN.md describes them. Nothing else in src/ may hold a literal colour or font. */
+
+:root {
+  color-scheme: light;
+  --paper: #f5f3ee;
+  --surface: #fbfaf7;
+  --raised: #ffffff;
+  --sunk: #ebe8e0;
+  --line: #d9d5c9;
+  --line-strong: #8a8678;
+  --ink: #1b1a17;
+  --muted: #55524a;
+  --faint: #615d53;
+  --accent: #0a6b5b;
+  --accent-ink: #ffffff;
+  --accent-soft: #d5eae3;
+  --accent-text: #075446;
+  --bad: #9b2c1d;
+  --warn: #7a4a00;
+  --focus: #0a6b5b;
+  --term: #1b1a17;
+  --term-text: #ece9df;
+  --term-dim: #a29e92;
+  --term-accent: #5fd0b5;
+  --term-line: #34322b;
+  --code-keyword: #8a3b12;
+  --code-fn: #6b3f8f;
+  --code-comment: #5c584e;
+  --tile: #ffffff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #151410;
+  --surface: #1b1a16;
+  --raised: #23221d;
+  --sunk: #100f0c;
+  --line: #34322b;
+  --line-strong: #6a6759;
+  --ink: #ece9df;
+  --muted: #b0ac9f;
+  --faint: #9a9688;
+  --accent: #5fd0b5;
+  --accent-ink: #0a1f1a;
+  --accent-soft: #1d3a32;
+  --accent-text: #86e0ca;
+  --bad: #f19a8c;
+  --warn: #e7b46a;
+  --focus: #5fd0b5;
+  --term: #100f0c;
+  --code-keyword: #e5a073;
+  --code-fn: #c8a8ea;
+  --code-comment: #a29e92;
+  --tile: #23221d;
+}
+
+/* Without scripting the system preference decides. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    color-scheme: dark;
+    --paper: #151410;
+    --surface: #1b1a16;
+    --raised: #23221d;
+    --sunk: #100f0c;
+    --line: #34322b;
+    --line-strong: #6a6759;
+    --ink: #ece9df;
+    --muted: #b0ac9f;
+    --faint: #9a9688;
+    --accent: #5fd0b5;
+    --accent-ink: #0a1f1a;
+    --accent-soft: #1d3a32;
+    --accent-text: #86e0ca;
+    --bad: #f19a8c;
+    --warn: #e7b46a;
+    --focus: #5fd0b5;
+    --term: #100f0c;
+    --code-keyword: #e5a073;
+    --code-fn: #c8a8ea;
+    --code-comment: #a29e92;
+    --tile: #23221d;
+  }
+}
+
+@theme {
+  --font-sans: 'Avenir Next', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* Type scale: caption 14, body 16, lead up to 22, h3 20, h2 up to 40, stat 36, hero up to 64. */
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-code: 0.8125rem;
+  --text-code--line-height: 1.65;
+  --text-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.25;
+  --text-h2: clamp(1.75rem, 1.35rem + 1.8vw, 2.5rem);
+  --text-h2--line-height: 1.1;
+  --text-stat: clamp(1.875rem, 1.5rem + 1.6vw, 2.25rem);
+  --text-stat--line-height: 1.05;
+  --text-hero: clamp(2.25rem, 1.4rem + 3.8vw, 4rem);
+  --text-hero--line-height: 1.04;
+
+  /* Spacing is Tailwind's 4px scale. Section rhythm and gutters have their own tokens. */
+  --spacing-section: clamp(4rem, 3rem + 5vw, 7rem);
+  --spacing-gutter: clamp(1rem, 0.5rem + 2.4vw, 2.5rem);
+
+  --container-site: 76rem;
+  --container-measure: 40rem;
+  --container-heading: 48rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --ease-stack: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-bad: var(--bad);
+  --color-warn: var(--warn);
+  --color-focus: var(--focus);
+  --color-term: var(--term);
+  --color-term-text: var(--term-text);
+  --color-term-dim: var(--term-dim);
+  --color-term-accent: var(--term-accent);
+  --color-term-line: var(--term-line);
+  --color-code-keyword: var(--code-keyword);
+  --color-code-fn: var(--code-fn);
+  --color-code-comment: var(--code-comment);
+  --color-tile: var(--tile);
+}

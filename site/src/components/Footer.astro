@@ -1,16 +1,20 @@
 ---
+import Container from './Container.astro';
+const links = [
+  ['GitHub', 'https://github.com/glincker/stacklit'],
+  ['npm', 'https://www.npmjs.com/package/stacklit'],
+  ['MIT license', 'https://github.com/glincker/stacklit/blob/master/LICENSE'],
+  ['FAQ', '/docs/faq/'],
+  ['Privacy', '/docs/privacy/'],
+  ['Changelog', '/docs/changelog/'],
+  ['llms.txt', '/llms.txt'],
+];
 ---
-<footer class="site-footer">
-  <div class="container">
-    <ul class="footer-links">
-      <li><a href="https://github.com/glincker/stacklit">GitHub</a></li>
-      <li><a href="https://www.npmjs.com/package/stacklit">npm</a></li>
-      <li><a href="https://github.com/glincker/stacklit/blob/master/LICENSE">MIT license</a></li>
-      <li><a href="/docs/faq/">FAQ</a></li>
-      <li><a href="/docs/privacy/">Privacy</a></li>
-      <li><a href="/docs/changelog/">Changelog</a></li>
-      <li><a href="/llms.txt">llms.txt</a></li>
+<footer class="border-t border-line bg-surface py-12">
+  <Container>
+    <ul class="flex flex-wrap gap-x-6 gap-y-2">
+      {links.map(([label, href]) => <li><a href={href} class="inline-flex min-h-9 items-center text-body text-ink underline decoration-1 underline-offset-4 hover:decoration-2">{label}</a></li>)}
     </ul>
-    <p>No cookies, no analytics, no third-party scripts. The only outside requests are the star count at build time and small logos from thesvg.org, and the pages work without them.</p>
-  </div>
+    <p class="mt-6 max-w-measure text-caption text-muted">No cookies, no analytics, no third party scripts, fonts or images. This site makes no third party requests. The star count is read once, when the site is built.</p>
+  </Container>
 </footer>

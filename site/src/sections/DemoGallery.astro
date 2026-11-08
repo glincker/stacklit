@@ -1,0 +1,58 @@
+---
+import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import data from '../data/demos.json';
+import copy from '../data/copy.json';
+
+const demos = data.demos;
+const languages = [...new Set(demos.map((d) => d.language))];
+const n = (v: number) => v.toLocaleString('en-US');
+const time = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)} s` : `${v} ms`);
+---
+<Section label="demos-title">
+  <h1 id="demos-title" class="max-w-heading text-hero font-bold tracking-tight text-ink">{copy.demos.title}</h1>
+  <p class="mt-6 max-w-measure text-lead text-muted">{copy.demos.sub}</p>
+  <div class="mt-10 flex flex-wrap gap-2" data-filter role="group" aria-label="Filter by language">
+    <button type="button" aria-pressed="true" data-lang="all" class="min-h-9 rounded-full border border-line-strong px-4 text-caption font-semibold text-ink hover:bg-sunk aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-accent-ink">All</button>
+    {languages.map((l) => <button type="button" aria-pressed="false" data-lang={l} class="min-h-9 rounded-full border border-line-strong px-4 text-caption font-semibold text-ink hover:bg-sunk aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-accent-ink">{l}</button>)}
+  </div>
+  <ul class="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    {demos.map((d, i) => (
+      <li class="min-w-0 data-[hidden]:hidden" data-lang={d.language}>
+        <a href={`/demos/${d.id}/`} aria-label={`Open the ${d.name} map`} class="block overflow-hidden rounded-lg border border-line">
+          <img class="aspect-[8/5] w-full object-cover object-top dark:hidden" src={`/demos/${d.id}/thumb-light.webp`} alt={`Light theme screenshot of the Stacklit map for ${d.name}, showing its module graph.`} width="800" height="500" loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
+          <img class="hidden aspect-[8/5] w-full object-cover object-top dark:block" src={`/demos/${d.id}/thumb-dark.webp`} alt={`Dark theme screenshot of the Stacklit map for ${d.name}, showing its module graph.`} width="800" height="500" loading={i < 3 ? 'eager' : 'lazy'} decoding="async" />
+        </a>
+        <h2 class="mt-4 text-h3 text-ink">{d.name} <small class="text-caption font-normal text-muted">{d.language}, {d.ref}</small></h2>
+        <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-caption">
+          <div><dt class="text-muted">Files</dt><dd class="text-ink">{n(d.files)}</dd></div>
+          <div><dt class="text-muted">Modules</dt><dd class="text-ink">{n(d.modules)}</dd></div>
+          <div><dt class="text-muted">Graph</dt><dd class="text-ink">{n(d.graphNodes)} nodes, {n(d.graphEdges)} edges</dd></div>
+          <div><dt class="text-muted">Generated in</dt><dd class="text-ink">{time(d.generateMs)}</dd></div>
+          <div><dt class="text-muted">Source lines</dt><dd class="text-ink">{n(d.lines)}</dd></div>
+          <div><dt class="text-muted">Map size</dt><dd class="text-ink">{Math.round(d.htmlBytes / 1024)} KB</dd></div>
+        </dl>
+        <p class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-body">
+          <a class="inline-flex min-h-9 items-center text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2" href={`/demos/${d.id}/`}>Open the map</a>
+          <a class="inline-flex min-h-9 items-center text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2" href={`${d.url}/tree/${d.sha}`}>Source at {d.sha}</a>
+        </p>
+      </li>
+    ))}
+  </ul>
+  <p class="mt-10 max-w-measure text-caption text-muted">Generated with <code class="rounded-sm bg-sunk px-1 font-mono">stacklit generate --graph</code> on a shallow clone of each tag, using the default settings. Generation time is one cold run on a laptop and varies by machine. These maps make no outside requests. A map you generate yourself loads small language logos from thesvg.org unless you set <code class="rounded-sm bg-sunk px-1 font-mono">STACKLIT_MAP_ICONS=off</code>. Rebuild everything with <code class="rounded-sm bg-sunk px-1 font-mono">npm run demos</code> in the <code class="rounded-sm bg-sunk px-1 font-mono">site</code> folder.</p>
+</Section>
+<script is:inline>
+  (function () {
+    var bar = document.querySelector('[data-filter]');
+    if (!bar) return;
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-lang]');
+      if (!b) return;
+      var lang = b.getAttribute('data-lang');
+      bar.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      document.querySelectorAll('li[data-lang]').forEach(function (d) {
+        if (lang !== 'all' && d.getAttribute('data-lang') !== lang) d.setAttribute('data-hidden', ''); else d.removeAttribute('data-hidden');
+      });
+    });
+  })();
+</script>

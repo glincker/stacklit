@@ -4,3 +4,8 @@ dist/
 src/content/docs/
 src/data/bench.json
 src/data/stars.json
+.hallmark/
+screenshots/render-gate/*.png
+screenshots/render-gate/*.jpg
+!screenshots/render-gate/keep-*.jpg
+!screenshots/render-gate/keep-*.png

@@ -1,0 +1,46 @@
+---
+import Section from '../components/Section.astro';
+import Button from '../components/Button.astro';
+import StarButton from '../components/StarButton.astro';
+import CodeBlock from '../components/CodeBlock.astro';
+import samples from '../data/samples.json';
+import bench from '../data/bench.json';
+import copy from '../data/copy.json';
+import { fill } from '../data/agentAb';
+
+const hero = copy.hero.variants[copy.hero.active as keyof typeof copy.hero.variants];
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// A hyphenated word must not break at its hyphen.
+const headline = esc(fill(hero.headline)).replace(/\b(\w+-\w+)\b/g, '<span class="whitespace-nowrap">$1</span>');
+const lines = samples.derive.trimEnd().split('\n');
+// The first line is the repo summary; the section keys are dimmed so the module names read first.
+const deriveHtml = lines
+  .map((l, i) => {
+    const h = esc(l);
+    if (i === 0) return `<span class="text-term-accent">${h}</span>`;
+    return h
+      .replace(/(depends:|depended-by:)/g, '<span class="text-term-dim">$1</span>')
+      .replace(/^(modules:|do-not-touch:|test:)/, '<span class="text-term-dim">$1</span>');
+  })
+  .join('\n');
+---
+<Section label="hero-title" size="hero">
+  <div class="grid min-w-0 grid-cols-1 items-start gap-10 xl:grid-cols-12 xl:gap-12">
+    <div class="min-w-0 xl:col-span-5">
+      <h1 id="hero-title" class="max-w-heading text-hero font-bold tracking-tight text-ink" set:html={headline} />
+      <p class="mt-6 max-w-measure text-lead text-muted">{fill(hero.sub)}</p>
+      <div class="mt-8">
+        <div class="action-row">
+          <CodeBlock inline copy prompt code={copy.hero.install} class="w-fit max-w-full" />
+          <StarButton />
+        </div>
+        <div class="mt-3"><Button href={copy.hero.secondaryHref} variant="link">{copy.hero.secondaryCta}</Button></div>
+        <p class="mt-4 max-w-measure text-caption text-muted">{copy.hero.installNote}</p>
+      </div>
+    </div>
+    <div class="min-w-0 xl:col-span-7">
+      <CodeBlock code={samples.derive} html={deriveHtml} label={copy.hero.terminalLabel} note={copy.hero.terminalNote.replace('{tokens}', bench.repos[0].deriveTokens)} copy />
+      <p class="mt-3 max-w-measure text-caption text-muted">{copy.hero.caption}</p>
+    </div>
+  </div>
+</Section>

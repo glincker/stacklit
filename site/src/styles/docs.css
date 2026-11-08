@@ -1,0 +1,69 @@
+/* Hallmark · shape: Plain-column landing (redesign) · genre: modern-minimal · theme: custom · job: try · idea: "A small committed map of a codebase, shown with its real output." · vibe: "warm paper, one deep green accent, plain tools"
+ * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack (Avenir Next first) · body: system UI stack · hero: head, one sentence and actions left, real derive output right · nav: wordmark left, text links, star and theme toggle right · footer: one row of links and a privacy line · imagery: the product, real maps and real command output · signature: the 137 token map of gin as terminal output
+ * axes: warm-paper/system/green · posture: split · contrast: pass (npm run check:contrast) · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the page has no photography by design, the real command output and real maps carry it */
+@layer base, starlight, theme, components, utilities;
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import './tokens.css';
+
+/* Starlight is dark by default and light under [data-theme='light']. Both are mapped to the site tokens. */
+:root,
+:root[data-theme='dark'] {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: var(--ink);
+  --sl-color-gray-2: var(--muted);
+  --sl-color-gray-3: var(--faint);
+  --sl-color-gray-4: var(--line-strong);
+  --sl-color-gray-5: var(--line);
+  --sl-color-gray-6: var(--raised);
+  --sl-color-gray-7: var(--surface);
+  --sl-color-black: var(--paper);
+  --sl-color-bg-nav: var(--paper);
+  --sl-color-bg-sidebar: var(--paper);
+  --sl-color-hairline: var(--line);
+  --sl-color-hairline-light: var(--line);
+  --sl-color-hairline-shade: var(--line);
+  --sl-color-accent-low: var(--accent-soft);
+  --sl-color-accent: var(--accent);
+  --sl-color-accent-high: var(--accent-text);
+  --sl-color-text: var(--ink);
+  --sl-color-text-accent: var(--accent-text);
+  --sl-color-bg-inline-code: var(--sunk);
+  --sl-content-width: 46rem;
+  --sl-text-body: 1rem;
+  --sl-text-code: 0.875rem;
+}
+:root[data-theme='light'] {
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: var(--ink);
+  --sl-color-gray-2: var(--muted);
+  --sl-color-gray-3: var(--faint);
+  --sl-color-gray-4: var(--line-strong);
+  --sl-color-gray-5: var(--line);
+  --sl-color-gray-6: var(--raised);
+  --sl-color-gray-7: var(--surface);
+  --sl-color-black: var(--paper);
+  --sl-color-accent-low: var(--accent-soft);
+  --sl-color-accent: var(--accent);
+  --sl-color-accent-high: var(--accent-text);
+}
+.sl-markdown-content table { display: block; overflow-x: auto; max-width: 100%; }
+.sl-markdown-content pre { white-space: pre; }
+
+/* Keep the docs chrome centred on wide screens: the header, sidebar and table of contents
+ * stop at 90rem and the extra width becomes equal gutters on both sides. */
+:root { --docs-gutter: max(0px, calc((100vw - 90rem) / 2)); }
+@media (min-width: 50rem) {
+  .page > .header,
+  [data-has-sidebar] .page > .header {
+    padding-inline: calc(var(--sl-nav-pad-x) + var(--docs-gutter));
+  }
+  .page > .header > .header { grid-template-columns: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x)) minmax(0, 1fr) auto; }
+  .sidebar-pane { inset-inline-start: var(--docs-gutter); }
+  html[data-has-sidebar] { --sl-content-inline-start: calc(var(--sl-sidebar-width) + var(--docs-gutter)); }
+  .main-frame { padding-inline-end: var(--docs-gutter); }
+}

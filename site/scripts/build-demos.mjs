@@ -67,7 +67,7 @@ console.log(`binary: ${version}`);
 const outRoot = join(siteDir, 'public', 'demos');
 const demos = [];
 const env = { ...process.env };
-delete env.STACKLIT_MAP_ICONS; // the default: logos requested from thesvg.org
+env.STACKLIT_MAP_ICONS = 'off'; // the site makes no third party requests, so the maps carry no remote logos
 
 for (const r of REPOS) {
   const dir = join(tmp, r.id);

@@ -1,0 +1,8 @@
+---
+// A table that scrolls inside its own box instead of widening the page, with one look for every table.
+interface Props { label: string }
+const { label } = Astro.props;
+---
+<div role="region" aria-label={label} tabindex="0" class="max-w-full overflow-x-auto rounded-lg border border-line bg-surface [&_table]:w-full [&_table]:min-w-[34rem] [&_table]:border-collapse [&_th]:px-4 [&_th]:py-3 [&_th]:text-left [&_th]:text-caption [&_th]:font-semibold [&_th]:text-muted [&_td]:border-t [&_td]:border-line [&_td]:px-4 [&_td]:py-3 [&_td]:align-top [&_td]:text-body [&_td.num]:whitespace-nowrap [&_td.num]:tabular-nums [&_th.num]:text-right [&_td.num]:text-right [&_tr.total_td]:font-semibold">
+  <slot />
+</div>

@@ -7,17 +7,26 @@
     "sync": "node scripts/sync-docs.mjs",
     "demos": "node scripts/build-demos.mjs",
     "dev": "npm run sync && npm run stars && astro dev",
-    "build": "npm run sync && npm run stars && astro build && node scripts/check-links.mjs",
+    "build": "npm run sync && npm run stars && node scripts/check-layout.mjs && node scripts/check-contrast.mjs && astro build && node scripts/check-links.mjs && node scripts/check-external.mjs",
     "preview": "astro preview",
     "check:links": "node scripts/check-links.mjs",
     "stars": "node scripts/fetch-stars.mjs",
-    "og": "node scripts/make-og.mjs"
+    "og": "node scripts/make-og.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:layout": "node scripts/check-layout.mjs",
+    "check:external": "node scripts/check-external.mjs",
+    "check:render": "node scripts/check-render.mjs"
   },
   "dependencies": {
-    "astro": "6.4.8",
-    "github-slugger": "2.0.0"
+    "@astrojs/starlight": "0.42.10",
+    "@astrojs/starlight-tailwind": "5.0.0",
+    "@tailwindcss/vite": "4.3.5",
+    "@thesvg/astro": "4.0.4",
+    "astro": "7.4.7",
+    "github-slugger": "2.0.0",
+    "tailwindcss": "4.3.5"
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.23.4"
   }
 }
