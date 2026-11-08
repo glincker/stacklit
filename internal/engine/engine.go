@@ -18,7 +18,6 @@ import (
 	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/glincker/stacklit/internal/schema"
 	"github.com/glincker/stacklit/internal/summary"
-	"github.com/glincker/stacklit/internal/walker"
 )
 
 // Options configures an engine Run.
@@ -205,20 +204,12 @@ func Run(opts Options) (*Result, error) {
 		fmt.Printf("[stacklit] monorepo detected: %s (%d workspaces)\n", mono.Tool, len(mono.Workspaces))
 	}
 
-	// 3. Walk the filesystem, honouring extra ignore patterns from config.
-	files, err := walker.Walk(root, cfg.ScanIgnore())
+	// 3-4, 7, 9. Walk, parse in parallel (with cache) and hash.
+	sc, err := scanRepo(root, cfg, opts.Quiet)
 	if err != nil {
-		return nil, fmt.Errorf("walking %s: %w", root, err)
+		return nil, err
 	}
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] found %d files\n", len(files))
-	}
-
-	// 4. Parse all files.
-	parsed, parseErrs := parser.ParseAll(files)
-	if !opts.Quiet {
-		fmt.Printf("[stacklit] parsed %d files (%d errors)\n", len(parsed), len(parseErrs))
-	}
+	files, parsed := sc.Files, sc.Parsed
 
 	// 5. Build dependency graph with config-driven limits.
 	g := graph.Build(parsed, graph.BuildOptions{
@@ -226,27 +217,20 @@ func Run(opts Options) (*Result, error) {
 		MaxModules: cfg.MaxModules,
 	})
 
-	// 6. Get git activity.
-	activity, err := git.GetActivity(root, 90)
-	if err != nil {
-		// Non-fatal.
-		activity = &git.Activity{}
-	}
-
-	// 7. Read file contents (needed for Merkle and env var detection).
-	contents := make(map[string][]byte, len(files))
-	for _, f := range files {
-		data, readErr := os.ReadFile(f)
-		if readErr == nil {
-			contents[f] = data
+	// 6. Get git activity (optional: it is the main source of churn in a committed index).
+	activity := &git.Activity{}
+	if cfg.GitActivityEnabled() {
+		if a, gerr := git.GetActivity(root, 90); gerr == nil {
+			activity = a
 		}
 	}
 
 	// 8. Assemble schema.Index.
-	idx := assembleIndex(root, mono, files, parsed, g, activity, contents, cfg)
-
-	// 9. Compute Merkle hash.
-	idx.MerkleHash = git.ComputeMerkle(files, contents)
+	idx := assembleIndex(root, mono, files, parsed, g, activity, map[string][]byte{}, cfg)
+	idx.Hints.EnvVars = mergeEnvVars(root, sc.EnvVars)
+	idx.Scan = sc.Info
+	idx.MerkleHash = sc.MerkleHash
+	renderer.SetTimestamps(cfg.TimestampsEnabled())
 
 	// 10. Generate AI summary if requested.
 	if opts.Summary {
@@ -449,7 +433,7 @@ func assembleIndex(
 	primaryLang := ""
 	primaryCount := 0
 	for lang, ls := range langStats {
-		if ls.Files > primaryCount {
+		if ls.Files > primaryCount || (ls.Files == primaryCount && lang < primaryLang) {
 			primaryCount = ls.Files
 			primaryLang = lang
 		}

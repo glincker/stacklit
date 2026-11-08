@@ -23,6 +23,7 @@ type Config struct {
 	Workers     int      `json:"workers,omitempty"`       // parser pool size; 0 means NumCPU
 	Cache       *bool    `json:"cache,omitempty"`         // incremental cache, default on
 	Timestamps  *bool    `json:"timestamps,omitempty"`    // write generated_at, default on
+	GitActivity *bool    `json:"git_activity,omitempty"`  // include hot/recent files, default on
 }
 
 // OutputConfig controls where output files are written.

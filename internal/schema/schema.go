@@ -3,7 +3,8 @@ package schema
 type Index struct {
 	Schema          string                `json:"$schema"`
 	Version         string                `json:"version"`
-	GeneratedAt     string                `json:"generated_at"`
+	SchemaVersion   int                   `json:"schema_version"`
+	GeneratedAt     string                `json:"generated_at,omitempty"`
 	StacklitVersion string                `json:"stacklit_version"`
 	MerkleHash      string                `json:"merkle_hash,omitempty"`
 	Project         Project               `json:"project"`
@@ -14,10 +15,23 @@ type Index struct {
 	Git             GitInfo               `json:"git,omitempty"`
 	Hints           Hints                 `json:"hints,omitempty"`
 	Architecture    Architecture          `json:"architecture,omitempty"`
+	Scan            *ScanInfo             `json:"scan,omitempty"`
+}
+
+// CurrentSchemaVersion is bumped on any breaking change to the index layout.
+const CurrentSchemaVersion = 1
+
+// ScanInfo records what a run deliberately left out, so readers can tell a
+// partial index from a complete one. All lists are sorted for stable diffs.
+type ScanInfo struct {
+	SkippedLarge    []string `json:"skipped_large,omitempty"`
+	SkippedSymlinks []string `json:"skipped_symlinks,omitempty"`
+	SkippedOther    []string `json:"skipped_other,omitempty"`
+	ParseErrors     []string `json:"parse_errors,omitempty"`
 }
 
 type Architecture struct {
-	Pattern string `json:"pattern,omitempty"`   // e.g. "Clean Architecture"
+	Pattern string `json:"pattern,omitempty"`    // e.g. "Clean Architecture"
 	Summary string `json:"ai_summary,omitempty"` // AI-generated narrative
 }
 
@@ -97,14 +111,14 @@ type Hints struct {
 }
 
 type MultiIndex struct {
-	Schema      string        `json:"$schema"`
-	Version     string        `json:"version"`
-	Type        string        `json:"type"` // "polyrepo"
-	GeneratedAt string        `json:"generated_at"`
-	TotalFiles  int           `json:"total_files"`
-	TotalLines  int           `json:"total_lines"`
-	TotalModules int          `json:"total_modules"`
-	Repos       []RepoSummary `json:"repos"`
+	Schema       string        `json:"$schema"`
+	Version      string        `json:"version"`
+	Type         string        `json:"type"` // "polyrepo"
+	GeneratedAt  string        `json:"generated_at"`
+	TotalFiles   int           `json:"total_files"`
+	TotalLines   int           `json:"total_lines"`
+	TotalModules int           `json:"total_modules"`
+	Repos        []RepoSummary `json:"repos"`
 }
 
 type RepoSummary struct {

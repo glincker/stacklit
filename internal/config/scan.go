@@ -37,6 +37,10 @@ func (c *Config) applyEnv() {
 			c.Timestamps = &b
 		}
 	}
+	if v := os.Getenv("STACKLIT_NO_GIT"); v != "" {
+		off := false
+		c.GitActivity = &off
+	}
 	if v := os.Getenv("STACKLIT_ROOTS"); v != "" {
 		c.Roots = nil
 		for _, r := range strings.Split(v, ",") {
@@ -60,6 +64,9 @@ func (c *Config) CacheEnabled() bool { return c.Cache == nil || *c.Cache }
 
 // TimestampsEnabled reports whether generated_at should be written (default true).
 func (c *Config) TimestampsEnabled() bool { return c.Timestamps == nil || *c.Timestamps }
+
+// GitActivityEnabled reports whether git history feeds the index (default true).
+func (c *Config) GitActivityEnabled() bool { return c.GitActivity == nil || *c.GitActivity }
 
 // NormalizedRoots returns cleaned, slash-separated scan roots relative to the
 // repo root. Empty means "scan everything".
