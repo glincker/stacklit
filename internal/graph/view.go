@@ -79,7 +79,11 @@ type View struct {
 	Shown   int         `json:"shown"`
 	Omitted int         `json:"omitted,omitempty"`
 	Notice  string      `json:"notice,omitempty"`
-	ranked  bool
+	// Next lists files ranked just below the shown ones, set only for
+	// questions that look like a flow or chain (see flow.go).
+	Next     []string `json:"next,omitempty"`
+	nextLine string
+	ranked   bool
 }
 
 // item is a ranked node with relation tags (caller, depth, edge confidence).
@@ -101,6 +105,9 @@ type viewSpec struct {
 	// ranked marks items as scored and in rank order (query only).
 	ranked bool
 	order  Order
+	// nextFiles is how many lower ranked files to name when the answer looks
+	// like several files; zero keeps the view unchanged.
+	nextFiles int
 }
 
 // buildView groups the first k items by file. Ranked views list files by their
@@ -187,6 +194,13 @@ func (g *SymGraph) buildView(sp viewSpec, k int) *View {
 		v.Head = append(append([]string(nil), v.Head...), fmt.Sprintf("best match: %s:%d %s", top.File, top.Symbols[0].Start, top.Symbols[0].Name))
 	}
 	v.Omitted = v.Total - k
+	if sp.nextFiles > 0 && k < len(sp.items) && len(v.Files) > 0 {
+		shown := make(map[string]bool, len(v.Files))
+		for _, f := range v.Files {
+			shown[f.File] = true
+		}
+		v.Next, v.nextLine = g.nextCandidates(sp.items, k, shown, sp.nextFiles)
+	}
 	if v.Omitted > 0 {
 		v.Notice = fmt.Sprintf("[truncated: %d of %d omitted, lowest ranked first; raise it with: %s]", v.Omitted, v.Total, sp.hint)
 	}
@@ -230,6 +244,10 @@ func (v *View) Text() string {
 				b.WriteString("      " + t + "\n")
 			}
 		}
+	}
+	if v.nextLine != "" {
+		b.WriteString(v.nextLine)
+		b.WriteByte('\n')
 	}
 	if v.Notice != "" {
 		b.WriteString(v.Notice)
