@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "2564b02eea72501f9695be64ba5edccb79164c73178e1273cdb7334a58956318",
+  "merkle_hash": "c6eea312a2fc4cb8ffce39c74cffaaa5a491dc8676ffa23e56d38bdefcb5eabc",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -69,8 +69,8 @@
         "lines": 17
       },
       "go": {
-        "files": 274,
-        "lines": 41409
+        "files": 283,
+        "lines": 43437
       },
       "graphql": {
         "files": 1,
@@ -97,8 +97,8 @@
         "lines": 1128
       },
       "json": {
-        "files": 496,
-        "lines": 23349
+        "files": 501,
+        "lines": 24485
       },
       "julia": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 898,
-    "total_lines": 68353
+    "total_files": 912,
+    "total_lines": 71517
   },
   "modules": {
     ".claude-plugin": {
@@ -426,7 +426,7 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 28,
-      "lines": 2375,
+      "lines": 2383,
       "file_list": [
         "errors.go",
         "root.go",
@@ -501,7 +501,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 696,
+      "lines": 743,
       "file_list": [
         "scan.go",
         "config.go",
@@ -513,13 +513,13 @@
         "DefaultMaxFileSize",
         "DefaultMaxModuleFiles",
         "DefaultModuleSplitFiles",
+        "DefaultSmallRepoFiles",
+        "SmallRepoLimit() int",
         "WorkerCount() int",
         "CacheEnabled() bool",
         "TimestampsEnabled() bool",
         "GitActivityEnabled() bool",
-        "NormalizedRoots() []string",
-        "LoadStrict(root string) (*Config, error)",
-        "Validate() error"
+        "NormalizedRoots() []string"
       ],
       "type_defs": {
         "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
@@ -754,8 +754,8 @@
     "internal/git": {
       "purpose": "Git integration",
       "language": "go",
-      "files": 9,
-      "lines": 717,
+      "files": 10,
+      "lines": 756,
       "file_list": [
         "activity.go",
         "refresh_hooks.go",
@@ -765,7 +765,8 @@
         "merkle_leaves.go",
         "activity_test.go",
         "hooks_body_test.go",
-        "refresh_hooks_test.go"
+        "refresh_hooks_test.go",
+        "status_race_test.go"
       ],
       "exports": [
         "type FileActivity",
@@ -799,8 +800,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 48,
-      "lines": 11538,
+      "files": 53,
+      "lines": 12431,
       "file_list": [
         "symbols.go",
         "view.go",
@@ -814,6 +815,7 @@
         "pointer.go",
         "stale.go",
         "body.go",
+        "importers.go",
         "query.go",
         "watch.go",
         "community.go",
@@ -830,8 +832,7 @@
         "extract_opts_test.go",
         "extract_py.go",
         "extract_rs.go",
-        "extract_test.go",
-        "gold_test.go"
+        "extract_test.go"
       ],
       "exports": [
         "SchemaVersion",
@@ -930,11 +931,11 @@
       "purpose": "MCP server for AI agents",
       "language": "go",
       "files": 6,
-      "lines": 700,
+      "lines": 760,
       "file_list": [
         "server.go",
-        "minimal.go",
         "instructions.go",
+        "minimal.go",
         "graph_tools.go",
         "graph_tools_test.go",
         "profile_test.go"
@@ -943,9 +944,10 @@
         "StartServer() error",
         "StartServerProfile(profile string) error",
         "NewServer(profile string) (*sdkmcp.Server, error)",
+        "Instructions(profile string) string",
+        "InstructionsFor(profile string, steering string) string",
         "ProfileFull",
-        "ProfileMinimal",
-        "Instructions(profile string) string"
+        "ProfileMinimal"
       ],
       "depends_on": [
         "internal/config",
@@ -1245,14 +1247,14 @@
     "internal/setup": {
       "purpose": "Setup",
       "language": "go",
-      "files": 18,
-      "lines": 3362,
+      "files": 19,
+      "lines": 3577,
       "file_list": [
         "crawlguard.go",
-        "mcp.go",
         "digest.go",
-        "tools.go",
+        "mcp.go",
         "guide.go",
+        "tools.go",
         "claude.go",
         "report.go",
         "block.go",
@@ -1265,7 +1267,8 @@
         "git.go",
         "guide_test.go",
         "session_test.go",
-        "setup_test.go"
+        "setup_test.go",
+        "small_test.go"
       ],
       "exports": [
         "CrawlOff",
@@ -1937,6 +1940,7 @@
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
+      "AGENT_AB_CLONES",
       "AGENT_AB_TRANSCRIPTS",
       "AGENT_BROWSER",
       "AGENT_BROWSER_BIN",
@@ -1955,11 +1959,13 @@
       "STACKLIT_CRAWL_STATE_DAYS",
       "STACKLIT_DATA_RUN_LINES",
       "STACKLIT_DIGEST_TOKENS",
+      "STACKLIT_FLOW_WORDS",
       "STACKLIT_GIT",
       "STACKLIT_GRAPH_INCLUDE_TESTS",
       "STACKLIT_GRAPH_MAX_PARSE_BYTES",
       "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_IMPACT_SCAN",
       "STACKLIT_INSTRUCTIONS_TOKENS",
       "STACKLIT_LOCK_HELPER",
       "STACKLIT_LOCK_STALE_SEC",
@@ -1981,6 +1987,7 @@
       "STACKLIT_SCIP_MAX_BYTES",
       "STACKLIT_SKIP_CHECKSUM",
       "STACKLIT_SKIP_GENERATED",
+      "STACKLIT_SMALL_REPO_FILES",
       "STACKLIT_STATS",
       "STACKLIT_STEERING",
       "STACKLIT_STRESS_DIR",
