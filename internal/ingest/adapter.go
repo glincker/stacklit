@@ -152,6 +152,7 @@ func RunAdapter(parent context.Context, o AdapterOptions) (*AdapterResult, error
 	} else {
 		cmd = exec.CommandContext(ctx, "sh", "-c", o.Command)
 	}
+	setupProc(cmd)
 	cmd.Dir = o.Root
 	cmd.Env = append(os.Environ(), "STACKLIT_ADAPTER=1", "STACKLIT_ADAPTER_NAME="+o.Name)
 	cmd.Stdin = strings.NewReader(strings.Join(o.Files, "\n") + "\n")
@@ -168,9 +169,10 @@ func RunAdapter(parent context.Context, o AdapterOptions) (*AdapterResult, error
 	res, perr := parseAdapter(io.LimitReader(stdout, o.MaxBytes+1), o)
 	if perr != nil {
 		cancel()
+	} else {
+		// Drain so the process can exit even when the item cap stopped parsing early.
+		_, _ = io.Copy(io.Discard, stdout)
 	}
-	// Drain so the process can exit even when the cap stopped parsing early.
-	_, _ = io.Copy(io.Discard, stdout)
 	werr := cmd.Wait()
 	if ctx.Err() == context.DeadlineExceeded {
 		return nil, fmt.Errorf("adapter timed out after %s (STACKLIT_ADAPTER_TIMEOUT_SEC)", o.Timeout)

@@ -43,6 +43,10 @@ func TestRunAdapterLimits(t *testing.T) {
 	if _, err := RunAdapter(context.Background(), AdapterOptions{Root: root, Command: "yes aaaaaaaaaaaaaaaa", MaxBytes: 1000}); err == nil || !strings.Contains(err.Error(), "exceeded") {
 		t.Fatalf("size: %v", err)
 	}
+	// A trailing command stops sh from exec-ing, so the child outlives sh like it does under dash.
+	if _, err := RunAdapter(context.Background(), AdapterOptions{Root: root, Command: "yes aaaaaaaaaaaaaaaa; true", MaxBytes: 1000}); err == nil || !strings.Contains(err.Error(), "exceeded") {
+		t.Fatalf("size with forked child: %v", err)
+	}
 	r, err := RunAdapter(context.Background(), AdapterOptions{Root: root, Command: echoAdapter, Files: []string{"a", "b", "c"}, MaxItems: 2})
 	if err != nil || len(r.Concepts)+len(r.Links) != 2 {
 		t.Fatalf("items: %v %+v", err, r)
