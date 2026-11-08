@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DocsNav from '../../components/DocsNav.astro';
+const pages = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Documentation | Stacklit" description="Quickstart, commands, MCP tools, configuration, privacy, FAQ and benchmarks for Stacklit." path="/docs/">
+  <div class="container docs">
+    <DocsNav />
+    <div class="prose">
+      <h1>Documentation</h1>
+      <p>Everything here is generated from the Markdown in the repository, so the site and the repo cannot drift apart.</p>
+      <ul>
+        {pages.map((p) => (<li><a href={`/docs/${p.id}/`}>{p.data.title}</a>. {p.data.description}</li>))}
+      </ul>
+    </div>
+  </div>
+</Base>

@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import DocsNav from '../../components/DocsNav.astro';
+
+export async function getStaticPaths() {
+  const pages = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+  return pages.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: pages[i - 1], next: pages[i + 1] },
+  }));
+}
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const sourceUrl = `https://github.com/glincker/stacklit/blob/master/${entry.data.source}`;
+---
+<Base title={`${entry.data.title} | Stacklit docs`} description={entry.data.description} path={`/docs/${entry.id}/`}>
+  <div class="container docs">
+    <DocsNav current={entry.id} />
+    <article class="prose">
+      <h1>{entry.data.title}</h1>
+      <Content />
+      <p class="edit-link">Generated from <a href={sourceUrl}>{entry.data.source}</a> in the repository, the single source of truth.</p>
+      <div class="page-nav">
+        {prev ? <a href={`/docs/${prev.id}/`} rel="prev">Previous: {prev.data.title}</a> : <span />}
+        {next ? <a href={`/docs/${next.id}/`} rel="next">Next: {next.data.title}</a> : <span />}
+      </div>
+    </article>
+  </div>
+</Base>
