@@ -126,7 +126,7 @@ func StartServer() error {
 		}
 		q := strings.ToLower(args.Query)
 		type match struct {
-			Name   string           `json:"name"`
+			Name   string            `json:"name"`
 			Module schema.ModuleInfo `json:"module"`
 		}
 		var results []match

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -54,6 +55,14 @@ func (f *graphFlags) load(cmd *cobra.Command) (*graph.SymGraph, error) {
 	}
 	fmt.Fprintf(cmd.ErrOrStderr(), "%s not found, building in memory (run 'stacklit graph' to save it)\n", f.file)
 	return buildSymbolGraph(f.root)
+}
+
+// htmlMaxNodes caps symbols embedded in stacklit.html; STACKLIT_HTML_MAX_NODES overrides it.
+func htmlMaxNodes() int {
+	if n, err := strconv.Atoi(os.Getenv("STACKLIT_HTML_MAX_NODES")); err == nil && n > 0 {
+		return n
+	}
+	return 5000
 }
 
 func newGraphCmd() *cobra.Command {

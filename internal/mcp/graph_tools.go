@@ -102,9 +102,13 @@ func registerGraphTools(s *sdkmcp.Server) {
 	add("explain_symbol", "Definition, file:line range, signature, callers and callees of a symbol",
 		func(g *graph.SymGraph, a graphArgs) (string, error) { return g.Explain(a.Symbol, a.Budget, a.JSON) })
 	add("impact", "Blast radius: symbols and files that depend on a symbol or file",
-		func(g *graph.SymGraph, a graphArgs) (string, error) { return g.Impact(a.Symbol, a.Depth, a.Budget, a.JSON) })
+		func(g *graph.SymGraph, a graphArgs) (string, error) {
+			return g.Impact(a.Symbol, a.Depth, a.Budget, a.JSON)
+		})
 	add("get_hubs", "Most connected symbols (god nodes)",
-		func(g *graph.SymGraph, a graphArgs) (string, error) { return graph.RenderHubs(g.Hubs(a.Top), a.JSON), nil })
+		func(g *graph.SymGraph, a graphArgs) (string, error) {
+			return graph.RenderHubs(g.Hubs(a.Top), a.JSON), nil
+		})
 	add("get_communities", "Deterministic clusters of files with labels and top symbols",
 		func(g *graph.SymGraph, a graphArgs) (string, error) { return g.RenderCommunities(a.JSON), nil })
 	add("graph_report", "Graph overview: key concepts, surprising cross-community links, suggested questions",

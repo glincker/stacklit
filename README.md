@@ -220,6 +220,24 @@ jobs:
 
 </details>
 
+## Symbol graph and query layer
+
+`stacklit graph` (or `stacklit generate --graph`) writes `stacklit.graph.json`: definitions, calls, imports, inherits and implements edges for Go, TypeScript/JavaScript, Python, Rust and Java. Every edge is tagged `EXTRACTED` (read from syntax or a unique resolution) or `INFERRED` (matched by name) with a 0 to 1 score. `stacklit.json` stays small and committable.
+
+```
+stacklit query "how are imports resolved" --budget 1500   # ranked, file-grouped subgraph
+stacklit explain Resolve                                  # definition, callers, callees
+stacklit impact Resolve --depth 3                         # blast radius
+stacklit path Run extractGo                               # shortest path, weakest hop
+stacklit slice Resolve                                    # only that symbol's source lines
+stacklit hubs | communities | report                      # god nodes, clusters, GRAPH_REPORT.md
+stacklit watch                                            # incremental rebuild on change
+```
+
+Every command takes `--json`. `query`, `explain` and `impact` obey a hard `--budget` in tokens: the lowest ranked items are dropped first and a one-line notice says how to get more. Output is byte-stable between runs, so it caches well. The same tools are available in `stacklit serve`, and `stacklit view` adds a Symbols tab with search, community filter and click to expand.
+
+`watch` only watches directories that contain sources. Above `STACKLIT_WATCH_MAX` directories (default 4096) it polls every `STACKLIT_WATCH_POLL_MS` instead of exhausting inotify.
+
 ## Visual map
 
 ![Stacklit visual map](stacklit-og.png)

@@ -759,6 +759,19 @@
     display: none;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   }
+
+  /* Symbols tab */
+  #view-symbols { flex-direction: row; }
+  #view-symbols.active { display: flex; }
+  #sym-side { width: 300px; flex-shrink: 0; border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 8px; padding: 10px; overflow: auto; }
+  #sym-side input, #sym-side select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; font-size: 13px; }
+  #sym-canvas-wrap { flex: 1; position: relative; min-width: 0; }
+  #sym-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; }
+  #sym-stat, .sym-meta { color: var(--text-muted); font-size: 12px; }
+  .sym-name { font-weight: 600; font-size: 15px; }
+  .sym-sig { display: block; font-size: 12px; white-space: pre-wrap; word-break: break-word; color: var(--text); }
+  .sym-hit, .sym-rel { cursor: pointer; font-size: 12px; padding: 3px 4px; border-radius: 4px; word-break: break-word; }
+  .sym-hit:hover, .sym-rel:hover { background: var(--border); }
 </style>
 </head>
 <body>
@@ -780,6 +793,7 @@
   <button class="tab-btn" data-tab="tree">Tree</button>
   <button class="tab-btn" data-tab="table">Table</button>
   <button class="tab-btn" data-tab="flow">Flow</button>
+  <button class="tab-btn" id="tab-symbols" data-tab="symbols" hidden>Symbols</button>
   <button id="share-btn" title="Download as standalone HTML">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
       <path d="M2.5 8a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
@@ -837,6 +851,19 @@
           Dependency flow — entrypoints at top &nbsp;·&nbsp; Drag to pan &nbsp;·&nbsp; Scroll to zoom &nbsp;·&nbsp; <kbd style="background:var(--border);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--text);font-family:inherit">F</kbd> fit
         </div>
       </div>
+    </div>
+
+    <!-- View 5: Symbols (search, filter by community, click to expand) -->
+    <div id="view-symbols" class="view">
+      <div id="sym-side">
+        <input id="sym-search" type="search" placeholder="Search symbols, signatures, docs..." autocomplete="off" spellcheck="false">
+        <select id="sym-comm"><option value="">All communities</option></select>
+        <select id="sym-kind"><option value="">All kinds</option></select>
+        <div id="sym-stat"></div>
+        <div id="sym-list"></div>
+        <div id="sym-info"><div class="sym-meta">Click a cluster to expand it, then click a symbol to see its callers and callees.</div></div>
+      </div>
+      <div id="sym-canvas-wrap"><canvas id="sym-canvas"></canvas></div>
     </div>
 
   </div>
@@ -2343,6 +2370,10 @@
   });
 
 })();
+</script>
+<script id="stacklit-graph" type="application/json">{{STACKLIT_GRAPH}}</script>
+<script>
+{{SYMBOLS_JS}}
 </script>
 </body>
 </html>

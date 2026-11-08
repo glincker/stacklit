@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/glincker/stacklit/internal/engine"
+	"github.com/glincker/stacklit/internal/renderer"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +12,7 @@ var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate the stacklit.json codebase index",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_, err := engine.Run(engine.Options{
+		res, err := engine.Run(engine.Options{
 			Root:  ".",
 			Quiet: generateQuiet,
 		})
@@ -22,7 +23,10 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return g.Save(graphFile)
+		if err := g.Save(graphFile); err != nil {
+			return err
+		}
+		return renderer.WriteHTMLWithGraph(res.Index, g, htmlMaxNodes(), res.HTMLPath)
 	},
 }
 
