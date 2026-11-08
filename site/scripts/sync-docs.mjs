@@ -146,14 +146,22 @@ add('sessions', 'Sessions and hooks',
     ? part(sessionsDoc, shift(whole(sessionsDoc), 0))
     : part(CHANGELOG, 'This page is coming with 0.5.0. Session persistence and the related hooks are not in a released version yet, so there is nothing to document as stable.\n\nThe git hook that regenerates the index after each commit is available today. See [Quickstart](/docs/quickstart/) and the `stacklit init --hook` flag in the [commands reference](/docs/commands/). Progress is tracked in the [changelog](/docs/changelog/).')]);
 
+// The repo page shows brand logos fetched from a CDN. The site makes no third party requests, so the
+// images and their column are dropped here; the language name carries the row.
+const noRemoteLogos = (md) => md
+  .replace(/<picture>[\s\S]*?<\/picture>/g, '')
+  .replace(/<img\b[^>]*>/g, '')
+  .replace(/ Logos load from the thesvg icon set; languages without a logo there show no icon\./, '')
+  .replace(/^\|[^|\n]*\|/gm, '|');
 add('languages', 'Languages',
   'Which languages and formats Stacklit indexes and what it extracts from each.', 8,
-  'docs/LANGUAGES.md', [part(LANGUAGES, whole(LANGUAGES))]);
+  'docs/LANGUAGES.md', [part(LANGUAGES, noRemoteLogos(whole(LANGUAGES)))]);
 
 add('privacy', 'Privacy',
   'Stacklit runs locally, has no telemetry and no account. What it reads, writes and sends.', 9,
   'docs/PRIVACY.md', [
     part(PRIVACY, whole(PRIVACY)),
+    part(PRIVACY, '## This website\n\nThis website makes no third party requests. It loads no fonts, scripts, images, analytics or logos from another host, and it sets no cookies. Search runs in your browser against an index served from this same site. The star count is read once, when the site is built. The demo maps are generated with remote logos turned off.'),
     part(PRIVACY, 'To report a security issue, follow the [security policy](../.github/SECURITY.md).'),
   ]);
 
