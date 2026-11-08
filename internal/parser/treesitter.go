@@ -47,6 +47,13 @@ var tsLangMap = map[string]func(root *gts.Node, lang *gts.Language, src []byte, 
 	"r":           extractR,
 	"perl":        extractPerl,
 	"julia":       extractJulia,
+	"nim":         extractNim,
+	"erlang":      extractErlang,
+	"groovy":      extractGroovy,
+	"fsharp":      extractFSharp,
+	"fortran":     extractFortran,
+	"elm":         extractElm,
+	"solidity":    extractSolidity,
 }
 
 // skipExts are file extensions handled by other parsers or that we skip.

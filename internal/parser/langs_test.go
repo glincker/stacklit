@@ -184,6 +184,54 @@ func TestMoreLanguages(t *testing.T) {
 			exports:  []string{"@interface Person", "@protocol Walker"},
 			typeDefs: map[string]string{"Person": "- (void)greet:(NSString *)who", "Walker": "- (void)walk"},
 		},
+		{
+			name: "groovy", file: "sample.groovy", language: "groovy",
+			imports:    []string{"groovy.json.JsonSlurper", "java.util.List"},
+			exports:    []string{"Greeter", "Person", "def helper(int a, int b)", "Level"},
+			notExports: []string{"secret"},
+			typeDefs:   map[string]string{"Person": "greet(String who)"},
+		},
+		{
+			name: "nim", file: "sample.nim", language: "nim",
+			imports:    []string{"strutils", "sequtils", "os", "helpers"},
+			exports:    []string{"proc add(a, b: int): int", "func double(x: int): int", "type Color", "type Person", "const Pi"},
+			notExports: []string{"secret", "Hidden"},
+			typeDefs:   map[string]string{"Color": "Red", "Person": "name"},
+		},
+		{
+			name: "erlang", file: "sample.erl", language: "erlang",
+			imports:    []string{"defs.hrl", "kernel/include/file.hrl", "lists"},
+			exports:    []string{"module shapes", "area/1", "perimeter/2", "record point", "type color"},
+			notExports: []string{"helper"},
+			typeDefs:   map[string]string{"point": "x"},
+		},
+		{
+			name: "fsharp", file: "sample.fs", language: "fsharp",
+			imports:    []string{"System", "System.Collections.Generic"},
+			exports:    []string{"module Geometry.Shapes", "type Color", "type Point", "type Circle", "let add (a: int) (b: int) : int", "let rec fact n"},
+			notExports: []string{"hidden"},
+			typeDefs:   map[string]string{"Color": "Red", "Point": "X"},
+		},
+		{
+			name: "fortran", file: "sample.f90", language: "fortran",
+			imports:  []string{"iso_fortran_env", "math_utils"},
+			exports:  []string{"module geometry", "function area(r)", "subroutine greet(name)", "type point"},
+			typeDefs: map[string]string{"point": "real :: x"},
+		},
+		{
+			name: "elm", file: "sample.elm", language: "elm",
+			imports:    []string{"Html", "Json.Decode"},
+			exports:    []string{"add : Int -> Int -> Int", "main : Html msg", "type Model"},
+			notExports: []string{"helper", "type Msg"},
+			typeDefs:   map[string]string{"Model": "count"},
+		},
+		{
+			name: "solidity", file: "sample.sol", language: "solidity",
+			imports:    []string{"./IERC20.sol", "@openzeppelin/contracts/access/Ownable.sol"},
+			exports:    []string{"interface IToken", "library MathLib", "contract Token"},
+			notExports: []string{"_burn"},
+			typeDefs:   map[string]string{"Token": "function mint(address to, uint256 amount) public onlyOwner", "IToken": "function transfer"},
+		},
 	}
 
 	p := &TreeSitterParser{}
