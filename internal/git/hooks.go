@@ -4,12 +4,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/glincker/stacklit/internal/config"
 )
 
-const hookScript = `#!/bin/sh
-stacklit generate --quiet 2>/dev/null
-git add stacklit.json DEPENDENCIES.md 2>/dev/null || true
-`
+// HookBody is the post-commit snippet for root. It stages the configured
+// index and mermaid outputs, so moving output.mermaid keeps the hook correct.
+func HookBody(root string) string {
+	cfg := config.Load(root)
+	return "stacklit generate --quiet 2>/dev/null\ngit add " + cfg.Output.JSON + " " + cfg.Output.Mermaid + " 2>/dev/null || true\n"
+}
 
 // InstallHook installs (or appends to) the post-commit git hook in root so
 // that stacklit regenerates its output on every commit.
@@ -43,10 +47,10 @@ func InstallHook(root string) error {
 			return err
 		}
 		defer f.Close()
-		_, err = f.WriteString("\n" + hookScript)
+		_, err = f.WriteString("\n" + HookBody(root))
 		return err
 	}
 
 	// Create a new hook file.
-	return os.WriteFile(hookPath, []byte(hookScript), 0755)
+	return os.WriteFile(hookPath, []byte("#!/bin/sh\n"+HookBody(root)), 0755)
 }

@@ -10,6 +10,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - uses: glincker/stacklit-action@v1
+      # The in-repo action takes a files list, and building from master keeps the
+      # committed index in step with the code (the published action only knows the old file paths).
+      - uses: ./action
         with:
           mode: auto-commit
+          version: master
+          files: stacklit.json docs/DEPENDENCIES.md
