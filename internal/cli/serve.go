@@ -20,7 +20,9 @@ Tools exposed:
   find_module         Search modules by name or purpose
   get_dependencies    Dependency edges for a module
   get_hot_files       Most frequently changed files (git)
-  get_hints           Workflow hints and commands`,
+  get_hints           Workflow hints and commands
+  query_graph, shortest_path, explain_symbol, impact, get_hubs,
+  get_communities, graph_report, slice_symbol   Symbol graph tools`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return mcp.StartServer()
 		},

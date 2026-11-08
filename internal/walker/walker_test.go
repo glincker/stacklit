@@ -140,3 +140,30 @@ func sortedKeys(m map[string]bool) []string {
 	sort.Strings(keys)
 	return keys
 }
+
+func TestWalkIncludesBuildFilesAndSkipsLockfiles(t *testing.T) {
+	dir := t.TempDir()
+	for _, name := range []string{"Makefile", "Dockerfile", "Dockerfile.dev", "CMakeLists.txt", "app.hs", "lib.fs", "cfg.toml", "package.json", "package-lock.json", "notes.zzz"} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte("x\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	files, err := walker.Walk(dir, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]bool{}
+	for _, f := range files {
+		got[f] = true
+	}
+	for _, want := range []string{"Makefile", "Dockerfile", "Dockerfile.dev", "CMakeLists.txt", "app.hs", "lib.fs", "cfg.toml", "package.json"} {
+		if !got[want] {
+			t.Errorf("%s missing from %v", want, files)
+		}
+	}
+	for _, bad := range []string{"package-lock.json", "notes.zzz"} {
+		if got[bad] {
+			t.Errorf("%s should be skipped", bad)
+		}
+	}
+}

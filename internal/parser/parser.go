@@ -94,3 +94,14 @@ func extIs(filename string, exts ...string) bool {
 	}
 	return false
 }
+
+// dataLanguages describe configuration and build files rather than program code.
+var dataLanguages = map[string]bool{
+	"json": true, "yaml": true, "toml": true, "dockerfile": true, "make": true, "cmake": true,
+}
+
+// IsDataLanguage reports whether lang is config or build data, which should not
+// decide a project's or module's primary language.
+func IsDataLanguage(lang string) bool {
+	return dataLanguages[strings.ToLower(lang)]
+}

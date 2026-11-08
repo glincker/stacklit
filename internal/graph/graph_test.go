@@ -249,3 +249,16 @@ func moduleNames(mods []*Module) []string {
 	}
 	return names
 }
+
+// TestNormalizePythonImportLeavesPathStyleAlone guards JS-style relative paths
+// with extensions from being rewritten as dotted Python modules.
+func TestNormalizePythonImportLeavesPathStyleAlone(t *testing.T) {
+	for _, imp := range []string{"./utils.js", "../lib/x.ts", "./a/b"} {
+		if got, ok := normalizePythonImport(imp); ok {
+			t.Errorf("normalizePythonImport(%q) = %q, want unchanged", imp, got)
+		}
+	}
+	if got, ok := normalizePythonImport("..db.client"); !ok || got != ".././db/client" {
+		t.Errorf("normalizePythonImport(..db.client) = %q, %v", got, ok)
+	}
+}

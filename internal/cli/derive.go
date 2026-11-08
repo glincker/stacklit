@@ -15,11 +15,11 @@ var deriveInject string
 func newDeriveCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "derive",
-		Short: "Generate a compact codebase navigation map (~250 tokens)",
+		Short: "Generate a compact codebase navigation map",
 		Long: `Generates a token-efficient navigation map from stacklit.json.
 
-The map contains architecture, modules, dependencies, and hints in ~250 tokens,
-replacing 3,000-8,000 tokens of agent exploration per session.
+The map contains architecture, modules, dependencies, and hints in a few hundred tokens
+(measured sizes are in the README).
 
 Use --inject to automatically insert the map into agent config files:
   stacklit derive                  Print map to stdout

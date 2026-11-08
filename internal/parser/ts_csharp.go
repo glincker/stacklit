@@ -48,7 +48,7 @@ func extractCSharp(root *gts.Node, lang *gts.Language, src []byte, path string) 
 				return gts.WalkContinue
 			}
 			info.Exports = append(info.Exports, name)
-			typeMethods[name] = csPublicMethods(node, lang, src)
+			typeMethods[name] = csPublicMethods(node, lang, src, node.Type(lang) == "interface_declaration")
 			return gts.WalkContinue
 		}
 		return gts.WalkContinue
@@ -93,7 +93,8 @@ func csTypeName(node *gts.Node, lang *gts.Language, src []byte) string {
 }
 
 // csPublicMethods collects public method signatures from a type body.
-func csPublicMethods(node *gts.Node, lang *gts.Language, src []byte) []string {
+// Interface members have no modifiers because they are implicitly public.
+func csPublicMethods(node *gts.Node, lang *gts.Language, src []byte, isInterface bool) []string {
 	var methods []string
 	// Look for a declaration_list (body of class/struct/interface).
 	body := childByType(node, lang, "declaration_list")
@@ -103,8 +104,12 @@ func csPublicMethods(node *gts.Node, lang *gts.Language, src []byte) []string {
 	for i := 0; i < body.ChildCount(); i++ {
 		child := body.Child(i)
 		t := child.Type(lang)
+		if isInterface && t == "property_declaration" {
+			methods = append(methods, truncSig(nodeText(child, src), 80))
+			continue
+		}
 		if t == "method_declaration" || t == "constructor_declaration" {
-			if csHasPublicModifier(child, lang, src) {
+			if isInterface || csHasPublicModifier(child, lang, src) {
 				// Build a brief signature: return_type name(params)
 				sig := csMethodSig(child, lang, src)
 				if sig != "" {
@@ -133,5 +138,7 @@ func csMethodSig(node *gts.Node, lang *gts.Language, src []byte) string {
 		}
 	}
 	sig := strings.Join(parts, " ")
+	// Attach the parameter list to the name: "Total()" not "Total ()".
+	sig = strings.Replace(sig, " (", "(", 1)
 	return truncSig(sig, 80)
 }

@@ -51,6 +51,30 @@ func extractKotlin(root *gts.Node, lang *gts.Language, src []byte, path string) 
 			classes = append(classes, classEntry{name: name, members: members})
 			return gts.WalkSkipChildren
 
+		case "infix_expression":
+			// The grammar parses `object Name { ... }` as an infix expression.
+			if depth <= 1 && childByType(node, lang, "object_literal") != nil {
+				if id := childByType(node, lang, "simple_identifier"); id != nil {
+					name := nodeText(id, src)
+					info.Exports = append(info.Exports, name)
+					var members []string
+					if lam := childByType(node, lang, "lambda_literal"); lam != nil {
+						gts.Walk(lam, func(c *gts.Node, d int) gts.WalkAction {
+							if c.Type(lang) == "function_declaration" {
+								if !ktHasModifier(c, lang, src, "private") {
+									members = append(members, ktFunctionSig(c, lang, src))
+								}
+								return gts.WalkSkipChildren
+							}
+							return gts.WalkContinue
+						})
+					}
+					classes = append(classes, classEntry{name: name, members: members})
+				}
+				return gts.WalkSkipChildren
+			}
+			return gts.WalkContinue
+
 		case "function_declaration":
 			// Top-level functions (not inside a class).
 			if depth > 2 {
@@ -118,6 +142,14 @@ func ktDeclName(node *gts.Node, lang *gts.Language, src []byte) string {
 // ktClassMembers collects public method and property names from a class/object body.
 func ktClassMembers(node *gts.Node, lang *gts.Language, src []byte) []string {
 	var members []string
+	if pc := childByType(node, lang, "primary_constructor"); pc != nil {
+		members = append(members, truncSig(nodeText(pc, src), 80))
+	}
+	if eb := childByType(node, lang, "enum_class_body"); eb != nil {
+		for _, e := range childrenByType(eb, lang, "enum_entry") {
+			members = append(members, nodeText(e, src))
+		}
+	}
 	body := childByType(node, lang, "class_body")
 	if body == nil {
 		return members
@@ -137,34 +169,32 @@ func ktClassMembers(node *gts.Node, lang *gts.Language, src []byte) []string {
 			if ktHasModifier(child, lang, src, "private") {
 				continue
 			}
-			name := childByType(child, lang, "simple_identifier")
-			if name != nil {
-				members = append(members, nodeText(name, src))
+			if vd := childByType(child, lang, "variable_declaration"); vd != nil {
+				if name := childByType(vd, lang, "simple_identifier"); name != nil {
+					members = append(members, nodeText(name, src))
+				}
 			}
 		}
 	}
 	return members
 }
 
-// ktFunctionSig builds a brief function signature string.
+// ktFunctionSig returns the declaration text from `fun` up to the body, so generics,
+// receivers and return types are kept verbatim.
 func ktFunctionSig(node *gts.Node, lang *gts.Language, src []byte) string {
-	var parts []string
-	// fun keyword, name, and parameter list.
+	start := node.StartByte()
 	for i := 0; i < node.ChildCount(); i++ {
-		child := node.Child(i)
-		t := child.Type(lang)
-		switch t {
-		case "modifiers", "function_body", "block", "{", "}":
-			continue
-		case "fun":
-			parts = append(parts, "fun")
-		case "simple_identifier", "function_value_parameters":
-			parts = append(parts, nodeText(child, src))
-		case "user_type", "nullable_type", "function_type":
-			// Return type annotation.
-			parts = append(parts, ": "+nodeText(child, src))
+		if node.Child(i).Type(lang) == "fun" {
+			start = node.Child(i).StartByte()
+			break
 		}
 	}
-	sig := strings.Join(parts, " ")
-	return truncSig(sig, 80)
+	end := node.EndByte()
+	if body := childByType(node, lang, "function_body"); body != nil {
+		end = body.StartByte()
+	}
+	if end > uint32(len(src)) || start >= end {
+		return ""
+	}
+	return truncSig(string(src[start:end]), 100)
 }

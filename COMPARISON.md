@@ -21,7 +21,7 @@ Different tools solve this differently. Some dump everything. Some build knowled
 | [Aider repo-map](https://github.com/Aider-AI/aider) | 43k** | Tree-sitter + PageRank | Text | ~1k | 40+ | Yes | Locked to Aider |
 | [Codebase-Memory](https://github.com/DeusData/codebase-memory-mcp) | 1.4k | Knowledge graph | SQLite | 2k-10k/session | 66 | Yes (call graph) | MCP server (C) |
 | [Axon](https://github.com/harshkedia177/axon) | 648 | Graph + community detection | Neo4j/KuzuDB | 2k-10k/session | 3 | Yes (blast radius) | MCP server (Python) |
-| **[Stacklit](https://github.com/glincker/stacklit)** | -- | Tree-sitter + module map | JSON + HTML | **~250 (compact map)** | 11 | Yes | CLI (Go) |
+| **[Stacklit](https://github.com/glincker/stacklit)** | -- | Tree-sitter + module map | JSON + HTML | **120 to 1,100 (compact map; scales with module count)** | 11 | Yes | CLI (Go) |
 
 *Token cost = tokens consumed to give an agent full project context on a ~10k-line repo.
 **Aider's 43k stars are for the entire tool, not just the repo-map feature.
@@ -53,7 +53,7 @@ Best for: Large codebases, long interactive sessions, teams with infra capacity.
 ### Structural Index (Stacklit)
 
 Parses code with tree-sitter, builds a module-level dependency graph, outputs a compact navigation map:
-- **~250 tokens** for the compact map (vs 50k-500k for dumpers)
+- **137 to 1,372 tokens** for the compact map on three measured repos (vs tens of thousands for a full dump); the full index is 2,500 to 16,000
 - Static artifact  - commit `stacklit.json` to your repo
 - Self-contained HTML visualization
 - Auto-configures Claude Code, Cursor, Aider via `stacklit setup`
@@ -83,24 +83,23 @@ Built into IDEs, not standalone:
 | MCP server | Yes | No | Yes | Yes | Yes |
 | Monorepo support | No | No | No | No | **Yes** |
 | Git activity tracking | No | No | Partial | Yes | Yes |
-| Compact map output | No | No | No | No | **Yes (~250 tokens)** |
+| Compact map output | No | No | No | No | **Yes** |
 | Auto-configure agents | No | No | No | No | **Yes** |
 | Single binary, no deps | No (Node) | No (Python) | Yes (C) | No (Python) | Yes (Go) |
 
 *Repomix output is too large to commit meaningfully.
 
-## Real Token Counts
+## Measured Stacklit Sizes
 
-Measured on real open-source projects using `stacklit init`:
+Measured with the reproducible harness in [bench/](bench/) on pinned commits (tokens approximated as bytes / 4). Figures for other tools are not re-measured here; a full dump is roughly the size of the source itself.
 
-| Repository | Files | Lines | Repomix (full) | Stacklit JSON | Stacklit Compact Map |
-|-----------|-------|-------|---------------|---------------|---------------------|
-| Express.js | 186 | 14,455 | ~180k tokens | 3,765 tokens | ~200 tokens |
-| FastAPI | 392 | 36,714 | ~400k tokens | 5,890 tokens | ~280 tokens |
-| Gin | 155 | 19,780 | ~200k tokens | 3,204 tokens | ~220 tokens |
-| Axum | 218 | 25,350 | ~280k tokens | 4,120 tokens | ~250 tokens |
+| Repository | Language | Source lines | Modules | Stacklit JSON | Stacklit compact map |
+|-----------|----------|-------------:|--------:|--------------:|---------------------:|
+| gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens |
+| flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens |
+| hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens |
 
-Repomix counts estimated from file sizes. Stacklit counts measured directly.
+Size follows the number of modules, not lines of code. See [bench/RESULTS.md](bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 30 navigation tasks, and limitations.
 
 ## When to Use What
 

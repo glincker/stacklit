@@ -1,0 +1,34 @@
+schema {
+  query: Query
+}
+
+type Query {
+  user(id: ID!): User
+  users: [User!]!
+}
+
+type User implements Node {
+  id: ID!
+  name: String
+}
+
+interface Node {
+  id: ID!
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+input NewUser {
+  name: String!
+}
+
+union SearchResult = User | Post
+
+scalar DateTime
+
+extend type Query {
+  me: User
+}

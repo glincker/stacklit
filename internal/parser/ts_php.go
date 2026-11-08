@@ -37,7 +37,20 @@ func extractPHP(root *gts.Node, lang *gts.Language, src []byte, path string) *Fi
 			}
 			return gts.WalkSkipChildren
 
-		case "class_declaration", "interface_declaration", "trait_declaration":
+		case "function_definition":
+			// Top-level functions only; methods are collected from class bodies.
+			if p := node.Parent(); p != nil && p.Type(lang) == "program" {
+				if name := childByType(node, lang, "name"); name != nil {
+					sig := nodeText(name, src)
+					if fp := childByType(node, lang, "formal_parameters"); fp != nil {
+						sig += nodeText(fp, src)
+					}
+					info.Exports = append(info.Exports, truncSig(sig, 80))
+				}
+			}
+			return gts.WalkSkipChildren
+
+		case "class_declaration", "interface_declaration", "trait_declaration", "enum_declaration":
 			name := phpTypeName(node, lang, src)
 			if name == "" {
 				return gts.WalkContinue
@@ -114,22 +127,21 @@ func phpHasPublicModifier(node *gts.Node, lang *gts.Language, src []byte) bool {
 	return false
 }
 
-// phpMethodSig builds a short method signature string.
+// phpMethodSig returns the method declaration from `function` up to the body.
 func phpMethodSig(node *gts.Node, lang *gts.Language, src []byte) string {
-	// Collect function keyword, name, and parameter list.
-	var parts []string
+	start := node.StartByte()
 	for i := 0; i < node.ChildCount(); i++ {
-		child := node.Child(i)
-		t := child.Type(lang)
-		switch t {
-		case "visibility_modifier", "modifier", "compound_statement", ":", "{", "}":
-			continue
-		case "name", "identifier", "formal_parameters", "union_type", "named_type", "primitive_type":
-			parts = append(parts, nodeText(child, src))
-		case "function":
-			parts = append(parts, "function")
+		if node.Child(i).Type(lang) == "function" {
+			start = node.Child(i).StartByte()
+			break
 		}
 	}
-	sig := strings.Join(parts, " ")
-	return truncSig(sig, 80)
+	end := node.EndByte()
+	if body := childByType(node, lang, "compound_statement"); body != nil {
+		end = body.StartByte()
+	}
+	if end > uint32(len(src)) || start >= end {
+		return ""
+	}
+	return truncSig(strings.TrimSuffix(strings.TrimSpace(string(src[start:end])), ";"), 100)
 }

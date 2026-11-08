@@ -126,7 +126,7 @@ func StartServer() error {
 		}
 		q := strings.ToLower(args.Query)
 		type match struct {
-			Name   string           `json:"name"`
+			Name   string            `json:"name"`
 			Module schema.ModuleInfo `json:"module"`
 		}
 		var results []match
@@ -224,6 +224,8 @@ func StartServer() error {
 		}
 		return textResult(idx.Hints)
 	})
+
+	registerGraphTools(s)
 
 	err := s.Run(context.Background(), &sdkmcp.StdioTransport{})
 	// EOF on stdin is normal shutdown — not an error to report.

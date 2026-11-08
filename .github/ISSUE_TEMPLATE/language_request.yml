@@ -1,0 +1,21 @@
+name: Language or parser request
+description: Ask for a new language, or report a parser that misses exports or imports
+labels: [language]
+body:
+  - type: input
+    id: language
+    attributes:
+      label: Language
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Example source
+      description: A small file showing the imports, exports or types that should be extracted.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected in stacklit.json
