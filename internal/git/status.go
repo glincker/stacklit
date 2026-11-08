@@ -58,11 +58,37 @@ func CheckStale(root, builtCommit string, builtAt time.Time, keep func(string) b
 			}
 		}
 	}
+	// The git commands are independent, so start them together: each process
+	// spawn costs tens of milliseconds and hooks call this on a latency budget.
+	type res struct {
+		out string
+		ok  bool
+	}
+	start := func(args ...string) func() res {
+		ch := make(chan res, 1)
+		go func() { o, ok := run(root, args...); ch <- res{o, ok} }()
+		var r res
+		var got bool
+		return func() res {
+			if !got {
+				r, got = <-ch, true
+			}
+			return r
+		}
+	}
+	diffRes := start("diff", "--relative", "--name-only", "HEAD")
+	untrackedRes := start("ls-files", "--others", "--exclude-standard")
+	var logRes, countRes func() res
+	if builtCommit == "" && !builtAt.IsZero() {
+		since := "--since=" + strconv.FormatInt(builtAt.Unix(), 10)
+		logRes = start("log", since, "--relative", "--name-only", "--pretty=format:")
+		countRes = start("rev-list", "--count", since, "HEAD")
+	}
 	// Dirty files only count when touched after the build, since a graph built
 	// from an unclean tree already contains them.
 	dirty := func() {
-		for _, args := range [][]string{{"diff", "--relative", "--name-only", "HEAD"}, {"ls-files", "--others", "--exclude-standard"}} {
-			out, _ := run(root, args...)
+		for _, get := range []func() res{diffRes, untrackedRes} {
+			out := get().out
 			for _, f := range strings.Split(out, "\n") {
 				if f = strings.TrimSpace(f); f == "" {
 					continue
@@ -88,12 +114,11 @@ func CheckStale(root, builtCommit string, builtAt time.Time, keep func(string) b
 		}
 	}
 	if !builtAt.IsZero() {
-		since := "--since=" + strconv.FormatInt(builtAt.Unix(), 10)
-		if l, ok := run(root, "log", since, "--relative", "--name-only", "--pretty=format:"); ok {
-			add(l)
+		if l := logRes(); l.ok {
+			add(l.out)
 		}
-		if n, ok := run(root, "rev-list", "--count", since, "HEAD"); ok {
-			s.CommitsBehind, _ = strconv.Atoi(n)
+		if n := countRes(); n.ok {
+			s.CommitsBehind, _ = strconv.Atoi(n.out)
 		}
 		dirty()
 	}
