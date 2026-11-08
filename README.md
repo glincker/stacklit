@@ -21,7 +21,7 @@
 </p>
 
 Stacklit parses your repo with tree-sitter and writes `stacklit.json`: modules, exports, dependency edges and hints. Commit it, and an agent reads a few hundred tokens instead of rediscovering the layout every session.
-Free and MIT, no paid tier. One Go binary, local, deterministic, no LLM and no network.
+Free and MIT, no paid tier. One Go binary, local and deterministic, no LLM, and the CLI makes no network calls. (The map page can load language icons from thesvg.org; `STACKLIT_MAP_ICONS=off` removes that.)
 
 ## Install
 
