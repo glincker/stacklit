@@ -11,11 +11,11 @@ import (
 // `--session-hook` install. Hidden: it is plumbing, not a user command.
 func newHookCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:       "hook <pretool|session>",
+		Use:       "hook <pretool|session|subagent|posttool>",
 		Short:     "Claude Code hook handler (used by setup)",
 		Hidden:    true,
 		Args:      cobra.ExactArgs(1),
-		ValidArgs: []string{"pretool", "session"},
+		ValidArgs: []string{"pretool", "session", "subagent", "posttool"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var out string
 			switch args[0] {
@@ -23,6 +23,10 @@ func newHookCmd() *cobra.Command {
 				out = setup.PreToolHook(cmd.InOrStdin())
 			case "session":
 				out = setup.SessionHook(cmd.InOrStdin())
+			case "subagent":
+				out = setup.SubagentHook(cmd.InOrStdin())
+			case "posttool":
+				return runPostToolRefresh(cmd)
 			default:
 				return fmt.Errorf("unknown hook %q", args[0])
 			}

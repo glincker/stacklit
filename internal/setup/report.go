@@ -107,7 +107,7 @@ func Report(idx *schema.Index, tools []Tool, mcpTokens int) []ReportRow {
 		ReportRow{Item: "claude skill (name+description)", Tokens: Tokens(frontmatterField(SkillMD, "name") + frontmatterField(SkillMD, "description")), Note: "always on; body loads only when invoked"},
 		ReportRow{Item: "claude skill body", Tokens: Tokens(SkillMD), Note: "only when invoked"},
 		ReportRow{Item: "claude PreToolUse pointer", Tokens: graph.DefaultPointerTokens, Note: "max, only on Grep for a known identifier"},
-		ReportRow{Item: "claude SessionStart nudge", Tokens: Tokens(sessionNudge), Note: "once per session"},
+		ReportRow{Item: "claude SessionStart status line", Tokens: Tokens(sessionStatusSample), Note: "once per session when CLAUDE.md already holds the map"},
 	)
 	return rows
 }

@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/schema"
+	"github.com/glincker/stacklit/internal/session"
 )
 
 // Tokens approximates token count as bytes/4, the documented estimate used
@@ -22,7 +24,40 @@ func digestBudget() int {
 	return 500
 }
 
-const digestHeader = "## Codebase map (stacklit)\nCheck `stacklit.json` or the stacklit MCP tools before grep/glob. Refresh: `stacklit generate`.\n\n"
+// steering holds the rule text variants, selectable with the "steering" config
+// key or STACKLIT_STEERING so phrasings can be A/B tested. Each stays byte
+// stable and well inside the digest cap.
+var steering = map[string]string{
+	"a": "Before grepping the repo, run `stacklit query \"<question>\" --budget 800`.\n" +
+		"Read code with `stacklit slice <symbol>`, not whole files.\n" +
+		"Before editing shared code, run `stacklit impact <symbol>`.\n",
+	"b": "Stacklit first: `stacklit query \"<question>\"` before grep, `stacklit slice <symbol>` before reading a file, `stacklit impact <symbol>` before editing shared code.\n",
+	"c": "Stacklit answers structure questions in far fewer tokens than grep plus whole-file reads.\n" +
+		"- Where is X or how does Y work: `stacklit query \"<question>\" --budget 800`\n" +
+		"- Need one function or type: `stacklit slice <symbol>`\n" +
+		"- Changing shared code: `stacklit impact <symbol>` lists what depends on it\n",
+}
+
+// DefaultSteering is the variant used when none is configured.
+const DefaultSteering = "a"
+
+// SteeringVariants lists the valid variant names.
+func SteeringVariants() []string { return []string{"a", "b", "c"} }
+
+func steeringText(variant string) string {
+	if t, ok := steering[strings.ToLower(strings.TrimSpace(variant))]; ok {
+		return t
+	}
+	return steering[DefaultSteering]
+}
+
+// SteeringFor resolves the variant: STACKLIT_STEERING wins, then the config key.
+func SteeringFor(root string) string {
+	if v := os.Getenv("STACKLIT_STEERING"); v != "" {
+		return v
+	}
+	return config.Load(root).Steering
+}
 
 func oneLine(s string, max int) string {
 	s = strings.Join(strings.Fields(s), " ")
@@ -35,11 +70,20 @@ func oneLine(s string, max int) string {
 // MarkdownBody builds the always-on orientation digest. It is deterministic
 // (sorted, no timestamps, no churn counters) so reruns are byte-identical and
 // do not invalidate prompt caches, and it is capped to the token budget.
-func MarkdownBody(idx *schema.Index) string {
+func MarkdownBody(idx *schema.Index) string { return BodyFor(idx, DefaultSteering) }
+
+// StructureTag prefixes the hash in the digest so a reader (or the session
+// hook) can tell which structure a CLAUDE.md block was written from.
+const StructureTag = "map "
+
+// BodyFor is MarkdownBody with a chosen steering variant. Nothing in it
+// depends on line counts, timestamps or churn, only on structure.
+func BodyFor(idx *schema.Index, variant string) string {
 	var head strings.Builder
-	head.WriteString(digestHeader)
-	head.WriteString("```\n")
-	line1 := fmt.Sprintf("%s | %s | %d modules", idx.Project.Name, idx.Tech.PrimaryLanguage, len(idx.Modules))
+	head.WriteString("## Codebase map (stacklit)\n")
+	head.WriteString(steeringText(variant))
+	head.WriteString("\n```\n")
+	line1 := fmt.Sprintf("%s | %s | %d modules | %s%s", idx.Project.Name, idx.Tech.PrimaryLanguage, len(idx.Modules), StructureTag, session.StructureHash(idx))
 	if len(idx.Tech.Frameworks) > 0 {
 		line1 += " | " + oneLine(strings.Join(idx.Tech.Frameworks, ", "), 60)
 	}
@@ -62,7 +106,7 @@ func MarkdownBody(idx *schema.Index) string {
 	}
 	head.WriteString("modules:\n")
 
-	// Rank by blast radius, then size, then name, so the cut is stable.
+	// Rank by blast radius, then dependents, then name, so the cut is stable.
 	rank := map[string]int{}
 	for i, m := range idx.Dependencies.MostDepended {
 		rank[m] = i + 1
@@ -80,8 +124,8 @@ func MarkdownBody(idx *schema.Index) string {
 		if ra != rb {
 			return ra < rb
 		}
-		if la, lb := idx.Modules[a].Lines, idx.Modules[b].Lines; la != lb {
-			return la > lb
+		if da, db := len(idx.Modules[a].DependedBy), len(idx.Modules[b].DependedBy); da != db {
+			return da > db
 		}
 		return a < b
 	})

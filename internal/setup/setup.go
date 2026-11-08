@@ -44,6 +44,11 @@ func Run(r *Runner, o Options) error {
 				return fmt.Errorf("aider: %w", err)
 			}
 		}
+		if t.ID == "claude" {
+			if err := r.ApplyClaudeExtras(o.Claude, o.Uninstall); err != nil {
+				return fmt.Errorf("claude extras: %w", err)
+			}
+		}
 		if o.NoMCP {
 			continue
 		}
@@ -65,11 +70,6 @@ func Run(r *Runner, o Options) error {
 			seen[m.Path] = true
 			if err := r.applyMCP(m, o.Uninstall); err != nil {
 				return fmt.Errorf("%s mcp: %w", t.ID, err)
-			}
-		}
-		if t.ID == "claude" {
-			if err := r.ApplyClaudeExtras(o.Claude, o.Uninstall); err != nil {
-				return fmt.Errorf("claude extras: %w", err)
 			}
 		}
 	}
@@ -102,7 +102,7 @@ func (r *Runner) applyRule(rule Rule, o Options) error {
 	if !existed {
 		base = rule.Frontmatter
 	}
-	return r.write(rule.Path, old, existed, upsertBlock(base, MarkdownBody(o.Index), rule.Style))
+	return r.write(rule.Path, old, existed, upsertBlock(base, BodyFor(o.Index, SteeringFor(o.Root)), rule.Style))
 }
 
 // applyAiderConf points Aider at CONVENTIONS.md without clobbering a user's own read list.

@@ -17,7 +17,7 @@ import (
 type setupFlags struct {
 	all, dryRun, uninstall, global, list, report bool
 	noMCP, noGitHook                             bool
-	preTool, session, skill                      bool
+	preTool, session, refresh, skill             bool
 }
 
 func newSetupCmd() *cobra.Command {
@@ -37,7 +37,9 @@ idempotent. Use --dry-run to preview and --uninstall to reverse.
 
 Claude Code extras (opt-in):
   --pretool-hook   point a grepped identifier at its definition and callers
-  --session-hook   inject the compact map at session start
+  --session-hook   inject the orientation map at session start, after /clear and
+                   after compaction, and into Explore and Plan subagents
+  --refresh-hook   refresh the map for just the files an edit touched (async)
   --skill          install the /stacklit skill
 These go to .claude/settings.json in the repo, or ~/.claude with --global.
 
@@ -68,6 +70,7 @@ Examples:
 	fl.BoolVar(&f.noGitHook, "no-git-hook", false, "Skip the post-commit git hook")
 	fl.BoolVar(&f.preTool, "pretool-hook", false, "Claude Code: add a PreToolUse hook that points a grepped identifier at its definition and callers (needs the symbol graph)")
 	fl.BoolVar(&f.session, "session-hook", false, "Claude Code: add a SessionStart hook that injects the map")
+	fl.BoolVar(&f.refresh, "refresh-hook", false, "Claude Code: add an async PostToolUse hook that refreshes the map for just the edited files")
 	fl.BoolVar(&f.skill, "skill", false, "Claude Code: install the /stacklit skill")
 	return cmd
 }
@@ -138,14 +141,14 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 		Root: root, Tools: tools, Index: idx,
 		Uninstall: f.uninstall, NoMCP: f.noMCP, NoGitHook: f.noGitHook, Global: f.global,
 		Claude: setup.ClaudeOptions{
-			PreToolHook: f.preTool, SessionHook: f.session, Skill: f.skill, GlobalScope: f.global,
+			PreToolHook: f.preTool, SessionHook: f.session, RefreshHook: f.refresh, Skill: f.skill, GlobalScope: f.global,
 		},
 	})
 	if err != nil {
 		return err
 	}
 	if idx != nil && !f.uninstall {
-		body := setup.MarkdownBody(idx)
+		body := setup.BodyFor(idx, setup.SteeringFor(root))
 		fmt.Fprintf(out, "\ninjected digest: %d tokens (%d bytes, bytes/4)\n", setup.Tokens(body), len(body))
 	}
 	switch {
