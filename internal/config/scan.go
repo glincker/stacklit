@@ -9,6 +9,9 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/glincker/stacklit/internal/parser"
 )
 
 // DefaultMaxFileSize is the fallback cap for a single source file (bytes).
@@ -33,6 +36,43 @@ func (c *Config) applyEnv() {
 			c.ParseMemoryMB = n
 			if n == 0 {
 				c.ParseMemoryMB = -1
+			}
+		}
+	}
+	if v := os.Getenv("STACKLIT_PARSE_TIMEOUT_MS"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			c.ParseTimeoutMS = n
+			if n == 0 {
+				c.ParseTimeoutMS = -1
+			}
+		}
+	}
+	if v := os.Getenv("STACKLIT_TS_MAX_BYTES"); v != "" {
+		if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+			c.TSMaxBytes = n
+			if n == 0 {
+				c.TSMaxBytes = -1
+			}
+		}
+	}
+	if v := os.Getenv("STACKLIT_MAX_LINE_LEN"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			c.MaxLineLen = n
+			if n == 0 {
+				c.MaxLineLen = -1
+			}
+		}
+	}
+	if v := os.Getenv("STACKLIT_SKIP_GENERATED"); v != "" {
+		if b, err := strconv.ParseBool(v); err == nil {
+			c.SkipGenerated = &b
+		}
+	}
+	if v := os.Getenv("STACKLIT_MEMORY_LIMIT_MB"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			c.MemoryLimitMB = n
+			if n == 0 {
+				c.MemoryLimitMB = -1
 			}
 		}
 	}
@@ -162,7 +202,7 @@ func Check(root string) error {
 }
 
 // DefaultParseMemoryMB bounds concurrent parser memory when nothing is set.
-const DefaultParseMemoryMB = 512
+const DefaultParseMemoryMB = 256
 
 // ParseMemoryBytes returns the concurrent-parse memory budget, or 0 for
 // unlimited (STACKLIT_PARSE_MEMORY_MB=0).
@@ -174,4 +214,61 @@ func (c *Config) ParseMemoryBytes() int64 {
 		return DefaultParseMemoryMB << 20
 	}
 	return int64(c.ParseMemoryMB) << 20
+}
+
+// Defaults for the per-file parse limits. Each is overridable in
+// .stacklitrc.json or by env (a value of -1, or 0 in env, disables it).
+const (
+	DefaultParseTimeoutMS       = 3000
+	DefaultTSMaxBytes     int64 = 128 << 10
+	DefaultMaxLineLen           = 2000
+)
+
+// ParseLimits resolves the effective per-file cost limits.
+func (c *Config) ParseLimits() parser.Limits {
+	l := parser.Limits{
+		ParseTimeout: time.Duration(DefaultParseTimeoutMS) * time.Millisecond,
+		MaxBytes:     DefaultTSMaxBytes,
+		MaxLineLen:   DefaultMaxLineLen,
+		Generated:    c.SkipGenerated == nil || *c.SkipGenerated,
+	}
+	switch {
+	case c.ParseTimeoutMS < 0:
+		l.ParseTimeout = 0
+	case c.ParseTimeoutMS > 0:
+		l.ParseTimeout = time.Duration(c.ParseTimeoutMS) * time.Millisecond
+	}
+	switch {
+	case c.TSMaxBytes < 0:
+		l.MaxBytes = 0
+	case c.TSMaxBytes > 0:
+		l.MaxBytes = c.TSMaxBytes
+	}
+	switch {
+	case c.MaxLineLen < 0:
+		l.MaxLineLen = 0
+	case c.MaxLineLen > 0:
+		l.MaxLineLen = c.MaxLineLen
+	}
+	return l
+}
+
+// DefaultMemoryLimitMB is the soft heap limit applied during a scan. The
+// pure-Go parser churns gigabytes of short-lived arenas; without a limit the
+// GC lets RSS run several times above the live set.
+const DefaultMemoryLimitMB = 448
+
+// MemoryLimitBytes returns the soft heap limit, or 0 for none. An explicit
+// GOMEMLIMIT in the environment always wins.
+func (c *Config) MemoryLimitBytes() int64 {
+	if os.Getenv("GOMEMLIMIT") != "" {
+		return 0
+	}
+	switch {
+	case c.MemoryLimitMB < 0:
+		return 0
+	case c.MemoryLimitMB == 0:
+		return DefaultMemoryLimitMB << 20
+	}
+	return int64(c.MemoryLimitMB) << 20
 }

@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 )
 
 // Cache stores parse results keyed by a content-and-path hash so unchanged
@@ -31,6 +32,8 @@ type PoolOptions struct {
 	// parses, in bytes. One file larger than the budget still runs, alone.
 	// 0 disables the cap.
 	MemoryBudget int64
+	// Limits routes expensive files to the lightweight parser.
+	Limits Limits
 
 	gate *memGate
 }
@@ -43,11 +46,17 @@ type Scanned struct {
 	Err      error
 	Cached   bool
 	Panicked bool
+	Dur      time.Duration // parse time, zero for cache hits
 }
 
 // ParseContent runs the registered parsers on in-memory content. A panic in
 // any parser is converted into an error so one bad file cannot kill a scan.
 func ParseContent(path string, content []byte) (info *FileInfo, err error) {
+	return ParseContentWith(path, content, Limits{})
+}
+
+// ParseContentWith is ParseContent under cost limits.
+func ParseContentWith(path string, content []byte, lim Limits) (info *FileInfo, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			info = nil
@@ -56,6 +65,16 @@ func ParseContent(path string, content []byte) (info *FileInfo, err error) {
 	}()
 	for _, p := range registry {
 		if p.CanParse(path) {
+			if ts, ok := p.(*TreeSitterParser); ok {
+				if why := lim.fallbackReason(path, content); why != "" {
+					info, err = (&GenericParser{}).Parse(path, content)
+					if info != nil {
+						info.Fallback = why
+					}
+					return info, err
+				}
+				return ts.ParseWithTimeout(path, content, lim.ParseTimeout)
+			}
 			return p.Parse(path, content)
 		}
 	}
@@ -141,8 +160,13 @@ func scanOne(rel string, o PoolOptions) (res Scanned) {
 		}
 	}
 	cost := parseCost(rel, len(content))
+	if o.Limits.fallbackReason(rel, content) != "" {
+		cost = 0
+	}
 	o.gate.acquire(cost)
-	info, err := ParseContent(rel, content)
+	start := time.Now()
+	info, err := ParseContentWith(rel, content, o.Limits)
+	res.Dur = time.Since(start)
 	o.gate.release(cost)
 	if err != nil {
 		res.Err = err

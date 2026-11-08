@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"bytes"
+	"encoding/json"
 	"os"
 	"strconv"
 	"strings"
@@ -43,6 +45,61 @@ func (k *keyCollector) add(key string) {
 	}
 	k.seen[key] = true
 	k.keys = append(k.keys, key)
+}
+
+// jsonTopKeys streams the top-level object keys of valid JSON without building
+// a tree. The GLR parser takes seconds on a 100 KB locale file; this takes
+// microseconds. ok is false for invalid JSON so the caller can fall back.
+func jsonTopKeys(src []byte) (keys []string, ok bool) {
+	if !json.Valid(src) {
+		return nil, false
+	}
+	dec := json.NewDecoder(bytes.NewReader(src))
+	if t, err := dec.Token(); err != nil || t != json.Delim('{') {
+		return nil, err == nil
+	}
+	kc := newKeyCollector()
+	for dec.More() {
+		t, err := dec.Token()
+		if err != nil {
+			return nil, false
+		}
+		k, isStr := t.(string)
+		if !isStr {
+			return nil, false
+		}
+		kc.add(k)
+		if err := skipJSONValue(dec); err != nil {
+			return nil, false
+		}
+	}
+	return kc.keys, true
+}
+
+// skipJSONValue consumes one value, including nested containers.
+func skipJSONValue(dec *json.Decoder) error {
+	t, err := dec.Token()
+	if err != nil {
+		return err
+	}
+	d, isDelim := t.(json.Delim)
+	if !isDelim || (d != '{' && d != '[') {
+		return nil
+	}
+	for depth := 1; depth > 0; {
+		t, err := dec.Token()
+		if err != nil {
+			return err
+		}
+		if d, ok := t.(json.Delim); ok {
+			if d == '{' || d == '[' {
+				depth++
+			} else {
+				depth--
+			}
+		}
+	}
+	return nil
 }
 
 // extractJSON lists the top-level object keys.

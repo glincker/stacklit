@@ -3,6 +3,7 @@ package parser
 import (
 	"strings"
 	"sync"
+	"time"
 
 	gts "github.com/odvcencio/gotreesitter"
 	"github.com/odvcencio/gotreesitter/grammars"
@@ -108,6 +109,9 @@ func detectEntry(path string) *grammars.LangEntry {
 	return grammars.DetectLanguage(path)
 }
 
+// jsonFastPath is a var only so tests can compare against the tree-sitter path.
+var jsonFastPath = true
+
 // parserPools reuses one parser per grammar. A fresh parser re-allocates its
 // GLR scratch buffers (tens of MB) and forgets its arena sizing hints.
 var parserPools sync.Map // grammar name -> *sync.Pool
@@ -127,14 +131,34 @@ func releaseParser(name string, p *gts.Parser) {
 }
 
 func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error) {
+	return p.ParseWithTimeout(path, content, 0)
+}
+
+// ParseWithTimeout is Parse with a wall-clock budget. When the budget runs
+// out the partial tree is discarded and the file gets the generic parser's
+// result, marked with FallbackTimeout.
+func (p *TreeSitterParser) ParseWithTimeout(path string, content []byte, timeout time.Duration) (*FileInfo, error) {
 	entry := detectEntry(path)
 	if entry == nil {
 		return nil, nil
 	}
 
+	if entry.Name == "bash" {
+		return scanShell(path, content), nil
+	}
+	if jsonFastPath && entry.Name == "json" && len(content) <= configMaxBytes() {
+		if keys, ok := jsonTopKeys(content); ok {
+			return &FileInfo{Path: path, Language: "json", Exports: keys, LineCount: countLines(content)}, nil
+		}
+	}
+
 	lang := entry.Language()
 	parser := acquireParser(entry.Name, lang)
-	defer releaseParser(entry.Name, parser)
+	parser.SetTimeoutMicros(uint64(timeout / time.Microsecond))
+	defer func() {
+		parser.SetTimeoutMicros(0)
+		releaseParser(entry.Name, parser)
+	}()
 	parseSrc := content
 	if entry.Name == "sql" {
 		parseSrc = maskDollarQuotes(content)
@@ -144,6 +168,15 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 		// Fallback to generic on parse failure.
 		g := &GenericParser{}
 		return g.Parse(path, content)
+	}
+
+	if timeout > 0 && tree.ParseStopReason() == gts.ParseStopTimeout {
+		tree.Release()
+		info, err := (&GenericParser{}).Parse(path, content)
+		if info != nil {
+			info.Fallback = FallbackTimeout
+		}
+		return info, err
 	}
 
 	// Release returns the node arena to the library pool; without it every
