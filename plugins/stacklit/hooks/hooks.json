@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v stacklit >/dev/null 2>&1 && stacklit hook session || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v stacklit >/dev/null 2>&1 && stacklit hook posttool || true",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

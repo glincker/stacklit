@@ -1,0 +1,15 @@
+{
+  "name": "stacklit",
+  "description": "Stacklit, a committed map of your codebase for AI coding agents",
+  "owner": {
+    "name": "Glincker",
+    "url": "https://github.com/glincker"
+  },
+  "plugins": [
+    {
+      "name": "stacklit",
+      "source": "./plugins/stacklit",
+      "description": "Orientation map hooks, a query skill and a minimal MCP server for repos indexed with Stacklit. Needs the stacklit binary on PATH."
+    }
+  ]
+}
