@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: https://thesvg.org https://cdn.jsdelivr.net; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; font-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; font-src 'none'; form-action 'none'; base-uri 'none'">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Interactive map of this codebase: modules, dependencies, exports and symbols. Generated locally by Stacklit.">
 <title>Stacklit map</title>
@@ -661,89 +661,7 @@ td.act { color: var(--muted); }
 // Language and framework name (lowercase) to a thesvg slug. No SVG data is stored here;
 // the map page requests icons at view time, and falls back to a letter monogram offline.
 // m: 1 means the slug has a mono.svg that is tinted with the page text color.
-var ICON_BASES = ['https://thesvg.org/icons/', 'https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/'];
-var MARK_SLUG = 'stacklit';
-var LANG_ICONS = {
-  'c': { s: 'c', m: 1 },
-  'cpp': { s: 'cplusplus', m: 1 },
-  'csharp': { s: 'csharp', m: 0 },
-  'clojure': { s: 'clojure', m: 1 },
-  'cmake': { s: 'cmake', m: 1 },
-  'dart': { s: 'dart', m: 1 },
-  'dockerfile': { s: 'docker', m: 1 },
-  'elixir': { s: 'elixir', m: 1 },
-  'elm': { s: 'elm', m: 1 },
-  'erlang': { s: 'erlang', m: 1 },
-  'fortran': { s: 'fortran', m: 1 },
-  'fsharp': { s: 'fsharp', m: 1 },
-  'gdscript': { s: 'godot', m: 1 },
-  'gleam': { s: 'gleam', m: 1 },
-  'go': { s: 'go', m: 1 },
-  'graphql': { s: 'graphql', m: 1 },
-  'haskell': { s: 'haskell', m: 1 },
-  'hcl': { s: 'hcl', m: 1 },
-  'java': { s: 'java', m: 0 },
-  'javascript': { s: 'javascript', m: 1 },
-  'json': { s: 'json', m: 1 },
-  'julia': { s: 'julia', m: 1 },
-  'kotlin': { s: 'kotlin', m: 1 },
-  'lua': { s: 'lua', m: 1 },
-  'make': { s: 'make', m: 1 },
-  'nim': { s: 'nim', m: 1 },
-  'ocaml': { s: 'ocaml', m: 1 },
-  'perl': { s: 'perl', m: 1 },
-  'php': { s: 'php', m: 1 },
-  'powershell': { s: 'powershell', m: 0 },
-  'python': { s: 'python', m: 1 },
-  'r': { s: 'r', m: 1 },
-  'ruby': { s: 'ruby', m: 1 },
-  'rust': { s: 'rust', m: 1 },
-  'scala': { s: 'scala', m: 1 },
-  'shell': { s: 'shell', m: 1 },
-  'solidity': { s: 'solidity', m: 1 },
-  'svelte': { s: 'svelte', m: 1 },
-  'swift': { s: 'swift', m: 1 },
-  'toml': { s: 'toml', m: 1 },
-  'tsx': { s: 'typescript', m: 1 },
-  'typescript': { s: 'typescript', m: 1 },
-  'vue': { s: 'vue', m: 0 },
-  'yaml': { s: 'yaml', m: 1 },
-  'zig': { s: 'zig', m: 1 },
-  'react': { s: 'react', m: 1 },
-  'express': { s: 'express', m: 1 },
-  'docker': { s: 'docker', m: 1 },
-  'github actions': { s: 'github-actions', m: 1 },
-  'next.js': { s: 'nextjs', m: 0 },
-  'django': { s: 'django', m: 1 },
-  'fastapi': { s: 'fastapi', m: 1 },
-  'flask': { s: 'flask', m: 1 },
-  'angular': { s: 'angular', m: 1 },
-  'spring boot': { s: 'spring', m: 1 },
-  'gin': { s: 'gin', m: 1 },
-  'laravel': { s: 'laravel', m: 1 },
-  'rails': { s: 'ruby-on-rails', m: 1 },
-  'nestjs': { s: 'nestjs', m: 1 },
-  'fastify': { s: 'fastify', m: 1 },
-  'hono': { s: 'hono', m: 1 },
-  'remix': { s: 'remix', m: 1 },
-  'astro': { s: 'astro', m: 1 },
-  'nuxt': { s: 'nuxt', m: 1 },
-  'vite': { s: 'vite', m: 1 },
-  'webpack': { s: 'webpack', m: 1 },
-  'tailwind css': { s: 'tailwindcss', m: 0 },
-  'electron': { s: 'electron', m: 1 },
-  'tauri': { s: 'tauri', m: 1 },
-  'flutter': { s: 'flutter', m: 1 },
-  'prisma': { s: 'prisma', m: 1 },
-  'jest': { s: 'jest', m: 1 },
-  'vitest': { s: 'vitest', m: 1 },
-  'pytest': { s: 'pytest', m: 1 },
-  'actix': { s: 'actix', m: 1 },
-  'terraform': { s: 'terraform', m: 1 },
-  'postgresql': { s: 'postgresql', m: 1 },
-  'sqlite': { s: 'sqlite', m: 1 },
-  'mysql': { s: 'mysql', m: 1 },
-};
+var LANG_ICONS = {}; var ICON_BASES = []; var MARK_SLUG = '';
 
 </script>
 <script>

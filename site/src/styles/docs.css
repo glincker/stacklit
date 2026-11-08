@@ -53,3 +53,17 @@
 }
 .sl-markdown-content table { display: block; overflow-x: auto; max-width: 100%; }
 .sl-markdown-content pre { white-space: pre; }
+
+/* Keep the docs chrome centred on wide screens: the header, sidebar and table of contents
+ * stop at 90rem and the extra width becomes equal gutters on both sides. */
+:root { --docs-gutter: max(0px, calc((100vw - 90rem) / 2)); }
+@media (min-width: 50rem) {
+  .page > .header,
+  [data-has-sidebar] .page > .header {
+    padding-inline: calc(var(--sl-nav-pad-x) + var(--docs-gutter));
+  }
+  .page > .header > .header { grid-template-columns: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x)) minmax(0, 1fr) auto; }
+  .sidebar-pane { inset-inline-start: var(--docs-gutter); }
+  html[data-has-sidebar] { --sl-content-inline-start: calc(var(--sl-sidebar-width) + var(--docs-gutter)); }
+  .main-frame { padding-inline-end: var(--docs-gutter); }
+}
