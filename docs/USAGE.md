@@ -1,6 +1,6 @@
 # Stacklit usage guide
 
-Complete reference for the `stacklit` command line, the MCP server, configuration and the `stacklit.json` format. For a short introduction see the [README](README.md).
+Complete reference for the `stacklit` command line, the MCP server, configuration and the `stacklit.json` format. For a short introduction see the [README](../README.md).
 
 Contents: [Install](#install) | [First run](#first-run) | [Command reference](#command-reference) | [MCP server](#mcp-server) | [Configuration](#configuration) | [Environment variables](#environment-variables) | [Reading stacklit.json](#reading-stacklitjson) | [Monorepos](#monorepo-support) | [Polyrepo scanning](#polyrepo-scanning) | [CI/CD](#cicd) | [Troubleshooting](#troubleshooting)
 
@@ -43,7 +43,7 @@ Typical output:
 Opening visual map...
 ```
 
-(File counts and timing vary. Go repos index in milliseconds; Python and TypeScript repos can take seconds, see [bench/RESULTS.md](bench/RESULTS.md).)
+(File counts and timing vary. Go repos index in milliseconds; Python and TypeScript repos can take seconds, see [bench/RESULTS.md](../bench/RESULTS.md).)
 
 Commit the portable outputs. `stacklit.html` is gitignored and regenerates with `stacklit view`.
 
@@ -110,7 +110,7 @@ Scans the current directory, writes `stacklit.json`, `DEPENDENCIES.md` and `stac
 
 | Flag | Description |
 |------|-------------|
-| `--hook` | Install a git `post-commit` hook that runs `stacklit generate --quiet` and stages `stacklit.json` and `DEPENDENCIES.md`. An existing hook is appended to, never replaced. (The flag's built-in help text says "pre-commit"; the hook that is installed is `post-commit`.) |
+| `--hook` | Install a git `post-commit` hook that runs `stacklit generate --quiet` and stages `stacklit.json` and the configured mermaid file (`DEPENDENCIES.md` by default). An existing hook is appended to, never replaced. (The flag's built-in help text says "pre-commit"; the hook that is installed is `post-commit`.) |
 | `--summary` | Add an AI-written architecture narrative to the index. This is the only opt-in feature that sends data anywhere, see [Summary](#summary-opt-in). |
 | `--multi FILE` | Polyrepo mode: scan every repo path listed in FILE. See [Polyrepo scanning](#polyrepo-scanning). |
 | `--workspace PATH` | Accepted but currently has no effect on the scan. Monorepo workspaces are detected automatically. |
@@ -158,7 +158,7 @@ Recomputes a content hash (Merkle hash) of the current source files and compares
 stacklit derive [--inject claude|cursor|aider]
 ```
 
-Prints a compact navigation map built from `stacklit.json`: one header line, an entry and test line, one line per module with its purpose and key dependencies, hot files, the add-feature hint and do-not-touch paths. Size grows with the number of modules: 122 tokens for a 6-module Go repo, 1,122 for a 72-module TypeScript repo (see [bench/RESULTS.md](bench/RESULTS.md)).
+Prints a compact navigation map built from `stacklit.json`: one header line, an entry and test line, one line per module with its purpose and key dependencies, hot files, the add-feature hint and do-not-touch paths. Size grows with the number of modules: 122 tokens for a 6-module Go repo, 1,122 for a 72-module TypeScript repo (see [bench/RESULTS.md](../bench/RESULTS.md)).
 
 | Flag | Description |
 |------|-------------|
@@ -242,7 +242,9 @@ stacklit slice <symbol>                 # only that symbol's source, with line n
 stacklit watch                          # keep the graph current as files change
 ```
 
-All of them accept `--root`, `--graph`, `--include-tests` (keep test files in the graph; also `STACKLIT_GRAPH_INCLUDE_TESTS=1`) and (except `watch`) `--json`. Twenty languages produce symbols and call, import and inheritance edges; the per-language table is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#symbol-graph-extraction). `STACKLIT_GRAPH_MAX_PARSE_BYTES` (default 196608) sets the largest file parsed with tree-sitter, and `STACKLIT_PARSE_MEMORY_MB` bounds concurrent parse memory. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
+`query` prints files in relevance order: each file group is numbered (`1. path`) by the best score among its symbols (ties by path), symbols inside a file go by score then line, and a `best match: <file>:<line> <symbol>` line names the top result. Output is byte-stable between runs, and the `--budget` limit drops the lowest ranked results first. `--order relevance|path` picks the layout; `path` is the older alphabetical grouping with no numbers (default from `STACKLIT_QUERY_ORDER`, otherwise `relevance`). With `--json` each file has `rank` (1 is best) and `score` (0 to about 1.2, relative to the best seed), each symbol has its own `score`, and files stay in the printed order. The MCP `query_graph` and `query` tools return the same text. Two scoring knobs: `STACKLIT_AUX_PENALTY` (default 0.6) multiplies the score of files under test, example, benchmark or fixture directories unless the question mentions them (1 turns it off), and `STACKLIT_IDENT_TOKEN_BOOST` (default 0.5) raises symbols named exactly like a camelCase or snake_case word in the question.
+
+All of them accept `--root`, `--graph`, `--include-tests` (keep test files in the graph; also `STACKLIT_GRAPH_INCLUDE_TESTS=1`) and (except `watch`) `--json`. Twenty languages produce symbols and call, import and inheritance edges; the per-language table is in [docs/ARCHITECTURE.md](ARCHITECTURE.md#symbol-graph-extraction). `STACKLIT_GRAPH_MAX_PARSE_BYTES` (default 196608) sets the largest file parsed with tree-sitter, and `STACKLIT_PARSE_MEMORY_MB` bounds concurrent parse memory. `watch` uses fsnotify and falls back to polling above `STACKLIT_WATCH_MAX` directories (default 4096); `STACKLIT_WATCH_POLL_MS` sets the polling interval.
 
 ### stacklit doctor
 
@@ -266,7 +268,7 @@ Writes `stacklit.context.json` next to the index and leaves `stacklit.json` unto
 stacklit ingest --adapter "<command>" [--adapter-name NAME] [--adapter-files GLOBS] [--into-graph]
 ```
 
-Runs your command with file paths on stdin (one per line, relative to the root) and reads JSON Lines back: `{"type":"node","id","name","kind","summary","source_file"}` and `{"type":"edge","from","to","kind"}`. Use it for concepts from PDFs, images, audio or anything else stacklit does not parse. Results are stored in `stacklit.context.json` as `concepts` and `concept_links`, always tagged `INFERRED` with a `source` field, and a rerun replaces that adapter's earlier output. `--into-graph` also adds them to `stacklit.graph.json` as `concept` nodes. Stacklit makes no network or model calls itself. Limits: `STACKLIT_ADAPTER_TIMEOUT_SEC` (60), `STACKLIT_ADAPTER_MAX_BYTES` (4 MiB), `STACKLIT_ADAPTER_MAX_ITEMS` (5000). The full contract and an example are in [examples/adapters](examples/adapters/README.md).
+Runs your command with file paths on stdin (one per line, relative to the root) and reads JSON Lines back: `{"type":"node","id","name","kind","summary","source_file"}` and `{"type":"edge","from","to","kind"}`. Use it for concepts from PDFs, images, audio or anything else stacklit does not parse. Results are stored in `stacklit.context.json` as `concepts` and `concept_links`, always tagged `INFERRED` with a `source` field, and a rerun replaces that adapter's earlier output. `--into-graph` also adds them to `stacklit.graph.json` as `concept` nodes. Stacklit makes no network or model calls itself. Limits: `STACKLIT_ADAPTER_TIMEOUT_SEC` (60), `STACKLIT_ADAPTER_MAX_BYTES` (4 MiB), `STACKLIT_ADAPTER_MAX_ITEMS` (5000). The full contract and an example are in [examples/adapters](../examples/adapters/README.md).
 
 #### SCIP
 

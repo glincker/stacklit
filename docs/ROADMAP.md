@@ -4,12 +4,12 @@ Stacklit is MIT licensed and stays that way: no paid tier, no gated features. Th
 
 Status labels:
 
-- **Shipped**: in a tagged release. See [CHANGELOG.md](CHANGELOG.md).
+- **Shipped**: in a tagged release. See [CHANGELOG.md](../CHANGELOG.md).
 - **Unreleased**: merged and listed in the Unreleased 0.5.0 section of the changelog.
 - **In progress**: work exists on a branch and is not merged or released. Do not rely on it.
 - **Planned**: wanted, not started.
 
-Priorities come from measurements in [bench/RESULTS.md](bench/RESULTS.md) where possible. The honest summary of that benchmark: the map is cheap and helps most with "what depends on X" and "where would this go" questions, but exact symbol lookup and dependency accuracy have gaps.
+Priorities come from measurements in [bench/RESULTS.md](../bench/RESULTS.md) where possible. The honest summary of that benchmark: the map is cheap and helps most with "what depends on X" and "where would this go" questions, but exact symbol lookup and dependency accuracy have gaps.
 
 ## 1. Query layer
 
@@ -100,4 +100,4 @@ The benchmark shows generation takes milliseconds on a Go repo but seconds and 0
 
 ## How to influence this
 
-Open a [feature request](https://github.com/glincker/stacklit/issues/new/choose), add a benchmark task that shows a gap, or send a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Open a [feature request](https://github.com/glincker/stacklit/issues/new/choose), add a benchmark task that shows a gap, or send a pull request. See [CONTRIBUTING.md](../.github/CONTRIBUTING.md).

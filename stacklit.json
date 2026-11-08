@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T19:32:11Z",
+  "generated_at": "2026-11-08T19:36:01Z",
   "stacklit_version": "dev",
-  "merkle_hash": "6c8fb78b12dc20e785fdab784fea635a48aafc57c3d803c8bd532c0e97fc4b48",
+  "merkle_hash": "9bcf677a07f153494f740c0e5120c400d0f3a2a5b3a86b214a95d368f4e969c1",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 49
       },
       "go": {
-        "files": 246,
-        "lines": 35703
+        "files": 247,
+        "lines": 36184
       },
       "graphql": {
         "files": 1,
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 315,
-    "total_lines": 37291
+    "total_files": 316,
+    "total_lines": 37772
   },
   "modules": {
     "assets": {
@@ -228,7 +228,7 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 23,
-      "lines": 1885,
+      "lines": 1891,
       "file_list": [
         "check.go",
         "check_test.go",
@@ -575,8 +575,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 46,
-      "lines": 11066,
+      "files": 47,
+      "lines": 11475,
       "file_list": [
         "analysis.go",
         "body.go",
@@ -609,7 +609,7 @@
         "ConfInferred",
         "DefaultExplainBudget",
         "DefaultImpactBudget",
-        "DefaultPointerTokens"
+        "DefaultOrder() Order"
       ],
       "type_defs": {
         "BuildOptions": "MaxDepth int, MaxModules int, Root string, SplitFiles int",
@@ -618,7 +618,7 @@
         "Edge": "From string, To string, Count int",
         "EdgeRef": "From string, To string, Kind string, Conf string, Score float64",
         "ExtractOptions": "IncludeTests bool, MaxFileBytes int, MaxParseBytes int, ParseTimeout time.Duration, MemoryBudget int64",
-        "FileGroup": "File string, Symbols []SymLine",
+        "FileGroup": "File string, Rank int, Score float64, Symbols []SymLine",
         "FileSyms": "Path string, Lang string, Pkg string, Defs []Def, Imports []Import, Refs []Ref",
         "HTMLGraph": "Files []string, Kinds []string, Comms []Community, Nodes []HTMLNode, Edges [][]float64, Total int",
         "HTMLNode": "Name string, Kind string, File int, Line int, End int, Comm int, Sig string, Doc string"
@@ -1492,6 +1492,7 @@
       "STACKLIT_PARSE_MEMORY_MB",
       "STACKLIT_PARSE_TIMEOUT_MS",
       "STACKLIT_PPROF",
+      "STACKLIT_QUERY_ORDER",
       "STACKLIT_ROOTS",
       "STACKLIT_SCALE_BUDGET_S",
       "STACKLIT_SCIP_MAX_BYTES",

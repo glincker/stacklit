@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use Stacklit in research or tooling, please cite it as below."
+title: "Stacklit"
+abstract: "A committed, deterministic index of a codebase (modules, exports, dependency edges, symbol graph) for AI coding agents. Free, MIT licensed, one Go binary."
+type: software
+version: 0.4.0
+date-released: 2026-05-07
+license: MIT
+repository-code: "https://github.com/glincker/stacklit"
+url: "https://github.com/glincker/stacklit"
+keywords:
+  - codebase index
+  - code navigation
+  - tree-sitter
+  - model context protocol
+  - ai coding agents
+authors:
+  - name: "Glincker"
