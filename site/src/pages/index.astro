@@ -181,12 +181,12 @@ const behaviour = [
         <div class="table-wrap">
           <table>
             <caption class="sr-only">Cost of Stacklit sessions relative to sessions without it, by repo</caption>
-            <thead><tr><th>Repo</th><th>Size</th><th class="num">Cost ratio [95% interval]</th><th>Reading</th></tr></thead>
+            <thead><tr><th>Repo</th><th class="num">Cost ratio [95% CI]</th><th>Reading</th></tr></thead>
             <tbody>
               {ab.repos.map((r) => (
-                <tr><td>{r.name}</td><td>{sizes[r.name]}</td><td class="num">{r.cost.text}</td><td>{verdictText[r.verdict]}</td></tr>
+                <tr><td>{r.name}<span class="sz">{sizes[r.name]}</span></td><td class="num">{r.cost.text}</td><td>{verdictText[r.verdict]}</td></tr>
               ))}
-              <tr class="total"><td>{at.pooledLabel}</td><td>{ab.pairs} pairs</td><td class="num">{ab.cost.text}</td><td>No saving. Tokens {ab.tokens.text}.</td></tr>
+              <tr class="total"><td>{at.pooledLabel}<span class="sz">{ab.pairs} pairs</span></td><td class="num">{ab.cost.text}</td><td>No saving. Tokens {ab.tokens.text}.</td></tr>
             </tbody>
           </table>
         </div>
