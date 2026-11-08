@@ -113,7 +113,7 @@ A repo with fewer source files than `small_repo_files` (default 600, `.stacklitr
 
 Three layers push an agent to answer structure questions from the index instead of crawling the repo. The first A/B suggests that pushing hard does not pay (see above), so the shipped wording is the routed one.
 
-1. MCP handshake. `stacklit serve` returns an `instructions` string in the initialize result (both profiles, about 100 tokens, byte stable). It says to use query when you do not know where something is (and explain or path to see how things connect), grep or impact when you know the exact name, to check the neighbours when the answer is several files because one query is a lead and not the answer, to read code with slice, and to refresh when stale. `STACKLIT_STEERING=d` returns the earlier wording, which called the index the source of truth and said not to crawl.
+1. MCP handshake. `stacklit serve` returns an `instructions` string in the initialize result (both profiles, 99 and 89 tokens, byte stable). It says to use query when you do not know where something is, not to call stacklit for an exact name (grep) or a small file (read it), that impact lists importers and callers with file:line, that one query is a lead and not the answer on a multi-file question, to read code with slice, and to refresh when stale. `STACKLIT_STEERING=d` returns the earlier wording, which called the index the source of truth and said not to crawl.
 2. Rules block. Steering variant `e` above, set with `steering` or `STACKLIT_STEERING=e`. The default stays `a`.
 3. Crawl guard. Opt in, below, and not recommended.
 

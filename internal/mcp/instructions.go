@@ -11,16 +11,17 @@ import (
 // its first tool call. Kept short: they are paid on every session. The shipped
 // wording routes exact names to grep or impact and asks for a neighbour check
 // on multi-file answers; the strict no-crawl wording stays behind steering "d".
-const instructionsFull = "Stacklit's index and symbol graph show this repo's structure. " +
-	"Use query when you do not know where something is, and explain or path to see how things connect. " +
-	"When you know the exact name, use grep or impact. " +
-	"When the answer is several files, check the neighbours before answering: one query is a lead, not the answer. " +
-	"Read code with slice, not whole files. If a result is stale or a symbol is missing, refresh the index."
+const instructionsFull = "Stacklit's symbol graph shows this repo's structure. " +
+	"Use query when you do not know where something is; a flow question returns its call chain. " +
+	"Do not call stacklit for an exact name (use grep) or a small file (read it). impact lists importers and callers with file:line. " +
+	"On a multi-file answer one query is a lead, not the answer. " +
+	"Read code with slice. If a result is stale, refresh the index."
 
-const instructionsMinimal = "Stacklit's index and symbol graph show this repo's structure. " +
-	"Use query when you do not know where something is. When you know the exact name, use grep or impact. " +
-	"When the answer is several files, check the neighbours with map and slice before answering: one query is a lead, not the answer. " +
-	"Read code with slice, not whole files. If a result is stale or a symbol is missing, refresh the index."
+const instructionsMinimal = "Stacklit's symbol graph shows this repo's structure. " +
+	"Use query when you do not know where something is. " +
+	"Do not call stacklit for an exact name (use grep) or a small file (read it). impact lists importers and callers with file:line. " +
+	"On a multi-file answer one query is a lead, not the answer. " +
+	"Read code with slice. If a result is stale, refresh the index."
 
 const instructionsStrictFull = "Stacklit's index and symbol graph are the source of truth for this repo's structure. " +
 	"Use query, explain, impact and path before searching or reading files. " +
