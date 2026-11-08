@@ -51,24 +51,21 @@ stacklit setup        # detects Claude Code, Cursor and Aider, configures each, 
 
 ## Measured numbers
 
-All figures below come from the reproducible harness in [bench/](bench/) (full methodology, limitations and confidence intervals in [bench/RESULTS.md](bench/RESULTS.md)). Six pinned public repos in six languages, 58 navigation tasks, no LLM calls. Tokens are approximated as bytes / 4.
+All figures below come from the reproducible harness in [bench/](bench/) (full methodology and limitations in [bench/RESULTS.md](bench/RESULTS.md)). Three pinned public repos, 30 navigation tasks, no LLM calls. Tokens are approximated as bytes / 4.
 
 | Repo | Language | Source lines | Modules | `stacklit.json` | `stacklit derive` map | Generate (median) |
 |------|----------|-------------:|--------:|----------------:|----------------------:|------------------:|
-| gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens | 73 ms |
-| flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens | 2.0 s |
+| gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens | 40 ms |
+| flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens | 2.3 s |
 | hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens | 0.6 s |
-| ripgrep 14.1.1 | Rust | 51,442 | 33 | 7,582 tokens | 368 tokens | 3.4 s |
-| gson 2.11.0 | Java | 53,490 | 10 | 2,750 tokens | 187 tokens | 0.9 s |
-| rack 3.1.8 | Ruby | 19,805 | 9 | 2,162 tokens | 126 tokens | 15.8 s |
 
 What that says, and what it does not:
 
-- The index is roughly 2,000 to 16,000 tokens on these repos, and the derived map is roughly 130 to 1,400 tokens. Both grow with the number of modules, not with lines of code. The full code of these repos is 137,000 to 456,000 tokens.
-- Finding the file that answers a "where is X" question: a simulated agent running grep with a hand-written pattern found it within 5 opened files on all 47 localization tasks. The stacklit map plus module lookup found it on 55% [40-70] of them, and BM25 over the question text on 89% [81-98]. Stacklit's mean lookup was about 800 tokens against about 120 for grep, and the end-to-end token difference between them was within the confidence intervals. These results do not show a token saving for stacklit over grep on this task type.
-- For "what depends on X" questions grep passed all 11 tasks; the stacklit index passed 45% strictly [18-73]. Rust and Java indexes carry no dependency edges yet, and Ruby had none that matched.
-- Stacklit's value in these measurements is orientation at a small fixed cost (a 130 to 1,400 token map instead of a multi-hundred-thousand token dump), not better retrieval than a good search.
-- Generating the index takes tens of milliseconds on Go and seconds on the other languages (about 16 s on rack), with cold-run peak memory of 0.5 to 1.7 GB (a single large Python file costs about 350 MB inside the parser library). That is a known cost and is on the roadmap.
+- The index is roughly 2,500 to 16,000 tokens on these repos, and the derived map is roughly 140 to 1,400 tokens. Both grow with the number of modules, not with lines of code.
+- On the 30 tasks, a simulated agent that greps and then reads its top 3 files spent about 2.3x more tokens end to end than one that read the map, looked up modules in the index and read 1 file. The ratio ranged from roughly 1x on hono to about 7x on gin.
+- For lookups where you already know the exact symbol name, grep alone is cheaper than the map (a few hundred tokens versus roughly 700 including the map).
+- The grep and read path found the verified answer on 30 of 30 tasks. The map-and-lookup stacklit path found it on 27 of 30, and the graph query path (`stacklit query --budget 2000`, one call, about 1,650 tokens per task) on 28 of 30. The misses are mostly unexported symbols, truncated export lists and imperfect dependency edges. They are listed in the results file and tracked on the [roadmap](ROADMAP.md).
+- Generating the index is fast on Go and slower on Python and TypeScript, with cold-run peak memory of about 1.6 GB on flask and 0.9 GB on hono (a single large Python file costs about 350 MB inside the parser library). That is a known cost and is on the roadmap.
 
 This is a token-cost proxy, not an agent evaluation. See the limitations section of the results file before quoting any figure.
 
@@ -249,13 +246,13 @@ Less. If the whole repo fits comfortably in a prompt, an agent can just read it.
 When you already know the exact identifier. A single grep is cheaper than loading a map. The index helps with questions grep cannot answer in one step, such as "what depends on this module" or "where would a new adapter go".
 
 **How accurate are the dependency edges?**
-Module-level edges are built from import statements and are good enough to orient an agent, but not exact. In the benchmark, stacklit passed 5 of 11 "what depends on X" tasks under the strict rule (exact module names, at most 2 extras); it found no edges for Rust and Java repos. Known weak spots: test files counted as dependents, relative imports resolved to the wrong module, and short module names that can be ambiguous. Treat the graph as a guide and confirm with a read.
+Module-level edges are built from import statements and are good enough to orient an agent, but not exact. In the benchmark, 4 of 7 "what depends on X" lookups were fully correct. Known weak spots: test files counted as dependents, relative imports resolved to the wrong module, and short module names that can be ambiguous. Treat the graph as a guide and confirm with a read.
 
 **What if my language is not supported?**
 Files are still counted and language-detected, and the module map, git activity and hints still work. Exports and dependency edges need a parser.
 
 **Does the git hook slow commits down?**
-It runs `stacklit generate --quiet` after each commit. On Go repos of this size that is tens of milliseconds; on the Python, TypeScript, Rust and Java repos in the benchmark it took a few seconds, and about 16 seconds on a Ruby repo. If that is too slow, run `stacklit generate` manually or in CI instead.
+It runs `stacklit generate --quiet` after each commit. On Go repos of this size that is tens of milliseconds; on Python and TypeScript repos in the benchmark it took a few seconds. If that is too slow, run `stacklit generate` manually or in CI instead.
 
 **Can I use it with Copilot?**
 Yes. Commit `stacklit.json` and tell Copilot to read it in `.github/copilot-instructions.md`, or paste the output of `stacklit derive` there.
