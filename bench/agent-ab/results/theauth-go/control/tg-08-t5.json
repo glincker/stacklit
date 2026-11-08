@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-08",
+  "kind": "add",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/audit/events.go, audit/events.go",
+  "turns": 6,
+  "cost_usd": 0.029647100000000003,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 539,
+    "cache_creation_input_tokens": 5352,
+    "cache_read_input_tokens": 28291
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 3356,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.014665209,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=(?i)audit.*event.*name|EventName",
+    "Glob pattern=**/audit/**/*.go",
+    "Grep pattern=Event\\w* *= *\"",
+    "Grep pattern=const|= \" path=/private/tmp/abreal/work/ab-249815466/co-2286695706/audit/events.go",
+    "Read /private/tmp/abreal/work/ab-249815466/co-2286695706/audit/events.go"
+  ],
+  "at": "2026-11-08T20:58:09Z"
+}

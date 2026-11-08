@@ -52,31 +52,32 @@ type usage struct {
 
 // record is one finished session, written as raw JSON under results/.
 type record struct {
-	Repo          string         `json:"repo"`
-	Task          string         `json:"task"`
-	Kind          string         `json:"kind"`
-	Trial         int            `json:"trial"`
-	Arm           string         `json:"arm"`
-	Model         string         `json:"model"`
-	Correct       bool           `json:"correct"`
-	Recall        float64        `json:"recall"`
-	Answer        string         `json:"answer"`
-	Turns         int            `json:"turns"`
-	CostUSD       float64        `json:"cost_usd"`
-	Usage         usage          `json:"usage"`
-	ToolCalls     map[string]int `json:"tool_calls"`
-	FilesRead     int            `json:"files_read"`
-	ReadBytes     int            `json:"read_bytes"`
-	StacklitCalls int            `json:"stacklit_calls"`
-	HookEvents    int            `json:"hook_events"`
-	CrawlFired    bool           `json:"crawl_guard_fired"`
-	Denials       int            `json:"permission_denials"`
-	Subtype       string         `json:"result_subtype"`
-	Seconds       float64        `json:"seconds"`
-	WeekUtil      float64        `json:"seven_day_utilization"`
-	Calls         []string       `json:"call_log"`
-	Error         string         `json:"error,omitempty"`
-	At            string         `json:"at"`
+	Repo           string         `json:"repo"`
+	Task           string         `json:"task"`
+	Kind           string         `json:"kind"`
+	Trial          int            `json:"trial"`
+	Arm            string         `json:"arm"`
+	Model          string         `json:"model"`
+	Correct        bool           `json:"correct"`
+	Recall         float64        `json:"recall"`
+	Answer         string         `json:"answer"`
+	Turns          int            `json:"turns"`
+	CostUSD        float64        `json:"cost_usd"`
+	Usage          usage          `json:"usage"`
+	ToolCalls      map[string]int `json:"tool_calls"`
+	FilesRead      int            `json:"files_read"`
+	ReadBytes      int            `json:"read_bytes"`
+	StacklitCalls  int            `json:"stacklit_calls"`
+	HookEvents     int            `json:"hook_events"`
+	CrawlFired     bool           `json:"crawl_guard_fired"`
+	CrawlRedirects int            `json:"crawl_redirects"`
+	Denials        int            `json:"permission_denials"`
+	Subtype        string         `json:"result_subtype"`
+	Seconds        float64        `json:"seconds"`
+	WeekUtil       float64        `json:"seven_day_utilization"`
+	Calls          []string       `json:"call_log"`
+	Error          string         `json:"error,omitempty"`
+	At             string         `json:"at"`
 }
 
 type config struct {
@@ -485,7 +486,7 @@ func grade(answer string, t task) (bool, float64) {
 // crawlFired reports whether the crawl guard recorded a redirect for a
 // session that ran since start: its state file lives in the cache dir.
 func crawlFired(cacheDir string, since time.Time) bool {
-	files, _ := filepath.Glob(filepath.Join(cacheDir, "crawl-*.json"))
+	files, _ := filepath.Glob(filepath.Join(cacheDir, "*", "crawl-*.json"))
 	for _, f := range files {
 		st, err := os.Stat(f)
 		if err != nil || st.ModTime().Before(since) {

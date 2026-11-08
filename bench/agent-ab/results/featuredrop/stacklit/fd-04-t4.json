@@ -1,0 +1,35 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-04",
+  "kind": "trace",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/tour.tsx, src/react/hooks/use-tour.ts, src/react/hooks/use-tour-sequencer.ts, src/react/tour-registry.ts",
+  "turns": 2,
+  "cost_usd": 0.0229493,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 135,
+    "cache_creation_input_tokens": 5086,
+    "cache_read_input_tokens": 12473
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.734685833,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"guided product tour component hooks registry in react\" --budget 800"
+  ],
+  "at": "2026-11-08T21:03:43Z"
+}

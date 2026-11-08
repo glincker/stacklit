@@ -1,0 +1,36 @@
+{
+  "repo": "levelrail",
+  "task": "lr-09",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ingress/layer4.go",
+  "turns": 3,
+  "cost_usd": 0.0330128,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 411,
+    "cache_creation_input_tokens": 6746,
+    "cache_read_input_tokens": 19068
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.261955375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Grep pattern=layer4|layer 4|l4\\.|caddyl4 path=/private/tmp/abreal/work/ab-1216595303/co-4226374390/internal/ingress",
+    "Grep pattern=reverse_proxy|proxy path=/private/tmp/abreal/work/ab-1216595303/co-4226374390/internal/ingress"
+  ],
+  "at": "2026-11-08T21:10:03Z"
+}

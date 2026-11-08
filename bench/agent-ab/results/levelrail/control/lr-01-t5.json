@@ -1,0 +1,36 @@
+{
+  "repo": "levelrail",
+  "task": "lr-01",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/appsleep/conns_linux.go",
+  "turns": 3,
+  "cost_usd": 0.026563800000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 274,
+    "cache_creation_input_tokens": 5477,
+    "cache_read_input_tokens": 19038
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.734659333,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Grep pattern=/proc/net/tcp|ESTABLISHED",
+    "Grep pattern=/proc/|ESTABLISHED|established path=internal/appsleep"
+  ],
+  "at": "2026-11-08T21:19:54Z"
+}

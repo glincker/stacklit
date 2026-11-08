@@ -1,0 +1,35 @@
+{
+  "repo": "levelrail",
+  "task": "lr-10",
+  "kind": "trace",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.6666666666666666,
+  "answer": "internal/api/app_sleep.go, internal/appsleep/portwake.go, internal/reconcile/ingress/sleep.go",
+  "turns": 2,
+  "cost_usd": 0.0231235,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 133,
+    "cache_creation_input_tokens": 5135,
+    "cache_read_input_tokens": 12455
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 31.244326458,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"wake sleeping app HTTP wake endpoint, port waker, ingress reconciler\" --budget 800"
+  ],
+  "at": "2026-11-08T21:14:19Z"
+}

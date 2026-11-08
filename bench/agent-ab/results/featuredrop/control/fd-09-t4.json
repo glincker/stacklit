@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-09",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/analytics.ts, src/posthog-client.ts",
+  "turns": 4,
+  "cost_usd": 0.0179218,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 382,
+    "cache_creation_input_tokens": 3152,
+    "cache_read_input_tokens": 14818
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.211798458,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=posthog",
+    "Grep pattern=capture|posthog path=src/analytics.ts",
+    "Grep pattern=capture path=src/posthog-client.ts"
+  ],
+  "at": "2026-11-08T21:02:54Z"
+}

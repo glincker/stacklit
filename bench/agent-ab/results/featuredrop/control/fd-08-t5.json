@@ -1,0 +1,40 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-08",
+  "kind": "add",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/hooks/use-your-hook.ts, src/react/hooks/index.ts, src/react/index.ts",
+  "turns": 6,
+  "cost_usd": 0.0232924,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 494,
+    "cache_creation_input_tokens": 4042,
+    "cache_read_input_tokens": 21684
+  },
+  "tool_calls": {
+    "Glob": 4,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.408003375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Glob pattern=**/hooks/**/*.{ts,tsx}",
+    "Glob pattern=**/use*.{ts,tsx}",
+    "Glob pattern=**/hooks/**/*.{ts,tsx}",
+    "Glob pattern=**/use*.{ts,tsx}",
+    "Grep pattern=use-tour-sequencer|useTourSequencer path=src"
+  ],
+  "at": "2026-11-08T21:03:35Z"
+}

@@ -1,0 +1,51 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-07",
+  "kind": "add",
+  "trial": 5,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "src/adapters/dynamodb.ts, src/adapters/index.ts",
+  "turns": 15,
+  "cost_usd": 0.0733638,
+  "usage": {
+    "input_tokens": 22,
+    "output_tokens": 1860,
+    "cache_creation_input_tokens": 10554,
+    "cache_read_input_tokens": 125038
+  },
+  "tool_calls": {
+    "Bash": 7,
+    "Glob": 2,
+    "Grep": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 4,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 3,
+  "result_subtype": "success",
+  "seconds": 20.623308375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"storage adapters: where are adapters defined and exported\" --budget 800",
+    "Bash stacklit query \"who imports or re-exports src/adapters/redis.ts RedisAdapter, package exports, build entries\" --budget 600; grep -n \"adapters/redis\" package.jso",
+    "Bash grep -rln \"adapters/redis\\|RedisAdapter\" --include=*.ts --include=*.json --include=*.mjs --include=*.js --exclude-dir=node_modules --exclude-dir=dist --exclude-",
+    "Bash stacklit query \"adapters redis RedisAdapter\" --budget 800",
+    "Bash grep -rln \"adapters/redis\" --include=*.ts --include=*.json --include=*.mjs --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=apps --exclude-dir=exampl",
+    "Bash grep -rln \"adapters/redis\" --include=*.ts --include=*.json --include=*.mjs --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=apps --exclude-dir=exampl",
+    "Bash stacklit explain adapters/redis",
+    "Grep pattern=adapters/redis path=/private/tmp/abreal/work/ab-3641414405/co-918240761/package.json",
+    "Grep pattern=redis path=/private/tmp/abreal/work/ab-3641414405/co-918240761/package.json",
+    "Grep pattern=redis path=/private/tmp/abreal/work/ab-3641414405/co-918240761/src/index.ts",
+    "Glob pattern={tsup,vite,rollup,build}*.{ts,js,mjs,json}",
+    "Grep pattern=adapters path=/private/tmp/abreal/work/ab-3641414405/co-918240761/package.json",
+    "Grep pattern=adapters path=/private/tmp/abreal/work/ab-3641414405/co-918240761/tsup.config.ts",
+    "Glob pattern=src/adapters*"
+  ],
+  "at": "2026-11-08T21:27:16Z",
+  "crawl_redirects": 3
+}

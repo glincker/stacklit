@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-03",
+  "kind": "trace",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.5,
+  "answer": "storage/postgres/audit_chain.go, internal/audit/chainhash.go",
+  "turns": 5,
+  "cost_usd": 0.037964700000000004,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 718,
+    "cache_creation_input_tokens": 6624,
+    "cache_read_input_tokens": 42687
+  },
+  "tool_calls": {
+    "Bash": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.887830458,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Bash stacklit query \"audit log hash chain verify and compute row hash\" --budget 800",
+    "Bash ls internal/audit; grep -n \"^func\" internal/audit/chainhash.go",
+    "Bash grep -n \"^func\\|^// Package\" internal/audit/chain.go | head",
+    "Bash sed -n 1,40p internal/audit/chain.go"
+  ],
+  "at": "2026-11-08T20:58:49Z"
+}

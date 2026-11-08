@@ -1,0 +1,36 @@
+{
+  "repo": "levelrail",
+  "task": "lr-07",
+  "kind": "add",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/mcptools/server.go, internal/mcptools/classes.go",
+  "turns": 3,
+  "cost_usd": 0.0263428,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 258,
+    "cache_creation_input_tokens": 5389,
+    "cache_read_input_tokens": 21948
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 24.818018375,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"MCP tool registration groups and tool classification read mutate destructive\" --budget 800",
+    "Bash cd internal/mcptools \u0026\u0026 grep -n \"registerPlanTools\\|registerAttentionTools\" *.go | grep -v \"^tools_plan.go\\|^tools_attention.go\""
+  ],
+  "at": "2026-11-08T21:15:32Z"
+}

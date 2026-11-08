@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-07",
+  "kind": "add",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "provider/slack/slack.go, provider/slack/slack_test.go, provider/github/github.go\n\nNote: `provider/slack/` already exists, so Slack isn't a new provider. For a different provider, put the code in `provider/\u003cname\u003e/\u003cname\u003e.go` with a matching `_test.go`, and copy `provider/github/github.go` as the template.",
+  "turns": 4,
+  "cost_usd": 0.0268577,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 605,
+    "cache_creation_input_tokens": 4796,
+    "cache_read_input_tokens": 16117
+  },
+  "tool_calls": {
+    "Glob": 2,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.223865209,
+  "seven_day_utilization": 0.56,
+  "call_log": [
+    "Grep pattern=(?i)(github|google|gitlab|discord)",
+    "Glob pattern=**/*{oauth,social,provider}*",
+    "Glob pattern=provider/**/*.go"
+  ],
+  "at": "2026-11-08T20:56:45Z"
+}

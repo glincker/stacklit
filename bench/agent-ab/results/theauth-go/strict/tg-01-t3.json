@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-01",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/as/device.go, internal/apitokens/device.go",
+  "turns": 6,
+  "cost_usd": 0.0408515,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 469,
+    "cache_creation_input_tokens": 7929,
+    "cache_read_input_tokens": 44255
+  },
+  "tool_calls": {
+    "Bash": 4,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 4,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.719428458,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit query \"device login flow user code generation\" --budget 800",
+    "Bash stacklit query \"generate user_code device authorization handler\" --budget 800",
+    "Bash stacklit slice StartDeviceAuthorization | grep -i -n \"usercode\\|user_code\" ; stacklit slice StartDeviceAuth | grep -i -n \"usercode\\|user_code\"",
+    "Bash stacklit query \"newUserCode definition\" --budget 400 | head -20",
+    "Grep pattern=^func newUserCode"
+  ],
+  "at": "2026-11-08T21:26:18Z",
+  "crawl_redirects": 0
+}

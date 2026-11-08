@@ -1,0 +1,40 @@
+{
+  "repo": "featuredrop",
+  "task": "fd-05",
+  "kind": "impact",
+  "trial": 3,
+  "arm": "strict",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.9230769230769231,
+  "answer": "I'm working out which files import `src/core.ts` directly. The index only gives call edges, and the repo-wide grep I tried to confirm them was blocked. So the list below comes from the index's high-confidence depth-1 dependents.\n\nsrc/angular/index.ts, src/astro/index.ts, src/helpers.ts, src/next/index.ts, src/nuxt/index.ts, src/react/provider.tsx, src/remix/index.ts, src/renderer.ts, src/solid/store.ts, src/svelte/index.ts, src/vue/provider.ts, src/web-components/index.ts",
+  "turns": 6,
+  "cost_usd": 0.0603816,
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 1037,
+    "cache_creation_input_tokens": 11020,
+    "cache_read_input_tokens": 59076
+  },
+  "tool_calls": {
+    "Bash": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 3,
+  "hook_events": 2,
+  "crawl_guard_fired": true,
+  "permission_denials": 2,
+  "result_subtype": "success",
+  "seconds": 14.92957875,
+  "seven_day_utilization": 0.57,
+  "call_log": [
+    "Bash stacklit impact src/core.ts",
+    "Bash grep -rlE \"from ['\\\"](\\.{1,2}/)+(core)(\\.js|\\.ts)?['\\\"]\" src --include=*.ts --include=*.tsx | grep -vE \"\\.(test|spec)\\.\"",
+    "Bash stacklit query \"which files import src/core.ts directly\" --budget 800",
+    "Bash grep -rlE \"from ['\\\"](\\.{1,2}/)+(core)(\\.js|\\.ts)?['\\\"]\" src --include=*.ts --include=*.tsx | grep -vE \"\\.(test|spec)\\.\"",
+    "Bash stacklit query \"from core\" --budget 1600"
+  ],
+  "at": "2026-11-08T21:28:21Z",
+  "crawl_redirects": 2
+}
