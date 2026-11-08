@@ -5,7 +5,7 @@
   </picture>
 </p>
 
-<p align="center"><b>A committed map of your codebase, built for AI coding agents.</b></p>
+<p align="center"><b>Your AI starts every session already knowing your repo.</b></p>
 
 <p align="center">
   <a href="https://github.com/glincker/stacklit/actions/workflows/ci.yml"><img src="https://github.com/glincker/stacklit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -20,7 +20,7 @@
   <img src="docs/assets/demo.gif" alt="stacklit init in a terminal" width="720">
 </p>
 
-Stacklit parses your repo with tree-sitter and writes `stacklit.json`: modules, exports, dependency edges and hints. Commit it, and an agent reads a few hundred tokens instead of rediscovering the layout every session.
+Stacklit maps your codebase once and keeps the map fresh. It parses your repo with tree-sitter and writes `stacklit.json`: modules, exports, dependency edges and hints. Commit it, and your coding agent reads a few hundred tokens instead of crawling your files, then uses a few commands (`query`, `slice`, `impact`) to go straight to the right file.
 Free and MIT, no paid tier. One Go binary, local and deterministic, no LLM, and the CLI makes no network calls. (The map page can load language icons from thesvg.org; `STACKLIT_MAP_ICONS=off` removes that.)
 
 ## Install
