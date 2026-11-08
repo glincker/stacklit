@@ -42,8 +42,10 @@ const cmd = (m, p) => send(m, p, sessionId);
 await cmd('Page.enable');
 
 const probe = `(() => {
-  const iw = innerWidth, out = [];
+  // clientWidth leaves out a classic scrollbar (15 px on Linux), innerWidth does not,
+  // so gutters measured against innerWidth look lopsided on runners that have one.
   const de = document.documentElement;
+  const iw = de.clientWidth, out = [];
   if (de.scrollWidth > iw) out.push('horizontal scroll: scrollWidth ' + de.scrollWidth + ' > ' + iw);
   for (const pre of document.querySelectorAll('pre')) {
     const ws = getComputedStyle(pre).whiteSpace;
