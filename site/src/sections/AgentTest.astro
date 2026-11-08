@@ -1,6 +1,7 @@
 ---
 import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
+import Legend from '../components/Legend.astro';
 import TableWrap from '../components/TableWrap.astro';
 import Button from '../components/Button.astro';
 import copy from '../data/copy.json';
@@ -9,6 +10,13 @@ import { ab, fill } from '../data/agentAb';
 const at = copy.agentTest;
 const sizes: Record<string, string> = { levelrail: 'about 16,000 files', 'theauth-go': 'about 1,300 files', featuredrop: 'about 400 files' };
 const verdictText = { cheaper: 'Cheaper', dearer: 'Costs more', unclear: 'No clear difference' };
+const rows = [
+  { key: 'Sessions', value: fill('{sessions} Claude Code sessions'), href: '/docs/agent-test/' },
+  { key: 'Repos', value: '3 public repos', href: '/docs/agent-test/' },
+  { key: 'Pairs', value: `${ab.pairs} paired sessions`, href: '/docs/agent-test/' },
+  { key: 'Model', value: 'Sonnet, one day' },
+  { key: 'Cost', value: 'Notional list prices' },
+];
 const behaviour = [
   `About a third fewer tool calls: ${ab.toolCalls.text} (ratio of with to without, 95% interval).`,
   `About a quarter fewer model turns: ${ab.turns.text}.`,
@@ -16,8 +24,10 @@ const behaviour = [
   `Answers were right slightly less often: ${ab.correct.control}% without Stacklit, ${ab.correct.arm}% with it on the pre-registered grader (${ab.correct.diff} points, interval ${ab.correct.diffCi}); ${ab.correct.auditedControl}% and ${ab.correct.auditedArm}% on the audited grader.`,
 ];
 ---
-<Section id="agent-test" tone="surface" label="agent-title">
-  <SectionHead id="agent-title" title={at.title} lead={fill(at.intro)} />
+<Section id="agent-test" label="agent-title">
+  <SectionHead id="agent-title" n="07" label="Agent test" title={at.title} lead={fill(at.intro)}>
+    <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
+  </SectionHead>
   <TableWrap label="Cost of Stacklit sessions relative to sessions without it, by repo">
     <table>
       <caption class="sr-only">Cost of Stacklit sessions relative to sessions without it, by repo</caption>
@@ -31,7 +41,7 @@ const behaviour = [
     </table>
   </TableWrap>
   <p class="mt-3 max-w-measure text-caption text-muted">{fill(at.tableCaption)}</p>
-  <h3 class="mb-4 mt-10 text-h3 text-ink">{at.behaviourTitle}</h3>
+  <h3 class="mb-4 mt-14 text-h2 font-bold text-ink">{at.behaviourTitle}</h3>
   <ul class="max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">
     {behaviour.map((b) => <li>{b}</li>)}
   </ul>

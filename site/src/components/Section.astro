@@ -1,11 +1,11 @@
 ---
 import Container from './Container.astro';
-// One section: full-bleed band, vertical rhythm from the section token, content in a Container.
+// One section: a hairline on top, vertical rhythm from the section token, content in a Container.
 interface Props { id?: string; tone?: 'paper' | 'surface' | 'sunk'; size?: 'lg' | 'md' | 'hero'; label?: string; class?: string }
 const { id, tone = 'paper', size = 'lg', label, class: extra } = Astro.props;
-const sizes = { lg: 'py-section', md: 'py-12 sm:py-16', hero: 'pb-12 pt-10 sm:pb-16 sm:pt-16' } as const;
-const tones = { paper: 'bg-paper', surface: 'bg-surface border-y border-line', sunk: 'bg-sunk' } as const;
+const sizes = { lg: 'py-section', md: 'py-14 sm:py-20', hero: 'pb-16 pt-8 sm:pb-24 sm:pt-12' } as const;
+const tones = { paper: 'bg-paper', surface: 'bg-surface', sunk: 'bg-sunk' } as const;
 ---
-<section id={id} aria-labelledby={label} class:list={[sizes[size], tones[tone], extra]}>
+<section id={id} aria-labelledby={label} class:list={[sizes[size], tones[tone], size !== 'hero' && 'border-t border-line', 'scroll-mt-4', extra]}>
   <Container><slot /></Container>
 </section>

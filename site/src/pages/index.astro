@@ -4,6 +4,7 @@ import Hero from '../sections/Hero.astro';
 import Stats from '../sections/Stats.astro';
 import Works from '../sections/Works.astro';
 import Problem from '../sections/Problem.astro';
+import AskTheMap from '../sections/AskTheMap.astro';
 import Steps from '../sections/Steps.astro';
 import AgentTest from '../sections/AgentTest.astro';
 import WhereItHelps from '../sections/WhereItHelps.astro';
@@ -14,11 +15,12 @@ import FinalCta from '../sections/FinalCta.astro';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
 ---
-<Landing title={copy.meta.title} description={fill(copy.meta.description)} path="/" jsonLd>
+<Landing title={copy.meta.title} description={fill(copy.meta.description)} path="/" jsonLd rail>
   <Hero />
   <Stats />
   <Works />
   <Problem />
+  <AskTheMap />
   <Steps />
   <AgentTest />
   <WhereItHelps />

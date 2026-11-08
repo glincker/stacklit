@@ -1,0 +1,11 @@
+---
+import release from '../data/release.json';
+// A slim line with the real current release, read from the GitHub release at build time.
+---
+<aside aria-label="Latest release" class="border-b border-line bg-surface">
+  <p class="mx-auto flex w-full max-w-site flex-wrap items-center justify-center gap-x-4 gap-y-1 px-gutter py-2 text-caption text-muted">
+    <span class="label-mono rounded-full border border-line-strong px-2 text-ink">v{release.version}</span>
+    <span>Released {release.date}. Free, MIT, no telemetry.</span>
+    <a href="/docs/changelog/" class="min-h-6 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">Read the changelog</a>
+  </p>
+</aside>

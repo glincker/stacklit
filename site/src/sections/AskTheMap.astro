@@ -1,0 +1,43 @@
+---
+import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Legend from '../components/Legend.astro';
+import CodeWindow from '../components/CodeWindow.astro';
+import ask from '../data/ask.json';
+import { fill } from '../data/agentAb';
+import { queryClasses } from '../data/codeClasses';
+
+const tabs = ask.asks.map((a) => {
+  if (a.verdict === 'grep') {
+    const out = a.output;
+    const first = `$ ${a.command}\n${out}\n\n$ ${a.grepCommand}\n`;
+    const offset = first.split('\n').length - 1;
+    return {
+      label: a.chip, lang: 'text', code: `${first}${a.grepOutput}`, copy: a.grepCommand,
+      classes: { 1: 'ln-cmd', [offset]: 'ln-cmd' } as Record<number, string>,
+      note: fill(`Grep is enough here. The question names an exact thing, so one grep answers it, and stacklit impact gives the same six files. In our agent test, "who imports X" questions cost {impactRatio} times as much with Stacklit (interval {impactLo} to {impactHi}).`),
+      caption: `recorded output, ${ask.repo}. stacklit impact ${a.tokens} tokens, grep ${a.grepTokens} tokens, bytes divided by 4`,
+    };
+  }
+  return {
+    label: a.chip, lang: 'text', code: `$ ${a.command}\n${a.output}`, copy: a.command,
+    classes: { 1: 'ln-cmd', ...queryClasses(a.output, 1) } as Record<number, string>,
+    caption: `recorded output, ${ask.repo}, ${a.tokens} tokens, budget ${ask.budget}, bytes divided by 4`,
+  };
+});
+const rows = [
+  { key: 'Repo', value: ask.repo, href: 'https://github.com/gin-gonic/gin/tree/v1.10.0' },
+  { key: 'Mode', value: 'Recorded output, not a live demo' },
+  { key: 'Command', value: 'stacklit query, budget 600' },
+  { key: 'Source', value: 'The recording script', href: 'https://github.com/glincker/stacklit/blob/master/site/scripts/record-ask.mjs' },
+];
+---
+<Section id="ask" label="ask-title">
+  <SectionHead id="ask-title" n="05" label="Ask the map" title="Ask the map, see what your agent gets.">
+    <p class="max-w-measure text-body text-muted">Pick a question. Each answer is the real output of the command, recorded once on a pinned repo. It is not a live demo, and one of the questions is one where plain grep is enough.</p>
+    <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
+  </SectionHead>
+  <div class="reveal">
+    <CodeWindow name="ask" label="Ask the map: pick a question" chips title="stacklit, recorded on gin v1.10.0" tabs={tabs} />
+  </div>
+</Section>

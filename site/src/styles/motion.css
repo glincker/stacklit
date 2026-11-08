@@ -1,0 +1,46 @@
+/* Scroll linked motion, as progressive enhancement. A browser without animation-timeline shows everything at once,
+ * and prefers-reduced-motion turns it all off. Only transform and opacity move. */
+@keyframes settle {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rail-here {
+  0%, 100% { color: var(--faint); border-color: transparent; background-color: transparent; }
+  22%, 78% { color: var(--accent-ink); border-color: var(--accent); background-color: var(--accent); }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: settle 1ms var(--ease-stack) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+    /* The chapter rail: each section names a view timeline and its rail link lights while the section crosses the middle. */
+    body { timeline-scope: --c1, --c2, --c3, --c4, --c5, --c6, --c7, --c8, --c9, --c10, --c11, --c12; }
+    main > section:nth-of-type(1) { view-timeline: --c1 block; }
+    main > section:nth-of-type(2) { view-timeline: --c2 block; }
+    main > section:nth-of-type(3) { view-timeline: --c3 block; }
+    main > section:nth-of-type(4) { view-timeline: --c4 block; }
+    main > section:nth-of-type(5) { view-timeline: --c5 block; }
+    main > section:nth-of-type(6) { view-timeline: --c6 block; }
+    main > section:nth-of-type(7) { view-timeline: --c7 block; }
+    main > section:nth-of-type(8) { view-timeline: --c8 block; }
+    main > section:nth-of-type(9) { view-timeline: --c9 block; }
+    main > section:nth-of-type(10) { view-timeline: --c10 block; }
+    main > section:nth-of-type(11) { view-timeline: --c11 block; }
+    main > section:nth-of-type(12) { view-timeline: --c12 block; }
+    .rail a:nth-child(1) { animation: rail-here linear both; animation-timeline: --c1; }
+    .rail a:nth-child(2) { animation: rail-here linear both; animation-timeline: --c2; }
+    .rail a:nth-child(3) { animation: rail-here linear both; animation-timeline: --c3; }
+    .rail a:nth-child(4) { animation: rail-here linear both; animation-timeline: --c4; }
+    .rail a:nth-child(5) { animation: rail-here linear both; animation-timeline: --c5; }
+    .rail a:nth-child(6) { animation: rail-here linear both; animation-timeline: --c6; }
+    .rail a:nth-child(7) { animation: rail-here linear both; animation-timeline: --c7; }
+    .rail a:nth-child(8) { animation: rail-here linear both; animation-timeline: --c8; }
+    .rail a:nth-child(9) { animation: rail-here linear both; animation-timeline: --c9; }
+    .rail a:nth-child(10) { animation: rail-here linear both; animation-timeline: --c10; }
+    .rail a:nth-child(11) { animation: rail-here linear both; animation-timeline: --c11; }
+    .rail a:nth-child(12) { animation: rail-here linear both; animation-timeline: --c12; }
+  }
+}

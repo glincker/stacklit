@@ -1,30 +1,34 @@
 ---
 import Section from '../components/Section.astro';
+import Kicker from '../components/Kicker.astro';
 import Button from '../components/Button.astro';
 import StarButton from '../components/StarButton.astro';
 import CodeBlock from '../components/CodeBlock.astro';
+import SetupPrompt from '../components/SetupPrompt.astro';
 import Logo from '../components/Logo.astro';
 import copy from '../data/copy.json';
 const sources: [string, string][] = [['npm', 'npm'], ['go install', 'go'], ['GitHub releases', 'github']];
 ---
-<Section tone="surface" label="final-title">
-  <div class="grid min-w-0 items-center gap-10 lg:grid-cols-12 lg:gap-12">
-    <div class="min-w-0 lg:col-span-6">
-      <h2 id="final-title" class="min-w-0 max-w-heading break-words text-h2 text-ink">{copy.final.title}</h2>
-      <p class="mt-4 max-w-measure text-lead text-muted">{copy.final.text}</p>
+<Section id="try" label="final-title">
+  <Kicker n="12" label="Try it" class="reveal" />
+  <h2 id="final-title" class="reveal mt-8 max-w-[10ch] text-finale font-bold text-ink">Try it in a minute.</h2>
+  <div class="mt-12 grid min-w-0 gap-10 lg:mt-16 lg:grid-cols-12 lg:gap-12">
+    <div class="reveal min-w-0 lg:col-span-7">
+      <p class="max-w-measure text-lead text-ink">{copy.final.text}</p>
+      <div class="mt-8 max-w-measure space-y-4">
+        <CodeBlock inline copy prompt code={copy.cta.install} />
+        <SetupPrompt />
+        <div class="action-row">
+          <StarButton variant="primary" />
+          <Button href="/docs/quickstart/" variant="secondary">Quickstart</Button>
+        </div>
+      </div>
     </div>
-    <div class="flex min-w-0 flex-col gap-6 lg:col-span-6">
-      <CodeBlock inline copy prompt code={copy.cta.install} />
-      <div class="action-row">
-        <StarButton />
-        <Button href="/docs/quickstart/" variant="secondary">Quickstart</Button>
-      </div>
-      <div>
-        <h3 class="mb-3 text-body font-semibold text-ink">Also available through</h3>
-        <ul class="flex flex-wrap gap-x-6 gap-y-4">
-          {sources.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
-        </ul>
-      </div>
+    <div class="reveal min-w-0 lg:col-span-5 lg:border-l lg:border-line lg:pl-10">
+      <p class="label-mono mb-4 text-faint">Also available through</p>
+      <ul class="flex flex-wrap gap-x-8 gap-y-4">
+        {sources.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
+      </ul>
     </div>
   </div>
 </Section>

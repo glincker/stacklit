@@ -32,6 +32,13 @@
   --code-fn: #6b3f8f;
   --code-comment: #5c584e;
   --tile: #ffffff;
+  --tok-string: #075446;
+  --tok-const: #7a4a00;
+  --tok-punct: #55524a;
+  --tok-hl: #dfe7da;
+  --tok-add: #d3e6da;
+  --tok-del: #f0ddd5;
+  --ring: #cfcabc;
 }
 
 :root[data-theme='dark'] {
@@ -57,6 +64,13 @@
   --code-fn: #c8a8ea;
   --code-comment: #a29e92;
   --tile: #23221d;
+  --tok-string: #86e0ca;
+  --tok-const: #e7b46a;
+  --tok-punct: #b0ac9f;
+  --tok-hl: #1f2b26;
+  --tok-add: #16301f;
+  --tok-del: #3a1f19;
+  --ring: #3f3c33;
 }
 
 /* Without scripting the system preference decides. */
@@ -84,6 +98,13 @@
     --code-fn: #c8a8ea;
     --code-comment: #a29e92;
     --tile: #23221d;
+    --tok-string: #86e0ca;
+    --tok-const: #e7b46a;
+    --tok-punct: #b0ac9f;
+    --tok-hl: #1f2b26;
+    --tok-add: #16301f;
+    --tok-del: #3a1f19;
+    --ring: #3f3c33;
   }
 }
 
@@ -104,13 +125,27 @@
   --text-h3--line-height: 1.25;
   --text-h2: clamp(1.75rem, 1.35rem + 1.8vw, 2.5rem);
   --text-h2--line-height: 1.1;
-  --text-stat: clamp(1.875rem, 1.5rem + 1.6vw, 2.25rem);
-  --text-stat--line-height: 1.05;
+  --text-stat: clamp(2rem, 1.2rem + 2.4vw, 3.25rem);
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.04em;
   --text-hero: clamp(2.25rem, 1.4rem + 3.8vw, 4rem);
   --text-hero--line-height: 1.04;
+  /* Editorial scale: the display line for the hero and the section statements, and the mono metadata label. */
+  --text-display: clamp(2.5rem, 1rem + 6vw, 5.75rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.045em;
+  --text-statement: clamp(2.25rem, 1rem + 4.4vw, 4.75rem);
+  --text-statement--line-height: 0.98;
+  --text-statement--letter-spacing: -0.04em;
+  --text-finale: clamp(3rem, 0.8rem + 10.5vw, 9.5rem);
+  --text-finale--line-height: 0.92;
+  --text-finale--letter-spacing: -0.05em;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.14em;
 
   /* Spacing is Tailwind's 4px scale. Section rhythm and gutters have their own tokens. */
-  --spacing-section: clamp(4rem, 3rem + 5vw, 7rem);
+  --spacing-section: clamp(4.5rem, 2.5rem + 7vw, 9rem);
   --spacing-gutter: clamp(1rem, 0.5rem + 2.4vw, 2.5rem);
 
   --container-site: 76rem;
@@ -120,6 +155,7 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-frame: 20px;
 
   --duration-fast: 120ms;
   --duration-base: 220ms;
@@ -152,4 +188,11 @@
   --color-code-fn: var(--code-fn);
   --color-code-comment: var(--code-comment);
   --color-tile: var(--tile);
+  --color-tok-string: var(--tok-string);
+  --color-tok-const: var(--tok-const);
+  --color-tok-punct: var(--tok-punct);
+  --color-tok-hl: var(--tok-hl);
+  --color-tok-add: var(--tok-add);
+  --color-tok-del: var(--tok-del);
+  --color-ring: var(--ring);
 }

@@ -10,11 +10,11 @@ const links = [
   ['llms.txt', '/llms.txt'],
 ];
 ---
-<footer class="border-t border-line bg-surface py-12">
+<footer class="border-t border-line bg-paper pb-28 pt-10 md:pb-12">
   <Container>
-    <ul class="flex flex-wrap gap-x-6 gap-y-2">
-      {links.map(([label, href]) => <li><a href={href} class="inline-flex min-h-9 items-center text-body text-ink underline decoration-1 underline-offset-4 hover:decoration-2">{label}</a></li>)}
+    <ul class="flex flex-wrap gap-x-8 gap-y-1">
+      {links.map(([label, href]) => <li><a href={href} class="label-mono inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-4 hover:decoration-2">{label}</a></li>)}
     </ul>
-    <p class="mt-6 max-w-measure text-caption text-muted">No cookies, no analytics, no third party scripts, fonts or images. This site makes no third party requests. The star count is read once, when the site is built.</p>
+    <p class="mt-4 max-w-measure text-caption text-muted">No cookies, no analytics, no third party scripts, fonts or images. This site makes no third party requests. The star count and release are read once, when the site is built.</p>
   </Container>
 </footer>

@@ -7,6 +7,8 @@
 /* Hallmark · waive 79 · the gap measured is the stat band starting after the hero actions · the derive output block beside the headline fills that space, so no copy is added */
 @import 'tailwindcss';
 @import './tokens.css';
+@import './code.css';
+@import './motion.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
@@ -33,6 +35,16 @@
   p { text-wrap: pretty; }
   img, svg { display: block; max-width: 100%; }
   a { text-underline-offset: 0.18em; }
+}
+
+/* The metadata layer: tiny uppercase monospace, wide tracking. Labels and keys only, never sentences. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
 }
 
 /* A row of actions that wraps as a row: same gap both ways, items keep their natural width. */

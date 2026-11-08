@@ -21,3 +21,26 @@ try {
 }
 writeFileSync(out, JSON.stringify({ stars }) + '\n');
 console.log(stars === null ? 'stars: unavailable, count hidden' : `stars: ${stars}`);
+
+// The current release for the banner and the legend: the GitHub release when reachable,
+// otherwise the newest versioned heading in CHANGELOG.md, so the build never has an empty version.
+import { readFileSync } from 'node:fs';
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const pretty = (iso) => { const [y, m, d] = iso.slice(0, 10).split('-').map(Number); return `${d} ${months[m - 1]} ${y}`; };
+let release = null;
+try {
+  const res = await fetch('https://api.github.com/repos/glincker/stacklit/releases/latest', { headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'stacklit-site-build', ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) }, signal: AbortSignal.timeout(5000) });
+  if (res.ok) {
+    const r = await res.json();
+    if (/^v\d+\.\d+\.\d+/.test(r.tag_name) && r.published_at) release = { version: r.tag_name.replace(/^v/, ''), date: pretty(r.published_at), source: 'github release' };
+  }
+} catch {
+  // Offline or rate limited: use the changelog below.
+}
+if (!release) {
+  const log = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../CHANGELOG.md'), 'utf8');
+  const m = log.match(/^## (\d+\.\d+\.\d+) \((\d{4}-\d{2}-\d{2})\)/m);
+  release = m ? { version: m[1], date: pretty(m[2]), source: 'changelog' } : { version: '0.5.0', date: '8 Nov 2026', source: 'fallback' };
+}
+writeFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/release.json'), JSON.stringify(release) + '\n');
+console.log(`release: ${release.version} (${release.date}, ${release.source})`);

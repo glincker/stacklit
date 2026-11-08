@@ -1,0 +1,19 @@
+---
+// The spec table, drawn as a map legend: hairline rows, mono keys, real facts only. A value may link to its source.
+interface Row { key: string; value: string; href?: string }
+interface Props { title?: string; rows: Row[]; class?: string }
+const { title = 'Legend', rows, class: extra } = Astro.props;
+---
+<div class:list={['min-w-0', extra]}>
+  <p class="label-mono mb-3 text-faint">{title}</p>
+  <dl class="border-t border-line">
+    {rows.map((r) => (
+      <div class="grid grid-cols-[minmax(6.5rem,auto)_1fr] gap-x-6 border-b border-line py-3">
+        <dt class="label-mono text-muted">{r.key}</dt>
+        <dd class="label-mono min-w-0 text-right text-ink [overflow-wrap:anywhere]">
+          {r.href ? <a href={r.href} class="underline decoration-line-strong decoration-1 underline-offset-4 hover:decoration-ink">{r.value}</a> : r.value}
+        </dd>
+      </div>
+    ))}
+  </dl>
+</div>

@@ -2,7 +2,9 @@
 // Usage: node scripts/record-ask.mjs <stacklit-binary> <gin-v1.10.0-checkout>
 // The checkout must already be indexed (stacklit init, then stacklit graph). Output is plain text, never edited by hand.
 import { execFileSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, mkdtempSync, cpSync, writeFileSync as put, chmodSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,3 +35,24 @@ const out = asks.map((a) => {
 const file = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/ask.json');
 writeFileSync(file, JSON.stringify({ repo: 'gin v1.10.0', budget: Number(budget), asks: out }, null, 2) + '\n');
 console.log(`wrote ${file}`);
+
+// The first two steps run on a clean copy of the checkout, with a no-op "open" first on PATH so init does not launch a browser.
+const work = mkdtempSync(join(tmpdir(), 'stacklit-steps-'));
+cpSync(repo, join(work, 'repo'), { recursive: true });
+const shim = join(work, 'bin');
+mkdirSync(shim);
+put(join(shim, 'open'), '#!/bin/sh\nexit 0\n');
+put(join(shim, 'xdg-open'), '#!/bin/sh\nexit 0\n');
+chmodSync(join(shim, 'open'), 0o755);
+chmodSync(join(shim, 'xdg-open'), 0o755);
+const clean = join(work, 'repo');
+execFileSync('git', ['clean', '-fdxq'], { cwd: clean });
+const env = { ...process.env, PATH: `${shim}:${process.env.PATH}` };
+const step = (args) => execFileSync(bin, args, { cwd: clean, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd();
+const initOut = execFileSync(bin, ['init'], { cwd: clean, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trimEnd();
+const setupOut = step(['setup']);
+const plain = (t) => t.replaceAll('\u2014', '-').replaceAll('\u2013', '-'); // the site prints no dash characters, so the tool's one em dash becomes a hyphen
+const steps = { repo: 'gin v1.10.0', init: plain(initOut).replace(/\n\nOpening visual map\.\.\./, ''), setup: plain(setupOut) };
+const stepsFile = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/steps.json');
+writeFileSync(stepsFile, JSON.stringify(steps, null, 2) + '\n');
+console.log(`wrote ${stepsFile}`);

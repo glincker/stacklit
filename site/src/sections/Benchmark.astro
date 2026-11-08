@@ -1,6 +1,7 @@
 ---
 import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
+import Legend from '../components/Legend.astro';
 import TableWrap from '../components/TableWrap.astro';
 import Button from '../components/Button.astro';
 import bench from '../data/bench.json';
@@ -14,9 +15,17 @@ const armRows: [string, { found1: string; found5: string; tokens: string }][] = 
 ];
 const derive = bench.repos.map((r) => Number(r.deriveTokens));
 const range = `${Math.min(...derive).toLocaleString('en-US')} to ${Math.max(...derive).toLocaleString('en-US')}`;
+const rows = [
+  { key: 'Tasks', value: `${bench.localizationTasks} where-is-X questions`, href: '/docs/benchmarks/' },
+  { key: 'Repos', value: `${bench.repoCount} pinned public repos`, href: '/docs/benchmarks/' },
+  { key: 'Reader', value: 'Simulated, no model' },
+  { key: 'Run', value: bench.date },
+];
 ---
-<Section id="benchmark" tone="surface" label="bench-title">
-  <SectionHead id="bench-title" title={copy.proof.title} lead={copy.proof.intro} />
+<Section id="benchmark" label="bench-title">
+  <SectionHead id="bench-title" n="09" label="Benchmark" title={copy.proof.title} lead={copy.proof.intro}>
+    <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
+  </SectionHead>
   <p class="mb-4 max-w-measure text-body text-ink">{copy.proof.note}</p>
   <p class="mb-4 max-w-measure text-caption text-muted">{bench.localizationTasks} tasks across {bench.repoCount} pinned public repos in six languages, run {bench.date}. Intervals are 95% bootstrap intervals over tasks.</p>
   <TableWrap label="File finding benchmark by approach">

@@ -1,5 +1,7 @@
 ---
 import Section from '../components/Section.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Legend from '../components/Legend.astro';
 import Logo from '../components/Logo.astro';
 import copy from '../data/copy.json';
 
@@ -9,15 +11,23 @@ const assistants: [string, string | undefined][] = [
   ['Zed', 'zed'], ['Junie', 'junie'], ['Aider', undefined],
 ];
 const languages: [string, string][] = [['Go', 'go'], ['TypeScript', 'typescript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java']];
+const rows = [
+  { key: 'Set up', value: '25 assistants and a generic AGENTS.md', href: '/docs/assistants/' },
+  { key: 'MCP', value: 'Any client, via stacklit serve', href: '/docs/mcp/' },
+  { key: 'Indexed', value: '48 languages and formats', href: '/docs/languages/' },
+  { key: 'Symbol graph', value: '20 languages', href: '/docs/languages/' },
+];
 ---
-<Section label="works-title">
-  <h2 id="works-title" class="min-w-0 max-w-heading break-words text-h2 text-ink [overflow-wrap:break-word]">{copy.assistants.title}</h2>
-  <ul class="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-4">
+<Section id="works" label="works-title">
+  <SectionHead id="works-title" n="03" label="Works with" title={copy.assistants.title}>
+    <p class="max-w-measure text-body text-muted">{copy.assistants.note}</p>
+    <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
+  </SectionHead>
+  <ul class="reveal grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-8 sm:grid-cols-3 lg:grid-cols-4">
     {assistants.map(([name, slug]) => <li class="min-w-0"><Logo name={name} slug={slug} /></li>)}
   </ul>
-  <p class="mt-6 max-w-measure text-body text-muted">{copy.assistants.note}</p>
-  <h3 class="mb-4 mt-10 text-h3 text-ink">Symbol graphs for 20 languages, including</h3>
-  <ul class="flex flex-wrap gap-x-6 gap-y-4">
+  <p class="label-mono mb-5 mt-14 text-muted">Symbol graphs for 20 languages, including</p>
+  <ul class="reveal flex flex-wrap gap-x-8 gap-y-5">
     {languages.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
   </ul>
 </Section>

@@ -1,0 +1,91 @@
+/* CodeWindow: highlighted at build time by Shiki with the css-variables theme, coloured here from the site tokens.
+ * Tabs are radio inputs, so switching needs no script. Up to six tabs. */
+.codewin {
+  --astro-code-foreground: var(--ink);
+  --astro-code-background: transparent;
+  --astro-code-token-constant: var(--tok-const);
+  --astro-code-token-string: var(--tok-string);
+  --astro-code-token-comment: var(--code-comment);
+  --astro-code-token-keyword: var(--code-keyword);
+  --astro-code-token-parameter: var(--ink);
+  --astro-code-token-function: var(--code-fn);
+  --astro-code-token-string-expression: var(--tok-string);
+  --astro-code-token-punctuation: var(--tok-punct);
+  --astro-code-token-link: var(--accent-text);
+}
+.codewin pre.astro-code {
+  margin: 0;
+  padding: 1rem 0;
+  max-height: var(--codewin-max, 28rem);
+  overflow: auto;
+  background: transparent !important;
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: var(--text-code--line-height);
+  tab-size: 2;
+}
+.codewin pre.astro-code code { display: grid; min-width: max-content; counter-reset: ln; }
+.codewin .line { display: block; padding-inline: 1.25rem 1.5rem; counter-increment: ln; }
+.codewin .line::before {
+  content: counter(ln);
+  display: inline-block;
+  width: 2ch;
+  margin-inline-end: 1.25rem;
+  text-align: right;
+  color: var(--faint);
+  user-select: none;
+}
+.codewin .line.hl { background: var(--tok-hl); box-shadow: inset 2px 0 0 var(--accent); }
+.codewin .line.add { background: var(--tok-add); box-shadow: inset 2px 0 0 var(--accent); }
+.codewin .line.del { background: var(--tok-del); box-shadow: inset 2px 0 0 var(--bad); }
+.codewin .line.ln-cmd span { color: var(--accent-text) !important; font-weight: 600; }
+.codewin .line.ln-key span { color: var(--accent-text) !important; }
+.codewin .line.ln-dim span { color: var(--code-comment) !important; }
+.codewin .line.ln-file span { color: var(--ink) !important; font-weight: 650; }
+
+/* Tab state. Without :has support the first tab simply stays open. */
+.codewin .cw-panel { display: none; }
+.codewin .cw-panels > .cw-panel:first-child { display: block; }
+.codewin .cw-tab { color: var(--muted); }
+.codewin .cw-tab:hover { color: var(--ink); }
+
+.codewin:has(.cw-input:nth-of-type(1):checked) .cw-panels > .cw-panel:nth-child(1),
+.codewin:has(.cw-input:nth-of-type(2):checked) .cw-panels > .cw-panel:nth-child(2),
+.codewin:has(.cw-input:nth-of-type(3):checked) .cw-panels > .cw-panel:nth-child(3),
+.codewin:has(.cw-input:nth-of-type(4):checked) .cw-panels > .cw-panel:nth-child(4),
+.codewin:has(.cw-input:nth-of-type(5):checked) .cw-panels > .cw-panel:nth-child(5),
+.codewin:has(.cw-input:nth-of-type(6):checked) .cw-panels > .cw-panel:nth-child(6) { display: block; }
+.codewin:has(.cw-input:nth-of-type(2):checked) .cw-panels > .cw-panel:first-child:not(:nth-child(2)),
+.codewin:has(.cw-input:nth-of-type(3):checked) .cw-panels > .cw-panel:first-child:not(:nth-child(3)),
+.codewin:has(.cw-input:nth-of-type(4):checked) .cw-panels > .cw-panel:first-child:not(:nth-child(4)),
+.codewin:has(.cw-input:nth-of-type(5):checked) .cw-panels > .cw-panel:first-child:not(:nth-child(5)),
+.codewin:has(.cw-input:nth-of-type(6):checked) .cw-panels > .cw-panel:first-child:not(:nth-child(6)) { display: none; }
+
+.codewin:has(.cw-input:nth-of-type(1):checked) .cw-tab:nth-of-type(1),
+.codewin:has(.cw-input:nth-of-type(2):checked) .cw-tab:nth-of-type(2),
+.codewin:has(.cw-input:nth-of-type(3):checked) .cw-tab:nth-of-type(3),
+.codewin:has(.cw-input:nth-of-type(4):checked) .cw-tab:nth-of-type(4),
+.codewin:has(.cw-input:nth-of-type(5):checked) .cw-tab:nth-of-type(5),
+.codewin:has(.cw-input:nth-of-type(6):checked) .cw-tab:nth-of-type(6) { color: var(--ink); background: var(--sunk); box-shadow: inset 0 -2px 0 var(--accent); }
+.codewin:has(.cw-input:nth-of-type(1):focus-visible) .cw-tab:nth-of-type(1),
+.codewin:has(.cw-input:nth-of-type(2):focus-visible) .cw-tab:nth-of-type(2),
+.codewin:has(.cw-input:nth-of-type(3):focus-visible) .cw-tab:nth-of-type(3),
+.codewin:has(.cw-input:nth-of-type(4):focus-visible) .cw-tab:nth-of-type(4),
+.codewin:has(.cw-input:nth-of-type(5):focus-visible) .cw-tab:nth-of-type(5),
+.codewin:has(.cw-input:nth-of-type(6):focus-visible) .cw-tab:nth-of-type(6) { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+/* Chip style tabs (Ask the map): the same radios, labels drawn as pills. */
+.codewin .cw-chip { color: var(--ink); border-color: var(--line-strong); }
+.codewin .cw-chip:hover { background: var(--sunk); }
+.codewin:has(.cw-input:nth-of-type(1):checked) .cw-chip:nth-of-type(1),
+.codewin:has(.cw-input:nth-of-type(2):checked) .cw-chip:nth-of-type(2),
+.codewin:has(.cw-input:nth-of-type(3):checked) .cw-chip:nth-of-type(3),
+.codewin:has(.cw-input:nth-of-type(4):checked) .cw-chip:nth-of-type(4),
+.codewin:has(.cw-input:nth-of-type(5):checked) .cw-chip:nth-of-type(5),
+.codewin:has(.cw-input:nth-of-type(6):checked) .cw-chip:nth-of-type(6) { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.codewin:has(.cw-input:nth-of-type(1):focus-visible) .cw-chip:nth-of-type(1),
+.codewin:has(.cw-input:nth-of-type(2):focus-visible) .cw-chip:nth-of-type(2),
+.codewin:has(.cw-input:nth-of-type(3):focus-visible) .cw-chip:nth-of-type(3),
+.codewin:has(.cw-input:nth-of-type(4):focus-visible) .cw-chip:nth-of-type(4),
+.codewin:has(.cw-input:nth-of-type(5):focus-visible) .cw-chip:nth-of-type(5),
+.codewin:has(.cw-input:nth-of-type(6):focus-visible) .cw-chip:nth-of-type(6) { outline: 2px solid var(--focus); outline-offset: 2px; }

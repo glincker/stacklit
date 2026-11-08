@@ -25,6 +25,8 @@ const pairs = [
   ['accent-ink', 'accent'], ['accent-text', 'accent-soft'], ['ink', 'accent-soft'],
   ['term-text', 'term'], ['term-dim', 'term'], ['term-accent', 'term'],
   ['code-keyword', 'sunk'], ['code-fn', 'sunk'], ['code-comment', 'sunk'],
+  ...['code-keyword', 'code-fn', 'code-comment', 'tok-string', 'tok-const', 'tok-punct', 'ink'].flatMap((fg) => ['tok-hl', 'tok-add', 'tok-del'].map((bg) => [fg, bg])),
+  ...['tok-string', 'tok-const', 'tok-punct'].map((fg) => [fg, 'sunk']),
 ];
 let bad = 0;
 for (const [name, t] of Object.entries(themes)) {

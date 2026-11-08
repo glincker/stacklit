@@ -1,14 +1,14 @@
 ---
-// One button. Labels never wrap inside a button (the link form may wrap, it is plain text).
+// One button, a pill. Labels never wrap inside a button (the link form may wrap, it is plain text).
 interface Props { href: string; variant?: 'primary' | 'secondary' | 'ghost' | 'link'; size?: 'md' | 'sm'; class?: string; ariaLabel?: string }
 const { href, variant = 'secondary', size = 'md', class: extra, ariaLabel } = Astro.props;
 const base = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-fast ease-stack motion-reduce:transition-none';
 const variants = {
-  primary: 'rounded-md bg-accent text-accent-ink whitespace-nowrap hover:brightness-110',
-  secondary: 'rounded-md border border-line-strong bg-raised text-ink whitespace-nowrap hover:bg-sunk',
-  ghost: 'rounded-md text-ink whitespace-nowrap hover:bg-sunk',
+  primary: 'rounded-full bg-accent text-accent-ink whitespace-nowrap hover:brightness-110',
+  secondary: 'rounded-full border border-line-strong bg-raised text-ink whitespace-nowrap hover:bg-sunk',
+  ghost: 'rounded-full text-ink whitespace-nowrap hover:bg-sunk',
   link: 'min-h-11 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2',
 } as const;
-const sizes = { md: 'min-h-11 px-4 text-body', sm: 'min-h-9 px-3 text-caption' } as const;
+const sizes = { md: 'min-h-11 px-5 text-body', sm: 'min-h-9 px-3 text-caption' } as const;
 ---
 <a href={href} aria-label={ariaLabel} class:list={[base, variants[variant], variant !== 'link' && sizes[size], 'active:brightness-95 aria-disabled:pointer-events-none aria-disabled:opacity-50', extra]}><slot /></a>
