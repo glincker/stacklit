@@ -1,0 +1,271 @@
+[
+ {
+  "id": "tg2-01",
+  "kind": "locate",
+  "question": "Where is the in-memory limiter that keeps one limiter per key (an IP or an email address) and evicts keys that were not used for a while?",
+  "all_of": [],
+  "any_of": [
+   "internal/ratelimit/ratelimit.go"
+  ],
+  "rubric": "Keyed limiter in ratelimit.go.",
+  "check": [
+   {
+    "path": "internal/ratelimit/ratelimit.go",
+    "regex": "type Keyed"
+   }
+  ]
+ },
+ {
+  "id": "tg2-02",
+  "kind": "locate",
+  "question": "Where does the SAML service provider remember assertion ids it has already accepted, so a captured response cannot be replayed?",
+  "all_of": [],
+  "any_of": [
+   "internal/saml/tracker.go"
+  ],
+  "rubric": "RequestTracker in saml/tracker.go.",
+  "check": [
+   {
+    "path": "internal/saml/tracker.go",
+    "regex": "type RequestTracker"
+   }
+  ]
+ },
+ {
+  "id": "tg2-03",
+  "kind": "locate",
+  "question": "Where can access tokens be signed and verified with ES256 or RS256 keys, not only with EdDSA?",
+  "all_of": [],
+  "any_of": [
+   "internal/jwt/multialg.go"
+  ],
+  "rubric": "multialg.go adds ES256 and RS256.",
+  "check": [
+   {
+    "path": "internal/jwt/multialg.go",
+    "regex": "AlgES256"
+   }
+  ]
+ },
+ {
+  "id": "tg2-04",
+  "kind": "locate",
+  "question": "Where is the logic that remembers a browser through a signed cookie, so the second factor can be skipped, and forgets it when the password changes?",
+  "all_of": [],
+  "any_of": [
+   "internal/trusteddevice/service.go"
+  ],
+  "rubric": "trusteddevice service.",
+  "check": [
+   {
+    "path": "internal/trusteddevice/service.go",
+    "regex": "(?i)password changes"
+   }
+  ]
+ },
+ {
+  "id": "tg2-05",
+  "kind": "trace",
+  "question": "Which three files store tool approvals, one for each storage backend: in memory, SQLite and Postgres?",
+  "all_of": [
+   "storage/memory/memory_toolapprovals.go",
+   "storage/sqlite/tool_approvals.go",
+   "storage/postgres/postgres_toolapprovals.go"
+  ],
+  "any_of": [],
+  "rubric": "One file per backend.",
+  "check": [
+   {
+    "path": "storage/memory/memory_toolapprovals.go",
+    "regex": "package memory"
+   },
+   {
+    "path": "storage/sqlite/tool_approvals.go",
+    "regex": "package sqlite"
+   },
+   {
+    "path": "storage/postgres/postgres_toolapprovals.go",
+    "regex": "package postgres"
+   }
+  ]
+ },
+ {
+  "id": "tg2-06",
+  "kind": "trace",
+  "question": "A user enrolls an authenticator app and later confirms a code. Which three files take part: the HTTP handlers, the TOTP service, and the SQLite code that stores the secret?",
+  "all_of": [
+   "internal/totp/handlers/handlers.go",
+   "internal/totp/service.go",
+   "storage/sqlite/totp.go"
+  ],
+  "any_of": [],
+  "rubric": "totp handlers, totp service, sqlite totp store.",
+  "check": [
+   {
+    "path": "internal/totp/handlers/handlers.go",
+    "regex": "BeginEnrollment"
+   },
+   {
+    "path": "internal/totp/service.go",
+    "regex": "func \\(s \\*Service\\) BeginEnrollment"
+   },
+   {
+    "path": "storage/sqlite/totp.go",
+    "regex": "UpsertPendingTOTPSecret"
+   }
+  ]
+ },
+ {
+  "id": "tg2-07",
+  "kind": "impact",
+  "question": "List the Go source files, tests excluded, that import the internal/safehttp package.",
+  "all_of": [
+   "internal/as/jwks_fetcher.go",
+   "internal/as/oidc_logout.go",
+   "internal/cimd/safefetch.go",
+   "policy/hook/httpguard.go",
+   "signals/receiver.go",
+   "signals/transmitter.go",
+   "signals/urlcheck.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these seven files import internal/safehttp outside tests.",
+  "check": [
+   {
+    "path": "internal/as/jwks_fetcher.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "internal/as/oidc_logout.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "internal/cimd/safefetch.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "policy/hook/httpguard.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "signals/receiver.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "signals/transmitter.go",
+    "regex": "internal/safehttp\""
+   },
+   {
+    "path": "signals/urlcheck.go",
+    "regex": "internal/safehttp\""
+   }
+  ],
+  "verify": {
+   "include": [
+    ".go"
+   ],
+   "pattern": "/internal/safehttp\"",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "tg2-08",
+  "kind": "impact",
+  "question": "Which Go files outside the tests import the internal/emailnorm package?",
+  "all_of": [
+   "cmd/theauth-go/init.go",
+   "email/noop.go",
+   "forwarders.go",
+   "internal/magiclink/service.go",
+   "internal/password/service.go",
+   "internal/saml/service.go",
+   "internal/scim/handlers/handlers.go",
+   "theauth.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these eight files import internal/emailnorm outside tests.",
+  "check": [
+   {
+    "path": "cmd/theauth-go/init.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "email/noop.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "forwarders.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "internal/magiclink/service.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "internal/password/service.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "internal/saml/service.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "internal/scim/handlers/handlers.go",
+    "regex": "internal/emailnorm\""
+   },
+   {
+    "path": "theauth.go",
+    "regex": "internal/emailnorm\""
+   }
+  ],
+  "verify": {
+   "include": [
+    ".go"
+   ],
+   "pattern": "/internal/emailnorm\"",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "tg2-09",
+  "kind": "add",
+  "question": "I want to add a new built-in permission (for example for managing webhooks). Which file declares the permission name constants, and which file lists the seeded permissions with their descriptions?",
+  "all_of": [
+   "internal/models/permissions.go",
+   "internal/rbac/catalog.go"
+  ],
+  "any_of": [],
+  "rubric": "permissions.go constants and rbac/catalog.go SeededPermissions.",
+  "check": [
+   {
+    "path": "internal/models/permissions.go",
+    "regex": "PermissionBillingRead"
+   },
+   {
+    "path": "internal/rbac/catalog.go",
+    "regex": "func SeededPermissions"
+   }
+  ]
+ },
+ {
+  "id": "tg2-10",
+  "kind": "add",
+  "question": "I want to add a new way to deliver one-time codes, for example through an SMS gateway. Which file declares the sender contract, and which file holds the existing sender implementations I should follow?",
+  "all_of": [
+   "otp/otp.go",
+   "otp/senders.go"
+  ],
+  "any_of": [],
+  "rubric": "otp.Sender interface and the adapters in senders.go.",
+  "check": [
+   {
+    "path": "otp/otp.go",
+    "regex": "type Sender interface"
+   },
+   {
+    "path": "otp/senders.go",
+    "regex": "type EmailSender"
+   }
+  ]
+ }
+]
