@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "21cd0e201c94b212567fa72ccebcb404c2b940a38ef217050cb6b558bad3271e",
+  "merkle_hash": "23bca45ab8ea1779cbb712ce8d9f8768dd3bc7f6d6aad613d82c07d5b6c704b4",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -37,8 +37,8 @@
         "lines": 63
       },
       "dockerfile": {
-        "files": 1,
-        "lines": 9
+        "files": 3,
+        "lines": 34
       },
       "elixir": {
         "files": 3,
@@ -97,8 +97,8 @@
         "lines": 1116
       },
       "json": {
-        "files": 492,
-        "lines": 23219
+        "files": 496,
+        "lines": 23303
       },
       "julia": {
         "files": 1,
@@ -165,8 +165,8 @@
         "lines": 47
       },
       "shell": {
-        "files": 1,
-        "lines": 17
+        "files": 4,
+        "lines": 153
       },
       "solidity": {
         "files": 3,
@@ -214,10 +214,26 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 888,
-    "total_lines": 67923
+    "total_files": 897,
+    "total_lines": 68168
   },
   "modules": {
+    ".claude-plugin": {
+      "purpose": ".claude-plugin",
+      "language": "json",
+      "files": 1,
+      "lines": 15,
+      "file_list": [
+        "marketplace.json"
+      ],
+      "exports": [
+        "name",
+        "description",
+        "owner",
+        "plugins"
+      ],
+      "activity": "low"
+    },
     ".github/ISSUE_TEMPLATE": {
       "purpose": "ISSUE TEMPLATE",
       "language": "yaml",
@@ -288,6 +304,24 @@
       ],
       "depends_on": [
         "internal/cli"
+      ],
+      "activity": "low"
+    },
+    "docker": {
+      "purpose": "Docker",
+      "language": "dockerfile",
+      "files": 2,
+      "lines": 25,
+      "file_list": [
+        "Dockerfile",
+        "Dockerfile.dockerignore"
+      ],
+      "exports": [
+        "stage build from golang:1.25-alpine",
+        "stage 1 from gcr.io/distroless/static-debian12:nonroot"
+      ],
+      "depends_on": [
+        "root"
       ],
       "activity": "low"
     },
@@ -1362,7 +1396,7 @@
       "purpose": "Npm",
       "language": "javascript",
       "files": 2,
-      "lines": 258,
+      "lines": 259,
       "file_list": [
         "package.json",
         "install.js"
@@ -1370,14 +1404,14 @@
       "exports": [
         "name",
         "version",
+        "mcpName",
         "description",
         "bin",
         "scripts",
         "keywords",
         "author",
         "license",
-        "repository",
-        "homepage"
+        "repository"
       ],
       "activity": "low"
     },
@@ -1391,13 +1425,48 @@
       ],
       "activity": "low"
     },
+    "plugins/stacklit/.claude-plugin": {
+      "purpose": ".claude-plugin",
+      "language": "json",
+      "files": 1,
+      "lines": 14,
+      "file_list": [
+        "plugin.json"
+      ],
+      "exports": [
+        "name",
+        "displayName",
+        "version",
+        "description",
+        "author",
+        "homepage",
+        "repository",
+        "license",
+        "keywords"
+      ],
+      "activity": "low"
+    },
+    "plugins/stacklit/hooks": {
+      "purpose": "React hooks",
+      "language": "json",
+      "files": 1,
+      "lines": 27,
+      "file_list": [
+        "hooks.json"
+      ],
+      "exports": [
+        "hooks"
+      ],
+      "activity": "low"
+    },
     "root": {
       "purpose": "Root package",
-      "language": "make",
-      "files": 2,
-      "lines": 101,
+      "language": "json",
+      "files": 3,
+      "lines": 128,
       "file_list": [
         ".goreleaser.yml",
+        "server.json",
         "Makefile"
       ],
       "exports": [
@@ -1409,8 +1478,30 @@
         "changelog",
         "release",
         "brews",
-        "install",
-        "build"
+        "$schema",
+        "name"
+      ],
+      "depended_by": [
+        "docker"
+      ],
+      "activity": "low"
+    },
+    "scripts": {
+      "purpose": "Scripts",
+      "language": "shell",
+      "files": 3,
+      "lines": 136,
+      "file_list": [
+        "install.sh",
+        "gen-llms-full.sh",
+        "sync-plugin-skill.sh"
+      ],
+      "exports": [
+        "say()",
+        "die()",
+        "fetch()",
+        "final_url()",
+        "sha()"
       ],
       "activity": "low"
     },
@@ -1514,6 +1605,10 @@
       [
         "cmd/stacklit",
         "internal/cli"
+      ],
+      [
+        "docker",
+        "root"
       ],
       [
         "internal/cache",
@@ -1821,13 +1916,16 @@
       "internal/renderer"
     ],
     "isolated": [
+      ".claude-plugin",
       ".github/ISSUE_TEMPLATE",
       ".github/workflows",
       "action",
       "examples/adapters",
       "npm",
       "npm/bin",
-      "root",
+      "plugins/stacklit/.claude-plugin",
+      "plugins/stacklit/hooks",
+      "scripts",
       "site",
       "site/scripts",
       "site/src"

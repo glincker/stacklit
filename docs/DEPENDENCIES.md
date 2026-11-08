@@ -19,10 +19,12 @@ graph LR
   classDef scala fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef swift fill:#8b949e,color:#0d1117,stroke:#8b949e
   classDef typescript fill:#c9d1d9,color:#0d1117,stroke:#c9d1d9
+  claude_plugin[".claude-plugin<br/>.claude-plugin"]:::go
   github_ISSUE_TEMPLATE[".github/ISSUE_TEMPLATE<br/>ISSUE TEMPLATE"]:::go
   github_workflows[".github/workflows<br/>Workflows"]:::go
   action["action<br/>Action"]:::go
   cmd_stacklit["cmd/stacklit<br/>Stacklit"]:::go
+  docker["docker<br/>Docker"]:::go
   examples_adapters["examples/adapters<br/>Adapters"]:::go
   internal_assets["internal/assets<br/>Static assets"]:::go
   internal_cache["internal/cache<br/>Cache"]:::go
@@ -52,13 +54,17 @@ graph LR
   internal_walker["internal/walker<br/>File system walker"]:::go
   npm["npm<br/>Npm"]:::go
   npm_bin["npm/bin<br/>Bin"]:::go
+  plugins_stacklit_claude_plugin["plugins/stacklit/.claude-plugin<br/>.claude-plugin"]:::go
+  plugins_stacklit_hooks["plugins/stacklit/hooks<br/>React hooks"]:::go
   root["root<br/>Root package"]:::go
+  scripts["scripts<br/>Scripts"]:::go
   site["site<br/>Site"]:::go
   site_scripts["site/scripts<br/>Scripts"]:::go
   site_src["site/src<br/>Src"]:::go
   site_src_data["site/src/data<br/>Data"]:::go
   site_src_pages["site/src/pages<br/>Pages"]:::go
   cmd_stacklit --> internal_cli
+  docker --> root
   internal_cache --> internal_fsutil
   internal_cache --> internal_parser
   internal_check --> internal_config
