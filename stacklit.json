@@ -1,11 +1,11 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-05-07T02:35:01Z",
+  "generated_at": "2026-11-08T16:44:30Z",
   "stacklit_version": "dev",
-  "merkle_hash": "b99fe2df208508d2562bc18f0950a25193578caecf4f05c492c8cc20033a728c",
+  "merkle_hash": "ec5054d8a1372fd6dc98e3edca5f2bbdb8f4a67aca0080ac9a68a6f62dab80de",
   "project": {
-    "name": "stacklit",
+    "name": "stacklit-integrations",
     "root": ".",
     "type": "single"
   },
@@ -13,8 +13,8 @@
     "primary_language": "go",
     "languages": {
       "go": {
-        "files": 67,
-        "lines": 9396
+        "files": 69,
+        "lines": 9476
       },
       "java": {
         "files": 1,
@@ -46,8 +46,8 @@
     "entrypoints": [
       "cmd/stacklit/main.go"
     ],
-    "total_files": 78,
-    "total_lines": 9639
+    "total_files": 80,
+    "total_lines": 9719
   },
   "modules": {
     "assets": {
@@ -84,8 +84,8 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 9,
-      "lines": 560,
+      "files": 11,
+      "lines": 640,
       "file_list": [
         "derive.go",
         "diff.go",
@@ -95,6 +95,8 @@
         "root.go",
         "serve.go",
         "setup.go",
+        "version.go",
+        "version_test.go",
         "view.go"
       ],
       "exports": [
@@ -436,15 +438,15 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
-        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "HotFile": "Path string, Commits90d int",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
-        "LangStats": "Files int, Lines int",
         "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
-        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary"
+        "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
+        "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
       "depended_by": [
         "internal/cli",
@@ -682,109 +684,34 @@
   "git": {
     "hot_files": [
       {
-        "path": ".github/workflows/ci.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/release.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".github/workflows/stacklit-index.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": ".gitignore",
-        "commits_90d": 1
-      },
-      {
-        "path": ".goreleaser.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "COMPARISON.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "DEPENDENCIES.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "LICENSE",
-        "commits_90d": 1
-      },
-      {
         "path": "Makefile",
         "commits_90d": 1
       },
       {
-        "path": "README.md",
+        "path": "internal/cli/version.go",
         "commits_90d": 1
       },
       {
-        "path": "SKILL.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "USAGE.md",
-        "commits_90d": 1
-      },
-      {
-        "path": "action/action.yml",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/embed.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/lang-icons.js",
-        "commits_90d": 1
-      },
-      {
-        "path": "assets/template.html",
-        "commits_90d": 1
-      },
-      {
-        "path": "cmd/stacklit/main.go",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.gif",
-        "commits_90d": 1
-      },
-      {
-        "path": "demo.tape",
-        "commits_90d": 1
-      },
-      {
-        "path": "docs/superpowers/plans/2026-04-12-growth-package.md",
+        "path": "internal/cli/version_test.go",
         "commits_90d": 1
       }
     ],
     "recent": [
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
-      "DEPENDENCIES.md",
-      "LICENSE",
       "Makefile",
-      "README.md"
+      "internal/cli/version.go",
+      "internal/cli/version_test.go",
+      "stacklit.json",
+      "npm/install.js",
+      "DEPENDENCIES.md",
+      ".github/workflows/ci.yml",
+      "README.md",
+      "USAGE.md",
+      "internal/cli/export.go"
     ],
     "stable": [
-      ".github/workflows/ci.yml",
-      ".github/workflows/release.yml",
-      ".github/workflows/stacklit-index.yml",
-      ".gitignore",
-      ".goreleaser.yml",
-      "COMPARISON.md",
-      "DEPENDENCIES.md",
-      "LICENSE",
       "Makefile",
-      "README.md"
+      "internal/cli/version.go",
+      "internal/cli/version_test.go"
     ]
   },
   "hints": {
