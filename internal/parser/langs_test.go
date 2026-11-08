@@ -101,6 +101,45 @@ func TestMoreLanguages(t *testing.T) {
 			exports:  []string{"User", "User.Address", "Role", "UserService"},
 			typeDefs: map[string]string{"UserService": "rpc GetUser(GetUserRequest) returns (User)", "Role": "ADMIN"},
 		},
+		{
+			name: "csharp", file: "sample.cs", language: "csharp",
+			imports:    []string{"System", "System.Collections.Generic"},
+			exports:    []string{"IInvoice", "Invoice", "Money", "Status", "Point"},
+			notExports: []string{"Secret"},
+			typeDefs:   map[string]string{"Invoice": "decimal Total()"},
+		},
+		{
+			name: "ruby", file: "sample.rb", language: "ruby",
+			imports:  []string{"json", "helper"},
+			exports:  []string{"Billing", "Billing::Invoice", "top_level(a, b)"},
+			typeDefs: map[string]string{"Billing::Invoice": "total(tax, rate = 1)"},
+		},
+		{
+			name: "php", file: "sample.php", language: "php",
+			imports:    []string{"App\\Models\\User", "Illuminate\\Support\\Collection"},
+			exports:    []string{"Payable", "Loggable", "Invoice", "Status", "helper(int $x)"},
+			notExports: []string{"hidden"},
+			typeDefs:   map[string]string{"Invoice": "function total(float $tax): float"},
+		},
+		{
+			name: "swift", file: "sample.swift", language: "swift",
+			imports:  []string{"Foundation", "UIKit"},
+			exports:  []string{"Drawable", "Point", "Canvas", "Direction", "func render(_ c: Canvas, scale: Int) -> Bool"},
+			typeDefs: map[string]string{"Canvas": "func draw()", "Drawable": "func draw()"},
+		},
+		{
+			name: "c", file: "sample.c", language: "c",
+			imports:    []string{"stdio.h", "util.h"},
+			exports:    []string{"typedef Node", "struct Config", "enum Color", "add(int a, int b)", "run(const char *name)"},
+			notExports: []string{"helper", "_specifier"},
+			typeDefs:   map[string]string{"Config": "port", "Color": "GREEN"},
+		},
+		{
+			name: "cpp", file: "sample.cpp", language: "cpp",
+			imports:  []string{"vector", "engine.hpp"},
+			exports:  []string{"Entity", "struct Vec2", "compute(int a)"},
+			typeDefs: map[string]string{"Entity": "update(float dt)", "Vec2": "y"},
+		},
 	}
 
 	p := &TreeSitterParser{}

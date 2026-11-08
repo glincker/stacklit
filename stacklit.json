@@ -472,13 +472,13 @@
       ],
       "type_defs": {
         "Architecture": "Pattern string, Summary string",
+        "Dependencies": "Edges [][]string, Entrypoints []string, MostDepended []string, Isolated []string",
         "FrameworkPattern": "Name string, Config []string, Routes string, API string, Middleware string, Models string, Entry string",
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
-        "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
+        "HotFile": "Path string, Commits90d int",
         "LangStats": "Files int, Lines int",
         "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
-        "Project": "Name string, Root string, Type string, Workspaces []string",
         "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
         "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
@@ -718,7 +718,39 @@
   "git": {
     "hot_files": [
       {
+        "path": "stacklit.json",
+        "commits_90d": 2
+      },
+      {
         "path": "internal/parser/generic.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/langs_test.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/treesitter.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_common.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_dart.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_elixir.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_gdscript.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_hcl.go",
         "commits_90d": 1
       },
       {
@@ -726,36 +758,69 @@
         "commits_90d": 1
       },
       {
+        "path": "internal/parser/ts_lua.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_proto.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_scala.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_sfc.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_shell.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_sql.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/parser/ts_zig.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/walker/walker.go",
         "commits_90d": 1
       },
       {
-        "path": "stacklit.json",
+        "path": "stacklit.mmd",
         "commits_90d": 1
       },
       {
-        "path": "testdata/langs/sample.kt",
+        "path": "testdata/langs/sample.dart",
         "commits_90d": 1
       }
     ],
     "recent": [
-      "internal/parser/generic.go",
-      "internal/walker/walker.go",
-      "stacklit.json",
-      "internal/parser/ts_kotlin.go",
-      "testdata/langs/sample.kt",
-      "npm/install.js",
-      "DEPENDENCIES.md",
-      ".github/workflows/ci.yml",
-      "README.md",
-      "USAGE.md"
+      "internal/parser/langs_test.go",
+      "internal/parser/treesitter.go",
+      "internal/parser/ts_common.go",
+      "internal/parser/ts_dart.go",
+      "internal/parser/ts_elixir.go",
+      "internal/parser/ts_gdscript.go",
+      "internal/parser/ts_hcl.go",
+      "internal/parser/ts_lua.go",
+      "internal/parser/ts_proto.go",
+      "internal/parser/ts_scala.go"
     ],
     "stable": [
       "internal/parser/generic.go",
+      "internal/parser/langs_test.go",
+      "internal/parser/treesitter.go",
+      "internal/parser/ts_common.go",
+      "internal/parser/ts_dart.go",
+      "internal/parser/ts_elixir.go",
+      "internal/parser/ts_gdscript.go",
+      "internal/parser/ts_hcl.go",
       "internal/parser/ts_kotlin.go",
-      "internal/walker/walker.go",
-      "stacklit.json",
-      "testdata/langs/sample.kt"
+      "internal/parser/ts_lua.go"
     ]
   },
   "hints": {

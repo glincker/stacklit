@@ -133,5 +133,7 @@ func csMethodSig(node *gts.Node, lang *gts.Language, src []byte) string {
 		}
 	}
 	sig := strings.Join(parts, " ")
+	// Attach the parameter list to the name: "Total()" not "Total ()".
+	sig = strings.Replace(sig, " (", "(", 1)
 	return truncSig(sig, 80)
 }

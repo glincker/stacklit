@@ -80,16 +80,15 @@ func extractSwift(root *gts.Node, lang *gts.Language, src []byte, path string) *
 	return info
 }
 
-// swiftHasModifier checks if a node has a specific access control modifier.
+// swiftHasModifier checks if a node carries an access-control keyword (e.g. private).
 func swiftHasModifier(node *gts.Node, lang *gts.Language, src []byte, mod string) bool {
-	// Modifiers may appear as direct children with type "modifier" or "access_level_modifier".
-	for i := 0; i < node.ChildCount(); i++ {
-		child := node.Child(i)
-		t := child.Type(lang)
-		if t == "modifier" || t == "access_level_modifier" || t == "attribute" {
-			if strings.Contains(nodeText(child, src), mod) {
-				return true
-			}
+	m := childByType(node, lang, "modifiers")
+	if m == nil {
+		return false
+	}
+	for _, w := range strings.Fields(nodeText(m, src)) {
+		if w == mod {
+			return true
 		}
 	}
 	return false
@@ -128,7 +127,7 @@ func swiftTypeMembers(node *gts.Node, lang *gts.Language, src []byte) []string {
 	for i := 0; i < body.ChildCount(); i++ {
 		child := body.Child(i)
 		switch child.Type(lang) {
-		case "function_declaration":
+		case "function_declaration", "protocol_function_declaration":
 			if swiftHasModifier(child, lang, src, "private") || swiftHasModifier(child, lang, src, "fileprivate") {
 				continue
 			}
@@ -149,42 +148,35 @@ func swiftTypeMembers(node *gts.Node, lang *gts.Language, src []byte) []string {
 	return members
 }
 
-// swiftFunctionSig builds a brief function signature string.
+// swiftFunctionSig returns the declaration from `func` up to the body, keeping
+// parameter labels, generics and the return type verbatim.
 func swiftFunctionSig(node *gts.Node, lang *gts.Language, src []byte) string {
-	var parts []string
+	start := node.StartByte()
 	for i := 0; i < node.ChildCount(); i++ {
-		child := node.Child(i)
-		t := child.Type(lang)
-		switch t {
-		case "modifier", "access_level_modifier", "attribute", "function_body", "code_block", "{", "}":
-			continue
-		case "simple_identifier", "type_identifier":
-			parts = append(parts, nodeText(child, src))
-		case "parameter_clause", "function_value_parameters":
-			parts = append(parts, nodeText(child, src))
-		case "type_annotation":
-			parts = append(parts, "->"+nodeText(child, src))
-		case "func":
-			parts = append(parts, "func")
+		if node.Child(i).Type(lang) == "func" {
+			start = node.Child(i).StartByte()
+			break
 		}
 	}
-	sig := strings.Join(parts, " ")
-	return truncSig(sig, 80)
+	end := node.EndByte()
+	if body := childByType(node, lang, "function_body"); body != nil {
+		end = body.StartByte()
+	}
+	if end > uint32(len(src)) || start >= end {
+		return ""
+	}
+	return truncSig(string(src[start:end]), 100)
 }
 
 // swiftPropertyName extracts the name from a property declaration.
 func swiftPropertyName(node *gts.Node, lang *gts.Language, src []byte) string {
-	id := childByType(node, lang, "simple_identifier")
-	if id != nil {
-		return nodeText(id, src)
-	}
-	// pattern binding may nest the identifier.
-	pb := childByType(node, lang, "pattern_binding")
-	if pb != nil {
-		id = childByType(pb, lang, "simple_identifier")
-		if id != nil {
-			return nodeText(id, src)
+	// The identifier sits inside a pattern node, so search descendants.
+	var name string
+	gts.Walk(node, func(n *gts.Node, _ int) gts.WalkAction {
+		if name == "" && n.Type(lang) == "simple_identifier" {
+			name = nodeText(n, src)
 		}
-	}
-	return ""
+		return gts.WalkContinue
+	})
+	return name
 }
