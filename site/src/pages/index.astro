@@ -6,8 +6,7 @@ import Logo from '../components/Logo.astro';
 import samples from '../data/samples.json';
 import bench from '../data/bench.json';
 import copy from '../data/copy.json';
-import { existsSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { ab, fill } from '../data/agentAb';
 
 const hero = copy.hero.variants[copy.hero.active as keyof typeof copy.hero.variants];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -16,7 +15,7 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const headlineLines = hero.headline
   .split(/(?<=\.)\s+/)
   .map((line) => esc(line).replace(/\d[\d,]*k?/g, (n) => `<span class="n">${n}</span>`));
-const captionHtml = esc(copy.hero.caption).replace(esc(copy.hero.captionLink), `<a href="/docs/benchmarks/">${esc(copy.hero.captionLink)}</a>`);
+const captionHtml = esc(copy.hero.caption).replace(esc(copy.hero.captionLink), `<a href="${copy.hero.captionHref}">${esc(copy.hero.captionLink)}</a>`);
 
 const deriveHtml = samples.derive
   .trimEnd()
@@ -57,9 +56,15 @@ const derive = bench.repos.map((r) => Number(r.deriveTokens));
 const deriveMin = Math.min(...derive).toLocaleString('en-US');
 const deriveMax = Math.max(...derive).toLocaleString('en-US');
 
-// The real agent A/B appears only when its summary exists at build time.
-const abPath = fileURLToPath(new URL('../../../bench/agent-ab/summary.json', import.meta.url));
-const hasAb = existsSync(abPath);
+const at = copy.agentTest;
+const sizes: Record<string, string> = { levelrail: 'about 16,000 files', 'theauth-go': 'about 1,300 files', featuredrop: 'about 400 files' };
+const verdictText = { cheaper: 'Cheaper', dearer: 'Costs more', unclear: 'No clear difference' };
+const behaviour = [
+  `About a third fewer tool calls: ${ab.toolCalls.text} (ratio of with to without, 95% interval).`,
+  `About a quarter fewer model turns: ${ab.turns.text}.`,
+  `Grep and glob calls fell by more than four fifths: ${ab.grepGlob.text}.`,
+  `Answers were right slightly less often: ${ab.correct.control}% without Stacklit, ${ab.correct.arm}% with it on the pre-registered grader (${ab.correct.diff} points, interval ${ab.correct.diffCi}); ${ab.correct.auditedControl}% and ${ab.correct.auditedArm}% on the audited grader.`,
+];
 ---
 <Base title={copy.meta.title} description={copy.meta.description} path="/" jsonLd>
   <section class="hero">
@@ -163,13 +168,45 @@ const hasAb = existsSync(abPath);
           <li>{copy.proof.sizes.replace('{range}', `${deriveMin} to ${deriveMax}`)}</li>
           <li>Limits are listed on the benchmark page.</li>
         </ul>
-        {hasAb && (
-          <div class="ab">
-            <h3>{copy.proof.agentAbTitle}</h3>
-            <p>{copy.proof.agentAbNote} <a href="https://github.com/glincker/stacklit/blob/master/bench/agent-ab/summary.json">Read the summary and trajectories</a>.</p>
-          </div>
-        )}
         <p class="cite"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with {bench.totalTasks} tasks in all, methods and limits.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="agent-test">
+    <div class="container sec-grid">
+      <h2>{at.title}</h2>
+      <div class="sec-body">
+        <p class="big">{fill(at.intro)}</p>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Cost of Stacklit sessions relative to sessions without it, by repo</caption>
+            <thead><tr><th>Repo</th><th>Size</th><th class="num">Cost ratio [95% interval]</th><th>Reading</th></tr></thead>
+            <tbody>
+              {ab.repos.map((r) => (
+                <tr><td>{r.name}</td><td>{sizes[r.name]}</td><td class="num">{r.cost.text}</td><td>{verdictText[r.verdict]}</td></tr>
+              ))}
+              <tr class="total"><td>{at.pooledLabel}</td><td>{ab.pairs} pairs</td><td class="num">{ab.cost.text}</td><td>No saving. Tokens {ab.tokens.text}.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="cite">{fill(at.tableCaption)}</p>
+        <h3 class="sub">{at.behaviourTitle}</h3>
+        <ul class="points">
+          {behaviour.map((b) => <li>{b}</li>)}
+        </ul>
+        <div class="split">
+          <div>
+            <h3>{at.helpsTitle}</h3>
+            <ul>{at.helps.map((t) => <li>{fill(t)}</li>)}</ul>
+          </div>
+          <div>
+            <h3>{at.failsTitle}</h3>
+            <ul>{at.fails.map((t) => <li>{fill(t)}</li>)}</ul>
+          </div>
+        </div>
+        <p class="cite">{at.limits}</p>
+        <p class="cite"><a href={at.linkHref}>{at.link}</a>, with every table, the method and the claims we do not make.</p>
       </div>
     </div>
   </section>
@@ -189,7 +226,7 @@ const hasAb = existsSync(abPath);
         {copy.faq.items.map((f) => (
           <details>
             <summary>{f.q}</summary>
-            <p>{f.a}</p>
+            <p>{fill(f.a)}</p>
           </details>
         ))}
         <p class="cite"><a href="/docs/faq/">{copy.faq.more}</a></p>
