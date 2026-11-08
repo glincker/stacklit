@@ -118,16 +118,21 @@ func newGraphCmd() *cobra.Command {
 func newQueryCmd() *cobra.Command {
 	var f graphFlags
 	var budget int
+	var order string
 	c := &cobra.Command{
 		Use:   "query <question>",
 		Short: "Scoped, token-budgeted subgraph for a question",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ord, err := graph.ParseOrder(order)
+			if err != nil {
+				return err
+			}
 			g, err := f.load(cmd)
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), g.Query(joinArgs(args), budget, f.json))
+			fmt.Fprint(cmd.OutOrStdout(), g.QueryOrdered(joinArgs(args), budget, f.json, ord))
 			if !f.json && !f.loaded.IsZero() {
 				fmt.Fprint(cmd.OutOrStdout(), graph.StaleLine(f.root, g, f.loaded))
 			}
@@ -136,6 +141,7 @@ func newQueryCmd() *cobra.Command {
 	}
 	f.bind(c)
 	c.Flags().IntVar(&budget, "budget", graph.DefaultQueryBudget, "Hard output limit in tokens")
+	c.Flags().StringVar(&order, "order", "", "File order: relevance or path (default relevance; env STACKLIT_QUERY_ORDER)")
 	return c
 }
 
