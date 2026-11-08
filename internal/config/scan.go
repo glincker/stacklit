@@ -18,12 +18,35 @@ import (
 // Override with max_file_size in .stacklitrc.json or STACKLIT_MAX_FILE_SIZE.
 const DefaultMaxFileSize int64 = 1 << 20
 
+// Defaults for the per-module listing caps. Override with max_module_files and
+// module_split_files in .stacklitrc.json or STACKLIT_MAX_MODULE_FILES and
+// STACKLIT_MODULE_SPLIT_FILES.
+const (
+	DefaultMaxModuleFiles   = 30
+	DefaultModuleSplitFiles = 40
+)
+
 // applyEnv lets environment variables override file config, so CI and hooks
 // can tune a run without editing the committed rc file.
 func (c *Config) applyEnv() {
 	if v := os.Getenv("STACKLIT_MAX_FILE_SIZE"); v != "" {
 		if n, err := strconv.ParseInt(v, 10, 64); err == nil && n > 0 {
 			c.MaxFileSize = n
+		}
+	}
+	for _, e := range []struct {
+		name string
+		dst  *int
+		min  int
+	}{
+		{"STACKLIT_MAX_EXPORTS", &c.MaxExports, 1},
+		{"STACKLIT_MAX_MODULE_FILES", &c.MaxModuleFiles, 1},
+		{"STACKLIT_MODULE_SPLIT_FILES", &c.ModuleSplitFiles, -1},
+	} {
+		if v := os.Getenv(e.name); v != "" {
+			if n, err := strconv.Atoi(v); err == nil && n >= e.min {
+				*e.dst = n
+			}
 		}
 	}
 	if v := os.Getenv("STACKLIT_WORKERS"); v != "" {
@@ -159,8 +182,8 @@ func LoadStrict(root string) (*Config, error) {
 // Validate checks the settings for values that cannot work.
 func (c *Config) Validate() error {
 	var problems []string
-	if c.MaxDepth < 0 || c.MaxModules < 0 || c.MaxExports < 0 {
-		problems = append(problems, "max_depth, max_modules and max_exports must not be negative")
+	if c.MaxDepth < 0 || c.MaxModules < 0 || c.MaxExports < 0 || c.MaxModuleFiles < 0 {
+		problems = append(problems, "max_depth, max_modules, max_exports and max_module_files must not be negative")
 	}
 	if c.Workers < 0 {
 		problems = append(problems, "workers must not be negative")

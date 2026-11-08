@@ -225,6 +225,8 @@ func Run(opts Options) (*Result, error) {
 	g := graph.Build(parsed, graph.BuildOptions{
 		MaxDepth:   cfg.MaxDepth,
 		MaxModules: cfg.MaxModules,
+		Root:       root,
+		SplitFiles: cfg.ModuleSplitFiles,
 	})
 
 	// 6. Get git activity (optional: it is the main source of churn in a committed index).
@@ -410,13 +412,13 @@ func assembleIndex(
 		if strings.HasPrefix(mod.Name, "testdata") {
 			continue
 		}
-		exports := mod.Exports
+		exports := mod.ExportsByRank
 		if maxExports > 0 && len(exports) > maxExports {
 			exports = exports[:maxExports]
 		}
-		fileList := mod.Files
-		if len(fileList) > 20 {
-			fileList = fileList[:20]
+		fileList := mod.FilesByRank
+		if cfg.MaxModuleFiles > 0 && len(fileList) > cfg.MaxModuleFiles {
+			fileList = fileList[:cfg.MaxModuleFiles]
 		}
 		// Compute activity level from git hot files
 		activityLevel := "low"

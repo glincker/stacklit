@@ -73,3 +73,26 @@ func TestScanIgnoreIncludesOutputs(t *testing.T) {
 		}
 	}
 }
+
+func TestModuleCapsDefaultsRCAndEnv(t *testing.T) {
+	dir := t.TempDir()
+	cfg := Load(dir)
+	if cfg.MaxModuleFiles != DefaultMaxModuleFiles || cfg.ModuleSplitFiles != DefaultModuleSplitFiles {
+		t.Fatalf("defaults wrong: %d %d", cfg.MaxModuleFiles, cfg.ModuleSplitFiles)
+	}
+	rc := `{"max_module_files": 77, "module_split_files": 12, "max_exports": 31}`
+	if err := os.WriteFile(filepath.Join(dir, ".stacklitrc.json"), []byte(rc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg = Load(dir)
+	if cfg.MaxModuleFiles != 77 || cfg.ModuleSplitFiles != 12 || cfg.MaxExports != 31 {
+		t.Fatalf("rc not applied: %+v", cfg)
+	}
+	t.Setenv("STACKLIT_MAX_MODULE_FILES", "5")
+	t.Setenv("STACKLIT_MAX_EXPORTS", "3")
+	t.Setenv("STACKLIT_MODULE_SPLIT_FILES", "-1")
+	cfg = Load(dir)
+	if cfg.MaxModuleFiles != 5 || cfg.MaxExports != 3 || cfg.ModuleSplitFiles != -1 {
+		t.Fatalf("env not applied: %+v", cfg)
+	}
+}

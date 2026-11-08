@@ -17,23 +17,15 @@ func extractRust(root *gts.Node, lang *gts.Language, src []byte, path string) *F
 		switch node.Type(lang) {
 		case "use_declaration":
 			// use std::collections::HashMap; → take first 2 path segments
-			text := strings.TrimPrefix(strings.TrimSpace(nodeText(node, src)), "use ")
+			text := strings.TrimSpace(nodeText(node, src))
+			if i := strings.Index(text, "use "); i >= 0 {
+				text = text[i+len("use "):] // drops pub / pub(crate) visibility
+			}
 			text = strings.TrimSuffix(text, ";")
-			// strip braces e.g. use std::{a, b}
-			if idx := strings.IndexAny(text, "{"); idx != -1 {
-				text = text[:idx]
-			}
-			text = strings.Trim(text, ":")
-			parts := strings.SplitN(text, "::", 3)
-			var seg string
-			if len(parts) >= 2 {
-				seg = parts[0] + "::" + parts[1]
-			} else {
-				seg = parts[0]
-			}
-			seg = strings.TrimSpace(seg)
-			if seg != "" {
-				info.Imports = append(info.Imports, seg)
+			for _, t := range rustUseTargets(text) {
+				if t != "" {
+					info.Imports = append(info.Imports, t)
+				}
 			}
 			return gts.WalkSkipChildren
 
@@ -193,4 +185,71 @@ func extractRust(root *gts.Node, lang *gts.Language, src []byte, path string) *F
 		info.TypeDefs = nil
 	}
 	return info
+}
+
+// rustUseTargets turns the text of a use declaration into import targets of at
+// most two path segments. A crate, self or super prefix with a brace
+// group (`crate::{a, b}`) yields one target per member, so module dependencies are not lost.
+func rustUseTargets(text string) []string {
+	text = strings.TrimSpace(text)
+	idx := strings.Index(text, "{")
+	if idx == -1 {
+		return []string{rustTwoSegs(text)}
+	}
+	prefix := strings.Trim(text[:idx], ": ")
+	if prefix == "" || strings.Contains(prefix, "::") {
+		return []string{rustTwoSegs(prefix)}
+	}
+	if prefix != "crate" && prefix != "self" && prefix != "super" {
+		return []string{prefix}
+	}
+	body := text[idx+1:]
+	if end := strings.LastIndex(body, "}"); end >= 0 {
+		body = body[:end]
+	}
+	var out []string
+	depth, start := 0, 0
+	flush := func(end int) {
+		item := strings.TrimSpace(body[start:end])
+		if item == "" || strings.HasPrefix(item, "self") {
+			return
+		}
+		if i := strings.IndexAny(item, ": {"); i >= 0 {
+			item = item[:i]
+		}
+		if item != "" {
+			out = append(out, prefix+"::"+item)
+		}
+	}
+	for i, c := range body {
+		switch c {
+		case '{':
+			depth++
+		case '}':
+			depth--
+		case ',':
+			if depth == 0 {
+				flush(i)
+				start = i + 1
+			}
+		}
+	}
+	flush(len(body))
+	if len(out) == 0 {
+		out = append(out, prefix)
+	}
+	return out
+}
+
+// rustTwoSegs keeps the first two path segments of a use path.
+func rustTwoSegs(text string) string {
+	if idx := strings.Index(text, "{"); idx != -1 {
+		text = text[:idx]
+	}
+	text = strings.Trim(text, ": ")
+	parts := strings.SplitN(text, "::", 3)
+	if len(parts) >= 2 {
+		return strings.TrimSpace(parts[0] + "::" + parts[1])
+	}
+	return strings.TrimSpace(parts[0])
 }
