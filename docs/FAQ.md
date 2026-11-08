@@ -22,29 +22,4 @@ It runs `stacklit generate --quiet` after each commit. On Go repos of this size 
 Yes. Commit `stacklit.json` and tell Copilot to read it in `.github/copilot-instructions.md`, or paste the output of `stacklit derive` there.
 
 **How is it different from dumping the whole repo into a prompt?**
-A dump is the full source. Stacklit is structure only: it is orders of magnitude smaller but cannot answer questions that need code bodies. See [COMPARISON.md](COMPARISON.md) for a factual feature comparison.
-
-## Documentation
-
-- [USAGE.md](USAGE.md): full command reference, MCP tools, configuration, index schema
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how the pipeline works
-- [bench/RESULTS.md](bench/RESULTS.md): benchmark methodology and results
-- [ROADMAP.md](ROADMAP.md): what is planned and what is in progress
-- [CHANGELOG.md](CHANGELOG.md): release history
-- [COMPARISON.md](COMPARISON.md): feature comparison with other context tools
-- [SKILL.md](SKILL.md): instructions an agent can follow to use `stacklit.json`
-- [examples/](examples/): sample outputs (generated with earlier versions)
-- [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md)
-
-## Contributing
-
-```bash
-make build   # build the binary
-make test    # run all tests
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). Questions and ideas are welcome in [Discussions](https://github.com/glincker/stacklit/discussions).
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+A dump is the full source. Stacklit is structure only: it is orders of magnitude smaller but cannot answer questions that need code bodies. See [COMPARISON.md](../COMPARISON.md) for a factual feature comparison.
