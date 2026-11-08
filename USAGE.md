@@ -88,12 +88,14 @@ All commands run against the current directory. Run `stacklit <command> --help` 
 | [`view`](#stacklit-view) | Rebuild `stacklit.html` from `stacklit.json` and open it |
 | [`diff`](#stacklit-diff) | Check whether the index is stale |
 | [`derive`](#stacklit-derive) | Print the compact navigation map, or inject it into an agent config file |
-| [`export`](#stacklit-export) | Render the index as a readable markdown overview |
+| [`export`](#stacklit-export) | Render the index as markdown, or export the graph as GraphML, Cypher, JSON, DOT, Mermaid, an Obsidian vault or a markdown wiki |
 | [`setup`](#stacklit-setup) | Configure detected AI tools and install the git hook |
 | [`serve`](#stacklit-serve) | Run the MCP server over stdio |
 | [`graph`, `query`, `explain`, `impact`, `path`, `hubs`, `communities`, `report`, `slice`, `watch`](#symbol-graph-commands) | Symbol-level graph and token-budgeted queries |
 | [`doctor`](#stacklit-doctor) | Diagnose config, hooks, a stale index and parse errors |
 | [`ingest`](#stacklit-ingest) | Add docs, OpenAPI, SQL schemas and ownership to `stacklit.context.json` |
+| [`check`](#stacklit-check) | Enforce layer boundaries, cycles, fan-in and fan-out limits and orphans (exit code 3 on violation) |
+| [`merge-graphs`](#stacklit-merge-graphs) | Merge symbol graphs from several repos and link them by package names |
 | `completion` | Shell completions for bash, zsh, fish and PowerShell |
 
 Global flags: `--version`, `--help`.
@@ -172,11 +174,34 @@ Renders the index as markdown for people: a PR description, an issue, a chat mes
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--format` | `md` | Output format. Only markdown is supported. |
+| `--format` | `md` | `md`, or a graph format: `graphml`, `cypher`, `json`, `dot`, `mermaid`, `obsidian`, `markdown-wiki` |
+| `--scope` | auto | Graph scope for single-file graph formats: `modules` or `symbols`. Auto picks symbols when `stacklit.graph.json` exists. |
+| `--graph` | `stacklit.graph.json` | Symbol graph file for graph formats |
+| `--budget` | 2000 | Token budget per `markdown-wiki` page. Env: `STACKLIT_EXPORT_PAGE_TOKENS`. |
 | `--source` | `stacklit.json` | Index file to read |
-| `-o`, `--output` | stdout | Write to this file instead |
+| `-o`, `--output` | stdout | Write to this file (one-file formats) or directory (`obsidian`, `markdown-wiki`) instead |
 
 The markdown contains the project title and totals, a language and framework table, entrypoints and key directories, a modules table, collapsible per-module export lists, the dependency edges with most-depended and isolated modules, hot files when git data exists, and the hints. Output is deterministic: the same `stacklit.json` always gives byte-identical markdown.
+
+#### Graph formats
+
+Graph formats print to stdout unless you pass `-o`, and never write into the repo on their own. Every node carries `source_file`, and symbol edges carry their confidence (`EXTRACTED`, `INFERRED` or `EXACT`) and score.
+
+| Format | Output |
+|--------|--------|
+| `graphml` | One GraphML file (Gephi, yEd, NetworkX) |
+| `cypher` | `CREATE` and `MATCH ... CREATE` statements for Neo4j and compatible stores |
+| `json` | `{scope, nodes, edges}` |
+| `dot` | Graphviz. Inferred edges are dashed. Capped to the highest-degree nodes (`STACKLIT_EXPORT_MAX_NODES`, default 300). |
+| `mermaid` | Mermaid flowchart with the same cap |
+| `obsidian` | A vault folder: `Index.md` plus one note per module with `[[wikilinks]]` to dependencies, and symbol headings that other notes link to as `[[module#Symbol]]` |
+| `markdown-wiki` | `index.md` plus `modules/<module>.md`, each page cut off at the token budget with a "... N more" line. Same input gives identical files. |
+
+```
+stacklit export --format graphml -o /tmp/graph.graphml
+stacklit export --format obsidian -o ~/vault/myproject
+stacklit export --format markdown-wiki --budget 1500 -o /tmp/wiki
+```
 
 ### stacklit setup
 
@@ -234,6 +259,52 @@ stacklit ingest [--docs] [--api] [--schema] [--owners] [--git-owners]
 ```
 
 Writes `stacklit.context.json` next to the index and leaves `stacklit.json` untouched. With no connector flag, all but `--git-owners` run. Limits: `STACKLIT_INGEST_MAX_BYTES`, `STACKLIT_INGEST_MAX_ITEMS`.
+
+#### Adapters
+
+```
+stacklit ingest --adapter "<command>" [--adapter-name NAME] [--adapter-files GLOBS] [--into-graph]
+```
+
+Runs your command with file paths on stdin (one per line, relative to the root) and reads JSON Lines back: `{"type":"node","id","name","kind","summary","source_file"}` and `{"type":"edge","from","to","kind"}`. Use it for concepts from PDFs, images, audio or anything else stacklit does not parse. Results are stored in `stacklit.context.json` as `concepts` and `concept_links`, always tagged `INFERRED` with a `source` field, and a rerun replaces that adapter's earlier output. `--into-graph` also adds them to `stacklit.graph.json` as `concept` nodes. Stacklit makes no network or model calls itself. Limits: `STACKLIT_ADAPTER_TIMEOUT_SEC` (60), `STACKLIT_ADAPTER_MAX_BYTES` (4 MiB), `STACKLIT_ADAPTER_MAX_ITEMS` (5000). The full contract and an example are in [examples/adapters](examples/adapters/README.md).
+
+#### SCIP
+
+```
+stacklit ingest --scip index.scip [--graph stacklit.graph.json]
+```
+
+Reads a SCIP index (from `scip-go`, `scip-typescript` and similar) with a built-in decoder and upgrades `INFERRED` graph edges to `EXACT` where the index shows a reference from the edge's source to a symbol defined at its target. It never adds or removes edges and rewrites the graph file in place. Size cap: `STACKLIT_SCIP_MAX_BYTES` (512 MiB).
+
+### stacklit check
+
+```
+stacklit check [--root DIR] [--source stacklit.json] [--json]
+```
+
+Evaluates the `check` block of `.stacklitrc.json` against the module graph. Exit code 3 when any rule is violated, 0 otherwise, so it works as a CI step.
+
+```json
+{
+  "check": {
+    "forbidden": [{ "from": "ui/**", "to": "core/db", "reason": "go through the service layer" }],
+    "cycles": true,
+    "max_fan_in": 12,
+    "max_fan_out": 8,
+    "orphans": true
+  }
+}
+```
+
+Patterns are module paths with `*` wildcards; `dir/**` matches `dir` and everything below it. With no `check` block the command passes. `--json` prints `{ok, violations:[{rule, message, modules}]}`.
+
+### stacklit merge-graphs
+
+```
+stacklit merge-graphs a/stacklit.graph.json b/stacklit.graph.json -o merged.json [--multi stacklit-multi.json]
+```
+
+Combines symbol graphs from several repos. Node IDs get a `repo:` prefix, each node keeps its `source_file` and gets a `repo` field. Name a repo explicitly with `name=path.json`. With `--multi` (the output of `generate --multi`), repo nodes and `depends_on` edges are added for repos that depend on each other through manifest package names, plus import edges from the importing files to the provider repo.
 
 ---
 
@@ -298,6 +369,8 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
 | `parse_memory_mb` | 512 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |
 
+| `check` | none | Architecture rules for `stacklit check`: `forbidden`, `cycles`, `max_fan_in`, `max_fan_out`, `orphans` (see [stacklit check](#stacklit-check)) |
+
 A file that is missing, unreadable or invalid JSON is ignored and the defaults are used.
 
 Only files with recognised source extensions are scanned. Directories named `test`, `tests`, `testdata`, `fixtures`, `e2e`, `bench` or `benchmarks` are left out of the module list, and each module lists up to about 20 file names.
@@ -310,6 +383,10 @@ Only files with recognised source extensions are scanned. Directories named `tes
 |----------|---------|---------|
 | `STACKLIT_SUMMARY_CMD` | `init --summary` | Command (split on whitespace) that reads a prompt on stdin and prints the summary. Default: `claude -p`. |
 | `STACKLIT_SUMMARY_TIMEOUT` | `init --summary` | Timeout in seconds. Default: 120. |
+| `STACKLIT_EXPORT_PAGE_TOKENS` | `export --format markdown-wiki`, `obsidian` | Token budget per page. Default: 2000. |
+| `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
+| `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
+| `STACKLIT_SCIP_MAX_BYTES` | `ingest --scip` | Largest SCIP file read. Default: 512 MiB. |
 
 ### Summary (opt-in)
 
