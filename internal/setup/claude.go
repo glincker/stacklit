@@ -16,12 +16,15 @@ var SkillMD string
 const (
 	hookPreCmd     = "stacklit hook pretool"
 	hookSessionCmd = "stacklit hook session"
+	hookSubagent   = "stacklit hook subagent"
+	hookPostCmd    = "stacklit hook posttool"
 )
 
 // ClaudeOptions selects the optional Claude Code extras.
 type ClaudeOptions struct {
 	PreToolHook  bool
 	SessionHook  bool
+	RefreshHook  bool
 	Skill        bool
 	GlobalScope  bool
 	UninstallAll bool
@@ -39,8 +42,13 @@ func claudeBase(global bool) (string, error) {
 }
 
 // hookEntry builds one settings.json hook group.
-func hookEntry(matcher, cmd string) map[string]any {
-	g := map[string]any{"hooks": []any{map[string]any{"type": "command", "command": cmd}}}
+func hookEntry(matcher, cmd string, async bool) map[string]any {
+	h := map[string]any{"type": "command", "command": cmd}
+	if async {
+		// Async keeps the edit loop from waiting on the index refresh.
+		h["async"] = true
+	}
+	g := map[string]any{"hooks": []any{h}}
 	if matcher != "" {
 		g["matcher"] = matcher
 	}
@@ -60,7 +68,7 @@ func groupHasCmd(g any, cmd string) bool {
 }
 
 // setHook adds or removes one stacklit hook group under event.
-func setHook(m map[string]any, event, matcher, cmd string, on bool) {
+func setHook(m map[string]any, event, matcher, cmd string, on, async bool) {
 	hooks, _ := m["hooks"].(map[string]any)
 	if hooks == nil {
 		hooks = map[string]any{}
@@ -73,7 +81,7 @@ func setHook(m map[string]any, event, matcher, cmd string, on bool) {
 		}
 	}
 	if on {
-		kept = append(kept, hookEntry(matcher, cmd))
+		kept = append(kept, hookEntry(matcher, cmd, async))
 	}
 	if len(kept) == 0 {
 		delete(hooks, event)
@@ -94,7 +102,7 @@ func (r *Runner) ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error {
 	if err != nil {
 		return err
 	}
-	if o.PreToolHook || o.SessionHook || uninstall {
+	if o.PreToolHook || o.SessionHook || o.RefreshHook || uninstall {
 		path := filepath.Join(base, "settings.json")
 		old, existed, err := r.read(path)
 		if err != nil {
@@ -107,10 +115,15 @@ func (r *Runner) ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error {
 		}
 		before := encodeJSON(m)
 		if o.PreToolHook || uninstall {
-			setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, !uninstall)
+			setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, !uninstall, false)
 		}
 		if o.SessionHook || uninstall {
-			setHook(m, "SessionStart", "startup|resume", hookSessionCmd, !uninstall)
+			setHook(m, "SessionStart", "startup|resume|clear|compact", hookSessionCmd, !uninstall, false)
+			// Explore and Plan skip CLAUDE.md, so they get the digest here.
+			setHook(m, "SubagentStart", "Explore|Plan", hookSubagent, !uninstall, false)
+		}
+		if o.RefreshHook || uninstall {
+			setHook(m, "PostToolUse", "Edit|Write|MultiEdit|NotebookEdit", hookPostCmd, !uninstall, true)
 		}
 		switch {
 		case len(m) == 0 && existed:

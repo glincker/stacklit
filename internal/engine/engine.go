@@ -219,36 +219,14 @@ func Run(opts Options) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	files, parsed := sc.Files, sc.Parsed
-
-	// 5. Build dependency graph with config-driven limits.
-	g := graph.Build(parsed, graph.BuildOptions{
-		MaxDepth:   cfg.MaxDepth,
-		MaxModules: cfg.MaxModules,
-		Root:       root,
-		SplitFiles: cfg.ModuleSplitFiles,
-	})
-
-	// 6. Get git activity (optional: it is the main source of churn in a committed index).
+	// 5-8. Build the module graph and assemble the index.
 	activity := &git.Activity{}
 	if cfg.GitActivityEnabled() {
 		if a, gerr := git.GetActivity(root, 90); gerr == nil {
 			activity = a
 		}
 	}
-
-	// 8. Assemble schema.Index.
-	idx := assembleIndex(root, mono, files, parsed, g, activity, map[string][]byte{}, cfg)
-	idx.Hints.EnvVars = mergeEnvVars(root, sc.EnvVars)
-	idx.Scan = sc.Info
-	if mono.Type == "monorepo" {
-		names := make([]string, 0, len(idx.Modules))
-		for n := range idx.Modules {
-			names = append(names, n)
-		}
-		idx.Packages, idx.PackageEdges = buildPackages(root, mono.Workspaces, parsed, idx.Dependencies.Edges, names)
-	}
-	idx.MerkleHash = sc.MerkleHash
+	idx := buildIndex(root, cfg, mono, sc, activity)
 	renderer.SetTimestamps(cfg.TimestampsEnabled())
 	renderer.SetMapIcons(!cfg.MapIconsOff())
 
@@ -273,7 +251,7 @@ func Run(opts Options) (*Result, error) {
 		return &Result{
 			Index:    idx,
 			Duration: time.Since(start),
-			Imports:  importsByModule(parsed, idx.Modules),
+			Imports:  importsByModule(sc.Parsed, idx.Modules),
 			Provides: repoProvides(root, mono),
 		}, nil
 	}
@@ -315,6 +293,30 @@ func Run(opts Options) (*Result, error) {
 		Index:       idx,
 		Duration:    dur,
 	}, nil
+}
+
+// buildIndex turns scan results into an index. Run and Refresh both use it, so
+// an incremental refresh is the same computation as a full generate.
+func buildIndex(root string, cfg *config.Config, mono *monorepo.Result, sc *scanResult, activity *git.Activity) *schema.Index {
+	files, parsed := sc.Files, sc.Parsed
+	g := graph.Build(parsed, graph.BuildOptions{
+		MaxDepth:   cfg.MaxDepth,
+		MaxModules: cfg.MaxModules,
+		Root:       root,
+		SplitFiles: cfg.ModuleSplitFiles,
+	})
+	idx := assembleIndex(root, mono, files, parsed, g, activity, map[string][]byte{}, cfg)
+	idx.Hints.EnvVars = mergeEnvVars(root, sc.EnvVars)
+	idx.Scan = sc.Info
+	if mono.Type == "monorepo" {
+		names := make([]string, 0, len(idx.Modules))
+		for n := range idx.Modules {
+			names = append(names, n)
+		}
+		idx.Packages, idx.PackageEdges = buildPackages(root, mono.Workspaces, parsed, idx.Dependencies.Edges, names)
+	}
+	idx.MerkleHash = sc.MerkleHash
+	return idx
 }
 
 // assembleIndex builds a schema.Index from the pipeline outputs.

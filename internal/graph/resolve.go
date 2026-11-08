@@ -953,10 +953,17 @@ func DiscoverGoModules(root string, files []string) map[string]string {
 
 // BuildSymbols extracts and resolves the given root-relative files into a graph.
 func BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph {
-	fs := Extract(root, files, eo)
+	return LinkSymbols(root, files, Extract(root, files, eo), nil)
+}
+
+// LinkSymbols resolves already extracted files into a graph. files is the
+// full file list (for Go module discovery); fs must be sorted by path. Bodies
+// come from c when it holds the file, so only changed files are re-read.
+func LinkSymbols(root string, files []string, fs []*FileSyms, c BodyCache) *SymGraph {
 	g := Resolve(fs, ResolveOptions{GoModules: DiscoverGoModules(root, files)})
-	g.Root = filepath.Base(root)
-	g.attachBodies(root)
+	// A fixed value keeps a committed graph identical whatever the checkout folder is called.
+	g.Root = "."
+	g.AttachBodiesCached(root, c)
 	return g
 }
 

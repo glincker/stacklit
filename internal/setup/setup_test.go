@@ -125,13 +125,13 @@ func TestLegacyBlockMigrated(t *testing.T) {
 }
 
 func TestHooksPreserveUserHooks(t *testing.T) {
-	m := map[string]any{"hooks": map[string]any{"PreToolUse": []any{hookEntry("Bash", "echo hi")}}}
-	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, true)
-	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, true)
+	m := map[string]any{"hooks": map[string]any{"PreToolUse": []any{hookEntry("Bash", "echo hi", false)}}}
+	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, true, false)
+	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, true, false)
 	if n := len(m["hooks"].(map[string]any)["PreToolUse"].([]any)); n != 2 {
 		t.Fatalf("want 2 groups, got %d", n)
 	}
-	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, false)
+	setHook(m, "PreToolUse", "Grep|Glob", hookPreCmd, false, false)
 	if n := len(m["hooks"].(map[string]any)["PreToolUse"].([]any)); n != 1 {
 		t.Fatalf("want 1 group, got %d", n)
 	}
@@ -223,8 +223,8 @@ func TestDigestBudgetAndStability(t *testing.T) {
 }
 
 func TestNudgesAndSkillSmall(t *testing.T) {
-	if Tokens(sessionNudge) > 100 {
-		t.Fatal("hook nudge over 100 tokens")
+	if Tokens(sessionStatusSample) > 60 || Tokens(noIndexHint) > 60 {
+		t.Fatal("hook status lines over 60 tokens")
 	}
 	if len(SkillMD) > 1100 {
 		t.Fatalf("skill is %d bytes, want about 1KB", len(SkillMD))

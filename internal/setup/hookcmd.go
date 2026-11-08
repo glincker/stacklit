@@ -3,7 +3,6 @@ package setup
 import (
 	"encoding/json"
 	"io"
-	"os"
 	"path/filepath"
 
 	"github.com/glincker/stacklit/internal/graph"
@@ -12,17 +11,20 @@ import (
 // graphFile is the symbol graph the hook reads; absent means stay silent.
 const graphFile = "stacklit.graph.json"
 
-// sessionNudge stays at or under 100 tokens (bytes/4); a test enforces it.
-const sessionNudge = "This repo has a stacklit map: read stacklit.json or call stacklit MCP get_overview before broad searches."
-
 type hookInput struct {
 	ToolName  string `json:"tool_name"`
 	Cwd       string `json:"cwd"`
+	SessionID string `json:"session_id"`
+	Source    string `json:"source"`
+	AgentType string `json:"agent_type"`
 	ToolInput struct {
 		Pattern string `json:"pattern"`
 		Path    string `json:"path"`
 		Glob    string `json:"glob"`
 		Type    string `json:"type"`
+		// Edit, Write and MultiEdit carry file_path; NotebookEdit carries notebook_path.
+		FilePath     string `json:"file_path"`
+		NotebookPath string `json:"notebook_path"`
 	} `json:"tool_input"`
 }
 
@@ -66,19 +68,4 @@ func PreToolHook(stdin io.Reader) string {
 		return ""
 	}
 	return hookJSON("PreToolUse", ptr)
-}
-
-// SessionHook returns a short, static SessionStart pointer. The digest is
-// already in the rules file, so this stays tiny and byte-identical per run.
-func SessionHook(stdin io.Reader) string {
-	var in hookInput
-	_ = json.NewDecoder(stdin).Decode(&in)
-	dir := in.Cwd
-	if dir == "" {
-		dir = "."
-	}
-	if _, err := os.Stat(filepath.Join(dir, "stacklit.json")); err != nil {
-		return ""
-	}
-	return hookJSON("SessionStart", sessionNudge)
 }

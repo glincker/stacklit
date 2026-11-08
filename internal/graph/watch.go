@@ -163,7 +163,7 @@ func (w *watcher) write() error {
 		w.mods = DiscoverGoModules(w.o.Root, paths)
 	}
 	g := Resolve(fs, ResolveOptions{GoModules: w.mods})
-	g.Root = filepath.Base(w.o.Root)
+	g.Root = "."
 	g.attachBodies(w.o.Root)
 	tmp := w.o.Out + ".tmp"
 	if err := g.Save(tmp); err != nil {
