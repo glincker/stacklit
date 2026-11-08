@@ -184,7 +184,7 @@ Uses the existing `stacklit.json`, or generates one if none exists, then configu
 
 | Target | Detected by | What it changes |
 |--------|-------------|-----------------|
-| `claude` | `claude` on PATH or a `.claude` directory | injects the map into `CLAUDE.md`, adds the stacklit server to `.mcp.json` |
+| `claude` | `claude` on PATH or a `CLAUDE.md` file | injects the map into `CLAUDE.md`, adds the stacklit server to `.mcp.json` |
 | `cursor` | a `.cursor` directory or `.cursorrules` | injects the map into `.cursorrules`, adds `.cursor/mcp.json` |
 | `aider` | `aider` on PATH or `.aider.conf.yml` | injects the map into `.aider.conf.yml` |
 
@@ -434,4 +434,4 @@ Runs `stacklit generate --quiet` after each commit and stages the two committed 
 
 **Generation is slow or uses a lot of memory on Python or TypeScript**: this is a known cost of the pure-Go tree-sitter parsers. Add large generated or vendored directories to `ignore`.
 
-**Windows install problems**: see the npm installer notes in [npm/README.md](npm/README.md), or download the binary from Releases.
+**Windows install problems**: use `go install`, or download the binary from Releases and put it on your PATH.
