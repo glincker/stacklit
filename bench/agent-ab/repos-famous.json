@@ -1,0 +1,87 @@
+[
+  {
+    "name": "django",
+    "language": "Python",
+    "url": "https://github.com/django/django.git",
+    "ref": "main",
+    "sha": "a1f2b45ce5a327f42437bdb620a817839d0bd067",
+    "shallow_since": "2026-05-01",
+    "files": 7097,
+    "source_files": 2988,
+    "license": "BSD-3-Clause",
+    "stars": 91694,
+    "est_session_usd": {
+      "low": 0.0314,
+      "mid": 0.047,
+      "high": 0.0784
+    }
+  },
+  {
+    "name": "react",
+    "language": "JavaScript and Rust",
+    "url": "https://github.com/facebook/react.git",
+    "ref": "main",
+    "sha": "d71b537241d26861df496413db2142c7ba192c25",
+    "shallow_since": "2026-05-01",
+    "files": 7300,
+    "source_files": 4610,
+    "license": "MIT",
+    "stars": 252421,
+    "est_session_usd": {
+      "low": 0.0315,
+      "mid": 0.0472,
+      "high": 0.0787
+    }
+  },
+  {
+    "name": "tokio",
+    "language": "Rust",
+    "url": "https://github.com/tokio-rs/tokio.git",
+    "ref": "master",
+    "sha": "99dbe548b7046915cd56e570e31604e1f8fa83cd",
+    "shallow_since": "2026-05-01",
+    "files": 893,
+    "source_files": 817,
+    "license": "MIT",
+    "stars": 33723,
+    "est_session_usd": {
+      "low": 0.0235,
+      "mid": 0.0353,
+      "high": 0.0588
+    }
+  },
+  {
+    "name": "kafka",
+    "language": "Java and Scala",
+    "url": "https://github.com/apache/kafka.git",
+    "ref": "trunk",
+    "sha": "8f4cc1d80036105ffc79388dc659a9b325996943",
+    "shallow_since": "2026-05-01",
+    "files": 7664,
+    "source_files": 6740,
+    "license": "Apache-2.0",
+    "stars": 34194,
+    "est_session_usd": {
+      "low": 0.0316,
+      "mid": 0.0475,
+      "high": 0.0791
+    }
+  },
+  {
+    "name": "rails",
+    "language": "Ruby",
+    "url": "https://github.com/rails/rails.git",
+    "ref": "main",
+    "sha": "24259cf2d25c71c3e3320bf0be7ff2e3de93becf",
+    "shallow_since": "2026-05-01",
+    "files": 5032,
+    "source_files": 3546,
+    "license": "MIT",
+    "stars": 59081,
+    "est_session_usd": {
+      "low": 0.0301,
+      "mid": 0.0451,
+      "high": 0.0751
+    }
+  }
+]

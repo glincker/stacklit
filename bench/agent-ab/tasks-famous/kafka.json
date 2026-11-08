@@ -1,0 +1,259 @@
+[
+ {
+  "id": "kf-01",
+  "kind": "locate",
+  "question": "Where is the producer record accumulator that backs each batch with fixed-size chunks taken from the buffer pool and attaches more chunks as records are appended?",
+  "all_of": [],
+  "any_of": [
+   "clients/src/main/java/org/apache/kafka/clients/producer/internals/ChunkedRecordAccumulator.java"
+  ],
+  "rubric": "ChunkedRecordAccumulator.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/clients/producer/internals/ChunkedRecordAccumulator.java",
+    "regex": "class ChunkedRecordAccumulator"
+   }
+  ]
+ },
+ {
+  "id": "kf-02",
+  "kind": "locate",
+  "question": "Where is the server-side consumer group assignor whose javadoc lists its properties in priority order: validity, spread, and moving as few partitions as possible?",
+  "all_of": [],
+  "any_of": [
+   "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/Uniform2Assignor.java"
+  ],
+  "rubric": "Uniform2Assignor.",
+  "check": [
+   {
+    "path": "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/Uniform2Assignor.java",
+    "regex": "class Uniform2Assignor"
+   }
+  ]
+ },
+ {
+  "id": "kf-03",
+  "kind": "locate",
+  "question": "Where is the exception thrown when a file being transferred to a network channel cannot be read, as opposed to the channel failing to be written to?",
+  "all_of": [],
+  "any_of": [
+   "clients/src/main/java/org/apache/kafka/common/network/FileReadException.java"
+  ],
+  "rubric": "FileReadException.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/network/FileReadException.java",
+    "regex": "class FileReadException"
+   }
+  ]
+ },
+ {
+  "id": "kf-04",
+  "kind": "trace",
+  "question": "The records of the mirror state topic can be decoded as text by the console consumer and by the dump-log tool. Which three files hold the console consumer's formatter, the dump-log tool, and the serde class both rely on?",
+  "all_of": [
+   "tools/src/main/java/org/apache/kafka/tools/consumer/MirrorStateMessageFormatter.java",
+   "tools/src/main/java/org/apache/kafka/tools/DumpLogSegments.java",
+   "mirror-coordinator/src/main/java/org/apache/kafka/coordinator/mirror/MirrorCoordinatorRecordSerde.java"
+  ],
+  "any_of": [],
+  "rubric": "formatter, DumpLogSegments, serde.",
+  "check": [
+   {
+    "path": "tools/src/main/java/org/apache/kafka/tools/consumer/MirrorStateMessageFormatter.java",
+    "regex": "MirrorCoordinatorRecordSerde"
+   },
+   {
+    "path": "tools/src/main/java/org/apache/kafka/tools/DumpLogSegments.java",
+    "regex": "MirrorCoordinatorRecordSerde"
+   },
+   {
+    "path": "mirror-coordinator/src/main/java/org/apache/kafka/coordinator/mirror/MirrorCoordinatorRecordSerde.java",
+    "regex": "class MirrorCoordinatorRecordSerde"
+   }
+  ]
+ },
+ {
+  "id": "kf-05",
+  "kind": "trace",
+  "question": "An admin client call asks the cluster to unregister a controller. Which files carry it: the admin client implementation that sends the request, the Scala request handler on the controller, and the class that applies the change to the metadata state?",
+  "all_of": [
+   "clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java",
+   "core/src/main/scala/kafka/server/ControllerApis.scala"
+  ],
+  "any_of": [
+   "metadata/src/main/java/org/apache/kafka/controller/QuorumController.java",
+   "metadata/src/main/java/org/apache/kafka/controller/ClusterControlManager.java"
+  ],
+  "rubric": "KafkaAdminClient, ControllerApis, and the controller class.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java",
+    "regex": "UnregisterControllerRequestData"
+   },
+   {
+    "path": "core/src/main/scala/kafka/server/ControllerApis.scala",
+    "regex": "handleUnregisterController"
+   },
+   {
+    "path": "metadata/src/main/java/org/apache/kafka/controller/QuorumController.java",
+    "regex": "UnregisterControllerRecord"
+   },
+   {
+    "path": "metadata/src/main/java/org/apache/kafka/controller/ClusterControlManager.java",
+    "regex": "UnregisterControllerRecord"
+   }
+  ]
+ },
+ {
+  "id": "kf-06",
+  "kind": "trace",
+  "question": "When a share group record is rejected, a dead letter record is built from the original one. Which three files in the server's share dlq package hold the manager that coordinates this, the helper that builds the dead letter record, and the fetcher that reads the source record?",
+  "all_of": [
+   "server/src/main/java/org/apache/kafka/server/share/dlq/DefaultShareGroupDLQManager.java",
+   "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordHelper.java",
+   "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordFetcher.java"
+  ],
+  "any_of": [],
+  "rubric": "manager, record helper, record fetcher.",
+  "check": [
+   {
+    "path": "server/src/main/java/org/apache/kafka/server/share/dlq/DefaultShareGroupDLQManager.java",
+    "regex": "class DefaultShareGroupDLQManager"
+   },
+   {
+    "path": "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordHelper.java",
+    "regex": "class ShareGroupDLQRecordHelper"
+   },
+   {
+    "path": "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordFetcher.java",
+    "regex": "class ShareGroupDLQRecordFetcher"
+   }
+  ]
+ },
+ {
+  "id": "kf-07",
+  "kind": "impact",
+  "question": "Which main (non-test) Java files, not counting its own definition, use FileReadException in code?",
+  "all_of": [
+   "clients/src/main/java/org/apache/kafka/common/network/SslTransportLayer.java",
+   "clients/src/main/java/org/apache/kafka/common/record/internal/FileRecords.java",
+   "storage/src/main/java/org/apache/kafka/storage/internals/log/LocalLog.java"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these three files use FileReadException in code.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/network/SslTransportLayer.java",
+    "regex": "FileReadException"
+   },
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/record/internal/FileRecords.java",
+    "regex": "FileReadException"
+   },
+   {
+    "path": "storage/src/main/java/org/apache/kafka/storage/internals/log/LocalLog.java",
+    "regex": "FileReadException"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".java"
+   ],
+   "pattern": "FileReadException",
+   "exclude_tests": true,
+   "exclude_regex": "/FileReadException\\.java$"
+  }
+ },
+ {
+  "id": "kf-08",
+  "kind": "impact",
+  "question": "Which main Java files, with tests and test fixtures excluded and not counting its own definition, refer to SingleByteBufferOutputStream?",
+  "all_of": [
+   "clients/src/main/java/org/apache/kafka/common/record/internal/LegacyRecord.java",
+   "clients/src/main/java/org/apache/kafka/common/record/internal/MemoryRecords.java",
+   "clients/src/main/java/org/apache/kafka/common/record/internal/MemoryRecordsBuilder.java",
+   "clients/src/main/java/org/apache/kafka/common/telemetry/internals/ClientTelemetryUtils.java",
+   "raft/src/main/java/org/apache/kafka/raft/internals/BatchBuilder.java",
+   "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordFetcher.java"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these six files refer to SingleByteBufferOutputStream in code.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/record/internal/MemoryRecords.java",
+    "regex": "SingleByteBufferOutputStream"
+   },
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/record/internal/MemoryRecordsBuilder.java",
+    "regex": "SingleByteBufferOutputStream"
+   },
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/record/internal/LegacyRecord.java",
+    "regex": "SingleByteBufferOutputStream"
+   },
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/telemetry/internals/ClientTelemetryUtils.java",
+    "regex": "SingleByteBufferOutputStream"
+   },
+   {
+    "path": "raft/src/main/java/org/apache/kafka/raft/internals/BatchBuilder.java",
+    "regex": "SingleByteBufferOutputStream"
+   },
+   {
+    "path": "server/src/main/java/org/apache/kafka/server/share/dlq/ShareGroupDLQRecordFetcher.java",
+    "regex": "SingleByteBufferOutputStream"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".java"
+   ],
+   "pattern": "SingleByteBufferOutputStream",
+   "exclude_tests": true,
+   "exclude_regex": "(/SingleByteBufferOutputStream\\.java$|/testFixtures/)"
+  }
+ },
+ {
+  "id": "kf-09",
+  "kind": "add",
+  "question": "I want to add a new protocol error code with its own exception class. Which file maps error codes to exception classes, and in which directory do the exception classes of the clients library live?",
+  "all_of": [
+   "clients/src/main/java/org/apache/kafka/common/protocol/Errors.java"
+  ],
+  "any_of": [
+   "clients/src/main/java/org/apache/kafka/common/errors/"
+  ],
+  "rubric": "Errors.java plus the errors directory.",
+  "check": [
+   {
+    "path": "clients/src/main/java/org/apache/kafka/common/protocol/Errors.java",
+    "regex": "ReadOnlyTopicException"
+   }
+  ]
+ },
+ {
+  "id": "kf-10",
+  "kind": "add",
+  "question": "I want to add another server-side consumer group assignor next to the uniform ones. Which file declares the interface it must implement, and which existing assignor file is the closest model to follow?",
+  "all_of": [
+   "group-coordinator/group-coordinator-api/src/main/java/org/apache/kafka/coordinator/group/api/assignor/ConsumerGroupPartitionAssignor.java"
+  ],
+  "any_of": [
+   "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/UniformAssignor.java",
+   "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/Uniform2Assignor.java",
+   "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/RangeAssignor.java"
+  ],
+  "rubric": "The interface plus any existing assignor.",
+  "check": [
+   {
+    "path": "group-coordinator/group-coordinator-api/src/main/java/org/apache/kafka/coordinator/group/api/assignor/ConsumerGroupPartitionAssignor.java",
+    "regex": "interface ConsumerGroupPartitionAssignor"
+   },
+   {
+    "path": "group-coordinator/src/main/java/org/apache/kafka/coordinator/group/assignor/Uniform2Assignor.java",
+    "regex": "implements ConsumerGroupPartitionAssignor"
+   }
+  ]
+ }
+]

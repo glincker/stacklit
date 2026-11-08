@@ -1,0 +1,238 @@
+[
+ {
+  "id": "rl-01",
+  "kind": "locate",
+  "question": "Where is the object that tracks how many automatic retries a unit of database work still has, with an optional wall clock deadline and a single permitted reconnect?",
+  "all_of": [],
+  "any_of": [
+   "activerecord/lib/active_record/connection_adapters/retry_budget.rb"
+  ],
+  "rubric": "RetryBudget.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/retry_budget.rb",
+    "regex": "class RetryBudget"
+   }
+  ]
+ },
+ {
+  "id": "rl-02",
+  "kind": "locate",
+  "question": "Where is the object that describes an association's writable foreign key reference together with its query-only constraints, from the point of view of the record that holds the foreign key?",
+  "all_of": [],
+  "any_of": [
+   "activerecord/lib/active_record/association_route.rb"
+  ],
+  "rubric": "AssociationLink in association_route.rb.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/association_route.rb",
+    "regex": "class AssociationLink"
+   }
+  ]
+ },
+ {
+  "id": "rl-03",
+  "kind": "locate",
+  "question": "Where is the class that wraps one database result row as a hash-like object sharing a single column index among all rows?",
+  "all_of": [],
+  "any_of": [
+   "activemodel/lib/active_model/indexed_row.rb"
+  ],
+  "rubric": "IndexedRow.",
+  "check": [
+   {
+    "path": "activemodel/lib/active_model/indexed_row.rb",
+    "regex": "class IndexedRow"
+   }
+  ]
+ },
+ {
+  "id": "rl-04",
+  "kind": "trace",
+  "question": "Action View can compile templates with an HTML-aware ERB engine from the herb gem. Which three files hold the engine subclass, the class that checks every template of the view paths, and the Rake task that runs the check?",
+  "all_of": [
+   "actionview/lib/action_view/template/handlers/erb/herb.rb",
+   "actionview/lib/action_view/herb_checker.rb",
+   "actionview/lib/action_view/tasks/herb.rake"
+  ],
+  "any_of": [],
+  "rubric": "herb.rb, herb_checker.rb, herb.rake.",
+  "check": [
+   {
+    "path": "actionview/lib/action_view/template/handlers/erb/herb.rb",
+    "regex": "Herb::Engine"
+   },
+   {
+    "path": "actionview/lib/action_view/herb_checker.rb",
+    "regex": "class HerbChecker"
+   },
+   {
+    "path": "actionview/lib/action_view/tasks/herb.rake",
+    "regex": "herb_checker"
+   }
+  ]
+ },
+ {
+  "id": "rl-05",
+  "kind": "trace",
+  "question": "The schema cache can be dumped to and loaded from a JSON file. Which two files hold the serializer and the class whose load and dump methods call it?",
+  "all_of": [
+   "activerecord/lib/active_record/connection_adapters/schema_cache_serializer.rb",
+   "activerecord/lib/active_record/connection_adapters/schema_cache.rb"
+  ],
+  "any_of": [],
+  "rubric": "serializer plus schema_cache.rb.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/schema_cache_serializer.rb",
+    "regex": "JSONSchemaCacheSerializer"
+   },
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/schema_cache.rb",
+    "regex": "JSONSchemaCacheSerializer"
+   }
+  ]
+ },
+ {
+  "id": "rl-06",
+  "kind": "trace",
+  "question": "An attribute type can now choose the SQL expression used to compare its values in where clauses, for example a normalized form matching an expression index. Which three files hold the module a type includes to do this, the Arel attribute that carries the comparison expression, and the builder that applies it?",
+  "all_of": [
+   "activerecord/lib/active_record/type/query_predicates.rb",
+   "activerecord/lib/active_record/relation/predicate_builder/comparison.rb",
+   "activerecord/lib/active_record/relation/predicate_builder.rb"
+  ],
+  "any_of": [],
+  "rubric": "query_predicates.rb, comparison.rb, predicate_builder.rb.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/type/query_predicates.rb",
+    "regex": "module QueryPredicates"
+   },
+   {
+    "path": "activerecord/lib/active_record/relation/predicate_builder/comparison.rb",
+    "regex": "class ComparisonAttribute"
+   },
+   {
+    "path": "activerecord/lib/active_record/relation/predicate_builder.rb",
+    "regex": "ComparisonAttribute"
+   }
+  ]
+ },
+ {
+  "id": "rl-07",
+  "kind": "impact",
+  "question": "Which Ruby files outside the tests refer to ActiveSupport::WeakKeyMap, not counting the file that defines it?",
+  "all_of": [
+   "activerecord/lib/active_record/association_route.rb",
+   "activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb",
+   "activesupport/lib/active_support.rb"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these three files refer to WeakKeyMap.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/association_route.rb",
+    "regex": "WeakKeyMap"
+   },
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb",
+    "regex": "WeakKeyMap"
+   },
+   {
+    "path": "activesupport/lib/active_support.rb",
+    "regex": "WeakKeyMap"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".rb"
+   ],
+   "pattern": "WeakKeyMap",
+   "exclude_tests": true,
+   "exclude_regex": "active_support/weak_key_map\\.rb$"
+  }
+ },
+ {
+  "id": "rl-08",
+  "kind": "impact",
+  "question": "Which Ruby files outside the tests refer to IndexedRow, not counting the file that defines it?",
+  "all_of": [
+   "activemodel/lib/active_model.rb",
+   "activemodel/lib/active_model/attribute_set.rb",
+   "activerecord/lib/active_record/associations/join_dependency.rb",
+   "activerecord/lib/active_record/result.rb"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these four files refer to IndexedRow.",
+  "check": [
+   {
+    "path": "activemodel/lib/active_model.rb",
+    "regex": "IndexedRow"
+   },
+   {
+    "path": "activemodel/lib/active_model/attribute_set.rb",
+    "regex": "IndexedRow"
+   },
+   {
+    "path": "activerecord/lib/active_record/associations/join_dependency.rb",
+    "regex": "IndexedRow"
+   },
+   {
+    "path": "activerecord/lib/active_record/result.rb",
+    "regex": "IndexedRow"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".rb"
+   ],
+   "pattern": "IndexedRow",
+   "exclude_tests": true,
+   "exclude_regex": "active_model/indexed_row\\.rb$"
+  }
+ },
+ {
+  "id": "rl-09",
+  "kind": "add",
+  "question": "I want to add migration compatibility for a new Rails release. Which file defines the versioned compatibility classes, and which file holds the base behavior shared by all versions?",
+  "all_of": [
+   "activerecord/lib/active_record/migration/compatibility.rb",
+   "activerecord/lib/active_record/migration/compatibility_behavior.rb"
+  ],
+  "any_of": [],
+  "rubric": "compatibility.rb and compatibility_behavior.rb.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/migration/compatibility.rb",
+    "regex": "V\\d_\\d"
+   },
+   {
+    "path": "activerecord/lib/active_record/migration/compatibility_behavior.rb",
+    "regex": "class CompatibilityBehavior"
+   }
+  ]
+ },
+ {
+  "id": "rl-10",
+  "kind": "add",
+  "question": "I want to add support for another database in the Ractor connection handler, like the existing proxy adapters. Which file holds the handler that registers the adapters, and which file is the base class the adapters follow?",
+  "all_of": [
+   "activerecord/lib/active_record/connection_adapters/ractor_connection_handler.rb",
+   "activerecord/lib/active_record/connection_adapters/ractor_connection_handler/abstract_proxy_adapter.rb"
+  ],
+  "any_of": [],
+  "rubric": "handler plus abstract_proxy_adapter.rb.",
+  "check": [
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/ractor_connection_handler.rb",
+    "regex": "autoload :AbstractProxyAdapter"
+   },
+   {
+    "path": "activerecord/lib/active_record/connection_adapters/ractor_connection_handler/abstract_proxy_adapter.rb",
+    "regex": "class AbstractProxyAdapter"
+   }
+  ]
+ }
+]
