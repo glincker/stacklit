@@ -111,9 +111,9 @@ func registerGraphTools(s *sdkmcp.Server) {
 		})
 	add("explain_symbol", "Definition, file:line range, signature, callers and callees of a symbol",
 		func(g *graph.SymGraph, a graphArgs) (string, error) { return g.Explain(a.Symbol, a.Budget, a.JSON) })
-	add("impact", "Blast radius: symbols and files that depend on a symbol or file",
+	add("impact", "Who depends on it: importers of a file or package with file:line, or the dependents of a symbol",
 		func(g *graph.SymGraph, a graphArgs) (string, error) {
-			return g.Impact(a.Symbol, a.Depth, a.Budget, a.JSON)
+			return g.ImpactFor(".", a.Symbol, a.Depth, a.Budget, a.JSON, false)
 		})
 	add("get_hubs", "Most connected symbols (god nodes)",
 		func(g *graph.SymGraph, a graphArgs) (string, error) {
