@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T19:11:05Z",
+  "generated_at": "2026-11-08T19:21:27Z",
   "stacklit_version": "dev",
-  "merkle_hash": "9869b7b7bbd4bf051a70a0829d2d73b5bab93aac138d9d021ac300f06381e3a6",
+  "merkle_hash": "e6ac7dcc40fd18796e8ac6482d52b6e2212b93e1b4056c7fd1fb39cce40fef3b",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 49
       },
       "go": {
-        "files": 242,
-        "lines": 34756
+        "files": 246,
+        "lines": 35664
       },
       "graphql": {
         "files": 1,
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 311,
-    "total_lines": 36344
+    "total_files": 315,
+    "total_lines": 37252
   },
   "modules": {
     "assets": {
