@@ -1,6 +1,7 @@
 {
   "name": "stacklit",
   "version": "0.3.1",
+  "mcpName": "io.github.glincker/stacklit",
   "description": "A committed map of your codebase for AI coding agents. Free, MIT, one Go binary. Sets up Claude Code, Cursor, Codex and more.",
   "bin": {
     "stacklit": "bin/stacklit.js"

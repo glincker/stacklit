@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.glincker/stacklit",
+  "title": "Stacklit",
+  "description": "Query a committed codebase map: modules, symbols, dependency edges and blast radius.",
+  "repository": {
+    "url": "https://github.com/glincker/stacklit",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/glincker/stacklit",
+  "version": "0.5.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "stacklit",
+      "version": "0.5.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        { "type": "positional", "value": "serve" },
+        { "type": "named", "name": "--profile", "value": "minimal" }
+      ]
+    }
+  ]
+}
