@@ -18,7 +18,7 @@ The wordmark is live text set in a system font stack (Avenir Next, Segoe UI Vari
 
 ## Color tokens
 
-These match the tokens in `assets/template.html`.
+These match the tokens in `internal/assets/template.html`.
 
 | Token | Light | Dark |
 | --- | --- | --- |

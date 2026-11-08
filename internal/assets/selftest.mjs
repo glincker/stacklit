@@ -1,4 +1,4 @@
-// Node check for the map's prompt generator: node assets/selftest.mjs path/to/stacklit.html
+// Node check for the map's prompt generator: node internal/assets/selftest.mjs path/to/stacklit.html
 // (a generated map page; its embedded index and graph are used).
 // It lifts the pure model and prompt code out of template.html, so no browser is needed.
 import { readFileSync } from 'node:fs';
