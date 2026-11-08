@@ -1,0 +1,30 @@
+{
+  "repo": "theauth-go",
+  "task": "tg-05",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "oauth/token.go, oauth/introspect.go, middleware/dpop.go, resource/verify.go\n\nThis is a guess. I don't have reliable knowledge of the glincker/theauth-go repository, so these paths are plausible locations rather than confirmed ones.",
+  "turns": 1,
+  "cost_usd": 0.0114929,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 260,
+    "cache_creation_input_tokens": 2206,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.934421458,
+  "seven_day_utilization": 0.55,
+  "call_log": null,
+  "at": "2026-11-08T20:04:01Z"
+}

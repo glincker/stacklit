@@ -1,9 +1,12 @@
-// Command agent-ab runs real agent sessions twice per task, once without and
-// once with Stacklit configured, and compares the usage Claude Code reports.
-// It spends real money, so it refuses to run without --yes-spend.
+// Command agent-ab runs real Claude Code sessions per task and arm, with and
+// without Stacklit, and records the usage, tool calls and correctness of each.
+// It spends real quota, so it refuses to run without --yes-spend, keeps a
+// running ledger and stops at a hard cap or on the first limit or auth error.
 package main
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -12,7 +15,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sort"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -23,20 +26,23 @@ type repo struct {
 	SHA  string `json:"sha"`
 }
 
+// task is one pinned question. A session is correct when every AllOf path and
+// at least one AnyOf path (if any are listed) is named in the answer.
 type task struct {
-	ID          string   `json:"id"`
-	Question    string   `json:"question"`
-	ExpectPaths []string `json:"expect_paths"`
+	ID       string   `json:"id"`
+	Kind     string   `json:"kind"`
+	Question string   `json:"question"`
+	AllOf    []string `json:"all_of"`
+	AnyOf    []string `json:"any_of"`
+	Rubric   string   `json:"rubric"`
 }
 
-// unit is one agent session: a task, a trial number and an arm.
 type unit struct {
 	Task  task   `json:"task"`
 	Trial int    `json:"trial"`
 	Arm   string `json:"arm"`
 }
 
-// usage is what `claude -p --output-format json` reports for a session.
 type usage struct {
 	InputTokens         int `json:"input_tokens"`
 	OutputTokens        int `json:"output_tokens"`
@@ -44,56 +50,68 @@ type usage struct {
 	CacheReadTokens     int `json:"cache_read_input_tokens"`
 }
 
-type claudeResult struct {
-	IsError  bool    `json:"is_error"`
-	Result   string  `json:"result"`
-	NumTurns int     `json:"num_turns"`
-	Cost     float64 `json:"total_cost_usd"`
-	Usage    usage   `json:"usage"`
-}
-
-// record is one finished session.
+// record is one finished session, written as raw JSON under results/.
 type record struct {
-	Task     string  `json:"task"`
-	Trial    int     `json:"trial"`
-	Arm      string  `json:"arm"`
-	Correct  bool    `json:"correct"`
-	Turns    int     `json:"turns"`
-	CostUSD  float64 `json:"cost_usd"`
-	Usage    usage   `json:"usage"`
-	Error    string  `json:"error,omitempty"`
-	Duration float64 `json:"seconds"`
+	Repo          string         `json:"repo"`
+	Task          string         `json:"task"`
+	Kind          string         `json:"kind"`
+	Trial         int            `json:"trial"`
+	Arm           string         `json:"arm"`
+	Model         string         `json:"model"`
+	Correct       bool           `json:"correct"`
+	Recall        float64        `json:"recall"`
+	Answer        string         `json:"answer"`
+	Turns         int            `json:"turns"`
+	CostUSD       float64        `json:"cost_usd"`
+	Usage         usage          `json:"usage"`
+	ToolCalls     map[string]int `json:"tool_calls"`
+	FilesRead     int            `json:"files_read"`
+	ReadBytes     int            `json:"read_bytes"`
+	StacklitCalls int            `json:"stacklit_calls"`
+	HookEvents    int            `json:"hook_events"`
+	Denials       int            `json:"permission_denials"`
+	Subtype       string         `json:"result_subtype"`
+	Seconds       float64        `json:"seconds"`
+	WeekUtil      float64        `json:"seven_day_utilization"`
+	Calls         []string       `json:"call_log"`
+	Error         string         `json:"error,omitempty"`
+	At            string         `json:"at"`
 }
 
 type config struct {
-	repo, reposFile, tasksDir, stacklit, claude, model, out, arms string
-	trials, limit, maxTurns                                       int
-	seed                                                          int64
-	yesSpend, dryRun                                              bool
-	maxBudget                                                     float64
-	estLow, estMid, estHigh                                       float64
+	repo, reposFile, tasksDir, stacklit, claude, model, resultsDir, ledger, arms, work, mode, only string
+	trials, limit, maxTurns                                                                        int
+	seed                                                                                           int64
+	yesSpend, dryRun                                                                               bool
+	maxBudget, cap, estMid                                                                         float64
 }
+
+// errStop means a limit, auth or cap condition: the whole run must halt.
+var errStop = errors.New("stop")
 
 func main() {
 	var c config
-	flag.StringVar(&c.repo, "repo", "gin", "repo name from repos.json")
-	flag.StringVar(&c.reposFile, "repos", "bench/repos.json", "pinned repos file")
-	flag.StringVar(&c.tasksDir, "tasks", "bench/tasks", "directory of <repo>.json task files")
-	flag.StringVar(&c.stacklit, "stacklit", "stacklit", "stacklit binary for the treatment arm")
+	flag.StringVar(&c.repo, "repo", "theauth-go", "repo name from repos.json")
+	flag.StringVar(&c.reposFile, "repos", "bench/agent-ab/repos.json", "pinned repos file")
+	flag.StringVar(&c.tasksDir, "tasks", "bench/agent-ab/tasks", "directory of <repo>.json task files")
+	flag.StringVar(&c.stacklit, "stacklit", "stacklit", "stacklit binary for the treatment arm(s)")
 	flag.StringVar(&c.claude, "claude", "claude", "claude binary")
-	flag.StringVar(&c.model, "model", "", "model alias passed to claude (empty: its default)")
-	flag.StringVar(&c.out, "out", "agent-ab-results.json", "raw results file")
-	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run (a smoke test can use just one)")
-	flag.IntVar(&c.trials, "trials", 3, "trials per task and arm (3 or more recommended)")
+	flag.StringVar(&c.model, "model", "sonnet", "model alias passed to claude")
+	flag.StringVar(&c.resultsDir, "results", "bench/agent-ab/results", "directory for per-session JSON")
+	flag.StringVar(&c.ledger, "ledger", "bench/agent-ab/ledger.jsonl", "append-only cost ledger")
+	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run: control, stacklit, strict")
+	flag.StringVar(&c.work, "work", "/tmp/abreal/work", "temp dir for clones (deleted afterwards)")
+	flag.StringVar(&c.mode, "mode", "run", "run, or memory (all tools disabled, answers from memory)")
+	flag.StringVar(&c.only, "only", "", "comma separated task ids to run (default all, or the first --limit)")
+	flag.IntVar(&c.trials, "trials", 3, "trials per task and arm")
 	flag.IntVar(&c.limit, "limit", 0, "use only the first N tasks (0 = all)")
-	flag.IntVar(&c.maxTurns, "max-turns", 20, "turn cap per session")
+	flag.IntVar(&c.maxTurns, "max-turns", 25, "turn cap per session")
 	flag.Int64Var(&c.seed, "seed", 1, "seed for the session order")
-	flag.Float64Var(&c.maxBudget, "max-budget-usd", 2, "per-session spend cap passed to claude")
-	flag.BoolVar(&c.dryRun, "dry-run", false, "print the plan and the projected cost, run nothing")
+	flag.Float64Var(&c.maxBudget, "max-budget-usd", 1.5, "per-session spend cap passed to claude")
+	flag.Float64Var(&c.cap, "cap-usd", 60, "total notional spend cap across the ledger")
+	flag.Float64Var(&c.estMid, "est-session-usd", 0.3, "assumed USD per session, for the dry-run projection only")
+	flag.BoolVar(&c.dryRun, "dry-run", false, "print the plan, run nothing")
 	flag.BoolVar(&c.yesSpend, "yes-spend", false, "required: confirm you accept the spend of real agent sessions")
-	flag.Float64Var(&c.estLow, "est-low", 0.15, "assumed USD per session, low case (an assumption, not a measurement)")
-	flag.Float64Var(&c.estMid, "est-mid", 0.40, "assumed USD per session, middle case")
-	flag.Float64Var(&c.estHigh, "est-high", 1.00, "assumed USD per session, high case")
 	flag.Parse()
 	if err := run(c); err != nil {
 		fmt.Fprintln(os.Stderr, "agent-ab:", err)
@@ -106,8 +124,14 @@ func run(c config) error {
 	if err != nil {
 		return err
 	}
-	units := plan(tasks, c.trials, c.seed, strings.Split(c.arms, ","))
-	fmt.Print(projection(len(tasks), c, len(units)))
+	arms := strings.Split(c.arms, ",")
+	if c.mode == "memory" {
+		arms = []string{"memory"}
+		c.trials = 1
+	}
+	units := plan(tasks, c.trials, c.seed, arms)
+	fmt.Printf("plan: %d tasks x %d trials x %d arm(s) = %d sessions; assumed %.2f USD each = %.2f USD (assumption); per-session cap %.2f, total cap %.2f\n",
+		len(tasks), c.trials, len(arms), len(units), c.estMid, c.estMid*float64(len(units)), c.maxBudget, c.cap)
 	if c.dryRun {
 		return nil
 	}
@@ -117,25 +141,107 @@ func run(c config) error {
 	if err := checkIsolation(); err != nil {
 		return err
 	}
-	base, err := os.MkdirTemp("", "agent-ab-")
+	if err := os.MkdirAll(c.work, 0o755); err != nil {
+		return err
+	}
+	base, err := os.MkdirTemp(c.work, "ab-")
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(base)
-	if err := cloneBase(base, r); err != nil {
-		return err
+	if c.mode != "memory" {
+		if err := cloneBase(base, r); err != nil {
+			return err
+		}
 	}
-	var recs []record
 	for i, u := range units {
-		fmt.Printf("[%d/%d] %s trial %d arm %s\n", i+1, len(units), u.Task.ID, u.Trial, u.Arm)
-		recs = append(recs, runUnit(c, base, u))
+		out := resultPath(c, u)
+		if _, err := os.Stat(out); err == nil {
+			continue
+		}
+		total, err := ledgerTotal(c.ledger)
+		if err != nil {
+			return err
+		}
+		if total+c.maxBudget > c.cap {
+			return fmt.Errorf("%w: ledger total %.2f plus a session cap %.2f would pass the %.2f cap", errStop, total, c.maxBudget, c.cap)
+		}
+		fmt.Printf("[%d/%d] %s %s trial %d arm %s (ledger %.2f)\n", i+1, len(units), r.Name, u.Task.ID, u.Trial, u.Arm, total)
+		rec, stop := runUnit(c, r, base, u)
+		if rec.Error != "" {
+			fmt.Printf("   error: %s\n", rec.Error)
+		}
+		if stop != nil {
+			return stop
+		}
+		if rec.Error != "" {
+			continue // harness failure: not saved, so a rerun retries it
+		}
+		if err := writeRecord(out, rec); err != nil {
+			return err
+		}
+		if err := appendLedger(c.ledger, rec, total+rec.CostUSD); err != nil {
+			return err
+		}
+		fmt.Printf("   correct=%v cost=%.3f turns=%d calls=%d stacklit=%d\n", rec.Correct, rec.CostUSD, rec.Turns, sum(rec.ToolCalls), rec.StacklitCalls)
 	}
-	b, _ := json.MarshalIndent(recs, "", "  ")
-	if err := os.WriteFile(c.out, b, 0o644); err != nil {
+	return nil
+}
+
+func sum(m map[string]int) int {
+	n := 0
+	for _, v := range m {
+		n += v
+	}
+	return n
+}
+
+func resultPath(c config, u unit) string {
+	return filepath.Join(c.resultsDir, c.repo, u.Arm, fmt.Sprintf("%s-t%d.json", u.Task.ID, u.Trial))
+}
+
+func writeRecord(path string, rec record) error {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	fmt.Print(report(recs))
-	return nil
+	b, _ := json.MarshalIndent(rec, "", "  ")
+	return os.WriteFile(path, b, 0o644)
+}
+
+func ledgerTotal(path string) (float64, error) {
+	b, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	var total float64
+	for _, l := range strings.Split(strings.TrimSpace(string(b)), "\n") {
+		if l == "" {
+			continue
+		}
+		var e struct {
+			Cost float64 `json:"cost_usd"`
+		}
+		if json.Unmarshal([]byte(l), &e) == nil {
+			total += e.Cost
+		}
+	}
+	return total, nil
+}
+
+func appendLedger(path string, rec record, running float64) error {
+	e := map[string]any{"at": rec.At, "repo": rec.Repo, "task": rec.Task, "trial": rec.Trial, "arm": rec.Arm,
+		"model": rec.Model, "cost_usd": rec.CostUSD, "running_total_usd": running}
+	b, _ := json.Marshal(e)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.Write(append(b, '\n'))
+	return err
 }
 
 func load(c config) ([]task, repo, error) {
@@ -164,14 +270,26 @@ func load(c config) ([]task, repo, error) {
 	if err := json.Unmarshal(tb, &tasks); err != nil {
 		return nil, r, err
 	}
-	if c.limit > 0 && len(tasks) > c.limit {
+	if c.only != "" {
+		want := map[string]bool{}
+		for _, id := range strings.Split(c.only, ",") {
+			want[strings.TrimSpace(id)] = true
+		}
+		var kept []task
+		for _, t := range tasks {
+			if want[t.ID] {
+				kept = append(kept, t)
+			}
+		}
+		tasks = kept
+	} else if c.limit > 0 && len(tasks) > c.limit {
 		tasks = tasks[:c.limit]
 	}
 	return tasks, r, nil
 }
 
 // plan expands tasks x trials x arms and shuffles with a seed, so arms are
-// interleaved (time-of-day or cache effects hit both) and the order repeats.
+// interleaved and the order repeats.
 func plan(tasks []task, trials int, seed int64, arms []string) []unit {
 	var us []unit
 	for _, t := range tasks {
@@ -184,17 +302,6 @@ func plan(tasks []task, trials int, seed int64, arms []string) []unit {
 	rng := rand.New(rand.NewSource(seed))
 	rng.Shuffle(len(us), func(i, j int) { us[i], us[j] = us[j], us[i] })
 	return us
-}
-
-// projection states the cost of the full run before anything is spent. The
-// per-session figures are assumptions; replace them with a measured value.
-func projection(tasks int, c config, units int) string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "plan: %d tasks x %d trials x %d arm(s) = %d paid sessions\n", tasks, c.trials, len(strings.Split(c.arms, ",")), units)
-	fmt.Fprintf(&b, "projected cost at an ASSUMED $%.2f / $%.2f / $%.2f per session (low/mid/high): $%.2f / $%.2f / $%.2f\n",
-		c.estLow, c.estMid, c.estHigh, float64(units)*c.estLow, float64(units)*c.estMid, float64(units)*c.estHigh)
-	fmt.Fprintf(&b, "hard cap: %.2f USD per session via --max-budget-usd, so the worst case is $%.2f\n", c.maxBudget, float64(units)*c.maxBudget)
-	return b.String()
 }
 
 // checkIsolation refuses to run when the user's own settings already wire
@@ -211,149 +318,154 @@ func checkIsolation() error {
 	return nil
 }
 
-func git(dir string, args ...string) error {
-	cmd := exec.Command("git", append([]string{"-C", dir}, args...)...)
+func sh(dir string, name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = dir
 	if out, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("git %s: %v\n%s", strings.Join(args, " "), err, out)
+		return fmt.Errorf("%s %s: %v\n%s", name, strings.Join(args, " "), err, out)
 	}
 	return nil
 }
 
+// cloneBase fetches exactly the pinned commit, shallow.
 func cloneBase(base string, r repo) error {
 	dst := filepath.Join(base, "base")
-	if out, err := exec.Command("git", "clone", "-q", r.URL, dst).CombinedOutput(); err != nil {
-		return fmt.Errorf("clone: %v\n%s", err, out)
+	if err := os.MkdirAll(dst, 0o755); err != nil {
+		return err
 	}
-	return git(dst, "checkout", "-q", r.SHA)
+	for _, a := range [][]string{{"init", "-q"}, {"remote", "add", "origin", r.URL}, {"fetch", "-q", "--depth", "1", "origin", r.SHA}, {"checkout", "-q", "FETCH_HEAD"}} {
+		if err := sh(dst, "git", a...); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func prompt(t task) string {
-	return t.Question + " Answer with the file path or paths only, on one line."
+const answerSuffix = " Answer with the file paths only, comma separated, on one line."
+
+func prompt(c config, r repo, t task) string {
+	if c.mode == "memory" {
+		return "You have no tools and no access to files. From your own knowledge of the open source repository github.com/glincker/" + r.Name + ", answer: " + t.Question + answerSuffix + " If you do not know, give your best guess."
+	}
+	return t.Question + answerSuffix
 }
 
-func runUnit(c config, base string, u unit) record {
-	rec := record{Task: u.Task.ID, Trial: u.Trial, Arm: u.Arm}
+func runUnit(c config, r repo, base string, u unit) (record, error) {
+	rec := record{Repo: r.Name, Task: u.Task.ID, Kind: u.Task.Kind, Trial: u.Trial, Arm: u.Arm, At: time.Now().UTC().Format(time.RFC3339)}
 	start := time.Now()
 	dir, err := os.MkdirTemp(base, "co-")
 	if err != nil {
 		rec.Error = err.Error()
-		return rec
+		return rec, nil
 	}
 	defer os.RemoveAll(dir)
-	if out, err := exec.Command("git", "clone", "-q", "--local", filepath.Join(base, "base"), dir).CombinedOutput(); err != nil {
-		rec.Error = fmt.Sprintf("checkout: %v %s", err, out)
-		return rec
-	}
-	env := append(os.Environ(), "STACKLIT_CACHE_DIR="+filepath.Join(base, "cache-"+u.Arm), "STACKLIT_STATS=0")
 	tools := "Read,Grep,Glob"
-	if u.Arm == "stacklit" {
-		for _, args := range [][]string{
-			{"generate", "--graph", "--quiet"},
-			{"setup", "claude", "--no-mcp", "--no-git-hook", "--session-hook"},
-		} {
-			cmd := exec.Command(c.stacklit, args...)
-			cmd.Dir, cmd.Env = dir, env
-			if out, err := cmd.CombinedOutput(); err != nil {
-				rec.Error = fmt.Sprintf("stacklit %v: %v %s", args, err, out)
-				return rec
+	var allowed string
+	stackBin, _ := filepath.Abs(c.stacklit)
+	env := append(os.Environ(), "STACKLIT_CACHE_DIR="+filepath.Join(base, "cache-"+u.Arm), "STACKLIT_STATS=0",
+		"PATH="+filepath.Dir(stackBin)+string(os.PathListSeparator)+os.Getenv("PATH"))
+	if c.mode == "memory" {
+		tools = ""
+	} else {
+		if out, err := exec.Command("git", "clone", "-q", "--depth", "1", "file://"+filepath.Join(base, "base"), dir).CombinedOutput(); err != nil {
+			rec.Error = fmt.Sprintf("checkout: %v %s", err, out)
+			return rec, nil
+		}
+		if u.Arm != "control" {
+			steps := [][]string{{"generate", "--graph", "--quiet"}}
+			setup := []string{"setup", "claude", "--no-mcp", "--no-git-hook", "--session-hook"}
+			if u.Arm == "strict" {
+				setup = append(setup, "--crawl-guard", "--steering", "d")
+			}
+			steps = append(steps, setup)
+			for _, args := range steps {
+				cmd := exec.Command(stackBin, args...)
+				cmd.Dir, cmd.Env = dir, env
+				if out, err := cmd.CombinedOutput(); err != nil {
+					rec.Error = fmt.Sprintf("stacklit %v: %v %s", args, err, out)
+					return rec, nil
+				}
+			}
+			tools += ",Bash"
+			allowed = "Bash(stacklit *)"
+		}
+	}
+	args := []string{"-p", prompt(c, r, u.Task), "--output-format", "stream-json", "--verbose", "--no-session-persistence",
+		"--setting-sources", "project,local", "--strict-mcp-config", "--disable-slash-commands", "--tools", tools,
+		"--max-turns", fmt.Sprint(c.maxTurns), "--max-budget-usd", fmt.Sprint(c.maxBudget), "--model", c.model}
+	if allowed != "" {
+		args = append(args, "--allowedTools", allowed)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, c.claude, args...)
+	cmd.Dir, cmd.Env = dir, env
+	cmd.Stdin = nil
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+	runErr := cmd.Run()
+	rec.Seconds = time.Since(start).Seconds()
+	keepTranscript(base, u, stdout.Bytes())
+	p, perr := parseStream(stdout.Bytes())
+	if perr != nil {
+		rec.Error = fmt.Sprintf("parse: %v (run: %v) %s", perr, runErr, truncate(stderr.String(), 300))
+		if limitText.MatchString(stderr.String() + stdout.String()) {
+			return rec, fmt.Errorf("%w: limit or auth error: %s", errStop, truncate(stderr.String()+stdout.String(), 400))
+		}
+		return rec, nil
+	}
+	fill(&rec, p)
+	if p.stop != "" {
+		return rec, fmt.Errorf("%w: %s", errStop, p.stop)
+	}
+	rec.Correct, rec.Recall = grade(rec.Answer, u.Task)
+	return rec, nil
+}
+
+// keepTranscript saves the raw stream outside the repo for hand spot checks.
+func keepTranscript(base string, u unit, b []byte) {
+	dir := os.Getenv("AGENT_AB_TRANSCRIPTS")
+	if dir == "" {
+		return
+	}
+	_ = os.MkdirAll(dir, 0o755)
+	_ = os.WriteFile(filepath.Join(dir, fmt.Sprintf("%s-%s-t%d.jsonl", u.Arm, u.Task.ID, u.Trial)), b, 0o600)
+}
+
+func truncate(s string, n int) string {
+	if len(s) > n {
+		return s[:n]
+	}
+	return s
+}
+
+var limitText = regexp.MustCompile(`(?i)rate.?limit|usage limit|limit reached|out of extra usage|not logged in|please run /login|authentication|invalid api key|oauth|unauthorized|credit balance|overloaded_error|\b(401|403|429)\b`)
+
+// pathRe returns a matcher for a path that is not part of a longer path.
+func pathRe(p string) *regexp.Regexp {
+	return regexp.MustCompile(`(^|[^A-Za-z0-9_./-])` + regexp.QuoteMeta(p))
+}
+
+// grade returns whether the answer is correct and the recall of AllOf paths.
+func grade(answer string, t task) (bool, float64) {
+	hit := 0
+	for _, p := range t.AllOf {
+		if pathRe(p).MatchString(answer) {
+			hit++
+		}
+	}
+	recall := -1.0 // not defined for any-of-only tasks
+	if len(t.AllOf) > 0 {
+		recall = float64(hit) / float64(len(t.AllOf))
+	}
+	ok := hit == len(t.AllOf)
+	if ok && len(t.AnyOf) > 0 {
+		ok = false
+		for _, p := range t.AnyOf {
+			if pathRe(p).MatchString(answer) {
+				ok = true
 			}
 		}
-		tools += ",Bash(stacklit *)"
 	}
-	args := []string{"-p", prompt(u.Task), "--output-format", "json", "--no-session-persistence",
-		"--setting-sources", "project,local", "--allowedTools", tools,
-		"--max-turns", fmt.Sprint(c.maxTurns), "--max-budget-usd", fmt.Sprint(c.maxBudget)}
-	if c.model != "" {
-		args = append(args, "--model", c.model)
-	}
-	cmd := exec.Command(c.claude, args...)
-	cmd.Dir, cmd.Env = dir, env
-	out, err := cmd.Output()
-	rec.Duration = time.Since(start).Seconds()
-	if err != nil && len(out) == 0 {
-		rec.Error = err.Error()
-		return rec
-	}
-	res, perr := parseResult(out)
-	if perr != nil {
-		rec.Error = perr.Error()
-		return rec
-	}
-	rec.Turns, rec.CostUSD, rec.Usage = res.NumTurns, res.Cost, res.Usage
-	rec.Correct = !res.IsError && correct(res.Result, u.Task.ExpectPaths)
-	if res.IsError {
-		rec.Error = "agent reported an error"
-	}
-	return rec
-}
-
-func parseResult(b []byte) (claudeResult, error) {
-	var r claudeResult
-	if err := json.Unmarshal(b, &r); err != nil {
-		return r, fmt.Errorf("unparseable claude output: %w", err)
-	}
-	return r, nil
-}
-
-// correct is a deterministic heuristic: the answer names an expected path. It
-// can miss a right answer phrased differently, equally in both arms.
-func correct(answer string, expect []string) bool {
-	for _, p := range expect {
-		if strings.Contains(answer, p) {
-			return true
-		}
-	}
-	return false
-}
-
-type armTotals struct {
-	n                       int
-	correct                 int
-	cost                    float64
-	in, out, cacheW, cacheR int
-	turns                   int
-	errs                    int
-}
-
-func report(recs []record) string {
-	arms := map[string]*armTotals{}
-	for _, r := range recs {
-		a := arms[r.Arm]
-		if a == nil {
-			a = &armTotals{}
-			arms[r.Arm] = a
-		}
-		a.n++
-		if r.Error != "" {
-			a.errs++
-			continue
-		}
-		if r.Correct {
-			a.correct++
-		}
-		a.cost += r.CostUSD
-		a.in += r.Usage.InputTokens
-		a.out += r.Usage.OutputTokens
-		a.cacheW += r.Usage.CacheCreationTokens
-		a.cacheR += r.Usage.CacheReadTokens
-		a.turns += r.Turns
-	}
-	names := make([]string, 0, len(arms))
-	for n := range arms {
-		names = append(names, n)
-	}
-	sort.Strings(names)
-	var b strings.Builder
-	fmt.Fprintf(&b, "%-9s %4s %5s %7s %9s %9s %9s %9s %6s\n", "arm", "n", "ok", "errs", "in", "out", "cacheW", "cacheR", "$/run")
-	for _, n := range names {
-		a := arms[n]
-		ok := a.n - a.errs
-		if ok == 0 {
-			ok = 1
-		}
-		fmt.Fprintf(&b, "%-9s %4d %5d %7d %9d %9d %9d %9d %6.3f\n", n, a.n, a.correct, a.errs,
-			a.in/ok, a.out/ok, a.cacheW/ok, a.cacheR/ok, a.cost/float64(ok))
-	}
-	b.WriteString("token columns are per-run means as reported by claude; ok = answers naming an expected path\n")
-	return b.String()
+	return ok, recall
 }
