@@ -476,10 +476,10 @@
         "GitInfo": "HotFiles []HotFile, Recent []string, Stable []string",
         "Hints": "AddFeature string, TestCmd string, EnvVars []string, DoNotTouch []string",
         "Index": "Schema string, Version string, GeneratedAt string, StacklitVersion string, MerkleHash string, Project Project, Tech Tech, Structure Structure, Modules map[string]ModuleInfo, Dependencies Dependenci...",
-        "ModuleInfo": "Purpose string, Language string, Files int, Lines int, FileList []string, Exports []string, TypeDefs map[string]string, DependsOn []string, DependedBy []string, Activity string",
+        "LangStats": "Files int, Lines int",
         "MultiIndex": "Schema string, Version string, Type string, GeneratedAt string, TotalFiles int, TotalLines int, TotalModules int, Repos []RepoSummary",
+        "Project": "Name string, Root string, Type string, Workspaces []string",
         "RepoSummary": "Name string, Path string, PrimaryLanguage string, TotalFiles int, TotalLines int, Modules map[string]ModuleInfo, Frameworks []string, Entrypoints []string",
-        "Structure": "Entrypoints []string, TotalFiles int, TotalLines int, KeyDirectories map[string]string",
         "Tech": "PrimaryLanguage string, Languages map[string]LangStats, Frameworks []string, FrameworkPatterns []FrameworkPattern"
       },
       "depended_by": [
@@ -718,7 +718,19 @@
   "git": {
     "hot_files": [
       {
+        "path": "internal/parser/generic.go",
+        "commits_90d": 1
+      },
+      {
         "path": "internal/parser/ts_kotlin.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "internal/walker/walker.go",
+        "commits_90d": 1
+      },
+      {
+        "path": "stacklit.json",
         "commits_90d": 1
       },
       {
@@ -727,19 +739,22 @@
       }
     ],
     "recent": [
+      "internal/parser/generic.go",
+      "internal/walker/walker.go",
+      "stacklit.json",
       "internal/parser/ts_kotlin.go",
       "testdata/langs/sample.kt",
-      "stacklit.json",
       "npm/install.js",
       "DEPENDENCIES.md",
       ".github/workflows/ci.yml",
       "README.md",
-      "USAGE.md",
-      "internal/cli/export.go",
-      "internal/cli/root.go"
+      "USAGE.md"
     ],
     "stable": [
+      "internal/parser/generic.go",
       "internal/parser/ts_kotlin.go",
+      "internal/walker/walker.go",
+      "stacklit.json",
       "testdata/langs/sample.kt"
     ]
   },
