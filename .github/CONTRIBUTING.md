@@ -29,7 +29,7 @@ cd /path/to/some/repo && /tmp/stacklit generate && /tmp/stacklit derive
 
 ## Where things live
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). In short: `internal/parser` reads files, `internal/graph` builds modules and edges, `internal/engine` ties the pipeline together, `internal/renderer` writes outputs, `internal/cli` holds the commands.
+See [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md). In short: `internal/parser` reads files, `internal/graph` builds modules and edges, `internal/engine` ties the pipeline together, `internal/renderer` writes outputs, `internal/cli` holds the commands.
 
 ## Common contributions
 
@@ -37,9 +37,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). In short: `internal/parser` re
 
 **Add a language.** Add `ts_<language>.go` with an extractor, register it in `tsLangMap` in `internal/parser/treesitter.go`, add the file extension to `sourceExtensions` in `internal/walker/walker.go` if it is missing, add a fixture and a test, and update the language table in the README.
 
-**Improve dependency resolution.** The logic is in `internal/graph/graph.go` (`resolveImport`). Include a minimal repro of the wrong edge in the test. The [benchmark tasks](bench/tasks) show the kinds of cases that currently fail.
+**Improve dependency resolution.** The logic is in `internal/graph/graph.go` (`resolveImport`). Include a minimal repro of the wrong edge in the test. The [benchmark tasks](../bench/tasks) show the kinds of cases that currently fail.
 
-**Add a benchmark task or repo.** See [bench/README.md](bench/README.md). Verify the expected answer by hand with grep, never with stacklit's own output.
+**Add a benchmark task or repo.** See [bench/README.md](../bench/README.md). Verify the expected answer by hand with grep, never with stacklit's own output.
 
 **Docs.** Fix anything that is wrong or unclear. Claims about size or speed must come from `bench/` output, with the command that produced them.
 

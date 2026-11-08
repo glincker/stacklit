@@ -38,5 +38,5 @@ body:
     attributes:
       label: Not a security issue
       options:
-        - label: This is not a security vulnerability (those go through the private report form, see SECURITY.md)
+        - label: This is not a security vulnerability (those go through the private report form, see .github/SECURITY.md)
           required: true
