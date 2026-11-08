@@ -1,0 +1,242 @@
+[
+ {
+  "id": "rc-01",
+  "kind": "locate",
+  "question": "Where is the constant for the empty digest that lets React tell an intentional client render apart from a missing digest?",
+  "all_of": [],
+  "any_of": [
+   "packages/shared/ReactRecoverable.js"
+  ],
+  "rubric": "REACT_RECOVERABLE_DIGEST.",
+  "check": [
+   {
+    "path": "packages/shared/ReactRecoverable.js",
+    "regex": "REACT_RECOVERABLE_DIGEST"
+   }
+  ]
+ },
+ {
+  "id": "rc-02",
+  "kind": "locate",
+  "question": "Where is the ReactDOM function that returns a recoverable value carrying an optional reason, kept cheap because it also runs in the browser?",
+  "all_of": [],
+  "any_of": [
+   "packages/react-dom/src/shared/ReactDOMBrowser.js"
+  ],
+  "rubric": "browser() in ReactDOMBrowser.js.",
+  "check": [
+   {
+    "path": "packages/react-dom/src/shared/ReactDOMBrowser.js",
+    "regex": "export function browser"
+   }
+  ]
+ },
+ {
+  "id": "rc-03",
+  "kind": "locate",
+  "question": "Where are the commit-phase helpers for Fragment instances kept, in a module of their own inside the reconciler?",
+  "all_of": [],
+  "any_of": [
+   "packages/react-reconciler/src/ReactFiberFragmentInstance.js"
+  ],
+  "rubric": "ReactFiberFragmentInstance.js.",
+  "check": [
+   {
+    "path": "packages/react-reconciler/src/ReactFiberFragmentInstance.js",
+    "regex": "FragmentInstanceType"
+   }
+  ]
+ },
+ {
+  "id": "rc-04",
+  "kind": "trace",
+  "question": "ReactDOM got a browser() API that returns a recoverable value. Which three files hold the function, the symbol that marks the value's type, and the module with the empty digest constant?",
+  "all_of": [
+   "packages/react-dom/src/shared/ReactDOMBrowser.js",
+   "packages/shared/ReactSymbols.js",
+   "packages/shared/ReactRecoverable.js"
+  ],
+  "any_of": [],
+  "rubric": "ReactDOMBrowser, ReactSymbols, ReactRecoverable.",
+  "check": [
+   {
+    "path": "packages/react-dom/src/shared/ReactDOMBrowser.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/shared/ReactSymbols.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/shared/ReactRecoverable.js",
+    "regex": "REACT_RECOVERABLE_DIGEST"
+   }
+  ]
+ },
+ {
+  "id": "rc-05",
+  "kind": "trace",
+  "question": "The bundle size report on pull requests is built by three scripts: one measures every artifact against the base build, one turns the numbers into the comment text, and one creates or updates the comment. Which three files are they?",
+  "all_of": [
+   "scripts/sizebot/compare-sizes.js",
+   "scripts/sizebot/render-comment.js",
+   "scripts/sizebot/pull-request-comment.js"
+  ],
+  "any_of": [],
+  "rubric": "The three sizebot scripts.",
+  "check": [
+   {
+    "path": "scripts/sizebot/compare-sizes.js",
+    "regex": "sizebot-results.json"
+   },
+   {
+    "path": "scripts/sizebot/render-comment.js",
+    "regex": "CRITICAL_THRESHOLD"
+   },
+   {
+    "path": "scripts/sizebot/pull-request-comment.js",
+    "regex": "COMMENT_AUTHOR"
+   }
+  ]
+ },
+ {
+  "id": "rc-06",
+  "kind": "trace",
+  "question": "The Rust port of the compiler converts UTF-16 offsets from Babel locations into byte offsets before slicing source text. Which three files hold the conversion helper and the two validators that slice source text with it?",
+  "all_of": [
+   "compiler/crates/react_compiler_validation/src/source_offsets.rs",
+   "compiler/crates/react_compiler_validation/src/validate_no_derived_computations_in_effects.rs",
+   "compiler/crates/react_compiler_validation/src/validate_no_set_state_in_effects.rs"
+  ],
+  "any_of": [],
+  "rubric": "source_offsets.rs and its two users.",
+  "check": [
+   {
+    "path": "compiler/crates/react_compiler_validation/src/source_offsets.rs",
+    "regex": "fn utf16_offset_to_byte"
+   },
+   {
+    "path": "compiler/crates/react_compiler_validation/src/validate_no_derived_computations_in_effects.rs",
+    "regex": "slice_by_utf16_range"
+   },
+   {
+    "path": "compiler/crates/react_compiler_validation/src/validate_no_set_state_in_effects.rs",
+    "regex": "slice_by_utf16_range"
+   }
+  ]
+ },
+ {
+  "id": "rc-07",
+  "kind": "impact",
+  "question": "Which JavaScript files outside the tests use REACT_RECOVERABLE_TYPE, not counting the file that defines it?",
+  "all_of": [
+   "packages/react-debug-tools/src/ReactDebugHooks.js",
+   "packages/react-dom/src/shared/ReactDOMBrowser.js",
+   "packages/react-reconciler/src/ReactFiberHooks.js",
+   "packages/react-server/src/ReactFizzHooks.js",
+   "packages/react-server/src/ReactFizzServer.js"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these five files use REACT_RECOVERABLE_TYPE.",
+  "check": [
+   {
+    "path": "packages/react-server/src/ReactFizzServer.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/react-server/src/ReactFizzHooks.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/react-debug-tools/src/ReactDebugHooks.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/react-dom/src/shared/ReactDOMBrowser.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   },
+   {
+    "path": "packages/react-reconciler/src/ReactFiberHooks.js",
+    "regex": "REACT_RECOVERABLE_TYPE"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".js"
+   ],
+   "pattern": "REACT_RECOVERABLE_TYPE",
+   "exclude_tests": true,
+   "exclude_regex": "^packages/shared/ReactSymbols\\.js$"
+  }
+ },
+ {
+  "id": "rc-08",
+  "kind": "impact",
+  "question": "Which JavaScript files outside the tests import the ReactFiberFragmentInstance module?",
+  "all_of": [
+   "packages/react-reconciler/src/ReactFiberCommitHostEffects.js",
+   "packages/react-reconciler/src/ReactFiberCommitWork.js"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these two files import ReactFiberFragmentInstance.",
+  "check": [
+   {
+    "path": "packages/react-reconciler/src/ReactFiberCommitWork.js",
+    "regex": "ReactFiberFragmentInstance"
+   },
+   {
+    "path": "packages/react-reconciler/src/ReactFiberCommitHostEffects.js",
+    "regex": "ReactFiberFragmentInstance"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".js"
+   ],
+   "pattern": "ReactFiberFragmentInstance'",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "rc-09",
+  "kind": "add",
+  "question": "I want to add a new validation pass to the Rust compiler. Which file lists the validation modules of the validation crate, and which file runs the passes in order in the compilation pipeline?",
+  "all_of": [
+   "compiler/crates/react_compiler_validation/src/lib.rs",
+   "compiler/crates/react_compiler/src/entrypoint/pipeline.rs"
+  ],
+  "any_of": [],
+  "rubric": "validation lib.rs and pipeline.rs.",
+  "check": [
+   {
+    "path": "compiler/crates/react_compiler_validation/src/lib.rs",
+    "regex": "pub mod validate_hooks_usage"
+   },
+   {
+    "path": "compiler/crates/react_compiler/src/entrypoint/pipeline.rs",
+    "regex": "validate_no_set_state_in_effects"
+   }
+  ]
+ },
+ {
+  "id": "rc-10",
+  "kind": "add",
+  "question": "I want to add a new feature flag with a different value for the Meta web build. Which file declares the flags with their defaults, and which file overrides them for that build?",
+  "all_of": [
+   "packages/shared/ReactFeatureFlags.js",
+   "packages/shared/forks/ReactFeatureFlags.www.js"
+  ],
+  "any_of": [],
+  "rubric": "ReactFeatureFlags.js and the www fork.",
+  "check": [
+   {
+    "path": "packages/shared/ReactFeatureFlags.js",
+    "regex": "export const"
+   },
+   {
+    "path": "packages/shared/forks/ReactFeatureFlags.www.js",
+    "regex": "export const"
+   }
+  ]
+ }
+]

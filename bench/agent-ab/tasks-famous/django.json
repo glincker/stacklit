@@ -1,0 +1,246 @@
+[
+ {
+  "id": "dj-01",
+  "kind": "locate",
+  "question": "Where is the pre-parser that rejects coordinate reference systems in spatial JSON documents when they would make GDAL read a file or fetch something over the network?",
+  "all_of": [],
+  "any_of": [
+   "django/contrib/gis/gdal/geojson.py"
+  ],
+  "rubric": "ExternalCRSBlocker.",
+  "check": [
+   {
+    "path": "django/contrib/gis/gdal/geojson.py",
+    "regex": "class ExternalCRSBlocker"
+   }
+  ]
+ },
+ {
+  "id": "dj-02",
+  "kind": "locate",
+  "question": "Where is the system check that warns when the installed GDAL is too old to block file and network access for spatial references?",
+  "all_of": [],
+  "any_of": [
+   "django/contrib/gis/checks.py"
+  ],
+  "rubric": "gis.W001 in checks.py.",
+  "check": [
+   {
+    "path": "django/contrib/gis/checks.py",
+    "regex": "def check_gdal_39"
+   }
+  ]
+ },
+ {
+  "id": "dj-03",
+  "kind": "locate",
+  "question": "Where is the form field used by the admin that reads booleans strictly and case-insensitively and rejects any value it cannot read?",
+  "all_of": [],
+  "any_of": [
+   "django/contrib/admin/formfields.py"
+  ],
+  "rubric": "StrictBooleanField.",
+  "check": [
+   {
+    "path": "django/contrib/admin/formfields.py",
+    "regex": "class StrictBooleanField"
+   }
+  ]
+ },
+ {
+  "id": "dj-04",
+  "kind": "trace",
+  "question": "Template tags may now span several lines, and a transitional option on the template engine turns that off. Which two files hold the lexer change and the engine option?",
+  "all_of": [
+   "django/template/base.py",
+   "django/template/engine.py"
+  ],
+  "any_of": [],
+  "rubric": "base.py lexer, engine.py option.",
+  "check": [
+   {
+    "path": "django/template/base.py",
+    "regex": "allow_multiline_tags"
+   },
+   {
+    "path": "django/template/engine.py",
+    "regex": "allow_multiline_tags"
+   }
+  ]
+ },
+ {
+  "id": "dj-05",
+  "kind": "trace",
+  "question": "Django now treats the HTTP QUERY method as safe. Which three files hold the CSRF check that skips it, the conditional GET middleware that handles it, and the test client method that sends it?",
+  "all_of": [
+   "django/middleware/csrf.py",
+   "django/middleware/http.py",
+   "django/test/client.py"
+  ],
+  "any_of": [],
+  "rubric": "csrf.py, http.py and test/client.py.",
+  "check": [
+   {
+    "path": "django/middleware/csrf.py",
+    "regex": "\"QUERY\""
+   },
+   {
+    "path": "django/middleware/http.py",
+    "regex": "\"QUERY\""
+   },
+   {
+    "path": "django/test/client.py",
+    "regex": "def query\\("
+   }
+  ]
+ },
+ {
+  "id": "dj-06",
+  "kind": "trace",
+  "question": "A GeoJSON string passed to the GDAL geometry class is checked for URL based coordinate reference systems before GDAL sees it. Which three files hold the checker, the geometry class that calls it, and the GIS form field whose docstring says it raises SuspiciousOperation?",
+  "all_of": [
+   "django/contrib/gis/gdal/geojson.py",
+   "django/contrib/gis/gdal/geometries.py",
+   "django/contrib/gis/forms/fields.py"
+  ],
+  "any_of": [],
+  "rubric": "geojson.py, geometries.py, forms/fields.py.",
+  "check": [
+   {
+    "path": "django/contrib/gis/gdal/geojson.py",
+    "regex": "ExternalCRSBlocker"
+   },
+   {
+    "path": "django/contrib/gis/gdal/geometries.py",
+    "regex": "ExternalCRSBlocker\\.check"
+   },
+   {
+    "path": "django/contrib/gis/forms/fields.py",
+    "regex": "SuspiciousOperation"
+   }
+  ]
+ },
+ {
+  "id": "dj-07",
+  "kind": "impact",
+  "question": "Which Python files outside the tests import trim_value from django.utils.text?",
+  "all_of": [
+   "django/contrib/gis/forms/widgets.py",
+   "django/contrib/gis/gdal/raster/source.py",
+   "django/db/models/query_utils.py",
+   "django/views/debug.py"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these four files import trim_value.",
+  "check": [
+   {
+    "path": "django/views/debug.py",
+    "regex": "import trim_value"
+   },
+   {
+    "path": "django/db/models/query_utils.py",
+    "regex": "import trim_value"
+   },
+   {
+    "path": "django/contrib/gis/forms/widgets.py",
+    "regex": "import trim_value"
+   },
+   {
+    "path": "django/contrib/gis/gdal/raster/source.py",
+    "regex": "import trim_value"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".py"
+   ],
+   "pattern": "import trim_value",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "dj-08",
+  "kind": "impact",
+  "question": "Which Python files outside the tests import RemovedInDjango2029Warning, the warning class for the deprecations that end in 2029?",
+  "all_of": [
+   "django/core/validators.py",
+   "django/db/models/functions/datetime.py",
+   "django/http/response.py",
+   "django/template/engine.py",
+   "django/utils/functional.py"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these five files import RemovedInDjango2029Warning.",
+  "check": [
+   {
+    "path": "django/core/validators.py",
+    "regex": "RemovedInDjango2029Warning"
+   },
+   {
+    "path": "django/db/models/functions/datetime.py",
+    "regex": "RemovedInDjango2029Warning"
+   },
+   {
+    "path": "django/http/response.py",
+    "regex": "RemovedInDjango2029Warning"
+   },
+   {
+    "path": "django/template/engine.py",
+    "regex": "RemovedInDjango2029Warning"
+   },
+   {
+    "path": "django/utils/functional.py",
+    "regex": "RemovedInDjango2029Warning"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".py"
+   ],
+   "pattern": "import .*RemovedInDjango2029Warning",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "dj-09",
+  "kind": "add",
+  "question": "I want to add another GIS system check that warns about the installed GDAL version, like the existing one. Which file defines the existing check, and which file registers GIS checks with the framework?",
+  "all_of": [
+   "django/contrib/gis/checks.py",
+   "django/contrib/gis/apps.py"
+  ],
+  "any_of": [],
+  "rubric": "checks.py defines, apps.py registers.",
+  "check": [
+   {
+    "path": "django/contrib/gis/checks.py",
+    "regex": "check_gdal_39"
+   },
+   {
+    "path": "django/contrib/gis/apps.py",
+    "regex": "checks.register"
+   }
+  ]
+ },
+ {
+  "id": "dj-10",
+  "kind": "add",
+  "question": "I want to add a new option to the Django template engine that can be set from the TEMPLATES setting. Which file defines the engine's constructor options, and which file is the backend that builds the engine from those settings?",
+  "all_of": [
+   "django/template/engine.py",
+   "django/template/backends/django.py"
+  ],
+  "any_of": [],
+  "rubric": "engine.py options and the Django backend.",
+  "check": [
+   {
+    "path": "django/template/engine.py",
+    "regex": "allow_multiline_tags"
+   },
+   {
+    "path": "django/template/backends/django.py",
+    "regex": "Engine"
+   }
+  ]
+ }
+]

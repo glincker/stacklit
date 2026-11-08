@@ -1,0 +1,232 @@
+[
+ {
+  "id": "tk-01",
+  "kind": "locate",
+  "question": "Where is the blocking pool's task queue that is split into several mutex-protected shards, with a bitmask that tells workers which shards are not empty?",
+  "all_of": [],
+  "any_of": [
+   "tokio/src/runtime/blocking/sharded.rs"
+  ],
+  "rubric": "The sharded queue module.",
+  "check": [
+   {
+    "path": "tokio/src/runtime/blocking/sharded.rs",
+    "regex": "NUM_SHARDS"
+   }
+  ]
+ },
+ {
+  "id": "tk-02",
+  "kind": "locate",
+  "question": "Where is the type that holds only the mode bits for the access rights of a Unix domain socket?",
+  "all_of": [],
+  "any_of": [
+   "tokio/src/net/unix/permissions.rs"
+  ],
+  "rubric": "The Unix socket Permissions type.",
+  "check": [
+   {
+    "path": "tokio/src/net/unix/permissions.rs",
+    "regex": "pub struct Permissions"
+   }
+  ]
+ },
+ {
+  "id": "tk-03",
+  "kind": "locate",
+  "question": "Where are the primitives that suspend the current thread on a promise so that blocking calls and the runtime driver can wait on an Emscripten WebAssembly target?",
+  "all_of": [],
+  "any_of": [
+   "tokio/src/runtime/jspi.rs"
+  ],
+  "rubric": "The JSPI park and unpark module.",
+  "check": [
+   {
+    "path": "tokio/src/runtime/jspi.rs",
+    "regex": "fn park"
+   }
+  ]
+ },
+ {
+  "id": "tk-04",
+  "kind": "trace",
+  "question": "Renaming a file can now go through io_uring instead of a blocking thread. Which three files take part: the public async function, the io_uring operation type, and the file that lists the operation kinds the driver can run?",
+  "all_of": [
+   "tokio/src/fs/rename.rs",
+   "tokio/src/io/uring/rename.rs",
+   "tokio/src/runtime/driver/op.rs"
+  ],
+  "any_of": [],
+  "rubric": "fs rename, the uring Rename op, and the driver op enum.",
+  "check": [
+   {
+    "path": "tokio/src/fs/rename.rs",
+    "regex": "uring"
+   },
+   {
+    "path": "tokio/src/io/uring/rename.rs",
+    "regex": "struct Rename"
+   },
+   {
+    "path": "tokio/src/runtime/driver/op.rs",
+    "regex": "Rename"
+   }
+  ]
+ },
+ {
+  "id": "tk-05",
+  "kind": "trace",
+  "question": "Shutting down the stdin handle of a spawned child process now closes the pipe. Which three files hold the public wrapper type and its Unix and Windows implementations?",
+  "all_of": [
+   "tokio/src/process/mod.rs",
+   "tokio/src/process/unix/mod.rs",
+   "tokio/src/process/windows.rs"
+  ],
+  "any_of": [],
+  "rubric": "process mod.rs plus the unix and windows backends.",
+  "check": [
+   {
+    "path": "tokio/src/process/mod.rs",
+    "regex": "Shutting down this stream"
+   },
+   {
+    "path": "tokio/src/process/unix/mod.rs",
+    "regex": "closed_err"
+   },
+   {
+    "path": "tokio/src/process/windows.rs",
+    "regex": "ChildStdin"
+   }
+  ]
+ },
+ {
+  "id": "tk-06",
+  "kind": "trace",
+  "question": "Which two files define the value that carries the access and modification times to set on a file, and the File method that applies it?",
+  "all_of": [
+   "tokio/src/fs/file.rs",
+   "tokio/src/fs/file_times.rs"
+  ],
+  "any_of": [],
+  "rubric": "file_times.rs and File::set_times in file.rs.",
+  "check": [
+   {
+    "path": "tokio/src/fs/file.rs",
+    "regex": "fn set_times"
+   },
+   {
+    "path": "tokio/src/fs/file_times.rs",
+    "regex": "struct FileTimes"
+   }
+  ]
+ },
+ {
+  "id": "tk-07",
+  "kind": "impact",
+  "question": "List the Rust source files, tests excluded, that use the cstr helper from the io_uring utils module.",
+  "all_of": [
+   "tokio/src/io/uring/open.rs",
+   "tokio/src/io/uring/rename.rs",
+   "tokio/src/io/uring/statx.rs"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these three files use utils::cstr outside tests.",
+  "check": [
+   {
+    "path": "tokio/src/io/uring/rename.rs",
+    "regex": "utils::cstr"
+   },
+   {
+    "path": "tokio/src/io/uring/open.rs",
+    "regex": "utils::cstr"
+   },
+   {
+    "path": "tokio/src/io/uring/statx.rs",
+    "regex": "utils::cstr"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".rs"
+   ],
+   "pattern": "utils::cstr",
+   "exclude_tests": true
+  }
+ },
+ {
+  "id": "tk-08",
+  "kind": "impact",
+  "question": "Which Rust source files, tests excluded and not counting the file that defines it, use the FileTimes type in code?",
+  "all_of": [
+   "tokio/src/fs/file.rs",
+   "tokio/src/fs/mocks.rs",
+   "tokio/src/fs/mod.rs"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these three files refer to FileTimes outside its definition.",
+  "check": [
+   {
+    "path": "tokio/src/fs/mod.rs",
+    "regex": "FileTimes"
+   },
+   {
+    "path": "tokio/src/fs/file.rs",
+    "regex": "FileTimes"
+   },
+   {
+    "path": "tokio/src/fs/mocks.rs",
+    "regex": "FileTimes"
+   }
+  ],
+  "verify": {
+   "include": [
+    ".rs"
+   ],
+   "pattern": "FileTimes",
+   "exclude_tests": true,
+   "exclude_regex": "^tokio/src/fs/file_times\\.rs$"
+  }
+ },
+ {
+  "id": "tk-09",
+  "kind": "add",
+  "question": "I want to add an io_uring backed symlink operation next to the rename one. Which file declares the io_uring operation modules, and which file lists the operation kinds the driver can run?",
+  "all_of": [
+   "tokio/src/io/uring/mod.rs",
+   "tokio/src/runtime/driver/op.rs"
+  ],
+  "any_of": [],
+  "rubric": "uring/mod.rs declares modules, driver/op.rs lists ops.",
+  "check": [
+   {
+    "path": "tokio/src/io/uring/mod.rs",
+    "regex": "mod rename"
+   },
+   {
+    "path": "tokio/src/runtime/driver/op.rs",
+    "regex": "Rename"
+   }
+  ]
+ },
+ {
+  "id": "tk-10",
+  "kind": "add",
+  "question": "I want to add a third strategy for the blocking pool's task queue. Which file holds the enum that chooses between queue implementations, and which file holds the runtime builder option that selects one?",
+  "all_of": [
+   "tokio/src/runtime/blocking/pool.rs",
+   "tokio/src/runtime/builder.rs"
+  ],
+  "any_of": [],
+  "rubric": "InnerImpl in pool.rs, sharded_blocking_queue in builder.rs.",
+  "check": [
+   {
+    "path": "tokio/src/runtime/blocking/pool.rs",
+    "regex": "InnerImpl"
+   },
+   {
+    "path": "tokio/src/runtime/builder.rs",
+    "regex": "sharded_blocking_queue"
+   }
+  ]
+ }
+]
