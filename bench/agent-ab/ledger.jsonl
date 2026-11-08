@@ -16,3 +16,13 @@
 {"arm":"memory","at":"2026-11-08T20:04:58Z","cost_usd":0.0111209,"model":"claude-sonnet-5-5","repo":"levelrail","running_total_usd":0.16889439999999997,"task":"lr-03","trial":1}
 {"arm":"memory","at":"2026-11-08T20:05:02Z","cost_usd":0.0109329,"model":"claude-sonnet-5-5","repo":"levelrail","running_total_usd":0.17982729999999997,"task":"lr-05","trial":1}
 {"arm":"memory","at":"2026-11-08T20:05:07Z","cost_usd":0.011400900000000002,"model":"claude-sonnet-5-5","repo":"levelrail","running_total_usd":0.19122819999999996,"task":"lr-04","trial":1}
+{"arm":"stacklit","at":"2026-11-08T20:05:58Z","cost_usd":0.031549499999999994,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.22277769999999997,"task":"tg-01","trial":1}
+{"arm":"stacklit","at":"2026-11-08T20:06:13Z","cost_usd":0.0257346,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.24851229999999996,"task":"tg-04","trial":1}
+{"arm":"control","at":"2026-11-08T20:06:28Z","cost_usd":0.0413151,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.28982739999999996,"task":"tg-03","trial":1}
+{"arm":"control","at":"2026-11-08T20:06:49Z","cost_usd":0.027686100000000005,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.31751349999999995,"task":"tg-01","trial":1}
+{"arm":"stacklit","at":"2026-11-08T20:07:03Z","cost_usd":0.0270096,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.34452309999999997,"task":"tg-05","trial":1}
+{"arm":"control","at":"2026-11-08T20:07:16Z","cost_usd":0.0197556,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.36427869999999996,"task":"tg-02","trial":1}
+{"arm":"stacklit","at":"2026-11-08T20:07:25Z","cost_usd":0.0229165,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.38719519999999996,"task":"tg-02","trial":1}
+{"arm":"stacklit","at":"2026-11-08T20:07:34Z","cost_usd":0.0322722,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.41946739999999993,"task":"tg-03","trial":1}
+{"arm":"control","at":"2026-11-08T20:07:47Z","cost_usd":0.013175300000000001,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.43264269999999994,"task":"tg-05","trial":1}
+{"arm":"control","at":"2026-11-08T20:07:54Z","cost_usd":0.015577200000000001,"model":"claude-sonnet-5-5","repo":"theauth-go","running_total_usd":0.44821989999999995,"task":"tg-04","trial":1}
