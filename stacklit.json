@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "9e88194cfe8d2f0fb2fe1e739699cd62b37cdafc088e4dc398743603ad422ee8",
+  "merkle_hash": "21cd0e201c94b212567fa72ccebcb404c2b940a38ef217050cb6b558bad3271e",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -69,8 +69,8 @@
         "lines": 17
       },
       "go": {
-        "files": 272,
-        "lines": 40628
+        "files": 274,
+        "lines": 41409
       },
       "graphql": {
         "files": 1,
@@ -97,8 +97,8 @@
         "lines": 1116
       },
       "json": {
-        "files": 19,
-        "lines": 606
+        "files": 492,
+        "lines": 23219
       },
       "julia": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 413,
-    "total_lines": 44529
+    "total_files": 888,
+    "total_lines": 67923
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -1838,6 +1838,7 @@
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
+      "AGENT_AB_TRANSCRIPTS",
       "AGENT_BROWSER",
       "AGENT_BROWSER_BIN",
       "CLAUDE_PROJECT_DIR",
@@ -1894,5 +1895,10 @@
       ".github/"
     ]
   },
-  "architecture": {}
+  "architecture": {},
+  "scan": {
+    "lightweight": [
+      "bench/agent-ab/summary.json (large)"
+    ]
+  }
 }
