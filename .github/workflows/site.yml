@@ -13,6 +13,10 @@ on:
   pull_request:
     paths:
       - 'site/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+      - 'bench/RESULTS.md'
       - '.github/workflows/site.yml'
   workflow_dispatch:
 
