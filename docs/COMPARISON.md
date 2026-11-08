@@ -53,10 +53,10 @@ Best for: Large codebases, long interactive sessions, teams with infra capacity.
 ### Structural Index (Stacklit)
 
 Parses code with tree-sitter, builds a module-level dependency graph, outputs a compact navigation map:
-- **137 to 1,372 tokens** for the compact map on three measured repos (vs tens of thousands for a full dump); the full index is 2,500 to 16,000
+- **137 to 1,351 tokens** for the compact map on six measured repos (vs tens of thousands for a full dump); the full index is 2,391 to 16,022
 - Static artifact  - commit `stacklit.json` to your repo
 - Self-contained HTML visualization
-- Auto-configures Claude Code, Cursor, Aider via `stacklit setup`
+- Sets up 25 assistants via `stacklit setup`, including Claude Code, Cursor and Codex
 - Git hook keeps the index fresh
 - No running server needed for basic use (MCP server optional)
 
@@ -95,11 +95,11 @@ Measured with the reproducible harness in [bench/](../bench/) on pinned commits 
 
 | Repository | Language | Source lines | Modules | Stacklit JSON | Stacklit compact map |
 |-----------|----------|-------------:|--------:|--------------:|---------------------:|
-| gin v1.10.0 | Go | 19,537 | 8 | 2,524 tokens | 137 tokens |
-| flask 3.1.2 | Python | 18,515 | 14 | 2,681 tokens | 221 tokens |
-| hono v4.6.0 | TypeScript | 57,307 | 79 | 16,126 tokens | 1,372 tokens |
+| gin v1.10.0 | Go | 19,537 | 8 | 2,491 tokens | 137 tokens |
+| flask 3.1.2 | Python | 18,515 | 14 | 2,818 tokens | 221 tokens |
+| hono v4.6.0 | TypeScript | 57,263 | 77 | 16,022 tokens | 1,351 tokens |
 
-Size follows the number of modules, not lines of code. See [bench/RESULTS.md](../bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 30 navigation tasks, and limitations.
+Size follows the number of modules, not lines of code. See [bench/RESULTS.md](../bench/RESULTS.md) for methodology, a grep-versus-map cost comparison on 58 navigation tasks, and limitations.
 
 ## When to Use What
 

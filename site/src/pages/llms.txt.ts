@@ -1,12 +1,13 @@
 import { getCollection } from 'astro:content';
 import { SITE, REPO } from '../data/site';
+import copy from '../data/copy.json';
 
 export async function GET() {
   const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
   const lines = [
     '# Stacklit',
     '',
-    '> Stacklit parses a repository with tree-sitter and writes stacklit.json (modules, exports, dependencies, hints), an interactive HTML map and an MCP server. MIT licensed, free, local only, no telemetry, one Go binary, deterministic output.',
+    `> ${copy.meta.llms}`,
     '',
     '## Docs',
     '',

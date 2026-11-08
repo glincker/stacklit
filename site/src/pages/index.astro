@@ -1,9 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
+import StarLink from '../components/StarLink.astro';
+import InstallBox from '../components/InstallBox.astro';
+import Logo from '../components/Logo.astro';
 import samples from '../data/samples.json';
 import bench from '../data/bench.json';
+import copy from '../data/copy.json';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
+const hero = copy.hero.variants[copy.hero.active as keyof typeof copy.hero.variants];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Each sentence of the headline is its own line, and the numbers carry the accent.
+const headlineLines = hero.headline
+  .split(/(?<=\.)\s+/)
+  .map((line) => esc(line).replace(/\d[\d,]*k?/g, (n) => `<span class="n">${n}</span>`));
+const captionHtml = esc(copy.hero.caption).replace(esc(copy.hero.captionLink), `<a href="/docs/benchmarks/">${esc(copy.hero.captionLink)}</a>`);
 
 const deriveHtml = samples.derive
   .trimEnd()
@@ -17,232 +30,190 @@ const deriveHtml = samples.derive
   })
   .join('\n');
 
-const genHtml = esc(samples.generateOut)
-  .split('\n')
-  .map((l) => l.replace(/^(\[stacklit\])/, '<span class="d">$1</span>'))
-  .join('\n');
-
-const queryHtml = esc(samples.query)
-  .split('\n')
-  .map((l, i) => (i === 0 ? `<span class="a">${l}</span>` : /^\s+calls/.test(l) ? `<span class="d">${l}</span>` : l))
-  .join('\n');
-
-const moduleJson = JSON.stringify({ [samples.moduleName]: samples.module }, null, 2);
-
-const assistants = [
-  ['claude-code', 'Claude Code'],
-  ['cursor', 'Cursor'],
-  ['github-copilot', 'GitHub Copilot'],
-  ['windsurf', 'Windsurf'],
-  ['cline', 'Cline'],
-  ['zed', 'Zed'],
-  ['codex', 'Codex'],
-  ['gemini', 'Gemini CLI'],
-  ['continue', 'Continue'],
-  ['opencode', 'OpenCode'],
-  ['junie', 'Junie'],
-  ['kilo-code', 'Kilo Code'],
-  [null, 'Aider'],
+// Slug pairs: [name, mono-or-single-colour logo, full colour logo]. Aider has no logo on thesvg.org.
+const assistants: [string, string | null, string | null][] = [
+  ['Claude Code', 'claude-code/mono', 'claude-code/default'],
+  ['Cursor', 'cursor/mono', 'cursor/default'],
+  ['Codex', 'codex/light', 'codex/default'],
+  ['GitHub Copilot', 'github-copilot/mono', 'github-copilot/default'],
+  ['Gemini CLI', 'google-gemini/mono', 'google-gemini/default'],
+  ['Windsurf', 'windsurf/mono', 'windsurf/default'],
+  ['Cline', 'cline/mono', 'cline/default'],
+  ['OpenCode', 'opencode/mono', 'opencode/default'],
+  ['Zed', 'zed/light', 'zed/default'],
+  ['Junie', 'junie/mono', 'junie/default'],
+  ['Aider', null, null],
 ];
-const n = (s: string) => Number(s).toLocaleString('en-US');
+const languages: [string, string][] = [['Go', 'go'], ['TypeScript', 'typescript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java']];
+const sources: [string, string][] = [['npm', 'npm'], ['go install', 'go'], ['GitHub releases', 'github']];
+
 const armRows: [string, { found1: string; found5: string; tokens: string }][] = [
   ['grep and read', bench.arms.grep],
   ['BM25 over the question', bench.arms.bm25],
   ['stacklit map plus lookup', bench.arms.map],
   ['stacklit query 1000, read in printed order', bench.arms.query],
 ];
+const derive = bench.repos.map((r) => Number(r.deriveTokens));
+const deriveMin = Math.min(...derive).toLocaleString('en-US');
+const deriveMax = Math.max(...derive).toLocaleString('en-US');
+
+// The real agent A/B appears only when its summary exists at build time.
+const abPath = fileURLToPath(new URL('../../../bench/agent-ab/summary.json', import.meta.url));
+const hasAb = existsSync(abPath);
 ---
-<Base
-  title="Stacklit: a committed map of your codebase for AI agents"
-  description="Stacklit parses your repo and writes a small index plus an interactive map. Free, MIT, local only, one Go binary, deterministic output."
-  path="/"
-  jsonLd
->
+<Base title={copy.meta.title} description={copy.meta.description} path="/" jsonLd>
   <section class="hero">
-    <div class="container hero-grid">
-      <div>
-        <h1>Your codebase, mapped for agents.</h1>
-        <p class="lede">A small index and an interactive map, generated locally in one pass.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="#install">Install in 30 seconds</a>
-          <a class="btn" href="/demos/">Open a live map</a>
+    <div class="container">
+      <h1>{headlineLines.map((l) => <span class="line" set:html={l} />)}</h1>
+      <p class="hero-caption" set:html={captionHtml} />
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lede">{hero.sub}</p>
+          <div class="hero-actions">
+            <InstallBox />
+            <div class="hero-buttons">
+              <StarLink />
+              <a class="btn" href="/docs/benchmarks/">{copy.hero.secondaryCta}</a>
+            </div>
+          </div>
+          <p class="hint">{copy.cta.installNote}</p>
         </div>
-      </div>
-      <figure class="strata">
-        <div class="term">
-          <div class="term-head"><span>$ stacklit derive</span><span>gin v1.10.0, 137 tokens</span></div>
+        <div class="term hero-term">
+          <div class="term-head"><span>$ stacklit derive</span><span>gin v1.10.0, {bench.repos[0].deriveTokens} tokens</span></div>
           <pre tabindex="0"><code set:html={deriveHtml} /></pre>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="shot-section" aria-label="A real map">
+    <div class="container">
+      <figure class="map-shot">
+        <img class="shot-light" src="/img/map-ripgrep-light.webp" alt="The Stacklit map of ripgrep: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" decoding="async" />
+        <img class="shot-dark" src="/img/map-ripgrep-dark.webp" alt="The Stacklit map of ripgrep in the dark theme: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" loading="lazy" decoding="async" />
+        <figcaption>{copy.cta.mapCaption} <a href="/demos/ripgrep/">{copy.cta.mapLink}</a></figcaption>
       </figure>
-    </div>
-  </section>
-
-  <section class="section" id="install">
-    <div class="container">
-      <div class="section-head">
-        <h2>Install, then run it in your repo</h2>
-        <p>Pick one. The first run scans the current directory and writes the index.</p>
-      </div>
-      <ul class="install">
-        <li>
-          <code><span class="p">$ </span>npx stacklit init</code>
-          <button class="copy" type="button" data-copy="npx stacklit init" aria-label="Copy the npx command">Copy</button>
-          <span class="how">No install. Downloads the binary on first use.</span>
-        </li>
-        <li>
-          <code><span class="p">$ </span>brew install glincker/tap/stacklit</code>
-          <button class="copy" type="button" data-copy="brew install glincker/tap/stacklit" aria-label="Copy the Homebrew command">Copy</button>
-          <span class="how">Homebrew tap for macOS and Linux.</span>
-        </li>
-        <li>
-          <code><span class="p">$ </span>go install github.com/glincker/stacklit/cmd/stacklit@latest</code>
-          <button class="copy" type="button" data-copy="go install github.com/glincker/stacklit/cmd/stacklit@latest" aria-label="Copy the go install command">Copy</button>
-          <span class="how">From source, needs Go.</span>
-        </li>
-      </ul>
-      <p class="after-install">Then commit <code>stacklit.json</code>, and run <code>stacklit setup</code> to wire up your AI tools. <a href="/docs/quickstart/">Quickstart</a></p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container split">
-      <div class="copy-block">
-        <h2>What a run looks like</h2>
-        <p>The real output of <code>stacklit generate --graph</code> on gin v1.10.0 (101 files) from a cold cache. It writes <code>stacklit.json</code>, a Mermaid diagram and a self-contained HTML map.</p>
-        <p><a href="/demos/">Browse the generated maps</a></p>
-      </div>
-      <div class="term">
-        <div class="term-head"><span>$ stacklit generate --graph</span><span>gin v1.10.0</span></div>
-        <pre tabindex="0"><code set:html={genHtml} /></pre>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head"><h2>What you get</h2></div>
-      <div class="rows">
-        <div class="row split">
-          <div class="copy-block">
-            <h3>An index agents can read</h3>
-            <p>Modules, what each exports, who depends on whom, and hints for tests and where to add code. Plain JSON you commit next to the source.</p>
-            <p><a href="/docs/format/">Index format</a></p>
-          </div>
-          <div>
-            <div class="term"><div class="term-head"><span>stacklit.json, one module</span><span>gin v1.10.0</span></div><pre tabindex="0"><code>{moduleJson}</code></pre></div>
-            <p class="snippet-note">Excerpt. Export lists are capped by default, so a module entry is not exhaustive.</p>
-          </div>
-        </div>
-        <div class="row split">
-          <div class="copy-block">
-            <h3>A small map to steer the agent</h3>
-            <p><code>stacklit derive</code> prints a compact map of a few hundred tokens. <code>stacklit setup</code> injects it into the config of your assistant, so a new session starts oriented. The same graph answers token-budgeted queries, also exposed as MCP tools.</p>
-            <p><a href="/docs/assistants/">Assistants and setup</a></p>
-          </div>
-          <div>
-            <div class="term"><div class="term-head"><span>$ stacklit query "{samples.question}" --budget 500</span><span>excerpt</span></div><pre tabindex="0"><code set:html={queryHtml} /></pre></div>
-            <p class="snippet-note">Output cut to the first lines. <a href="/docs/mcp/">MCP tools</a></p>
-          </div>
-        </div>
-        <div class="row split">
-          <div class="copy-block">
-            <h3>A map you can open</h3>
-            <p>Every run also writes one HTML file with graph, tree, table and flow views. No server and no build step. Six maps generated from pinned public repos are on the demos page.</p>
-            <p><a href="/demos/">See the demos</a></p>
-          </div>
-          <div>
-            <div class="term"><div class="term-head"><span>stacklit export</span><span>formats</span></div><pre tabindex="0"><code>Markdown index, GraphML, Cypher, JSON, DOT,
-Mermaid, an Obsidian vault, a markdown wiki</code></pre></div>
-            <p class="snippet-note">From the commands reference. <a href="/docs/commands/">Commands</a></p>
-          </div>
-        </div>
-        <div class="row split">
-          <div class="copy-block">
-            <h3>The same bytes every time</h3>
-            <p>Output has no timestamps by default, so the file changes only when the code does. Two cold runs on the same checkout gave one hash.</p>
-            <p><a href="/docs/ci/">Keep it fresh in CI</a></p>
-          </div>
-          <div>
-            <div class="term"><div class="term-head"><span>$ shasum stacklit.json</span><span>two cold runs</span></div><pre tabindex="0"><code><span class="d">run 1</span>  {samples.hashFirst}
-<span class="d">run 2</span>  {samples.hashSecond}
-<span class="d">$ </span>stacklit diff
-{samples.diff}</code></pre></div>
-          </div>
+      <div class="works">
+        <h2>{copy.assistants.title}</h2>
+        <ul class="logos">
+          {assistants.map(([name, mono, colour]) => <li><Logo name={name} mono={mono ?? undefined} colour={colour ?? undefined} /></li>)}
+        </ul>
+        <p class="note">{copy.assistants.note}</p>
+        <div class="lang-row">
+          <span>Symbol graphs for 20 languages, including</span>
+          <ul class="logos small">
+            {languages.map(([name, slug]) => <li><Logo name={name} mono={`${slug}/${slug === 'java' ? 'default' : 'mono'}`} colour={`${slug}/default`} size={20} /></li>)}
+          </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>Works with</h2>
-        <p>Setup covers 26 assistants. These are some of them. Aider has no logo on thesvg.org, so it keeps its letter.</p>
+  <section class="sec">
+    <div class="container sec-grid">
+      <h2>{copy.problem.title}</h2>
+      <div class="sec-body">
+        <p class="big">{copy.problem.body}</p>
+        <blockquote class="cite-quote">
+          <p>{copy.problem.citation.text}</p>
+          <footer><a href={copy.problem.citation.url} rel="noopener">{copy.problem.citation.source}</a></footer>
+        </blockquote>
+        <p class="cite">{copy.problem.citation.caveat}</p>
       </div>
-      <ul class="works">
-        {assistants.map(([slug, name]) => (
+    </div>
+  </section>
+
+  <section class="sec" id="how">
+    <div class="container sec-grid">
+      <h2>{copy.steps.title}</h2>
+      <ol class="steps">
+        {copy.steps.items.map((s, i) => (
           <li>
-            <span class="wlogo" aria-hidden="true"><span>{name[0]}</span>{slug && <img src={`https://thesvg.org/icons/${slug}/default.svg`} alt="" width="28" height="28" loading="lazy" decoding="async" referrerpolicy="no-referrer" />}</span>
-            <span>{name}</span>
+            <div>
+              <h3><span class="num" aria-hidden="true">{i + 1}</span>{s.name}</h3>
+              <p>{s.text}</p>
+            </div>
+            <div class="cmd"><code><span class="p" aria-hidden="true">$ </span>{s.command}</code><button class="copy" type="button" data-copy={s.command} aria-label={`Copy the ${s.name.toLowerCase()} command`}>Copy</button></div>
           </li>
         ))}
-      </ul>
-      <p class="works-note">Any MCP client works through <code>stacklit serve</code>, and anything else can read <code>stacklit.json</code> directly. Logos load from thesvg.org when you view this page. Without them the letters stay.</p>
+      </ol>
     </div>
   </section>
 
-  <section class="section">
+  <section class="sec" id="proof">
+    <div class="container sec-grid">
+      <h2>{copy.proof.title}</h2>
+      <div class="sec-body">
+        <p class="big">{copy.proof.intro}</p>
+        <p class="prose-p">{copy.proof.note}</p>
+        <p class="cite">{bench.localizationTasks} tasks across {bench.repoCount} pinned public repos in six languages, run {bench.date}. Intervals are 95% bootstrap intervals over tasks.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Approach</th><th class="num">Found first</th><th class="num">Found in top 5</th><th class="num">Tokens to find</th></tr></thead>
+            <tbody>
+              {armRows.map(([label, a]) => (
+                <tr><td>{label}</td><td class="num">{a.found1}</td><td class="num">{a.found5}</td><td class="num">{a.tokens}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <ul class="points">
+          <li>Grep and read finds the file first more often, and its search pattern was written by someone who knew the answer. The query command’s gap to it is {bench.pairedQueryVsGrep.found1} percentage points at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
+          <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact name, grep is cheaper than loading a map.</li>
+          <li>{copy.proof.sizes.replace('{range}', `${deriveMin} to ${deriveMax}`)}</li>
+          <li>Limits are listed on the benchmark page.</li>
+        </ul>
+        {hasAb && (
+          <div class="ab">
+            <h3>{copy.proof.agentAbTitle}</h3>
+            <p>{copy.proof.agentAbNote} <a href="https://github.com/glincker/stacklit/blob/master/bench/agent-ab/summary.json">Read the summary and trajectories</a>.</p>
+          </div>
+        )}
+        <p class="cite"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with {bench.totalTasks} tasks in all, methods and limits.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-strip" aria-label="Plain facts">
     <div class="container">
-      <div class="section-head"><h2>Plain terms</h2></div>
-      <ul class="trust">
-        <li><strong>MIT license</strong><span>Read it, fork it, ship it.</span></li>
-        <li><strong>Free</strong><span>No paid tier, no gated features, no account.</span></li>
-        <li><strong>Local only</strong><span>No telemetry, no upload.</span></li>
-        <li><strong>One Go binary</strong><span>Nothing to run alongside it.</span></li>
-        <li><strong>Deterministic</strong><span>Same code, same bytes.</span></li>
+      <ul>
+        {copy.trust.items.map((t) => <li>{t}</li>)}
       </ul>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>What we measured</h2>
-        <p>{bench.localizationTasks} "where is this implemented?" tasks across {bench.repoCount} pinned public repos in six languages, run on {bench.date}. No model was involved, and tokens are bytes divided by four. Intervals are 95% bootstrap intervals over tasks.</p>
+  <section class="sec">
+    <div class="container sec-grid">
+      <h2>{copy.faq.title}</h2>
+      <div class="sec-body faq">
+        {copy.faq.items.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+        <p class="cite"><a href="/docs/faq/">{copy.faq.more}</a></p>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Approach</th><th class="num">Found first</th><th class="num">Found in top 5</th><th class="num">Tokens to find</th></tr></thead>
-          <tbody>
-            {armRows.map(([label, a]) => (
-              <tr><td>{label}</td><td class="num">{a.found1}</td><td class="num">{a.found5}</td><td class="num">{a.tokens}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <ul class="bench-points">
-        <li>Grep and read leads on accuracy, and its search pattern was written by someone who knew the answer. The query command's gap to it, in percentage points with an interval, is {bench.pairedQueryVsGrep.found1} at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
-        <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact symbol, grep is cheaper than loading a map.</li>
-        <li>The query command used to print files sorted by path. Printed by relevance, the order an agent reads it, it beats BM25 on finding the right file first. It is a proxy, not an agent evaluation, and the scoring was tuned after looking at some benchmark failures.</li>
-      </ul>
-      <p class="after-install">Index size on each repo. Generation times are on the benchmark page, where they are marked as upper bounds from a loaded machine.</p>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Repo</th><th>Language</th><th class="num">Source lines</th><th class="num">Modules</th><th class="num">stacklit.json tokens</th><th class="num">derive map tokens</th></tr></thead>
-          <tbody>
-            {bench.repos.map((r) => (
-              <tr><td>{r.repo}</td><td>{r.lang}</td><td class="num">{n(r.lines)}</td><td class="num">{r.modules}</td><td class="num">{n(r.indexTokens)}</td><td class="num">{n(r.deriveTokens)}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p class="after-install"><a href="/docs/benchmarks/">Read the full benchmark page</a>, with {bench.totalTasks} tasks in all, methodology, the dependents results and limitations.</p>
     </div>
   </section>
-  <script is:inline>
-    document.querySelectorAll('.wlogo img').forEach(function (i) {
-      var ok = function () { i.parentNode.classList.add('ok'); };
-      if (i.complete && i.naturalWidth) ok(); else i.addEventListener('load', ok);
-    });
-  </script>
+
+  <section class="sec final">
+    <div class="container">
+      <h2>{copy.final.title}</h2>
+      <p class="lede">{copy.final.text}</p>
+      <div class="hero-actions">
+        <InstallBox id="install-final" />
+        <div class="hero-buttons">
+          <StarLink />
+          <a class="btn" href="/docs/quickstart/">Quickstart</a>
+        </div>
+      </div>
+      <div class="lang-row">
+        <span>Also available through</span>
+        <ul class="logos small">
+          {sources.map(([name, slug]) => <li><Logo name={name} mono={`${slug}/mono`} colour={`${slug}/default`} size={20} /></li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
 </Base>

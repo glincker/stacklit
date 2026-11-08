@@ -19,6 +19,9 @@ on:
       - 'bench/RESULTS.md'
       - '.github/workflows/site.yml'
   workflow_dispatch:
+  # Daily rebuild so the GitHub star count on the page stays current.
+  schedule:
+    - cron: '17 5 * * *'
 
 permissions:
   contents: read
@@ -45,6 +48,9 @@ jobs:
       # The demo maps are committed, so no Go toolchain is needed here.
       - run: npm ci
       - run: npm run build
+        env:
+          # Raises the star lookup's rate limit. The token is read-only and the lookup is optional.
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/configure-pages@v5.0.0
         if: github.event_name != 'pull_request' && vars.SITE_DEPLOY == 'true'
       - uses: actions/upload-pages-artifact@v3.0.1

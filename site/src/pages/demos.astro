@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import data from '../data/demos.json';
+import copy from '../data/copy.json';
 
 const demos = data.demos;
 const languages = [...new Set(demos.map((d) => d.language))];
@@ -13,8 +14,8 @@ const time = (v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)} s` : `${v} ms
   path="/demos/"
 >
   <div class="container page-head">
-    <h1>Real maps of six public repos</h1>
-    <p>Each one is the single stacklit.html the tool wrote for a pinned release. Open it, switch views, click a module.</p>
+    <h1>{copy.demos.title}</h1>
+    <p>{copy.demos.sub}</p>
   </div>
   <div class="container demos-body">
     <div class="chips" data-filter aria-label="Filter by language">

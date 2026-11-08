@@ -1,0 +1,14 @@
+---
+// A thesvg.org logo by URL. Falls back to a letter when the slug is missing or the image is blocked.
+const { name, mono, colour, size = 24 } = Astro.props;
+const base = 'https://thesvg.org/icons/';
+const img = { width: size, height: size, loading: 'lazy', decoding: 'async', referrerpolicy: 'no-referrer' } as const;
+---
+<span class="lg">
+  <span class="lg-mark">
+    {mono && <img class="lg-m" src={`${base}${mono}.svg`} alt={name} {...img} onerror="this.hidden=true" />}
+    {mono && colour && <img class="lg-c" src={`${base}${colour}.svg`} alt="" {...img} onerror="this.hidden=true" />}
+    <span class:list={['lg-letter', !mono && 'on']} role={mono ? undefined : 'img'} aria-label={mono ? undefined : name}><span aria-hidden="true">{name[0]}</span></span>
+  </span>
+  <span class="lg-name" aria-hidden={mono ? 'true' : undefined}>{name}</span>
+</span>

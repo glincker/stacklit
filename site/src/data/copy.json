@@ -1,0 +1,104 @@
+{
+  "_status": "Final copy deck applied. Every string on the home page, the OG image, the meta tags and llms.txt lives here. To swap the headline, change hero.active (a is live, b and c are the two alternates). Then run npm run og and npm run build.",
+  "hero": {
+    "active": "a",
+    "variants": {
+      "a": {
+        "headline": "A 19,500 line repo. A 137 token map.",
+        "sub": "Stacklit writes a small map of your codebase into git, so your coding agent starts from the layout. Free, MIT, one Go binary. Sets up Claude Code, Cursor, Codex and 22 more."
+      },
+      "b": {
+        "headline": "Give your agent a map, not a pile of files.",
+        "sub": "Stacklit writes a small map of your codebase into git, so your coding agent starts from the layout. Free, MIT, one Go binary. Sets up Claude Code, Cursor, Codex and 22 more."
+      },
+      "c": {
+        "headline": "137k tokens of code. A 137 token map.",
+        "sub": "gin v1.10.0, Go source with tests, tokens as bytes divided by 4. Stacklit writes the map into git for your coding agent."
+      }
+    },
+    "caption": "stacklit derive on gin v1.10.0. Tokens are bytes divided by 4. Method and limits are in the benchmark.",
+    "captionLink": "Method and limits are in the benchmark.",
+    "primaryCta": "Run npx stacklit init",
+    "secondaryCta": "Read the benchmark, including where grep wins"
+  },
+  "cta": {
+    "install": "npx stacklit init",
+    "installNote": "To use the assistant hooks, install it so stacklit is on your PATH: npm install -g stacklit",
+    "star": "Star on GitHub",
+    "demo": "See a live map",
+    "mapCaption": "The map Stacklit wrote for ripgrep (Rust, 52,215 lines). Click around in the live version.",
+    "mapLink": "Open it"
+  },
+  "assistants": {
+    "title": "Sets up the assistants you already use",
+    "note": "Setup writes the config for 25 assistants, plus a generic AGENTS.md. Any MCP client can use stacklit serve, and anything else can read stacklit.json."
+  },
+  "problem": {
+    "title": "Agents search before they work",
+    "body": "A new session does not know your layout, so it lists folders, greps and opens files to find its way. Stacklit gives it a map first. The agent still greps and reads when it needs to.",
+    "citation": {
+      "text": "In one study of eight models on SWE-bench Verified, the higher cost runs repeated file views and edits more, and three of the higher cost models repeated around half of their file actions on the same file.",
+      "url": "https://arxiv.org/abs/2604.22750",
+      "source": "Bai et al., How Do AI Agents Spend Your Money? (arXiv 2604.22750)",
+      "caveat": "This describes the waste. It does not show that Stacklit reduces it. One preprint, one agent framework, one benchmark."
+    }
+  },
+  "steps": {
+    "title": "Three commands",
+    "items": [
+      { "name": "Map it", "text": "One command scans the repo with tree-sitter and writes stacklit.json, a dependency diagram and a visual map, then opens the map in your browser.", "command": "npx stacklit init" },
+      { "name": "Wire it up", "text": "Setup finds the assistants on your machine and writes the config each one reads. It also installs git hooks that rebuild the map after commits, checkouts and merges.", "command": "stacklit setup" },
+      { "name": "Ask where", "text": "Your agent asks a plain question and gets a ranked file list that fits a token budget. Slice prints one symbol's source. Impact lists what depends on it.", "command": "stacklit query \"where is auth checked\" --budget 1000" }
+    ]
+  },
+  "proof": {
+    "title": "What we measured, and what we did not",
+    "intro": "A benchmark of 47 where-is-X questions over six repos in six languages, with a simulated reader and no model. One 1,000 token query put the right file first on 81% of questions (95% interval 70 to 91) and in the top five on 96%.",
+    "note": "Grep with a hand written pattern did better: 89% first, 100% in the top five. Our query beat plain keyword search at the first file, 81% to 57%. The 81% came after tuning on these questions. On a separate 40 question set from our own repo the right file was first on 28 and in the top five on all 40. This is a benchmark, not an agent study. We have not shown a token or cost saving.",
+    "sizes": "Sizes side by side: the derive map is {range} tokens on these repos, the session digest is 290 to 515 tokens, and one query is about 1,000.",
+    "agentAbTitle": "Agent A/B run",
+    "agentAbNote": "Same tasks and model, with and without Stacklit."
+  },
+  "trust": {
+    "items": [
+      "Free and MIT. There is no paid tier.",
+      "One Go binary that runs on your machine.",
+      "No account and no telemetry.",
+      "The map is built without an LLM or embeddings. The same repo gives the same bytes.",
+      "One optional command, init --summary, pipes module names to a command you choose. It is off by default.",
+      "Every number links to its method in the repo."
+    ]
+  },
+  "faq": {
+    "title": "Questions",
+    "items": [
+      { "q": "Will it lower my token bill?", "a": "We do not know yet. Published work on a different tool, ContextSniper (arXiv 2607.01916), reports 51.5% fewer tokens and 36.4% lower cost on 50 SWE-bench Lite tasks with one agent. That tool uses embeddings and a context gate, and we have not reproduced its result with Stacklit. Our benchmark shows no token saving over grep. We will publish our own agent test whichever way it goes." },
+      { "q": "Why not just use grep?", "a": "Grep is the better tool when you already know the name. In our benchmark, grep with a hand written pattern found the file first more often than our query, 89% to 81%. Stacklit takes a plain question with no pattern, and it is one file in git that every assistant reads and a pull request can review." },
+      { "q": "Does it keep the map fresh?", "a": "A git hook rebuilds it after commits, checkouts and merges. In Claude Code an optional hook refreshes it after each edit, and stacklit watch keeps the symbol graph current. Edits made by hand while none of these run wait for the next run. Use stacklit refresh or stacklit generate." },
+      { "q": "Does it send my code anywhere?", "a": "No. It runs locally with no account and no telemetry. The one exception is the optional init --summary, which pipes module names and exports, no file contents, to a command you configure. The visual map page loads small language logos from thesvg.org unless you turn that off." }
+    ],
+    "more": "More answers in the FAQ"
+  },
+  "final": {
+    "title": "Give your agent a map",
+    "text": "One command, free, MIT. Commit the map and every assistant on your team starts from the same page."
+  },
+  "meta": {
+    "title": "Stacklit: a 137 token map of a 19,500 line repo",
+    "description": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. Free, MIT, one Go binary. Sets up 25 assistants.",
+    "structured": "Stacklit is a free, MIT licensed command line tool that writes a small committed map of a codebase for AI coding agents, with token budgeted queries for files, symbols and dependents.",
+    "llms": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. A 19,500 line Go repo (gin v1.10.0) becomes a 137 token map (tokens are bytes divided by 4). It parses a repository with tree-sitter and writes stacklit.json, a dependency diagram and an interactive HTML map, and sets up 25 assistants including Claude Code, Cursor and Codex. The map is built without an LLM or embeddings. Free, MIT, one Go binary, no account, no telemetry. In our benchmark a 1,000 token query puts the right file first on 81% of questions, and grep with a hand written pattern does better at 89%; it is a benchmark, not an agent study."
+  },
+  "og": {
+    "line1": "A 19,500 line repo.",
+    "line2": "A 137 token map.",
+    "assistants": "Claude Code, Cursor, Codex, Gemini CLI",
+    "footer": "Free. MIT. One Go binary.",
+    "url": "github.com/glincker/stacklit",
+    "alt": "Stacklit: a 19,500 line repo. A 137 token map."
+  },
+  "demos": {
+    "title": "Real maps of six public repos",
+    "sub": "Each one is the single stacklit.html the tool wrote for a pinned release. Open it, switch views, click a module."
+  }
+}
