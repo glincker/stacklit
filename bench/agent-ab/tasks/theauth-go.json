@@ -1,0 +1,124 @@
+[
+ {
+  "id": "tg-01",
+  "kind": "locate",
+  "question": "Where is the short code that a person types on a second device during the device login flow generated?",
+  "all_of": [],
+  "any_of": [
+   "internal/apitokens/device.go",
+   "internal/as/device.go"
+  ],
+  "rubric": "Two device flows generate user codes: internal/apitokens/device.go (newUserCode) and internal/as/device.go (OAuth device grant). Either is accepted."
+ },
+ {
+  "id": "tg-02",
+  "kind": "locate",
+  "question": "Where is a DPoP proof checked against the request's HTTP method and URI (the htm and htu claims)?",
+  "all_of": [],
+  "any_of": [
+   "internal/dpop/service.go"
+  ],
+  "rubric": "The htm and htu checks are in internal/dpop/service.go (proof.go only declares the claim fields)."
+ },
+ {
+  "id": "tg-03",
+  "kind": "trace",
+  "question": "Which two files hold the audit log hash chain: the one that walks the stored rows to verify the chain and the one that computes each row's hash?",
+  "all_of": [
+   "internal/audit/chain.go",
+   "internal/audit/chainhash.go"
+  ],
+  "any_of": [],
+  "rubric": "VerifyChain is in chain.go, RowHash in chainhash.go."
+ },
+ {
+  "id": "tg-04",
+  "kind": "trace",
+  "question": "Which files implement the persistence of CIBA (backchannel authentication) requests, one per storage backend that supports it?",
+  "all_of": [
+   "storage/memory/memory_ciba.go",
+   "storage/sqlite/ciba.go",
+   "storage/postgres/postgres_ciba.go"
+  ],
+  "any_of": [],
+  "rubric": "memory, sqlite and postgres have CIBA stores. The mysql backend has none, so a mysql path is wrong."
+ },
+ {
+  "id": "tg-05",
+  "kind": "impact",
+  "question": "Which non-test Go files import the internal/dpop package?",
+  "all_of": [
+   "config.go",
+   "internal/as/config.go",
+   "internal/as/dpop.go",
+   "internal/as/service.go",
+   "internal/as/oidc_userinfo.go",
+   "internal/as/iotdevice.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these six files import internal/dpop outside tests."
+ },
+ {
+  "id": "tg-06",
+  "kind": "trace",
+  "question": "A client posts a pushed authorization request (PAR). Which files take part, from the HTTP handler through the authorization server logic down to each storage backend that stores pushed requests?",
+  "all_of": [
+   "internal/as/handlers/handlers.go",
+   "internal/as/par.go",
+   "storage/memory/memory_par.go",
+   "storage/sqlite/as_par.go",
+   "storage/postgres/postgres_par.go"
+  ],
+  "any_of": [],
+  "rubric": "Handler registers /oauth/par; par.go holds the service logic; memory, sqlite, postgres store it."
+ },
+ {
+  "id": "tg-07",
+  "kind": "add",
+  "question": "I want to add a new social login provider (say Slack) following the existing pattern. Where would the new code go and which existing file should I copy as a template?",
+  "all_of": [],
+  "any_of": [
+   "provider/discord/discord.go",
+   "provider/github/",
+   "provider/google/",
+   "provider/facebook/",
+   "provider/microsoft/"
+  ],
+  "rubric": "A new package under provider/<name>/, modelled on an existing provider package such as provider/discord."
+ },
+ {
+  "id": "tg-08",
+  "kind": "add",
+  "question": "I want to introduce a new audit event name. Which two files declare the audit event name constants, one internal and one public?",
+  "all_of": [
+   "internal/audit/events.go",
+   "audit/events.go"
+  ],
+  "any_of": [],
+  "rubric": "Constants live in internal/audit/events.go and are re-exported from the public audit/events.go."
+ },
+ {
+  "id": "tg-09",
+  "kind": "impact",
+  "question": "Which non-test Go files import the internal/scim package (not its handlers subpackage)?",
+  "all_of": [
+   "enterprise.go",
+   "internal/scim/handlers/handlers.go",
+   "middleware.go",
+   "theauth.go",
+   "wiring.go"
+  ],
+  "any_of": [],
+  "rubric": "Exactly these five files import internal/scim outside tests."
+ },
+ {
+  "id": "tg-10",
+  "kind": "locate",
+  "question": "Where is the SCIM filter expression (such as userName eq \"x\") parsed?",
+  "all_of": [],
+  "any_of": [
+   "internal/scim/filter.go"
+  ],
+  "rubric": "ParseEqFilter in internal/scim/filter.go."
+ }
+]

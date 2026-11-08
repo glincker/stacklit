@@ -1,0 +1,22 @@
+[
+  {"id": "lr-01", "kind": "locate", "question": "Where does the control plane count established TCP connections on Linux to decide whether an app is idle enough to sleep?",
+   "all_of": [], "any_of": ["internal/appsleep/conns_linux.go"], "rubric": "establishedOn in internal/appsleep/conns_linux.go."},
+  {"id": "lr-02", "kind": "locate", "question": "Where does dynamic DNS work out the machine's public IP address by asking several probe URLs and requiring them to agree?",
+   "all_of": [], "any_of": ["internal/ddns/detect.go"], "rubric": "Detector with a quorum in internal/ddns/detect.go."},
+  {"id": "lr-03", "kind": "trace", "question": "Which dashboard (web) files render the autoscale settings for an app and fetch its data? Give the card, the form and the data query module.",
+   "all_of": ["web/src/components/AppAutoscaleCard.tsx", "web/src/components/autoscale/AutoscaleForm.tsx", "web/src/queries/autoscale.ts"], "any_of": [], "rubric": "AppAutoscaleCard, AutoscaleForm and queries/autoscale."},
+  {"id": "lr-04", "kind": "trace", "question": "A user runs the CLI command to change the dynamic DNS settings. Which files take part, from the CLI command through the API client and the HTTP handler to the domain logic that applies the update?",
+   "all_of": ["cmd/levelrail-cli/settings_ddns.go", "internal/apiclient/settings_ddns.go", "internal/api/settings_ddns.go", "internal/ddns/manager.go"], "any_of": [], "rubric": "CLI command, apiclient, API handler, ddns.Manager.Apply."},
+  {"id": "lr-05", "kind": "impact", "question": "Which non-test Go files import the internal/appsleep package?",
+   "all_of": ["cmd/levelrail/boot_source.go", "cmd/levelrail/boot_stages_workers.go", "cmd/levelrail/jobs_http_target.go", "internal/api/app_sleep.go", "internal/api/app_sleep_history.go", "internal/api/app_sleep_state.go", "internal/api/app_sleep_wake.go", "internal/api/router.go"], "any_of": [], "rubric": "Exactly these eight files import internal/appsleep outside tests."},
+  {"id": "lr-06", "kind": "impact", "question": "Which non-test Go files import the internal/autoscale package?",
+   "all_of": ["cmd/levelrail/boot_loaders.go", "cmd/levelrail/boot_stages_workers.go", "internal/api/autoscale.go", "internal/api/autoscale_signals.go", "internal/apiclient/autoscale.go", "internal/deploy/autoscale.go", "internal/spec/autoscale.go", "internal/store/autoscale.go"], "any_of": [], "rubric": "Exactly these eight files import internal/autoscale outside tests."},
+  {"id": "lr-07", "kind": "add", "question": "I want to add a new MCP tool following the existing pattern. Which file registers the groups of tools, and which file holds the table that classifies each tool (read, mutate, destructive) by name?",
+   "all_of": ["internal/mcptools/server.go", "internal/mcptools/classes.go"], "any_of": [], "rubric": "registerXTools call in server.go, and the tool name entry in classes.go (plus a new tools_*.go file)."},
+  {"id": "lr-08", "kind": "add", "question": "I want to add a new subcommand under the CLI's `apps` command group (like `apps sleep`). Which file dispatches the apps subcommands, and where does a new subcommand's implementation file go?",
+   "all_of": ["cmd/levelrail-cli/apps.go"], "any_of": ["cmd/levelrail-cli/apps_sleep.go", "cmd/levelrail-cli/apps_"], "rubric": "Dispatch switch in cmd/levelrail-cli/apps.go, new apps_<name>.go beside apps_sleep.go."},
+  {"id": "lr-09", "kind": "locate", "question": "Where is the reverse proxy handler for raw TCP or UDP (layer 4) traffic built for the embedded Caddy ingress?",
+   "all_of": [], "any_of": ["internal/ingress/layer4.go"], "rubric": "NewLayer4ProxyHandler in internal/ingress/layer4.go."},
+  {"id": "lr-10", "kind": "trace", "question": "A request arrives for an app that is asleep and must wake it. Which files take part: the HTTP wake endpoint, the port-level waker, and the ingress reconciler?",
+   "all_of": ["internal/api/app_sleep_wake.go", "internal/appsleep/portwake.go", "internal/reconcile/ingress/sleep.go"], "any_of": [], "rubric": "api wake handler, appsleep portwake, reconcile/ingress sleep."}
+]
