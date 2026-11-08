@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T18:10:19Z",
+  "generated_at": "2026-11-08T18:29:53Z",
   "stacklit_version": "dev",
-  "merkle_hash": "cbeee2e67e8588f2bb01d5a3cb16619510fd69b1e107e67b12f15829b8c8bc27",
+  "merkle_hash": "55f33f1da76490c2d0bfaba310d6108fe9deb02cff070fcc23f7eae1e4e5a220",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 34
       },
       "go": {
-        "files": 208,
-        "lines": 27523
+        "files": 212,
+        "lines": 28134
       },
       "graphql": {
         "files": 1,
@@ -111,8 +111,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 240,
-    "total_lines": 28596
+    "total_files": 244,
+    "total_lines": 29207
   },
   "modules": {
     "assets": {
@@ -226,8 +226,8 @@
     "internal/cli": {
       "purpose": "Command-line interface",
       "language": "go",
-      "files": 21,
-      "lines": 1636,
+      "files": 22,
+      "lines": 1709,
       "file_list": [
         "check.go",
         "check_test.go",
@@ -244,11 +244,11 @@
         "ingest_ext.go",
         "init.go",
         "mergegraphs.go",
+        "profile.go",
         "root.go",
         "serve.go",
         "setup.go",
-        "version.go",
-        "version_test.go"
+        "version.go"
       ],
       "exports": [
         "Error() string",
@@ -292,7 +292,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 493,
+      "lines": 595,
       "file_list": [
         "config.go",
         "config_test.go",
@@ -305,20 +305,23 @@
         "Check(root string) error",
         "DefaultConfig() *Config",
         "DefaultMaxFileSize",
+        "DefaultMaxLineLen",
+        "DefaultMemoryLimitMB",
         "DefaultParseMemoryMB",
-        "Error() string",
-        "GitActivityEnabled() bool",
-        "Load(root string) *Config",
-        "LoadStrict(root string) (*Config, error)",
-        "NormalizedRoots() []string"
+        "DefaultParseTimeoutMS",
+        "DefaultTSMaxBytes",
+        "Error() string"
       ],
       "type_defs": {
         "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
-        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, Workers int, ParseMemoryMB int, Cache *boo...",
+        "Config": "Ignore []string, MaxDepth int, MaxModules int, MaxExports int, Output OutputConfig, Roots []string, Include []string, Exclude []string, MaxFileSize int64, Workers int, ParseMemoryMB int, ParseTimeo...",
         "Error": "Err error",
         "ForbiddenEdge": "From string, To string, Reason string",
         "OutputConfig": "JSON string, Mermaid string, HTML string"
       },
+      "depends_on": [
+        "internal/parser"
+      ],
       "depended_by": [
         "internal/check",
         "internal/cli",
@@ -417,8 +420,8 @@
     "internal/engine": {
       "purpose": "Core orchestration engine",
       "language": "go",
-      "files": 9,
-      "lines": 1590,
+      "files": 10,
+      "lines": 1684,
       "file_list": [
         "bench_test.go",
         "engine.go",
@@ -427,6 +430,7 @@
         "multi_test.go",
         "packages.go",
         "packages_test.go",
+        "scale_test.go",
         "scan.go",
         "stability_test.go"
       ],
@@ -757,8 +761,8 @@
     "internal/parser": {
       "purpose": "Source code parsers",
       "language": "go",
-      "files": 55,
-      "lines": 7017,
+      "files": 57,
+      "lines": 7314,
       "file_list": [
         "fuzz_test.go",
         "generic.go",
@@ -768,6 +772,8 @@
         "java_test.go",
         "langs_test.go",
         "langs_wave2_test.go",
+        "limits.go",
+        "limits_test.go",
         "parser.go",
         "pool.go",
         "pool_test.go",
@@ -777,32 +783,32 @@
         "ts_build.go",
         "ts_c.go",
         "ts_clojure.go",
-        "ts_common.go",
-        "ts_config.go",
-        "ts_csharp.go"
+        "ts_common.go"
       ],
       "exports": [
         "CanParse(_ string) bool",
         "CanParse(filename string) bool",
         "Error() string",
+        "FallbackGenerated",
+        "FallbackLarge",
+        "FallbackMinified",
+        "FallbackTimeout",
         "IsDataLanguage(lang string) bool",
         "LeafHash(path string, content []byte) []byte",
-        "Parse(path string, content []byte) (*FileInfo, error)",
-        "ParseAll(paths []string) ([]*FileInfo, []error)",
-        "ParseContent(path string, content []byte) (*FileInfo, error)",
-        "ParseFile(path string) (*FileInfo, error)",
-        "ScanFiles(files []string, o PoolOptions) []Scanned"
+        "Parse(path string, content []byte) (*FileInfo, error)"
       ],
       "type_defs": {
         "Cache": "interface{Get(), Put()}",
-        "FileInfo": "Path string, Language string, Imports []string, Exports []string, TypeDefs map[string]string, LineCount int, IsEntrypoint bool",
+        "FileInfo": "Path string, Language string, Imports []string, Exports []string, TypeDefs map[string]string, LineCount int, IsEntrypoint bool, Fallback string",
+        "Limits": "ParseTimeout time.Duration, MaxBytes int64, MaxLineLen int, Generated bool",
         "PanicError": "Path string, Value any, Stack string",
         "Parser": "interface{CanParse(), Parse()}",
-        "PoolOptions": "Root string, Workers int, MaxFileSize int64, Cache Cache, Visit any, MemoryBudget int64",
-        "Scanned": "Path string, Info *FileInfo, Leaf []byte, Err error, Cached bool, Panicked bool"
+        "PoolOptions": "Root string, Workers int, MaxFileSize int64, Cache Cache, Visit any, MemoryBudget int64, Limits Limits",
+        "Scanned": "Path string, Info *FileInfo, Leaf []byte, Err error, Cached bool, Panicked bool, Dur time.Duration"
       },
       "depended_by": [
         "internal/cache",
+        "internal/config",
         "internal/doctor",
         "internal/engine",
         "internal/graph"
@@ -852,7 +858,7 @@
       "purpose": "Data schema definitions",
       "language": "go",
       "files": 1,
-      "lines": 177,
+      "lines": 180,
       "file_list": [
         "schema.go"
       ],
@@ -1003,7 +1009,7 @@
       "purpose": "File system walker",
       "language": "go",
       "files": 4,
-      "lines": 765,
+      "lines": 807,
       "file_list": [
         "scan.go",
         "scan_test.go",
@@ -1142,6 +1148,10 @@
       [
         "internal/cli",
         "internal/walker"
+      ],
+      [
+        "internal/config",
+        "internal/parser"
       ],
       [
         "internal/derive",
@@ -1304,9 +1314,9 @@
       "internal/schema",
       "internal/graph",
       "internal/config",
+      "internal/parser",
       "internal/walker",
       "internal/git",
-      "internal/parser",
       "internal/fsutil",
       "internal/cache",
       "internal/renderer",
@@ -1431,18 +1441,27 @@
     "test_command": "go test ./...",
     "env_vars": [
       "ANTHROPIC_API_KEY",
+      "GOMEMLIMIT",
       "STACKLIT_CACHE_DIR",
       "STACKLIT_DIGEST_TOKENS",
       "STACKLIT_GIT",
       "STACKLIT_HTML_MAX_NODES",
       "STACKLIT_MAX_FILE_SIZE",
+      "STACKLIT_MAX_LINE_LEN",
+      "STACKLIT_MEMORY_LIMIT_MB",
       "STACKLIT_NO_CACHE",
       "STACKLIT_NO_GIT",
       "STACKLIT_PARSE_MEMORY_MB",
+      "STACKLIT_PARSE_TIMEOUT_MS",
+      "STACKLIT_PPROF",
       "STACKLIT_ROOTS",
+      "STACKLIT_SCALE_BUDGET_S",
       "STACKLIT_SCIP_MAX_BYTES",
       "STACKLIT_SKIP_CHECKSUM",
+      "STACKLIT_SKIP_GENERATED",
       "STACKLIT_TIMESTAMPS",
+      "STACKLIT_TRACE",
+      "STACKLIT_TS_MAX_BYTES",
       "STACKLIT_WORKERS"
     ],
     "do_not_touch": [

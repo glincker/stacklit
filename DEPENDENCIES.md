@@ -68,6 +68,7 @@ graph LR
   internal_cli --> internal_scip
   internal_cli --> internal_setup
   internal_cli --> internal_walker
+  internal_config --> internal_parser
   internal_derive --> internal_schema
   internal_doctor --> internal_cache
   internal_doctor --> internal_config
