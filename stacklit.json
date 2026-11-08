@@ -1,9 +1,9 @@
 {
   "$schema": "https://stacklit.dev/schema/v1.json",
   "version": "1",
-  "generated_at": "2026-11-08T18:56:34Z",
+  "generated_at": "2026-11-08T19:11:05Z",
   "stacklit_version": "dev",
-  "merkle_hash": "735d17495650c0b538e98c283479a6e8b2c592e1ea32c05cfa640a3479a206fd",
+  "merkle_hash": "9869b7b7bbd4bf051a70a0829d2d73b5bab93aac138d9d021ac300f06381e3a6",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -33,8 +33,8 @@
         "lines": 49
       },
       "go": {
-        "files": 240,
-        "lines": 34643
+        "files": 242,
+        "lines": 34756
       },
       "graphql": {
         "files": 1,
@@ -45,8 +45,8 @@
         "lines": 37
       },
       "javascript": {
-        "files": 6,
-        "lines": 493
+        "files": 7,
+        "lines": 480
       },
       "kotlin": {
         "files": 3,
@@ -111,18 +111,19 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 308,
-    "total_lines": 36244
+    "total_files": 311,
+    "total_lines": 36344
   },
   "modules": {
     "assets": {
       "purpose": "Static assets",
       "language": "javascript",
-      "files": 3,
-      "lines": 265,
+      "files": 4,
+      "lines": 252,
       "file_list": [
         "embed.go",
         "lang-icons.js",
+        "selftest.mjs",
         "symbols.js"
       ],
       "exports": [
@@ -227,7 +228,7 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 23,
-      "lines": 1881,
+      "lines": 1885,
       "file_list": [
         "check.go",
         "check_test.go",
@@ -292,7 +293,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 655,
+      "lines": 688,
       "file_list": [
         "config.go",
         "config_test.go",
@@ -421,7 +422,7 @@
       "purpose": "Core orchestration engine",
       "language": "go",
       "files": 10,
-      "lines": 1689,
+      "lines": 1690,
       "file_list": [
         "bench_test.go",
         "engine.go",
@@ -835,12 +836,13 @@
     "internal/renderer": {
       "purpose": "Output renderers",
       "language": "go",
-      "files": 11,
-      "lines": 1161,
+      "files": 13,
+      "lines": 1236,
       "file_list": [
         "html.go",
         "html_graph.go",
         "html_graph_test.go",
+        "html_icons_test.go",
         "json.go",
         "json_test.go",
         "markdown.go",
@@ -848,10 +850,12 @@
         "mermaid.go",
         "mermaid_test.go",
         "options.go",
+        "page.go",
         "stable.go"
       ],
       "exports": [
         "RenderMarkdown(idx *schema.Index) string",
+        "SetMapIcons(on bool)",
         "SetTimestamps(on bool)",
         "WriteHTML(idx *schema.Index, path string) error",
         "WriteHTMLWithGraph(idx *schema.Index, g *graph.SymGraph, maxNodes int, path stri",
@@ -1476,6 +1480,7 @@
       "STACKLIT_GRAPH_MAX_PARSE_BYTES",
       "STACKLIT_GRAPH_PARSE_TIMEOUT_MS",
       "STACKLIT_HTML_MAX_NODES",
+      "STACKLIT_MAP_ICONS",
       "STACKLIT_MAP_TOKENS",
       "STACKLIT_MAX_FILE_SIZE",
       "STACKLIT_MAX_LINE_LEN",
