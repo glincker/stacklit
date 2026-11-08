@@ -3,7 +3,7 @@ package renderer
 import (
 	"strings"
 
-	"github.com/glincker/stacklit/assets"
+	"github.com/glincker/stacklit/internal/assets"
 )
 
 const iconHosts = "https://thesvg.org https://cdn.jsdelivr.net"
