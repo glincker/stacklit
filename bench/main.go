@@ -284,6 +284,8 @@ func measureGenerate(binary, dir string, runs int) (GenStats, error) {
 		}
 		cmd := exec.Command(binary, "generate", "--quiet")
 		cmd.Dir = dir
+		// Cold-start numbers only: a warm parse cache would hide the real cost.
+		cmd.Env = append(os.Environ(), "STACKLIT_NO_CACHE=1")
 		start := time.Now()
 		if out, err := cmd.CombinedOutput(); err != nil {
 			return GenStats{}, fmt.Errorf("generate: %v: %s", err, out)
