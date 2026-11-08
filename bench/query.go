@@ -1,24 +1,49 @@
 package main
 
 import (
-	"encoding/json"
 	"os/exec"
+	"regexp"
 	"sort"
 	"strings"
 )
 
-// queryDoc is the part of `stacklit query --json` the harness reads. Files come
-// in the order the tool prints them: relevance order by default, path order with
-// `--order path`.
+// queryDoc is the printed `stacklit query` text, parsed back into files and
+// symbol lines. The harness reads the text, not --json, because the agent sees
+// the text and the two are cut to the same token budget at different sizes.
 type queryDoc struct {
 	Files []struct {
-		File    string `json:"file"`
-		Symbols []struct {
-			Name string `json:"name"`
-			Sig  string `json:"sig"`
-			Doc  string `json:"doc"`
-		} `json:"symbols"`
-	} `json:"files"`
+		File    string
+		Symbols []struct{ Name, Sig, Doc string }
+	}
+}
+
+var (
+	rankPrefix = regexp.MustCompile(`^\d+\. `)
+	symLine    = regexp.MustCompile(`^  \d+(?:-\d+)? (.*)$`)
+)
+
+// parseQueryText reads files in printed order. Unindented lines are file paths
+// (optionally "N. " ranked) except the title, head and bracketed notice lines.
+func parseQueryText(out []byte) queryDoc {
+	var doc queryDoc
+	for i, line := range strings.Split(string(out), "\n") {
+		switch {
+		case line == "" || i == 0:
+		case strings.HasPrefix(line, "      "):
+		case symLine.MatchString(line):
+			if n := len(doc.Files); n > 0 {
+				label, docText, _ := strings.Cut(symLine.FindStringSubmatch(line)[1], "  // ")
+				doc.Files[n-1].Symbols = append(doc.Files[n-1].Symbols, struct{ Name, Sig, Doc string }{label, label, docText})
+			}
+		case line[0] == '[' || strings.HasPrefix(line, "best match: ") || strings.Contains(line, " seeds, ") || line[0] == ' ':
+		default:
+			doc.Files = append(doc.Files, struct {
+				File    string
+				Symbols []struct{ Name, Sig, Doc string }
+			}{File: rankPrefix.ReplaceAllString(line, "")})
+		}
+	}
+	return doc
 }
 
 // RunQuery is the graph query arm: one `stacklit query --budget` call per
@@ -38,18 +63,11 @@ func RunQuery(arm, pathArm, readerArm, binary, dir string, task Task, modules []
 		out, _ := cmd.Output() // no match still exits cleanly; stderr notes are not read by the agent
 		return out
 	}
-	parse := func(extra ...string) queryDoc {
-		var doc queryDoc
-		if err := json.Unmarshal(run(append([]string{"--json"}, extra...)...), &doc); err != nil {
-			doc = queryDoc{}
-		}
-		return doc
-	}
-	tool.Lookup = CostOf(string(run()))
-	byPath.Lookup = CostOf(string(run("--order", "path")))
+	text, pathText := run(), run("--order", "path")
+	tool.Lookup, byPath.Lookup = CostOf(string(text)), CostOf(string(pathText))
 	reader.Lookup = byPath.Lookup
 
-	doc, pathDoc := parse(), parse("--order", "path")
+	doc, pathDoc := parseQueryText(text), parseQueryText(pathText)
 	if task.Kind == "dependents" {
 		mods := map[string]bool{}
 		for _, f := range doc.Files {

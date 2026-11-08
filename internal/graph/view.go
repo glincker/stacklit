@@ -193,6 +193,8 @@ func (g *SymGraph) buildView(sp viewSpec, k int) *View {
 	return v
 }
 
+func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }
+
 // Text renders the view as indented, file-grouped lines.
 func (v *View) Text() string {
 	var b strings.Builder
@@ -213,13 +215,14 @@ func (v *View) Text() string {
 			if s.End > s.Start {
 				rng = fmt.Sprintf("%d-%d", s.Start, s.End)
 			}
-			label := s.Sig
+			// One line per symbol: a multi-line signature or doc would read as a file path.
+			label := oneLine(s.Sig)
 			if label == "" {
 				label = s.Kind + " " + s.Name
 			}
 			line := "  " + rng + " " + label
 			if s.Doc != "" {
-				line += "  // " + s.Doc
+				line += "  // " + oneLine(s.Doc)
 			}
 			b.WriteString(line)
 			b.WriteByte('\n')
