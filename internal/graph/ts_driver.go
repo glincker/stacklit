@@ -3,6 +3,7 @@ package graph
 import (
 	"strings"
 	"sync"
+	"time"
 
 	gts "github.com/odvcencio/gotreesitter"
 	"github.com/odvcencio/gotreesitter/grammars"
@@ -31,6 +32,8 @@ type tsSpec struct {
 	docFn    func(w *tsw, n *gts.Node) string
 	prepare  func(w *tsw, root *gts.Node)
 	finish   func(w *tsw)
+	// mask rewrites source the grammar cannot read, keeping every byte offset.
+	mask func(src []byte) []byte
 	// qualAlias maps receiver keywords (parent, static, Self) to the names the resolver knows.
 	qualAlias map[string]string
 }
@@ -98,7 +101,7 @@ func releaseTS(name string, p *gts.Parser) {
 
 // extractTS parses src with the language's grammar and walks the tree once.
 // It returns nil when the grammar is missing or parsing fails, so callers can fall back.
-func extractTS(spec *tsSpec, grammar, file string, src []byte) (fs *FileSyms) {
+func extractTS(spec *tsSpec, grammar, file string, src []byte, timeout time.Duration) (fs *FileSyms) {
 	defer func() {
 		if r := recover(); r != nil {
 			fs = nil
@@ -111,6 +114,12 @@ func extractTS(spec *tsSpec, grammar, file string, src []byte) (fs *FileSyms) {
 	lang := entry.Language()
 	p := acquireTS(grammar, lang)
 	defer releaseTS(grammar, p)
+	// Some inputs make the GLR parser blow up (heavy preprocessor branching); a
+	// deadline keeps one file from stalling the whole build.
+	p.SetTimeoutMicros(uint64(timeout / time.Microsecond))
+	if spec.mask != nil {
+		src = spec.mask(src)
+	}
 	tree, err := p.Parse(src)
 	if err != nil || tree == nil {
 		return nil
@@ -118,6 +127,10 @@ func extractTS(spec *tsSpec, grammar, file string, src []byte) (fs *FileSyms) {
 	// Release hands the node arena back to the library; extraction copies every
 	// string it keeps, so nothing outlives the tree.
 	defer tree.Release()
+	if tree.ParseStoppedEarly() {
+		tree.Release()
+		return nil
+	}
 	root := tree.RootNode()
 	if root == nil {
 		return nil

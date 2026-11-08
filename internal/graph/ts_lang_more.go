@@ -87,6 +87,7 @@ var csharpSpec = &tsSpec{
 		"using_directive":                   csUsing,
 	},
 	comments:  set("comment"),
+	mask:      csharpMaskDirectives,
 	builtins:  wordSet("nameof typeof"),
 	nameKids:  []string{"identifier"},
 	qualAlias: map[string]string{"base": "super"},
@@ -270,6 +271,7 @@ var swiftSpec = &tsSpec{
 		},
 	},
 	comments:  set("comment", "multiline_comment"),
+	mask:      csharpMaskDirectives,
 	qualAlias: map[string]string{"Self": "self"},
 	vis: func(w *tsw, n *gts.Node, name string) string {
 		if v := w.modVis(n); v != "" {
@@ -1122,6 +1124,7 @@ var luaSpec = &tsSpec{
 	calls:    map[string]callRule{"function_call": {fn: "name"}},
 	special:  map[string]func(w *tsw, n *gts.Node) bool{"function_call": luaRequire},
 	comments: set("comment"),
+	mask:     luaMaskBlockComments,
 	builtins: wordSet("print require pairs ipairs type tostring tonumber setmetatable getmetatable error assert pcall xpcall select next rawget rawset unpack"),
 	vis: func(w *tsw, n *gts.Node, name string) string {
 		if strings.HasPrefix(strings.TrimSpace(w.text(n)), "local") {
@@ -1470,4 +1473,104 @@ func solBases(w *tsw, n *gts.Node, idx int) {
 		}
 	}
 	emitBases(w, idx, anc)
+}
+
+// luaMaskBlockComments turns --[[ ... ]] (and --[==[ ... ]==]) into runs of line
+// comments, which the grammar runtime reads correctly. Offsets are unchanged.
+func luaMaskBlockComments(src []byte) []byte {
+	var out []byte
+	n := len(src)
+	for i := 0; i+3 < n; i++ {
+		if src[i] != '-' || src[i+1] != '-' || src[i+2] != '[' {
+			continue
+		}
+		j := i + 3
+		for j < n && src[j] == '=' {
+			j++
+		}
+		if j >= n || src[j] != '[' {
+			continue
+		}
+		closer := "]" + strings.Repeat("=", j-(i+3)) + "]"
+		stop := n
+		if at := strings.Index(string(src[j+1:]), closer); at >= 0 {
+			stop = j + 1 + at + len(closer)
+		}
+		if out == nil {
+			out = append([]byte(nil), src...)
+		}
+		for k := i + 2; k <= j; k++ {
+			out[k] = ' '
+		}
+		if stop-len(closer) > j {
+			for k := stop - len(closer); k < stop; k++ {
+				out[k] = ' '
+			}
+		}
+		for k := j + 1; k < stop; k++ {
+			if out[k] == '\n' && k+2 < stop && out[k+1] != '\n' && out[k+2] != '\n' {
+				out[k+1], out[k+2] = '-', '-'
+			}
+		}
+		i = stop - 1
+	}
+	if out == nil {
+		return src
+	}
+	return out
+}
+
+// csharpMaskDirectives (also used for Swift) blanks preprocessor lines and keeps only the first branch of each
+// #if block. Both branches usually hold alternative versions of the same code, which the
+// grammar reads as duplicate or unbalanced declarations. Offsets are unchanged.
+func csharpMaskDirectives(src []byte) []byte {
+	if !strings.Contains(string(src), "\n#") && !(len(src) > 0 && src[0] == '#') {
+		return src
+	}
+	out := append([]byte(nil), src...)
+	type frame struct{ dropping bool }
+	var stack []frame
+	dropping := func() bool {
+		for _, f := range stack {
+			if f.dropping {
+				return true
+			}
+		}
+		return false
+	}
+	blank := func(a, b int) {
+		for k := a; k < b; k++ {
+			if out[k] != '\n' && out[k] != '\r' {
+				out[k] = ' '
+			}
+		}
+	}
+	for start := 0; start < len(src); {
+		end := start
+		for end < len(src) && src[end] != '\n' {
+			end++
+		}
+		line := strings.TrimSpace(string(src[start:end]))
+		switch {
+		case strings.HasPrefix(line, "#if"):
+			blank(start, end)
+			stack = append(stack, frame{})
+		case strings.HasPrefix(line, "#elif"), strings.HasPrefix(line, "#else"):
+			blank(start, end)
+			if len(stack) > 0 {
+				stack[len(stack)-1].dropping = true
+			}
+		case strings.HasPrefix(line, "#endif"):
+			blank(start, end)
+			if len(stack) > 0 {
+				stack = stack[:len(stack)-1]
+			}
+		case strings.HasPrefix(line, "#"):
+			blank(start, end)
+		case dropping():
+			blank(start, end)
+		}
+		start = end + 1
+	}
+	return out
 }
