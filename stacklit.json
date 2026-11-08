@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "95f75960204d49dc83ae1cff0ce93777a62df903adf288f53b97e63bbeab5dd3",
+  "merkle_hash": "9e88194cfe8d2f0fb2fe1e739699cd62b37cdafc088e4dc398743603ad422ee8",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -93,12 +93,12 @@
         "lines": 37
       },
       "javascript": {
-        "files": 12,
-        "lines": 1048
+        "files": 14,
+        "lines": 1116
       },
       "json": {
-        "files": 18,
-        "lines": 500
+        "files": 19,
+        "lines": 606
       },
       "julia": {
         "files": 1,
@@ -190,7 +190,7 @@
       },
       "typescript": {
         "files": 12,
-        "lines": 109
+        "lines": 110
       },
       "vue": {
         "files": 1,
@@ -198,7 +198,7 @@
       },
       "yaml": {
         "files": 13,
-        "lines": 513
+        "lines": 519
       },
       "zig": {
         "files": 3,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 410,
-    "total_lines": 44348
+    "total_files": 413,
+    "total_lines": 44529
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -243,7 +243,7 @@
       "purpose": "Workflows",
       "language": "yaml",
       "files": 5,
-      "lines": 230,
+      "lines": 236,
       "file_list": [
         "site.yml",
         "release.yml",
@@ -1418,7 +1418,7 @@
       "purpose": "Site",
       "language": "javascript",
       "files": 2,
-      "lines": 33,
+      "lines": 35,
       "file_list": [
         "package.json",
         "astro.config.mjs"
@@ -1437,11 +1437,13 @@
     "site/scripts": {
       "purpose": "Scripts",
       "language": "javascript",
-      "files": 4,
-      "lines": 556,
+      "files": 6,
+      "lines": 624,
       "file_list": [
         "build-demos.mjs",
         "check-links.mjs",
+        "fetch-stars.mjs",
+        "make-og.mjs",
         "shoot-thumbs.mjs",
         "sync-docs.mjs"
       ],
@@ -1463,24 +1465,25 @@
     "site/src/data": {
       "purpose": "Data",
       "language": "typescript",
-      "files": 3,
-      "lines": 136,
+      "files": 4,
+      "lines": 240,
       "file_list": [
+        "copy.json",
         "samples.json",
         "site.ts",
         "demos.json"
       ],
       "exports": [
-        "derive",
-        "query",
-        "question",
-        "diff",
-        "hashFirst",
-        "hashSecond",
-        "identical",
-        "moduleName",
-        "module",
-        "generateOut"
+        "_status",
+        "hero",
+        "cta",
+        "assistants",
+        "problem",
+        "steps",
+        "proof",
+        "trust",
+        "faq",
+        "final"
       ],
       "depended_by": [
         "site/src/pages"
@@ -1491,7 +1494,7 @@
       "purpose": "Pages",
       "language": "typescript",
       "files": 3,
-      "lines": 35,
+      "lines": 36,
       "file_list": [
         "llms.txt.ts",
         "robots.txt.ts",
@@ -1836,8 +1839,10 @@
     "test_command": "go test ./...",
     "env_vars": [
       "AGENT_BROWSER",
+      "AGENT_BROWSER_BIN",
       "CLAUDE_PROJECT_DIR",
       "DEMO_MAX_BYTES",
+      "GITHUB_TOKEN",
       "GOMEMLIMIT",
       "STACKLIT_BIN",
       "STACKLIT_CACHE_DIR",
