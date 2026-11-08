@@ -15,29 +15,29 @@ const tabs = ask.asks.map((a) => {
     return {
       label: a.chip, lang: 'text', code: `${first}${a.grepOutput}`, copy: a.grepCommand,
       classes: { 1: 'ln-cmd', [offset]: 'ln-cmd' } as Record<number, string>,
-      note: fill(`Grep is enough here. The question names an exact thing, so one grep answers it, and stacklit impact gives the same six files. In our agent test, "who imports X" questions cost {impactRatio} times as much with Stacklit (interval {impactLo} to {impactHi}).`),
-      caption: `recorded output, ${ask.repo}. stacklit impact ${a.tokens} tokens, grep ${a.grepTokens} tokens, bytes divided by 4`,
+      note: fill(`Grep is enough here. You already know the exact name, so one grep finds every file, and Stacklit gives the same six. In our test, questions like this cost about {impactRatio} times as much with Stacklit.`),
+      caption: `Recorded on gin. Stacklit printed ${a.tokens} tokens, grep printed ${a.grepTokens}.`,
     };
   }
   return {
     label: a.chip, lang: 'text', code: `$ ${a.command}\n${a.output}`, copy: a.command,
     classes: { 1: 'ln-cmd', ...queryClasses(a.output, 1) } as Record<number, string>,
-    caption: `recorded output, ${ask.repo}, ${a.tokens} tokens, budget ${ask.budget}, bytes divided by 4`,
+    caption: `Recorded on gin. The answer is ${a.tokens} tokens, under the ${ask.budget} we allowed.`,
   };
 });
 const rows = [
-  { key: 'Repo', value: ask.repo, href: 'https://github.com/gin-gonic/gin/tree/v1.10.0' },
-  { key: 'Mode', value: 'Recorded output, not a live demo' },
-  { key: 'Command', value: 'stacklit query, budget 600' },
-  { key: 'Source', value: 'The recording script', href: 'https://github.com/glincker/stacklit/blob/master/site/scripts/record-ask.mjs' },
+  { key: 'Repo', value: 'gin v1.10.0, a Go web framework', href: 'https://github.com/gin-gonic/gin/tree/v1.10.0' },
+  { key: 'Mode', value: 'Recorded, not live' },
+  { key: 'Limit', value: '600 tokens per answer' },
+  { key: 'Source', value: 'How it was recorded', href: 'https://github.com/glincker/stacklit/blob/master/site/scripts/record-ask.mjs' },
 ];
 ---
 <Section id="ask" label="ask-title">
   <SectionHead id="ask-title" n="05" label="Ask the map" title="Ask the map, see what your agent gets.">
-    <p class="max-w-measure text-body text-muted">Pick a question. Each answer is the real output of the command, recorded once on a pinned repo. It is not a live demo, and one of the questions is one where plain grep is enough.</p>
+    <p class="max-w-measure text-body text-muted">Pick a question. Each answer is what the command really printed, recorded once on a real repo. It is not a live demo. One question is there to show where plain grep is enough. A token is a small chunk of text, about three quarters of a word.</p>
     <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
   </SectionHead>
   <div class="reveal">
-    <CodeWindow name="ask" label="Ask the map: pick a question" chips title="stacklit, recorded on gin v1.10.0" tabs={tabs} />
+    <CodeWindow name="ask" label="Ask the map: pick a question" chips typed title="stacklit, recorded on gin v1.10.0" tabs={tabs} />
   </div>
 </Section>

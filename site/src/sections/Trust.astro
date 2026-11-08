@@ -9,15 +9,15 @@ const rows = [
   { key: 'Version', value: `${v}, ${release.date}`, href: `https://github.com/glincker/stacklit/releases/tag/${v}` },
   { key: 'License', value: 'MIT', href: 'https://github.com/glincker/stacklit/blob/master/LICENSE' },
   { key: 'Source', value: 'github.com/glincker/stacklit', href: 'https://github.com/glincker/stacklit' },
-  { key: 'npm', value: 'Published with provenance', href: 'https://www.npmjs.com/package/stacklit' },
-  { key: 'Checksums', value: 'checksums.txt for this release', href: `https://github.com/glincker/stacklit/releases/download/${v}/checksums.txt` },
-  { key: 'Network', value: 'None of its own, see privacy', href: '/docs/privacy/' },
+  { key: 'npm', value: 'Published with a build record', href: 'https://www.npmjs.com/package/stacklit' },
+  { key: 'Checksums', value: 'File fingerprints for this release', href: `https://github.com/glincker/stacklit/releases/download/${v}/checksums.txt` },
+  { key: 'Network', value: 'No requests of its own', href: '/docs/privacy/' },
   { key: 'Assistants', value: '25 set up', href: '/docs/assistants/' },
 ];
 ---
 <Section id="facts" label="trust-title">
   <SectionHead id="trust-title" n="10" label="Plain facts" title="Plain facts, and how to check them">
-    <p class="max-w-measure text-body text-muted"><span class="font-semibold text-ink">Verify.</span> The release binaries are listed in the checksums file for {v}, and the npm package is published with provenance from the release workflow. The privacy page says what the program does on the network, and the source is public.</p>
+    <p class="max-w-measure text-body text-muted"><span class="font-semibold text-ink">Verify.</span> The release files are listed with their fingerprints (checksums) for {v}, and the npm package is published with a build record (npm calls it provenance) that shows it came from our release workflow. The privacy page says what the program does on the network, and the source is public.</p>
     <Fragment slot="legend"><Legend title="Legend: provenance" rows={rows} /></Fragment>
   </SectionHead>
   <ul class="grid min-w-0 gap-x-12 sm:grid-cols-2">

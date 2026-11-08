@@ -1,20 +1,18 @@
 ---
-// A ledger, not cards: hairline cells with a big number, a plain label and a source link. Favourable, neutral and
-// unfavourable results share one size and one style; only the unfavourable ones take the drift colour.
-interface Item { polarity: 'good' | 'neutral' | 'bad'; number: string; label: string; source: string; href: string }
-interface Props { items: Item[]; cols?: 3 | 4; class?: string }
-const { items, cols = 4, class: extra } = Astro.props;
-const word = { good: 'In its favour', neutral: 'No change', bad: 'Against it' } as const;
+// Three headline results, each a plain sentence first, one big number, then what it means. Favourable, neutral
+// and unfavourable results share one size and one style; only the unfavourable one takes the drift colour.
+interface Item { polarity: 'good' | 'neutral' | 'bad'; sentence: string; number: string; means: string; href: string }
+interface Props { items: Item[]; class?: string }
+const { items, class: extra } = Astro.props;
 const tone = { good: 'text-accent-text', neutral: 'text-ink', bad: 'text-bad' } as const;
-const grid = { 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' } as const;
 ---
-<ul class:list={['grid grid-cols-1 border-t border-ink', grid[cols], extra]}>
+<ul class:list={['grid grid-cols-1 border-t border-ink md:grid-cols-3', extra]}>
   {items.map((it) => (
-    <li class="reveal flex min-w-0 flex-col gap-3 border-b border-line py-6 sm:border-s sm:px-6 sm:first:border-s-0 sm:first:ps-0 sm:[&:nth-child(2n+1)]:border-s-0 sm:[&:nth-child(2n+1)]:ps-0 lg:[&:nth-child(2n+1)]:border-s lg:[&:nth-child(2n+1)]:ps-6 lg:first:border-s-0 lg:first:ps-0">
-      <span class:list={['label-mono', tone[it.polarity]]}>{word[it.polarity]}</span>
-      <span class:list={['text-stat font-bold', tone[it.polarity]]}>{it.number}</span>
-      <span class="text-body text-ink">{it.label}</span>
-      <a href={it.href} class="mt-auto pt-1 text-caption text-muted underline decoration-1 underline-offset-4 hover:text-ink">{it.source}</a>
+    <li class="reveal flex min-w-0 flex-col gap-4 border-b border-line py-8 md:border-s md:px-8 md:first:border-s-0 md:first:ps-0">
+      <h3 class="max-w-[16ch] text-h2 font-bold text-ink">{it.sentence}</h3>
+      <p class:list={['text-stat font-bold', tone[it.polarity]]}>{it.number}</p>
+      <p class="text-body text-muted"><span class="label-mono me-2 text-faint">What this means</span><br />{it.means}</p>
+      <a href={it.href} class="mt-auto inline-flex min-h-11 items-center pt-1 text-caption font-semibold text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">See how we measured</a>
     </li>
   ))}
 </ul>

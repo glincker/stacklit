@@ -11,20 +11,20 @@ import { queryClasses } from '../data/codeClasses';
 // Real recorded output for each step, on gin v1.10.0. The third step reuses the recorded query.
 const q = ask.asks[0];
 const win = [
-  { label: 'stacklit init', code: `$ stacklit init\n${steps.init}`, copy: copy.steps.items[0].command, classes: { 1: 'ln-cmd' } as Record<number, string>, caption: `recorded on ${steps.repo}. npx stacklit init runs the same command` },
-  { label: 'stacklit setup', code: `$ ${copy.steps.items[1].command}\n${steps.setup}`, copy: copy.steps.items[1].command, classes: { 1: 'ln-cmd' } as Record<number, string>, caption: `recorded on ${steps.repo}, in a clean copy` },
-  { label: 'stacklit query', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) } as Record<number, string>, caption: `${q.command}, recorded on ${ask.repo}` },
+  { label: 'stacklit init', code: `$ stacklit init\n${steps.init}`, copy: copy.steps.items[0].command, classes: { 1: 'ln-cmd' } as Record<number, string>, caption: `Recorded on gin. npx stacklit init runs the same command.` },
+  { label: 'stacklit setup', code: `$ ${copy.steps.items[1].command}\n${steps.setup}`, copy: copy.steps.items[1].command, classes: { 1: 'ln-cmd' } as Record<number, string>, caption: `Recorded on a clean copy of gin.` },
+  { label: 'stacklit query', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) } as Record<number, string>, caption: `Recorded on gin. A plain question in, a ranked list of files out.` },
 ];
 const rows = [
   { key: 'Install', value: 'npm, go install or a release', href: '/docs/install/' },
-  { key: 'Writes', value: 'stacklit.json, a diagram, a map' },
-  { key: 'Parser', value: 'tree-sitter, no LLM' },
+  { key: 'Writes', value: 'A map file, a diagram, a web page' },
+  { key: 'Built by', value: 'A parser, no AI model' },
   { key: 'Updates', value: 'Git hooks rebuild the map' },
 ];
 ---
 <Section id="how" label="how-title">
   <SectionHead id="how-title" n="06" label="How it works" title={copy.steps.title}>
-    <p class="max-w-measure text-body text-muted">Three commands. The output under each is the real thing, recorded on gin v1.10.0.</p>
+    <p class="max-w-measure text-body text-muted">Three commands. The output next to each one is what it really printed, recorded on gin, a Go web framework.</p>
     <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
   </SectionHead>
   <ol class="min-w-0 border-t border-line">

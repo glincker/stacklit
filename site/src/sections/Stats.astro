@@ -3,24 +3,24 @@ import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
 import Legend from '../components/Legend.astro';
 import StatRow from '../components/StatRow.astro';
+import Button from '../components/Button.astro';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
 
-const f = (items: typeof copy.hero.statRow) => items.map((i) => ({ ...i, polarity: i.polarity as 'good' | 'neutral' | 'bad', number: fill(i.number), label: fill(i.label), source: fill(i.source) }));
+const items = copy.hero.statRow.map((i) => ({ ...i, polarity: i.polarity as 'good' | 'neutral' | 'bad', sentence: fill(i.sentence), number: fill(i.number), means: fill(i.means) }));
 const rows = [
-  { key: 'Sessions', value: fill('{sessions} Claude Code sessions'), href: '/docs/agent-test/' },
-  { key: 'Pairs', value: '150 per arm, 3 repos', href: '/docs/agent-test/' },
-  { key: 'Model', value: 'Sonnet, 30 tasks we wrote' },
-  { key: 'Method', value: 'Plan written before run 1', href: '/docs/agent-test/' },
+  { key: 'Test', value: fill('{sessions} real Claude Code sessions'), href: '/docs/agent-test/' },
+  { key: 'Repos', value: '3 public ones', href: '/docs/agent-test/' },
+  { key: 'Model', value: 'Sonnet, 30 questions we wrote' },
+  { key: 'Planned', value: 'Method written before the first run', href: '/docs/agent-test/' },
 ];
 ---
 <Section id="results" tone="paper" label="stats-title">
-  <SectionHead id="stats-title" n="02" label="Results" title={`What our test of ${fill('{sessions}')} Claude Code sessions measured`}>
-    <p class="max-w-measure text-body text-muted">The good numbers and the bad ones, side by side, at one size. Each links to its method.</p>
+  <SectionHead id="stats-title" n="02" label="Results" title="What happened when we tested it">
+    <p class="max-w-measure text-body text-muted">We ran {fill('{sessions}')} real Claude Code sessions, with and without Stacklit. Three results matter most. The good one, the neutral one and the bad one are shown at the same size.</p>
     <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
   </SectionHead>
-  <StatRow items={f(copy.hero.statRow)} cols={4} />
-  <p class="label-mono mb-3 mt-14 text-muted">More results, by repo size and question type</p>
-  <StatRow items={f(copy.hero.statRowExtra)} cols={3} />
-  <p class="mt-8 max-w-measure text-caption text-muted">{copy.hero.statRowNote}</p>
+  <StatRow items={items} />
+  <p class="mt-8 max-w-measure text-body text-muted">{copy.hero.statRowNote}</p>
+  <div class="mt-2"><Button href="/docs/agent-test/" variant="link">See how we measured, with every table</Button></div>
 </Section>

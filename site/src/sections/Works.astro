@@ -12,10 +12,10 @@ const assistants: [string, string | undefined][] = [
 ];
 const languages: [string, string][] = [['Go', 'go'], ['TypeScript', 'typescript'], ['Python', 'python'], ['Rust', 'rust'], ['Java', 'java']];
 const rows = [
-  { key: 'Set up', value: '25 assistants and a generic AGENTS.md', href: '/docs/assistants/' },
+  { key: 'Set up', value: '25 assistants, plus a generic AGENTS.md', href: '/docs/assistants/' },
   { key: 'MCP', value: 'Any client, via stacklit serve', href: '/docs/mcp/' },
-  { key: 'Indexed', value: '48 languages and formats', href: '/docs/languages/' },
-  { key: 'Symbol graph', value: '20 languages', href: '/docs/languages/' },
+  { key: 'Read', value: '48 languages and formats', href: '/docs/languages/' },
+  { key: 'Call links', value: '20 languages, who calls what', href: '/docs/languages/' },
 ];
 ---
 <Section id="works" label="works-title">
@@ -26,7 +26,7 @@ const rows = [
   <ul class="reveal grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-8 sm:grid-cols-3 lg:grid-cols-4">
     {assistants.map(([name, slug]) => <li class="min-w-0"><Logo name={name} slug={slug} /></li>)}
   </ul>
-  <p class="label-mono mb-5 mt-14 text-muted">Symbol graphs for 20 languages, including</p>
+  <p class="label-mono mb-5 mt-14 text-muted">Call links (who calls what) for 20 languages, including</p>
   <ul class="reveal flex flex-wrap gap-x-8 gap-y-5">
     {languages.map(([name, slug]) => <li><Logo name={name} slug={slug} /></li>)}
   </ul>

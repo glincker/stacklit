@@ -27,20 +27,20 @@ const q = ask.asks[0];
 const derive = samples.derive.trimEnd();
 const rows = [
   { key: 'Type', value: 'Command line tool' },
-  { key: 'License', value: 'MIT', href: 'https://github.com/glincker/stacklit/blob/master/LICENSE' },
-  { key: 'Binary', value: 'One Go binary' },
-  { key: 'Languages', value: '48 indexed, 20 with a symbol graph', href: '/docs/languages/' },
-  { key: 'Assistants', value: '25 set up', href: '/docs/assistants/' },
+  { key: 'License', value: 'MIT, free to use', href: 'https://github.com/glincker/stacklit/blob/master/LICENSE' },
+  { key: 'Binary', value: 'One file, written in Go' },
+  { key: 'Languages', value: '48 read, 20 with call links', href: '/docs/languages/' },
+  { key: 'Assistants', value: '25 set up for you', href: '/docs/assistants/' },
   { key: 'Runs', value: 'On your machine' },
-  { key: 'Telemetry', value: 'None', href: '/docs/privacy/' },
+  { key: 'Telemetry', value: 'None, nothing sent', href: '/docs/privacy/' },
   { key: 'Version', value: `v${release.version}, ${release.date}`, href: `https://github.com/glincker/stacklit/releases/tag/v${release.version}` },
 ];
 const deriveLines: Record<number, string> = { 1: 'ln-cmd', 2: 'ln-key', 5: 'ln-dim' };
 const tabs = [
-  { label: 'stacklit derive', lang: 'text', code: `$ stacklit derive\n${derive}`, copy: 'stacklit derive', classes: deriveLines, caption: `stacklit derive on ${copy.hero.terminalNote.replace('{tokens}', tokens)}, bytes divided by 4` },
-  { label: 'stacklit query', lang: 'text', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) }, caption: `stacklit query on ${ask.repo}, ${q.tokens} tokens, budget ${ask.budget}. Recorded output.` },
+  { label: 'stacklit derive', lang: 'text', code: `$ stacklit derive\n${derive}`, copy: 'stacklit derive', classes: deriveLines, caption: `stacklit derive on gin, a Go web framework with 19,500 lines. The whole map is ${tokens} tokens, about ${Math.round(Number(tokens) * 0.75)} words.` },
+  { label: 'stacklit query', lang: 'text', code: `$ ${q.command}\n${q.output}`, copy: q.command, classes: { 1: 'ln-cmd', ...queryClasses(q.output, 1) }, caption: `A plain question, answered with a ranked list of files. Recorded on gin, ${q.tokens} tokens, under the ${ask.budget} we allowed.` },
   { label: '.stacklitrc.json', lang: 'json', code: rc, highlight: [3], caption: 'This repo’s own .stacklitrc.json. Every key is optional. Line 3 moves the diagram file.' },
-  { label: 'claude plugin install', lang: 'bash', code: 'claude plugin marketplace add glincker/stacklit\nclaude plugin install stacklit@stacklit', caption: 'Claude Code plugin. Needs the stacklit binary on your PATH. From the install docs.' },
+  { label: 'claude plugin install', lang: 'bash', code: 'claude plugin marketplace add glincker/stacklit\nclaude plugin install stacklit@stacklit', caption: 'Two commands add the Claude Code plugin. It needs the stacklit program installed first.' },
 ];
 ---
 <Section id="overview" label="hero-title" size="hero">
@@ -63,7 +63,7 @@ const tabs = [
       <Legend title="Legend" rows={rows} />
     </aside>
   </div>
-  <div class="mt-12 sm:mt-16">
+  <div class="reveal mt-12 sm:mt-16">
     <CodeWindow name="hero" label="Real Stacklit output and setup" tabs={tabs} />
     <p class="mt-4 max-w-measure text-caption text-muted">{copy.hero.caption}</p>
   </div>

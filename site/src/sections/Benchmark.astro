@@ -2,23 +2,22 @@
 import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
 import Legend from '../components/Legend.astro';
-import TableWrap from '../components/TableWrap.astro';
 import Button from '../components/Button.astro';
 import bench from '../data/bench.json';
 import copy from '../data/copy.json';
 
-const armRows: [string, { found1: string; found5: string; tokens: string }][] = [
-  ['grep and read', bench.arms.grep],
-  ['BM25 over the question', bench.arms.bm25],
-  ['stacklit map plus lookup', bench.arms.map],
-  ['stacklit query 1000, read in printed order', bench.arms.query],
-];
+const first = (s: string) => s.split(' ')[0];
 const derive = bench.repos.map((r) => Number(r.deriveTokens));
 const range = `${Math.min(...derive).toLocaleString('en-US')} to ${Math.max(...derive).toLocaleString('en-US')}`;
+const lines: [string, string, string][] = [
+  [first(bench.arms.query.found1), 'Stacklit, one short query', 'The right file came first on this share of questions.'],
+  [first(bench.arms.grep.found1), 'Grep, with a pattern written by someone who knew the answer', 'Better than Stacklit at the first file.'],
+  [first(bench.arms.bm25.found1), 'Plain keyword search', 'Worse at the first file.'],
+];
 const rows = [
-  { key: 'Tasks', value: `${bench.localizationTasks} where-is-X questions`, href: '/docs/benchmarks/' },
-  { key: 'Repos', value: `${bench.repoCount} pinned public repos`, href: '/docs/benchmarks/' },
-  { key: 'Reader', value: 'Simulated, no model' },
+  { key: 'Questions', value: `${bench.localizationTasks} where-is-it questions`, href: '/docs/benchmarks/' },
+  { key: 'Repos', value: `${bench.repoCount} public ones`, href: '/docs/benchmarks/' },
+  { key: 'Reader', value: 'A script, no AI model' },
   { key: 'Run', value: bench.date },
 ];
 ---
@@ -26,20 +25,16 @@ const rows = [
   <SectionHead id="bench-title" n="09" label="Benchmark" title={copy.proof.title} lead={copy.proof.intro}>
     <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
   </SectionHead>
-  <p class="mb-4 max-w-measure text-body text-ink">{copy.proof.note}</p>
-  <p class="mb-4 max-w-measure text-caption text-muted">{bench.localizationTasks} tasks across {bench.repoCount} pinned public repos in six languages, run {bench.date}. Intervals are 95% bootstrap intervals over tasks.</p>
-  <TableWrap label="File finding benchmark by approach">
-    <table>
-      <caption class="sr-only">File finding benchmark by approach</caption>
-      <thead><tr><th>Approach</th><th class="num">Found first</th><th class="num">Found in top 5</th><th class="num">Tokens to find</th></tr></thead>
-      <tbody>{armRows.map(([label, a]) => <tr><td>{label}</td><td class="num">{a.found1}</td><td class="num">{a.found5}</td><td class="num">{a.tokens}</td></tr>)}</tbody>
-    </table>
-  </TableWrap>
-  <ul class="mt-6 max-w-measure list-disc space-y-2 pl-5 text-body text-ink marker:text-muted">
-    <li>Grep and read finds the file first more often, and its search pattern was written by someone who knew the answer. The query command’s gap to it is {bench.pairedQueryVsGrep.found1} percentage points at found first and {bench.pairedQueryVsGrep.found5} at top 5. Both intervals reach 0, so the gap is suggestive, not settled.</li>
-    <li>The token intervals overlap. We claim no token saving over grep or BM25, and when you already know the exact name, grep is cheaper than loading a map.</li>
-    <li>{copy.proof.sizes.replace('{range}', range)}</li>
-    <li>Limits are listed on the benchmark page.</li>
+  <ul class="grid min-w-0 border-t border-ink md:grid-cols-3">
+    {lines.map(([n, who, what]) => (
+      <li class="reveal flex min-w-0 flex-col gap-3 border-b border-line py-8 md:border-s md:px-8 md:first:border-s-0 md:first:ps-0">
+        <p class="text-stat font-bold text-ink">{n}</p>
+        <p class="text-h3 text-ink">{who}</p>
+        <p class="text-body text-muted">{what}</p>
+      </li>
+    ))}
   </ul>
-  <div class="mt-4"><Button href="/docs/benchmarks/" variant="link">Read the full benchmark page, with {bench.totalTasks} tasks in all, methods and limits</Button></div>
+  <p class="mt-8 max-w-measure text-body text-ink">{copy.proof.note}</p>
+  <p class="mt-4 max-w-measure text-body text-muted">We do not claim it saves tokens over grep, and when you already know the exact name, grep is cheaper than loading a map. {copy.proof.sizes.replace('{range}', range)}</p>
+  <div class="mt-4"><Button href="/docs/benchmarks/" variant="link">See how we measured, with every table and limit</Button></div>
 </Section>
