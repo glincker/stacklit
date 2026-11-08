@@ -192,6 +192,9 @@ func Run(opts Options) (*Result, error) {
 	}
 
 	// 1a. Load config (best-effort; uses defaults if absent).
+	if err := config.Check(root); err != nil {
+		return nil, err
+	}
 	cfg := config.Load(root)
 
 	// 2. Detect monorepo layout.

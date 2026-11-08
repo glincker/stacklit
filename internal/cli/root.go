@@ -19,6 +19,10 @@ func Execute() error {
 }
 
 func init() {
+	rootCmd.SetFlagErrorFunc(func(_ *cobra.Command, err error) error {
+		return &ExitError{Code: ExitUsage, Err: err}
+	})
+	rootCmd.AddCommand(newDoctorCmd())
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(viewCmd)

@@ -123,3 +123,27 @@ func (c *Config) Validate() error {
 	}
 	return nil
 }
+
+// Error marks a problem with the user's configuration, as opposed to an
+// internal failure. The CLI maps it to its own exit code.
+type Error struct{ Err error }
+
+func (e *Error) Error() string { return e.Err.Error() }
+func (e *Error) Unwrap() error { return e.Err }
+
+// Check returns a *Error when .stacklitrc.json exists but is not valid JSON or
+// holds values that cannot work. Unknown keys are tolerated so an older binary
+// still runs against a newer rc file; `stacklit doctor` reports them.
+func Check(root string) error {
+	data, err := os.ReadFile(filepath.Join(root, ".stacklitrc.json"))
+	if err != nil {
+		return nil
+	}
+	if !json.Valid(data) {
+		return &Error{fmt.Errorf(".stacklitrc.json is not valid JSON (run `stacklit doctor` for details)")}
+	}
+	if err := Load(root).Validate(); err != nil {
+		return &Error{err}
+	}
+	return nil
+}
