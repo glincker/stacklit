@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "fcb08bdf2ebf7fd1a802c46cc6d7ef01233fcb6e5b8536cb2bcffd9a74ce02f5",
+  "merkle_hash": "f46d98a0cfbce753a6935aab3e1a37f57d74aca5be8435c33c7bcb32b43f996d",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -93,12 +93,12 @@
         "lines": 37
       },
       "javascript": {
-        "files": 7,
-        "lines": 480
+        "files": 12,
+        "lines": 1048
       },
       "json": {
-        "files": 15,
-        "lines": 348
+        "files": 18,
+        "lines": 500
       },
       "julia": {
         "files": 1,
@@ -189,16 +189,16 @@
         "lines": 10
       },
       "typescript": {
-        "files": 7,
-        "lines": 54
+        "files": 12,
+        "lines": 109
       },
       "vue": {
         "files": 1,
         "lines": 18
       },
       "yaml": {
-        "files": 12,
-        "lines": 427
+        "files": 13,
+        "lines": 494
       },
       "zig": {
         "files": 3,
@@ -215,8 +215,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 388,
-    "total_lines": 41893
+    "total_files": 402,
+    "total_lines": 42735
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -243,9 +243,10 @@
     ".github/workflows": {
       "purpose": "Workflows",
       "language": "yaml",
-      "files": 4,
-      "lines": 149,
+      "files": 5,
+      "lines": 216,
       "file_list": [
+        "site.yml",
         "release.yml",
         "scorecard.yml",
         "ci.yml",
@@ -255,6 +256,7 @@
         "name",
         "on",
         "permissions",
+        "concurrency",
         "jobs"
       ],
       "activity": "low"
@@ -1402,6 +1404,97 @@
         "build"
       ],
       "activity": "low"
+    },
+    "site": {
+      "purpose": "Site",
+      "language": "javascript",
+      "files": 2,
+      "lines": 33,
+      "file_list": [
+        "package.json",
+        "astro.config.mjs"
+      ],
+      "exports": [
+        "name",
+        "private",
+        "type",
+        "version",
+        "scripts",
+        "dependencies",
+        "engines"
+      ],
+      "activity": "low"
+    },
+    "site/scripts": {
+      "purpose": "Scripts",
+      "language": "javascript",
+      "files": 4,
+      "lines": 556,
+      "file_list": [
+        "build-demos.mjs",
+        "check-links.mjs",
+        "shoot-thumbs.mjs",
+        "sync-docs.mjs"
+      ],
+      "activity": "low"
+    },
+    "site/src": {
+      "purpose": "Src",
+      "language": "typescript",
+      "files": 1,
+      "lines": 15,
+      "file_list": [
+        "content.config.ts"
+      ],
+      "exports": [
+        "collections"
+      ],
+      "activity": "low"
+    },
+    "site/src/data": {
+      "purpose": "Data",
+      "language": "typescript",
+      "files": 3,
+      "lines": 136,
+      "file_list": [
+        "samples.json",
+        "site.ts",
+        "demos.json"
+      ],
+      "exports": [
+        "derive",
+        "query",
+        "question",
+        "diff",
+        "hashFirst",
+        "hashSecond",
+        "identical",
+        "moduleName",
+        "module",
+        "generateOut"
+      ],
+      "depended_by": [
+        "site/src/pages"
+      ],
+      "activity": "low"
+    },
+    "site/src/pages": {
+      "purpose": "Pages",
+      "language": "typescript",
+      "files": 3,
+      "lines": 35,
+      "file_list": [
+        "llms.txt.ts",
+        "robots.txt.ts",
+        "sitemap.xml.ts"
+      ],
+      "exports": [
+        "GET()"
+      ],
+      "depends_on": [
+        "site/src/data"
+      ],
+      "activity": "low"
     }
   },
   "dependencies": {
@@ -1693,6 +1786,10 @@
       [
         "internal/summary",
         "internal/schema"
+      ],
+      [
+        "site/src/pages",
+        "site/src/data"
       ]
     ],
     "entrypoints": [
@@ -1718,7 +1815,10 @@
       "examples/adapters",
       "npm",
       "npm/bin",
-      "root"
+      "root",
+      "site",
+      "site/scripts",
+      "site/src"
     ]
   },
   "git": {},
@@ -1726,9 +1826,12 @@
     "add_feature": "Start from entrypoint cmd/stacklit/main.go",
     "test_command": "go test ./...",
     "env_vars": [
+      "AGENT_BROWSER",
       "ANTHROPIC_API_KEY",
       "CLAUDE_PROJECT_DIR",
+      "DEMO_MAX_BYTES",
       "GOMEMLIMIT",
+      "STACKLIT_BIN",
       "STACKLIT_CACHE_DIR",
       "STACKLIT_DATA_RUN_LINES",
       "STACKLIT_DIGEST_TOKENS",

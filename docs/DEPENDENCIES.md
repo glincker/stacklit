@@ -53,6 +53,11 @@ graph LR
   npm["npm<br/>Npm"]:::go
   npm_bin["npm/bin<br/>Bin"]:::go
   root["root<br/>Root package"]:::go
+  site["site<br/>Site"]:::go
+  site_scripts["site/scripts<br/>Scripts"]:::go
+  site_src["site/src<br/>Src"]:::go
+  site_src_data["site/src/data<br/>Data"]:::go
+  site_src_pages["site/src/pages<br/>Pages"]:::go
   cmd_stacklit --> internal_cli
   internal_cache --> internal_fsutil
   internal_cache --> internal_parser
@@ -125,4 +130,5 @@ graph LR
   internal_setup --> internal_session
   internal_stats --> internal_config
   internal_summary --> internal_schema
+  site_src_pages --> site_src_data
 ```
