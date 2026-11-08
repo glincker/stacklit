@@ -1,0 +1,100 @@
+{
+  "_status": "PLACEHOLDER copy. Every string on the home page, the OG image, the meta tags and llms.txt lives here. To apply a new deck, edit this file (or switch hero.active), then run npm run og and npm run build.",
+  "hero": {
+    "active": "a",
+    "variants": {
+      "a": {
+        "headline": "Your AI starts every session already knowing your repo.",
+        "sub": "Stacklit maps your codebase once and keeps the map fresh. Claude Code, Cursor, Codex and more read a few hundred tokens instead of crawling your files."
+      },
+      "b": {
+        "headline": "Stop paying your AI to re-read your repo.",
+        "sub": "Stacklit keeps a small, current map of your code. Your coding agent reads it first and goes straight to the right file."
+      },
+      "c": {
+        "headline": "A map of your code your AI can actually use.",
+        "sub": "Index your repo once. Stacklit keeps it fresh and gives your agent a few commands to find the right file."
+      }
+    }
+  },
+  "cta": {
+    "install": "npx stacklit init",
+    "installHint": "No install step. It writes the map and opens it.",
+    "star": "Star on GitHub",
+    "demo": "See a live map",
+    "mapCaption": "The map Stacklit wrote for ripgrep (Rust, 52,215 lines). Click around in the live version.",
+    "mapLink": "Open it"
+  },
+  "worksWith": {
+    "title": "Works with the assistants you already use",
+    "note": "Setup covers 26 assistants. Any MCP client works through stacklit serve, and anything else can read stacklit.json."
+  },
+  "problem": {
+    "title": "Agents start from zero every session.",
+    "body": "A coding agent does not remember your repo. Each session it opens files to find its way, and often opens the same ones again. One study of eight models found that 27 to 52 percent of their file views were repeats.",
+    "citeText": "Bai et al., arXiv 2604.22750",
+    "citeUrl": "https://arxiv.org/abs/2604.22750",
+    "caveat": "Measured on SWE-bench Verified tasks that every model solved. It describes the habit, not Stacklit."
+  },
+  "steps": {
+    "title": "Three commands.",
+    "items": [
+      { "name": "Index", "text": "Scan the repo and write the map. It runs locally, in tens of milliseconds on a small Go repo.", "command": "npx stacklit init" },
+      { "name": "Connect", "text": "Wire the map into the tools you use. A git hook refreshes it after each commit.", "command": "stacklit setup" },
+      { "name": "Ask", "text": "The agent asks for the part of the map it needs, with a hard size limit.", "command": "stacklit query \"where are routes registered\" --budget 500" }
+    ]
+  },
+  "get": {
+    "title": "What you get",
+    "items": [
+      { "name": "The map", "text": "stacklit.json lists your modules, what each one exports and who depends on whom. You commit it next to your code. A few hundred tokens of it go to the agent at the start of a session." },
+      { "name": "The commands", "text": "query, slice, impact, path, hubs and explain. Each takes a token budget, so the answer is never bigger than you allow." },
+      { "name": "The hooks", "text": "A git hook refreshes the map after every commit. An optional Claude Code hook points a grepped name to where it is defined." },
+      { "name": "The MCP tools", "text": "stacklit serve gives any MCP client 15 tools, or 4 with the minimal profile." }
+    ]
+  },
+  "proof": {
+    "title": "What we measured, including where grep wins",
+    "intro": "A benchmark, not an agent study. No model was involved. Each task asks where something is implemented, and we check whether the right file came back. Tokens are bytes divided by four.",
+    "agentAbTitle": "Agent A/B run",
+    "agentAbNote": "Same tasks and model, with and without Stacklit."
+  },
+  "trust": {
+    "items": [
+      { "name": "MIT licensed", "text": "Read it, fork it, ship it." },
+      { "name": "Free", "text": "No paid tier and no account." },
+      { "name": "Runs locally", "text": "Your code stays on your machine." },
+      { "name": "No telemetry", "text": "The CLI makes no network calls." }
+    ]
+  },
+  "faq": {
+    "title": "Questions",
+    "items": [
+      { "q": "Do I need an LLM key?", "a": "No. Stacklit parses your code with tree-sitter and uses no model. There is nothing to sign up for and no key to paste." },
+      { "q": "Does my code leave my machine?", "a": "No. The index is built locally and the CLI makes no network calls. Only the optional --summary flag sends anything, and only if you pass it. The HTML map can load small language logos from thesvg.org, and STACKLIT_MAP_ICONS=off turns that off." },
+      { "q": "What if the index is stale?", "a": "A git post-commit hook rebuilds it after each commit, and stacklit status tells you if it has drifted. You can also run stacklit generate in CI. The output has no timestamps, so the file only changes when the code does." },
+      { "q": "When is grep enough?", "a": "When you already know the exact name, and on small repos you can read whole. One grep is cheaper than loading a map. Stacklit helps with questions grep cannot answer in one step, like what depends on this module or where a new adapter belongs." }
+    ],
+    "more": "More answers in the FAQ"
+  },
+  "final": {
+    "title": "Try it on your repo.",
+    "text": "It takes a minute, and you can delete one file to undo it."
+  },
+  "meta": {
+    "title": "Stacklit: a map of your codebase for AI coding agents",
+    "description": "Stacklit maps your codebase once, keeps the map fresh, and gives your coding agent a few commands to find the right file. Free, MIT, runs locally.",
+    "structured": "Stacklit maps a codebase once, keeps the map fresh, and gives AI coding agents a small map and a few commands (query, slice, impact) to find the right file. Free, MIT, runs locally.",
+    "llms": "Stacklit maps your codebase once, keeps the map fresh, and gives AI coding agents a small map and a few commands (query, slice, impact) so they go straight to the right file. It parses a repository with tree-sitter and writes stacklit.json, an interactive HTML map and an MCP server. MIT licensed, free, local, no telemetry, one Go binary."
+  },
+  "og": {
+    "headline": "Your AI starts every session already knowing your repo.",
+    "sub": "Stacklit maps your codebase once and keeps the map fresh.",
+    "url": "stacklit.glinr.com",
+    "alt": "Stacklit: your AI starts every session already knowing your repo."
+  },
+  "demos": {
+    "title": "Real maps of six public repos",
+    "sub": "Each one is the single stacklit.html the tool wrote for a pinned release. Open it, switch views, click a module."
+  }
+}
