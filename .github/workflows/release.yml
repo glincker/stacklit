@@ -4,12 +4,19 @@ on:
   push:
     tags:
       - 'v*'
+  # Re-run the npm publish for a tag whose GitHub release already exists.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish to npm, for example v0.5.0'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
   release:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +36,8 @@ jobs:
 
   npm-publish:
     needs: release
+    # On a manual run the release job is skipped, which must not skip the publish.
+    if: ${{ !cancelled() && (needs.release.result == 'success' || needs.release.result == 'skipped') }}
     runs-on: ubuntu-latest
     environment: npm-publish
     permissions:
@@ -36,15 +45,20 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # npm 12 needs Node 22.22 or newer, so Node 20 breaks the npm upgrade below.
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
       - name: Upgrade npm for OIDC support
         run: npm install -g npm@latest
       - name: Update npm package version from tag
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${TAG#v}"
           cd npm
           npm version "$VERSION" --no-git-tag-version --allow-same-version
       - name: Publish to npm with provenance
