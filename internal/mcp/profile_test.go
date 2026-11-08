@@ -135,10 +135,32 @@ func TestInstructionsPresentAndSmall(t *testing.T) {
 		} else {
 			t.Logf("%s instructions: %d tokens", p, tok)
 		}
-		for _, w := range []string{"source of truth", "slice", "refresh"} {
+		for _, w := range []string{"exact name", "lead, not the answer", "slice", "refresh"} {
 			if !strings.Contains(got, w) {
 				t.Fatalf("%s: missing %q", p, w)
 			}
 		}
+	}
+}
+
+func TestInstructionsStrictKeptBehindSteering(t *testing.T) {
+	for _, p := range []string{ProfileFull, ProfileMinimal} {
+		old := InstructionsFor(p, "d")
+		cur := InstructionsFor(p, "")
+		if old == cur || !strings.Contains(old, "source of truth") || strings.Contains(cur, "source of truth") {
+			t.Fatalf("%s: strict and shipped wording must differ and stay separate", p)
+		}
+		if InstructionsFor(p, "a") != cur || InstructionsFor(p, "e") != cur {
+			t.Fatalf("%s: non-d variants must get the shipped wording", p)
+		}
+		for _, s := range []string{old, cur} {
+			if strings.ContainsRune(s, 0x2013) || strings.ContainsRune(s, 0x2014) {
+				t.Fatalf("%s: dash in instructions", p)
+			}
+		}
+	}
+	t.Setenv("STACKLIT_STEERING", "d")
+	if Instructions(ProfileFull) != instructionsStrictFull {
+		t.Fatal("STACKLIT_STEERING=d must select the strict wording")
 	}
 }

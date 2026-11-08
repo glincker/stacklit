@@ -13,6 +13,28 @@ const strictRules = "Stacklit is the source of truth for this repo's structure. 
 	"- If stacklit reports a stale index or a missing symbol, run `stacklit refresh --files <paths>` or `stacklit generate`.\n" +
 	"- Subagents follow the same rules.\n"
 
+// routedRules is steering variant e: it sends exact-name lookups to grep or
+// impact and asks for a neighbour check on multi-file answers, because the
+// first A/B showed a single query being taken as the whole answer.
+const routedRules = "Use stacklit when you do not know where something is or how things connect: `stacklit query \"<question>\" --budget 800`.\n" +
+	"When you know the exact name, use grep or `stacklit impact <name>`.\n" +
+	"When the answer is several files (a flow, a chain), check the neighbours with `stacklit explain <symbol>` or `stacklit path <from> <to>` before answering. One query is a lead, not the answer.\n" +
+	"Read one symbol with `stacklit slice <symbol>`.\n"
+
+// guideRulesE is the guide's rules text under the shipped wording.
+const guideRulesE = routedRules +
+	"If stacklit reports a stale index, run `stacklit refresh --files <paths>`.\n"
+
+// GuideRules returns the guide's rules text for a steering variant. The
+// strict no-crawl wording stays available as variant d for comparison; every
+// other value gets the shipped wording.
+func GuideRules(variant string) string {
+	if strings.ToLower(strings.TrimSpace(variant)) == "d" {
+		return strictRules
+	}
+	return guideRulesE
+}
+
 // GuideCommand is one row of the command list in the guide.
 type GuideCommand struct {
 	Command string `json:"command"`
@@ -24,7 +46,7 @@ func GuideCommands() []GuideCommand {
 	return []GuideCommand{
 		{`stacklit query "<question>" --budget 800`, "Ranked files and symbols for a question, within a token budget. Start here."},
 		{"stacklit explain <symbol>", "Definition, callers and callees of one symbol."},
-		{"stacklit impact <symbol|file>", "What depends on it. Run before editing shared code."},
+		{"stacklit impact <name>", "Who imports a file or package, or calls a symbol, with file:line. Run before editing shared code."},
 		{"stacklit path <from> <to>", "How two symbols connect."},
 		{"stacklit slice <symbol>", "Source of one symbol. Use instead of reading the whole file."},
 		{"stacklit report", "Repo overview: hubs, communities, surprises."},
@@ -41,11 +63,15 @@ var guideExamples = []string{
 	`Read one function?        stacklit slice parseToken`,
 }
 
-// GuideText is the full agent usage guide, plain text, byte stable.
-func GuideText() string {
+// GuideText is the full agent usage guide under the shipped wording.
+func GuideText() string { return GuideTextFor("") }
+
+// GuideTextFor is the agent usage guide, plain text, byte stable, with the
+// rules text of one steering variant.
+func GuideTextFor(variant string) string {
 	var b strings.Builder
 	b.WriteString("# Stacklit agent guide\n\n")
-	b.WriteString(strictRules)
+	b.WriteString(GuideRules(variant))
 	b.WriteString("\n## Commands\n")
 	for _, c := range GuideCommands() {
 		b.WriteString("- `" + c.Command + "`: " + c.Use + "\n")
@@ -58,13 +84,16 @@ func GuideText() string {
 }
 
 // GuideJSON is the same guide as JSON for tools that want structured input.
-func GuideJSON() string {
+func GuideJSON() string { return GuideJSONFor("") }
+
+// GuideJSONFor is GuideJSON for one steering variant.
+func GuideJSONFor(variant string) string {
 	out := struct {
 		Rules    string         `json:"rules"`
 		Commands []GuideCommand `json:"commands"`
 		Examples []string       `json:"examples"`
 		Text     string         `json:"text"`
-	}{strictRules, GuideCommands(), guideExamples, GuideText()}
+	}{GuideRules(variant), GuideCommands(), guideExamples, GuideTextFor(variant)}
 	b, _ := json.MarshalIndent(out, "", "  ")
 	return string(b) + "\n"
 }
