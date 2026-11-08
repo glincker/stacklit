@@ -61,13 +61,6 @@
       "/benches/",
       "/examples/",
       "/testutil.rs"
-    ],
-    "stacklit_ignore": [
-      "*.sh",
-      "*.zsh",
-      "*.bash",
-      "*.fish",
-      "*.ps1"
     ]
   },
   {

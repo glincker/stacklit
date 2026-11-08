@@ -127,7 +127,7 @@ func depTable(b *strings.Builder, results []RepoResult, arms []string, o Opts) {
 func RenderMarkdown(results []RepoResult, env Env, o Opts) string {
 	var b strings.Builder
 	arms := armOrder(o)
-	fmt.Fprintf(&b, "Run on %s, %s/%s, %d CPUs, %s, stacklit %s.\n\n", env.Date, env.OS, env.Arch, env.CPUs, env.GoVersion, env.Stacklit)
+	fmt.Fprintf(&b, "Run on %s, %s/%s, %d CPUs, %s, stacklit %s, config: %s.\n\n", env.Date, env.OS, env.Arch, env.CPUs, env.GoVersion, env.Stacklit, env.Config)
 	fmt.Fprintf(&b, "Parameters: grep output capped at %d lines (each cut to %d chars); an arm may open at most %d files in rank order; bootstrap %d resamples, seed %d; dependents strict rule allows at most %d unexpected modules; stacklit map+lookup inspects the top %d modules; BM25 prints %d paths and ranks %d; query budgets %v; repo-map budgets %v.\n\n",
 		o.Baseline.MaxGrepLines, o.Baseline.MaxLineChars, o.ReadCap, o.Boot, o.Seed, o.MaxExtra, o.TopN, o.BM25Listed, o.BM25Ranked, o.QueryBudgets, o.MapBudgets)
 	if p, err := exec.LookPath("aider"); err == nil {
@@ -137,20 +137,20 @@ func RenderMarkdown(results []RepoResult, env Env, o Opts) string {
 	}
 
 	b.WriteString("### Repos and generation cost\n\n")
-	b.WriteString("| Repo | Lang | Pinned commit | Tasks | Code files | Lines | Modules | Full dump tokens | Fits in context | stacklit.json tokens | derive map tokens | generate first (ms) | generate median (ms) | peak RSS (MB) | clean-index attempts | repo-map build (ms) | BM25 build (ms) |\n")
-	b.WriteString("|---|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+	b.WriteString("| Repo | Lang | Pinned commit | Tasks | Code files | Lines | Modules | Full dump tokens | Fits in context | stacklit.json tokens | derive map tokens | generate first (ms) | generate median (ms) | peak RSS (MB) | files dropped by parser | identical index every run | repo-map build (ms) | BM25 build (ms) |\n")
+	b.WriteString("|---|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---|---:|---:|\n")
 	for _, r := range results {
 		g := r.Gen
 		rss := "n/a"
 		if g.MaxRSSMB > 0 {
 			rss = fmt.Sprintf("%.0f", g.MaxRSSMB)
 		}
-		fmt.Fprintf(&b, "| %s | %s | `%s` (%s) | %d | %d | %d | %d | %d | %s | %d | %d | %.0f | %.0f | %s | %d | %.0f | %.0f |\n",
+		fmt.Fprintf(&b, "| %s | %s | `%s` (%s) | %d | %d | %d | %d | %d | %s | %d | %d | %.0f | %.0f | %s | %d | %s | %.0f | %.0f |\n",
 			r.Spec.Name, r.Spec.Language, r.Spec.SHA[:10], r.Spec.Ref, len(r.Tasks), g.Files, g.Lines, g.Modules,
 			r.DumpCost.Tokens(), yn(r.DumpCost.Tokens() <= o.ContextWindow), g.IndexCost.Tokens(), g.MapCost.Tokens(),
-			g.FirstMs, g.MedianMs, rss, g.Attempts, r.RepoMapMs, r.BM25Ms)
+			g.FirstMs, g.MedianMs, rss, g.ParseErrs, yn(g.Identical), r.RepoMapMs, r.BM25Ms)
 	}
-	fmt.Fprintf(&b, "\n\"Fits in context\" compares the full dump with a %d token window. Generation time is wall clock for `stacklit generate --quiet` (%d runs per repo, cold parse cache, outputs deleted before each run), peak RSS is the largest resident set of the child process. Clean-index attempts is how many `generate` runs it took to get an index with zero parse errors (the Rust parser panics on a varying set of files from run to run; the harness regenerates with one CPU until a run is clean and keeps that index so the stacklit arms are reproducible). Repo-map and BM25 build times are a single in-process run; their memory is not measured. Tokens are bytes/4.\n\n", o.ContextWindow, results[0].Gen.Runs)
+	fmt.Fprintf(&b, "\n\"Fits in context\" compares the full dump with a %d token window. Generation time is wall clock for `stacklit generate --quiet` (%d runs per repo, cold parse cache, outputs deleted before each run), peak RSS is the largest resident set of the child process. Files dropped by parser is read from one verbose `generate` run; identical index says whether every timed run wrote a byte-identical `stacklit.json`. There is no retry or CPU limit: the index the arms use is the plain output of `generate`. Repo-map and BM25 build times are a single in-process run; their memory is not measured. Tokens are bytes/4.\n\n", o.ContextWindow, results[0].Gen.Runs)
 
 	total := 0
 	for _, r := range results {
@@ -162,6 +162,8 @@ func RenderMarkdown(results []RepoResult, env Env, o Opts) string {
 	locTable(&b, results, arms, o, func(t Task) bool { return t.Kind == "where-to-add" })
 	b.WriteString("### All localization tasks (locate plus add-feature)\n\n")
 	locTable(&b, results, arms, o, func(t Task) bool { return isLocalization(t.Kind) })
+
+	pairedTable(&b, results, o)
 
 	b.WriteString("### Dependents (impact) tasks\n\n")
 	fmt.Fprintf(&b, "Lenient: every expected module is reported (short module names accepted, extras ignored). Strict: every expected module is reported by exact name and at most %d unexpected modules are reported. The repo-map, BM25 and full-dump arms have no dependents procedure and are marked n/a.\n\n", o.MaxExtra)
@@ -301,4 +303,40 @@ func yn(b bool) string {
 		return "yes"
 	}
 	return "no"
+}
+
+// pairedTable reports per-task differences between arm pairs on the same
+// localization tasks, in percentage points, with a bootstrap interval over
+// tasks. Pairing removes task difficulty, so it is a sharper comparison than
+// two overlapping unpaired intervals.
+func pairedTable(b *strings.Builder, results []RepoResult, o Opts) {
+	if len(o.QueryBudgets) == 0 {
+		return
+	}
+	q := o.QueryBudgets[0]
+	pairs := [][2]string{
+		{armQueryRD(q), armBM25}, {armQueryRD(q), armGrep},
+		{armQuery(q), armBM25}, {armQuery(q), armGrep},
+		{armStacklit, armBM25}, {armStacklit, armGrep},
+		{armBM25, armGrep},
+	}
+	b.WriteString("### Paired differences (all localization tasks)\n\nFirst arm minus second arm on the same tasks, in percentage points, with a 95% bootstrap interval over tasks. An interval that excludes 0 is a difference larger than task-sampling noise.\n\n")
+	b.WriteString("| First arm | Second arm | found@1 difference | found@5 difference |\n|---|---|---|---|\n")
+	for _, p := range pairs {
+		x := pick(results, p[0], func(t Task) bool { return isLocalization(t.Kind) })
+		y := pick(results, p[1], func(t Task) bool { return isLocalization(t.Kind) })
+		if len(x) == 0 || len(x) != len(y) {
+			continue
+		}
+		d1 := make([]float64, len(x))
+		d5 := make([]float64, len(x))
+		for i := range x {
+			d1[i] = (b2f(x[i].Found(1)) - b2f(y[i].Found(1))) * 100
+			d5[i] = (b2f(x[i].Found(5)) - b2f(y[i].Found(5))) * 100
+		}
+		c1 := bootstrapMean(d1, o.Boot, o.Seed)
+		c5 := bootstrapMean(d5, o.Boot, o.Seed)
+		fmt.Fprintf(b, "| %s | %s | %+.0f [%+.0f, %+.0f] | %+.0f [%+.0f, %+.0f] |\n", p[0], p[1], c1.Mean, c1.Lo, c1.Hi, c5.Mean, c5.Lo, c5.Hi)
+	}
+	b.WriteString("\n")
 }

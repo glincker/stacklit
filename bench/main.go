@@ -4,6 +4,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"embed"
 	"encoding/json"
 	"flag"
@@ -31,9 +32,6 @@ type RepoSpec struct {
 	SHA         string   `json:"sha"`
 	Exts        []string `json:"exts"`
 	TestMarkers []string `json:"test_markers"`
-	// StacklitIgnore is written to .stacklitrc.json in the checkout, only to
-	// keep generation from hanging on files the shell parser cannot handle.
-	StacklitIgnore []string `json:"stacklit_ignore,omitempty"`
 }
 
 // Task is one navigation question with a hand-verified answer.
@@ -60,10 +58,11 @@ type GenStats struct {
 	Modules   int
 	Files     int
 	Lines     int
-	// Attempts is how many generate runs it took to get an index with no
-	// parse errors; ParseErrs is what the kept index still had.
-	Attempts  int
+	// ParseErrs is the largest number of files a parser dropped in any run;
+	// Identical reports whether every timed run wrote a byte-identical
+	// stacklit.json.
 	ParseErrs int
+	Identical bool
 }
 
 // RepoResult is everything measured for one repo.
@@ -234,6 +233,7 @@ func repoRoot() string {
 }
 
 func armQuery(b int) string   { return fmt.Sprintf("stacklit query %d", b) }
+func armQueryRD(b int) string { return fmt.Sprintf("stacklit query %d + reader order", b) }
 func armRepoMap(b int) string { return fmt.Sprintf("repo-map approx %d", b) }
 
 const (
@@ -251,7 +251,7 @@ func armOrder(o Opts) []string {
 	}
 	arms = append(arms, armBM25, armDump, armStacklit)
 	for _, b := range o.QueryBudgets {
-		arms = append(arms, armQuery(b))
+		arms = append(arms, armQuery(b), armQueryRD(b))
 	}
 	return arms
 }
@@ -261,12 +261,6 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 	if err := checkout(dir, spec); err != nil {
 		return RepoResult{}, err
 	}
-	if len(spec.StacklitIgnore) > 0 {
-		rc, _ := json.Marshal(map[string]any{"ignore": spec.StacklitIgnore})
-		if err := os.WriteFile(filepath.Join(dir, ".stacklitrc.json"), rc, 0o644); err != nil {
-			return RepoResult{}, err
-		}
-	}
 	// Load sources before generating so stacklit outputs never enter any arm.
 	sources, sizes, err := LoadSources(dir, spec)
 	if err != nil {
@@ -274,10 +268,6 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 	}
 
 	gen, err := measureGenerate(binary, dir, o.Runs)
-	if err != nil {
-		return RepoResult{}, err
-	}
-	gen.Attempts, gen.ParseErrs, err = cleanIndex(binary, dir, maxIndexAttempts)
 	if err != nil {
 		return RepoResult{}, err
 	}
@@ -338,45 +328,11 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 		tr.Arms[armDump] = ArmResult{Arm: armDump, CostOnly: true, Lookup: dump, ToFound: dump}
 		tr.Arms[armStacklit] = RunStacklit(armStacklit, iv, gen.MapCost, t, o.TopN, sizes, o.ReadCap, o.MaxExtra)
 		for _, b := range o.QueryBudgets {
-			tr.Arms[armQuery(b)] = RunQuery(armQuery(b), binary, dir, t, modules, strconv.Itoa(b), sizes, o.ReadCap, o.MaxExtra)
+			tr.Arms[armQuery(b)], tr.Arms[armQueryRD(b)] = RunQuery(armQuery(b), armQueryRD(b), binary, dir, t, modules, strconv.Itoa(b), sizes, o.ReadCap, o.MaxExtra)
 		}
 		res.Tasks = append(res.Tasks, tr)
 	}
 	return res, nil
-}
-
-// maxIndexAttempts bounds the retries in cleanIndex.
-const maxIndexAttempts = 10
-
-var parseErrRe = regexp.MustCompile(`\((\d+) errors`)
-
-// cleanIndex regenerates the index until no file was dropped by a parser
-// error. The Rust parser panics on a varying subset of files from run to run,
-// which would make every stacklit arm non-deterministic; keeping the first
-// clean index makes the arms reproducible. It returns the attempts used and
-// the parse errors left in the kept index.
-func cleanIndex(binary, dir string, maxTries int) (attempts, errs int, err error) {
-	for attempts = 1; attempts <= maxTries; attempts++ {
-		for _, f := range []string{"stacklit.json", "stacklit.graph.json", "DEPENDENCIES.md", "stacklit.html"} {
-			_ = os.Remove(filepath.Join(dir, f))
-		}
-		cmd := exec.Command(binary, "generate")
-		cmd.Dir = dir
-		// One CPU makes the parser panics rare enough that a retry succeeds.
-		cmd.Env = append(os.Environ(), "STACKLIT_NO_CACHE=1", "GOMAXPROCS=1")
-		out, runErr := cmd.CombinedOutput()
-		if runErr != nil {
-			return attempts, 0, fmt.Errorf("generate: %v: %s", runErr, out)
-		}
-		errs = 0
-		if m := parseErrRe.FindSubmatch(out); m != nil {
-			errs, _ = strconv.Atoi(string(m[1]))
-		}
-		if errs == 0 {
-			return attempts, 0, nil
-		}
-	}
-	return maxTries, errs, nil
 }
 
 // verifyGold fails the run when a hand-written answer does not hold on the
@@ -492,6 +448,8 @@ func measureGenerate(binary, dir string, runs int) (GenStats, error) {
 	}
 	var times []float64
 	var maxRSS int64
+	hashes := map[[32]byte]bool{}
+	parseErrs := 0
 	for i := 0; i < runs; i++ {
 		for _, f := range []string{"stacklit.json", "stacklit.graph.json", "DEPENDENCIES.md", "stacklit.html"} {
 			_ = os.Remove(filepath.Join(dir, f))
@@ -505,13 +463,31 @@ func measureGenerate(binary, dir string, runs int) (GenStats, error) {
 			return GenStats{}, fmt.Errorf("generate: %v: %s", err, out)
 		}
 		times = append(times, float64(time.Since(start).Microseconds())/1000)
+		if raw, err := os.ReadFile(filepath.Join(dir, "stacklit.json")); err == nil {
+			hashes[sha256.Sum256(raw)] = true
+		}
 		if rss := maxRSSBytes(cmd); rss > maxRSS {
 			maxRSS = rss
 		}
 	}
+	// One verbose run reports dropped files; the timed runs use --quiet.
+	for _, f := range []string{"stacklit.json", "stacklit.graph.json", "DEPENDENCIES.md", "stacklit.html"} {
+		_ = os.Remove(filepath.Join(dir, f))
+	}
+	vcmd := exec.Command(binary, "generate")
+	vcmd.Dir = dir
+	vcmd.Env = append(os.Environ(), "STACKLIT_NO_CACHE=1")
+	out, err := vcmd.CombinedOutput()
+	if err != nil {
+		return GenStats{}, fmt.Errorf("generate: %v: %s", err, out)
+	}
+	if m := parseErrRe.FindSubmatch(out); m != nil {
+		parseErrs, _ = strconv.Atoi(string(m[1]))
+	}
 	first := times[0]
 	sort.Float64s(times)
-	st := GenStats{Runs: runs, FirstMs: first, MedianMs: times[len(times)/2]}
+	st := GenStats{Runs: runs, FirstMs: first, MedianMs: times[len(times)/2],
+		ParseErrs: parseErrs, Identical: len(hashes) == 1}
 	if maxRSS > 0 {
 		st.MaxRSSMB = float64(maxRSS) / (1024 * 1024)
 	}
@@ -523,7 +499,11 @@ type Env struct {
 	OS, Arch, GoVersion, Stacklit string
 	CPUs                          int
 	Date                          string
+	// Config lists the STACKLIT_* environment variables that were set.
+	Config string
 }
+
+var parseErrRe = regexp.MustCompile(`\((\d+) errors`)
 
 func environment(binary string) Env {
 	ver := "unknown"
@@ -533,6 +513,17 @@ func environment(binary string) Env {
 	if out, err := exec.Command("git", "-C", repoRoot(), "rev-parse", "--short", "HEAD").Output(); err == nil {
 		ver += " (checkout " + strings.TrimSpace(string(out)) + ")"
 	}
-	return Env{OS: runtime.GOOS, Arch: runtime.GOARCH, GoVersion: runtime.Version(), Stacklit: ver,
+	var cfg []string
+	for _, kv := range os.Environ() {
+		if strings.HasPrefix(kv, "STACKLIT_") {
+			cfg = append(cfg, kv)
+		}
+	}
+	sort.Strings(cfg)
+	conf := "default config"
+	if len(cfg) > 0 {
+		conf = strings.Join(cfg, " ")
+	}
+	return Env{Config: conf, OS: runtime.GOOS, Arch: runtime.GOARCH, GoVersion: runtime.Version(), Stacklit: ver,
 		CPUs: runtime.NumCPU(), Date: time.Now().UTC().Format("2006-01-02")}
 }
