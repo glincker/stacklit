@@ -9,11 +9,16 @@ import (
 
 // Config holds the settings loaded from a .stacklitrc.json file.
 type Config struct {
-	Ignore     []string     `json:"ignore,omitempty"`
-	MaxDepth   int          `json:"max_depth,omitempty"`
-	MaxModules int          `json:"max_modules,omitempty"`
-	MaxExports int          `json:"max_exports,omitempty"`
-	Output     OutputConfig `json:"output,omitempty"`
+	Ignore     []string `json:"ignore,omitempty"`
+	MaxDepth   int      `json:"max_depth,omitempty"`
+	MaxModules int      `json:"max_modules,omitempty"`
+	MaxExports int      `json:"max_exports,omitempty"`
+	// MaxModuleFiles caps the file names listed per module.
+	MaxModuleFiles int `json:"max_module_files,omitempty"`
+	// ModuleSplitFiles splits a module with more files than this into
+	// subdirectory modules. A negative value turns splitting off.
+	ModuleSplitFiles int          `json:"module_split_files,omitempty"`
+	Output           OutputConfig `json:"output,omitempty"`
 
 	// Scan controls (see scan.go for env overrides and validation).
 	Roots          []string `json:"roots,omitempty"`            // scan only these subdirectories
@@ -45,10 +50,13 @@ type OutputConfig struct {
 // DefaultConfig returns a Config populated with sensible defaults.
 func DefaultConfig() *Config {
 	return &Config{
-		MaxDepth:    4,
-		MaxModules:  200,
-		MaxExports:  10,
-		MaxFileSize: DefaultMaxFileSize,
+		MaxDepth:   4,
+		MaxModules: 200,
+		MaxExports: 10,
+
+		MaxModuleFiles:   DefaultMaxModuleFiles,
+		ModuleSplitFiles: DefaultModuleSplitFiles,
+		MaxFileSize:      DefaultMaxFileSize,
 		Output: OutputConfig{
 			JSON:    "stacklit.json",
 			Mermaid: "DEPENDENCIES.md",
@@ -81,6 +89,12 @@ func Load(root string) *Config {
 	}
 	if cfg.MaxExports == 0 {
 		cfg.MaxExports = 10
+	}
+	if cfg.MaxModuleFiles == 0 {
+		cfg.MaxModuleFiles = DefaultMaxModuleFiles
+	}
+	if cfg.ModuleSplitFiles == 0 {
+		cfg.ModuleSplitFiles = DefaultModuleSplitFiles
 	}
 	if cfg.Output.JSON == "" {
 		cfg.Output.JSON = "stacklit.json"

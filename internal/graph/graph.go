@@ -42,9 +42,14 @@ func shouldSkipModule(name string) bool {
 
 // Module represents a logical grouping of source files by directory.
 type Module struct {
-	Name            string
-	FileCount       int
-	Files           []string // basenames of files in this module
+	Name      string
+	FileCount int
+	Files     []string // basenames of files in this module
+	// FilesByRank lists the same basenames, most informative first (most
+	// exports, then name). Callers that cap the listing keep a useful prefix.
+	FilesByRank []string
+	// ExportsByRank is Exports reordered so symbols from richer files come first.
+	ExportsByRank   []string
 	Exports         []string
 	TypeDefs        map[string]string
 	DependsOn       []string
@@ -53,6 +58,12 @@ type Module struct {
 	PrimaryLanguage string
 	LineCount       int
 	langCounts      map[string]int // internal: file count per language
+	ranked          []rankedFile
+}
+
+type rankedFile struct {
+	name    string
+	exports []string
 }
 
 // Edge represents a dependency relationship between two modules.
@@ -81,6 +92,12 @@ type BuildOptions struct {
 	MaxDepth int
 	// MaxModules caps how many modules are retained. 0 means no cap.
 	MaxModules int
+	// Root is the project directory. Optional; lets Rust workspace crate names
+	// be read from Cargo.toml.
+	Root string
+	// SplitFiles splits a module holding more files than this into
+	// subdirectory modules, as far down as needed. 0 disables splitting.
+	SplitFiles int
 }
 
 // Build constructs a dependency Graph from a slice of parsed FileInfo.
@@ -95,9 +112,11 @@ func Build(files []*parser.FileInfo, opts BuildOptions) *Graph {
 		edges:   make(map[edgeKey]*Edge),
 	}
 
+	modOf := assignModules(files, maxDepth, opts.SplitFiles)
+
 	// First pass: create modules and collect entrypoints.
 	for _, f := range files {
-		mod := detectModuleWithDepth(f.Path, maxDepth)
+		mod := modOf[f.Path]
 		if shouldSkipModule(mod) {
 			continue
 		}
@@ -111,6 +130,7 @@ func Build(files []*parser.FileInfo, opts BuildOptions) *Graph {
 		m.Exports = appendUnique(m.Exports, f.Exports...)
 		m.Languages = appendUnique(m.Languages, f.Language)
 		m.Files = append(m.Files, filepath.Base(f.Path))
+		m.ranked = append(m.ranked, rankedFile{name: filepath.Base(f.Path), exports: f.Exports})
 		if f.Language != "" {
 			m.langCounts[f.Language]++
 		}
@@ -134,16 +154,21 @@ func Build(files []*parser.FileInfo, opts BuildOptions) *Graph {
 		knownModules = append(knownModules, name)
 	}
 
+	lr := newLangResolver(files, opts.Root, modOf)
+
 	// Second pass: resolve imports to edges.
 	for _, f := range files {
-		fromMod := detectModuleWithDepth(f.Path, maxDepth)
+		fromMod := modOf[f.Path]
 		if shouldSkipModule(fromMod) {
 			continue
 		}
 		fileDir := filepath.Dir(f.Path)
 
 		for _, imp := range f.Imports {
-			toMod := resolveImport(imp, fileDir, knownModules)
+			toMod, handled := lr.resolve(f, imp)
+			if !handled {
+				toMod = resolveImport(imp, fileDir, knownModules)
+			}
 			if toMod == "" || toMod == fromMod {
 				continue
 			}
@@ -175,6 +200,7 @@ func Build(files []*parser.FileInfo, opts BuildOptions) *Graph {
 		sort.Strings(m.DependedBy)
 		sort.Strings(m.Languages)
 		sort.Strings(m.Files)
+		m.rank()
 
 		// Determine the language with the most files in this module.
 		// Config files only decide the language when nothing else is present.
@@ -401,4 +427,99 @@ func appendUnique(s []string, values ...string) []string {
 		}
 	}
 	return s
+}
+
+// rank fills FilesByRank and ExportsByRank. Ties break on name so the output
+// is identical across runs.
+func (m *Module) rank() {
+	sort.SliceStable(m.ranked, func(i, j int) bool {
+		a, b := m.ranked[i], m.ranked[j]
+		if len(a.exports) != len(b.exports) {
+			return len(a.exports) > len(b.exports)
+		}
+		return a.name < b.name
+	})
+	m.FilesByRank = make([]string, 0, len(m.ranked))
+	seen := map[string]struct{}{}
+	for _, rf := range m.ranked {
+		m.FilesByRank = append(m.FilesByRank, rf.name)
+		for _, e := range rf.exports {
+			if e == "" {
+				continue
+			}
+			if _, ok := seen[e]; !ok {
+				seen[e] = struct{}{}
+				m.ExportsByRank = append(m.ExportsByRank, e)
+			}
+		}
+	}
+	m.ranked = nil
+}
+
+// assignModules maps each file path to its module name. A module that holds
+// more than splitFiles files is split by its next directory level, repeatedly,
+// so one oversized directory cannot hide most of its files.
+func assignModules(files []*parser.FileInfo, maxDepth, splitFiles int) map[string]string {
+	type entry struct {
+		path  string
+		parts []string
+	}
+	entries := make([]entry, 0, len(files))
+	for _, f := range files {
+		dir := filepath.ToSlash(filepath.Dir(f.Path))
+		var parts []string
+		if dir != "." && dir != "" && dir != "/" {
+			parts = strings.Split(dir, "/")
+		}
+		entries = append(entries, entry{f.Path, parts})
+	}
+	depthFor := map[string]int{} // module key -> segments to keep for files under it
+	name := func(parts []string) string {
+		if len(parts) == 0 {
+			return "root"
+		}
+		n := len(parts)
+		if maxDepth > 0 && n > maxDepth {
+			n = maxDepth
+		}
+		for {
+			key := strings.Join(parts[:n], "/")
+			d, ok := depthFor[key]
+			if !ok || d <= n || n >= len(parts) {
+				return key
+			}
+			n = d
+			if n > len(parts) {
+				n = len(parts)
+			}
+		}
+	}
+	for round := 0; splitFiles > 0 && round < 64; round++ {
+		counts := map[string]int{}
+		for _, e := range entries {
+			counts[name(e.parts)]++
+		}
+		changed := false
+		for _, e := range entries {
+			key := name(e.parts)
+			if counts[key] <= splitFiles || shouldSkipModule(key) {
+				continue
+			}
+			n := len(strings.Split(key, "/"))
+			if len(e.parts) > n {
+				if depthFor[key] < n+1 {
+					depthFor[key] = n + 1
+					changed = true
+				}
+			}
+		}
+		if !changed {
+			break
+		}
+	}
+	out := make(map[string]string, len(entries))
+	for _, e := range entries {
+		out[e.path] = name(e.parts)
+	}
+	return out
 }

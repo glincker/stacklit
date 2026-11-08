@@ -361,7 +361,9 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `ignore` | none | Extra gitignore-style patterns to skip, on top of `.gitignore` and the built-in skips (`node_modules`, `vendor`, `dist`, `build`, `target`, `.venv`, `__pycache__` and similar) |
 | `max_depth` | 4 | How deep module detection goes in the directory tree |
 | `max_modules` | 200 | Above this many modules, deeper ones are collapsed into their parents |
-| `max_exports` | 10 | Exports kept per module. Symbols beyond the cap are not in the index, so raise it if lookups by symbol name miss. |
+| `max_exports` | 10 | Exports kept per module, taken from the files with the most exports first. Symbols beyond the cap are not in the index, so raise it if lookups by symbol name miss. Env: `STACKLIT_MAX_EXPORTS`. |
+| `max_module_files` | 30 | File names listed per module, files with the most exports first. Env: `STACKLIT_MAX_MODULE_FILES`. |
+| `module_split_files` | 40 | A module with more files than this is split by subdirectory, repeatedly, so one big directory does not hide its files. Env: `STACKLIT_MODULE_SPLIT_FILES` (`-1` turns splitting off). |
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
 | `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |

@@ -120,7 +120,8 @@ func rubyRequire(node *gts.Node, lang *gts.Language, src []byte) string {
 	if method == nil {
 		return ""
 	}
-	if m := nodeText(method, src); m != "require" && m != "require_relative" {
+	m := nodeText(method, src)
+	if m != "require" && m != "require_relative" && m != "autoload" {
 		return ""
 	}
 	args := childByType(node, lang, "argument_list")

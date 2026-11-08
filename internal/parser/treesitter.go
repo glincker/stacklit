@@ -160,8 +160,11 @@ func (p *TreeSitterParser) ParseWithTimeout(path string, content []byte, timeout
 		releaseParser(entry.Name, parser)
 	}()
 	parseSrc := content
-	if entry.Name == "sql" {
+	switch entry.Name {
+	case "sql":
 		parseSrc = maskDollarQuotes(content)
+	case "ruby":
+		parseSrc = maskRubyDataRuns(content)
 	}
 	tree, err := parser.Parse(parseSrc)
 	if err != nil {
