@@ -21,16 +21,16 @@ func digestBudget() int {
 	if v, err := strconv.Atoi(os.Getenv("STACKLIT_DIGEST_TOKENS")); err == nil && v >= 100 {
 		return v
 	}
-	return 500
+	return 200
 }
 
 // steering holds the rule text variants, selectable with the "steering" config
 // key or STACKLIT_STEERING so phrasings can be A/B tested. Each stays byte
 // stable and well inside the digest cap.
 var steering = map[string]string{
-	"a": "Before grepping the repo, run `stacklit query \"<question>\" --budget 800`.\n" +
-		"Read code with `stacklit slice <symbol>`, not whole files.\n" +
-		"Before editing shared code, run `stacklit impact <symbol>`.\n",
+	"a": "Stacklit answers where-is-it and how-does-it-connect questions: `stacklit query \"<question>\" --budget 800`.\n" +
+		"For an exact name or a small file, grep or a plain read is enough; skip stacklit. One symbol's source: `stacklit slice <symbol>`.\n" +
+		"Before editing shared code, `stacklit impact <symbol>` lists dependents with file:line.\n",
 	"b": "Stacklit first: `stacklit query \"<question>\"` before grep, `stacklit slice <symbol>` before reading a file, `stacklit impact <symbol>` before editing shared code.\n",
 	"c": "Stacklit answers structure questions in far fewer tokens than grep plus whole-file reads.\n" +
 		"- Where is X or how does Y work: `stacklit query \"<question>\" --budget 800`\n" +
@@ -134,9 +134,6 @@ func BodyFor(idx *schema.Index, variant string) string {
 	}
 	if len(meta) > 0 {
 		head.WriteString(strings.Join(meta, " | ") + "\n")
-	}
-	if idx.Hints.AddFeature != "" {
-		head.WriteString("add: " + oneLine(idx.Hints.AddFeature, 120) + "\n")
 	}
 	if len(idx.Hints.DoNotTouch) > 0 {
 		head.WriteString("do-not-touch: " + oneLine(strings.Join(idx.Hints.DoNotTouch, ", "), 100) + "\n")

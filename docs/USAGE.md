@@ -437,7 +437,7 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_EXPORT_PAGE_TOKENS` | `export --format markdown-wiki`, `obsidian` | Token budget per page. Default: 2000. |
 | `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
-| `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
+| `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 200. |
 | `STACKLIT_STEERING` | `setup`, `guide`, `serve` | Steering wording variant `a`, `b`, `c`, `d` or `e`. `d` also selects the older MCP and guide wording. |
 | `STACKLIT_SMALL_REPO_FILES` | `setup`, hooks | Source file count below which a repo gets the small repo note instead of the digest. Default 600, 0 off. |
 | `STACKLIT_QUERY_NEXT`, `STACKLIT_FLOW_WORDS`, `STACKLIT_QUERY_SPREAD_DIRS`, `STACKLIT_QUERY_SPREAD_TOP`, `STACKLIT_QUERY_FLATNESS` | `query` | The "also ranked" line: files listed (default 4, 0 off), flow word list, and the spread test (defaults 4, 5, 0.5). |

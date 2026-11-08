@@ -26,9 +26,9 @@ Token figures are bytes/4 measured on the three repos in the table below (263, 1
 
 | Event | What Stacklit does | Tokens | Failure behavior |
 |---|---|---|---|
-| `SessionStart` (startup, resume, clear, fork) | Reads `stacklit.json`. A small repo (below `small_repo_files`, see below) gets one line saying grep is enough, then the status line. Otherwise, if the project `CLAUDE.md` already holds a digest of the current structure, injects only one status line; if not, the digest plus a tools line, then the status line. Records the structure hash it handed out. | 23 (status only), about 60 (small repo), 290 to 515 (full) | No index: silent, except one `stacklit init` hint per worktree on `startup`. Bad input or any error: no output, exit 0. |
-| `SessionStart` (compact) | Same logic. `CLAUDE.md` comes back from disk by itself, so normally only the status line is added. If the structure moved since `CLAUDE.md` was written, the fresh digest is injected. | 23 to 515 | Same. |
-| `SubagentStart` (Explore, Plan) | Injects the digest and tools line, because these agents skip `CLAUDE.md`. Other agent types get nothing (they already load `CLAUDE.md`). Override the list with `STACKLIT_SUBAGENT_TYPES`. | 264 to 491 | Silent on any error. |
+| `SessionStart` (startup, resume, clear, fork) | Reads `stacklit.json`. A small repo (below `small_repo_files`, see below) gets one line saying grep is enough, then the status line. Otherwise, if the project `CLAUDE.md` already holds a digest of the current structure, injects only one status line; if not, the digest plus a tools line, then the status line. Records the structure hash it handed out. | 23 (status only), about 60 (small repo), digest cap (default 200) plus the tools line (full) | No index: silent, except one `stacklit init` hint per worktree on `startup`. Bad input or any error: no output, exit 0. |
+| `SessionStart` (compact) | Same logic. `CLAUDE.md` comes back from disk by itself, so normally only the status line is added. If the structure moved since `CLAUDE.md` was written, the fresh digest is injected. | 23 up to the digest cap plus the tools line | Same. |
+| `SubagentStart` (Explore, Plan) | Injects the digest and tools line, because these agents skip `CLAUDE.md`. Other agent types get nothing (they already load `CLAUDE.md`). Override the list with `STACKLIT_SUBAGENT_TYPES`. | digest cap plus the tools line | Silent on any error. |
 | `PostToolUse` (Edit, Write, MultiEdit, NotebookEdit), async | Runs `stacklit hook posttool`, which calls `stacklit refresh` for the edited file. Never prints, never fails the edit. | 0 | Index missing: does nothing. Lock held: queues the path for the holder. |
 | `PreToolUse` (Grep, Glob) | Existing opt-in pointer to a definition and callers. Unchanged. | up to 120 | Silent without a graph. |
 | `UserPromptSubmit`, `Stop`, `PreCompact` | Not used. They would add tokens on every prompt or turn with no gain over the routes above. | 0 | n/a |
@@ -83,7 +83,7 @@ The `CLAUDE.md` or `AGENTS.md` block opens with short rules. Five phrasings are 
 - `d`: strict, not recommended (measured worse, see below). States that Stacklit is the source of truth for structure and tells the agent not to crawl: structure questions go to `stacklit query ... --budget 800` and `explain`, `impact` or `path`; no recursive listings, `find`, `tree` or repo wide grep to learn structure; open a file only after the map points to it and read it with `stacklit slice`; refresh or regenerate when stacklit reports a stale index or a missing symbol; subagents follow the same rules.
 - `e`: routed. Use Stacklit when you do not know where something is or how things connect; when you know the exact name, use grep or `stacklit impact <name>`; when the answer is several files (a flow, a chain), check the neighbours with `stacklit explain` or `stacklit path` before answering, because one query is a lead, not the answer. It does not forbid grep. It was written after the first A/B (below) and has not been measured yet; the default stays `a` until a second round says otherwise.
 
-Each is byte-stable, and the whole block stays under `STACKLIT_DIGEST_TOKENS` (default 500). `stacklit guide` and the MCP handshake use the `e` wording; steering `d` (or `STACKLIT_STEERING=d`) selects the older strict wording for both, kept for comparison.
+Each is byte-stable, and the whole block stays under `STACKLIT_DIGEST_TOKENS` (default 200). `stacklit guide` and the MCP handshake use the `e` wording; steering `d` (or `STACKLIT_STEERING=d`) selects the older strict wording for both, kept for comparison.
 
 ## What the first real-agent A/B measured
 
@@ -107,7 +107,7 @@ Based on that one A/B, one model and one task set written by us:
 
 ## Small repos
 
-A repo with fewer source files than `small_repo_files` (default 600, `.stacklitrc.json`; env `STACKLIT_SMALL_REPO_FILES`; 0 turns the mode off) does not need a map. In that case the session hook and `setup` write one factual line ("This repo is small (N source files), so grep and reading files are enough. Stacklit is available if a question needs more") instead of the digest, about 60 tokens instead of 490, with the status line after it. The count is the number of indexed files across all languages in `stacklit.json`. Subagents get the same line. The line is not a prohibition: `query`, `impact` and the other commands still work.
+A repo with fewer source files than `small_repo_files` (default 600, `.stacklitrc.json`; env `STACKLIT_SMALL_REPO_FILES`; 0 turns the mode off) does not need a map. In that case the session hook and `setup` write one factual line ("This repo is small (N source files), so grep and reading files are enough. Stacklit is available if a question needs more") instead of the digest, about 60 tokens instead of the capped digest, with the status line after it. The count is the number of indexed files across all languages in `stacklit.json`. Subagents get the same line. The line is not a prohibition: `query`, `impact` and the other commands still work.
 
 ## Source of truth
 

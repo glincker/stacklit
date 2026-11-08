@@ -583,7 +583,7 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_EXPORT_PAGE_TOKENS` | `export --format markdown-wiki`, `obsidian` | Token budget per page. Default: 2000. |
 | `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
-| `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
+| `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 200. |
 | `STACKLIT_STEERING` | `setup` | Steering wording variant `a`, `b`, `c` or `d`. |
 | `STACKLIT_CRAWL_GUARD` | `hook crawl` | `off`, `nudge` or `redirect`. Overrides the `crawl_guard` config key and the mode the hook was installed with. Default off when nothing sets it. |
 | `STACKLIT_CRAWL_REDIRECTS`, `STACKLIT_CRAWL_FRESH_TTL` | `hook crawl` | Consecutive redirects per session before the guard stands down (default 2), and seconds a staleness verdict is reused (default 10). |

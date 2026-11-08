@@ -18,7 +18,7 @@ import (
 // toolsLine is the factual tool summary appended to injected context. Hook
 // text avoids imperative wording on purpose: the docs warn it can read as an
 // injection attempt.
-const toolsLine = "Tools: stacklit query \"<question>\" --budget 800 returns ranked symbols; stacklit slice <symbol> returns one symbol's source; stacklit impact <symbol> lists dependents.\n"
+const toolsLine = "Ask: stacklit query \"<question>\" --budget 800 (ranked symbols); stacklit slice <symbol> (one symbol's source); stacklit impact <symbol> (dependents, file:line). Exact-name lookups and small files need only grep or a read.\n"
 
 // sessionStatusSample is a representative status line, used for sizing.
 const sessionStatusSample = "stacklit map 0123456789abcdef is current (HEAD 1a2b3c4d, no source changes since the index)."
