@@ -20,11 +20,17 @@ const (
 	hookPostCmd    = "stacklit hook posttool"
 )
 
+// crawlMatcher covers the tools a crawl can come through. Task is the older
+// name of the Agent tool.
+const crawlMatcher = "Bash|Glob|Read|Agent|Task"
+
 // ClaudeOptions selects the optional Claude Code extras.
 type ClaudeOptions struct {
-	PreToolHook  bool
-	SessionHook  bool
-	RefreshHook  bool
+	PreToolHook bool
+	SessionHook bool
+	RefreshHook bool
+	// CrawlGuard is "", "off" (remove), "nudge" or "redirect".
+	CrawlGuard   string
 	Skill        bool
 	GlobalScope  bool
 	UninstallAll bool
@@ -102,7 +108,7 @@ func (r *Runner) ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error {
 	if err != nil {
 		return err
 	}
-	if o.PreToolHook || o.SessionHook || o.RefreshHook || uninstall {
+	if o.PreToolHook || o.SessionHook || o.RefreshHook || o.CrawlGuard != "" || uninstall {
 		path := filepath.Join(base, "settings.json")
 		old, existed, err := r.read(path)
 		if err != nil {
@@ -121,6 +127,13 @@ func (r *Runner) ApplyClaudeExtras(o ClaudeOptions, uninstall bool) error {
 			setHook(m, "SessionStart", "startup|resume|clear|compact", hookSessionCmd, !uninstall, false)
 			// Explore and Plan skip CLAUDE.md, so they get the digest here.
 			setHook(m, "SubagentStart", "Explore|Plan", hookSubagent, !uninstall, false)
+		}
+		if o.CrawlGuard != "" || uninstall {
+			// One hook per mode string, so switching modes replaces the old entry.
+			for _, mode := range []string{CrawlNudge, CrawlRedirect} {
+				on := !uninstall && o.CrawlGuard == mode
+				setHook(m, "PreToolUse", crawlMatcher, hookCrawlCmd+" "+mode, on, false)
+			}
 		}
 		if o.RefreshHook || uninstall {
 			setHook(m, "PostToolUse", "Edit|Write|MultiEdit|NotebookEdit", hookPostCmd, !uninstall, true)

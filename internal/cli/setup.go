@@ -18,6 +18,7 @@ type setupFlags struct {
 	all, dryRun, uninstall, global, list, report bool
 	noMCP, noGitHook                             bool
 	preTool, session, refresh, skill             bool
+	crawlGuard                                   string
 }
 
 func newSetupCmd() *cobra.Command {
@@ -41,6 +42,11 @@ Claude Code extras (opt-in):
                    after compaction, and into Explore and Plan subagents
   --refresh-hook   refresh the map for just the files an edit touched (async)
   --skill          install the /stacklit skill
+  --crawl-guard[=nudge|redirect|off]
+                   PreToolUse hook that spots repo-wide crawls (find, ls -R, grep -r,
+                   Glob **/*, generic Explore prompts). nudge adds a pointer to the
+                   stacklit command; redirect denies up to twice per session while the
+                   index is current. Use = to pass a mode. off removes it.
 These go to .claude/settings.json in the repo, or ~/.claude with --global.
 
 Examples:
@@ -72,6 +78,8 @@ Examples:
 	fl.BoolVar(&f.session, "session-hook", false, "Claude Code: add a SessionStart hook that injects the map")
 	fl.BoolVar(&f.refresh, "refresh-hook", false, "Claude Code: add an async PostToolUse hook that refreshes the map for just the edited files")
 	fl.BoolVar(&f.skill, "skill", false, "Claude Code: install the /stacklit skill")
+	fl.StringVar(&f.crawlGuard, "crawl-guard", "", "Claude Code: add a crawl guard PreToolUse hook (nudge, redirect or off; bare flag means nudge)")
+	fl.Lookup("crawl-guard").NoOptDefVal = setup.CrawlNudge
 	return cmd
 }
 
@@ -136,12 +144,16 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 		}
 	}
 
+	f.crawlGuard = strings.ToLower(strings.TrimSpace(f.crawlGuard))
+	if f.crawlGuard != "" && f.crawlGuard != "off" && f.crawlGuard != setup.CrawlNudge && f.crawlGuard != setup.CrawlRedirect {
+		return fmt.Errorf("--crawl-guard must be nudge, redirect or off, got %q", f.crawlGuard)
+	}
 	r := &setup.Runner{Root: root, DryRun: f.dryRun, Out: out}
 	err = setup.Run(r, setup.Options{
 		Root: root, Tools: tools, Index: idx,
 		Uninstall: f.uninstall, NoMCP: f.noMCP, NoGitHook: f.noGitHook, Global: f.global,
 		Claude: setup.ClaudeOptions{
-			PreToolHook: f.preTool, SessionHook: f.session, RefreshHook: f.refresh, Skill: f.skill, GlobalScope: f.global,
+			PreToolHook: f.preTool, SessionHook: f.session, RefreshHook: f.refresh, CrawlGuard: f.crawlGuard, Skill: f.skill, GlobalScope: f.global,
 		},
 	})
 	if err != nil {
