@@ -6,10 +6,12 @@
   "scripts": {
     "sync": "node scripts/sync-docs.mjs",
     "demos": "node scripts/build-demos.mjs",
-    "dev": "npm run sync && astro dev",
-    "build": "npm run sync && astro build && node scripts/check-links.mjs",
+    "dev": "npm run sync && npm run stars && astro dev",
+    "build": "npm run sync && npm run stars && astro build && node scripts/check-links.mjs",
     "preview": "astro preview",
-    "check:links": "node scripts/check-links.mjs"
+    "check:links": "node scripts/check-links.mjs",
+    "stars": "node scripts/fetch-stars.mjs",
+    "og": "node scripts/make-og.mjs"
   },
   "dependencies": {
     "astro": "6.4.8",

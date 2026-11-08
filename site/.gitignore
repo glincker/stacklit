@@ -3,3 +3,4 @@ dist/
 .astro/
 src/content/docs/
 src/data/bench.json
+src/data/stars.json
