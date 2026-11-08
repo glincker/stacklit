@@ -1,0 +1,137 @@
+[
+ {
+  "id": "fd-01",
+  "kind": "locate",
+  "question": "Where is the logic that decides whether a feature currently counts as new for a user (release date, how long it stays new, and what the user has already dismissed)?",
+  "all_of": [],
+  "any_of": [
+   "src/core.ts"
+  ],
+  "rubric": "isNew in src/core.ts."
+ },
+ {
+  "id": "fd-02",
+  "kind": "locate",
+  "question": "Where is the code that limits how many announcements can pop up in a time window in the React layer?",
+  "all_of": [],
+  "any_of": [
+   "src/throttle.ts"
+  ],
+  "rubric": "src/throttle.ts, used by src/react/provider.tsx."
+ },
+ {
+  "id": "fd-03",
+  "kind": "trace",
+  "question": "Which source files define a framework helper named getNewFeaturesServer for server side rendering?",
+  "all_of": [
+   "src/next/index.ts",
+   "src/astro/index.ts",
+   "src/nuxt/index.ts",
+   "src/remix/index.ts"
+  ],
+  "any_of": [],
+  "rubric": "next, astro, nuxt and remix entry files each define it."
+ },
+ {
+  "id": "fd-04",
+  "kind": "trace",
+  "question": "Which files make up the guided product tour feature in the React layer: the component, the hooks, and the shared registry?",
+  "all_of": [
+   "src/react/components/tour.tsx",
+   "src/react/hooks/use-tour.ts",
+   "src/react/tour-registry.ts",
+   "src/react/hooks/use-tour-sequencer.ts"
+  ],
+  "any_of": [],
+  "rubric": "tour component, use-tour, use-tour-sequencer and tour-registry."
+ },
+ {
+  "id": "fd-05",
+  "kind": "impact",
+  "question": "Which non-test source files import src/core.ts?",
+  "all_of": [
+   "src/angular/index.ts",
+   "src/astro/index.ts",
+   "src/helpers.ts",
+   "src/index.ts",
+   "src/next/index.ts",
+   "src/nuxt/index.ts",
+   "src/react/provider.tsx",
+   "src/remix/index.ts",
+   "src/renderer.ts",
+   "src/solid/store.ts",
+   "src/svelte/index.ts",
+   "src/vue/provider.ts",
+   "src/web-components/index.ts"
+  ],
+  "any_of": [],
+  "rubric": "These thirteen files import ./core or ../core."
+ },
+ {
+  "id": "fd-06",
+  "kind": "impact",
+  "question": "Which non-test files import the tour registry module (src/react/tour-registry.ts)?",
+  "all_of": [
+   "src/react/hooks/use-tour.ts",
+   "src/react/hooks/use-tour-sequencer.ts",
+   "src/react/components/checklist.tsx"
+  ],
+  "any_of": [],
+  "rubric": "use-tour.ts, use-tour-sequencer.ts and checklist.tsx import ../tour-registry."
+ },
+ {
+  "id": "fd-07",
+  "kind": "add",
+  "question": "I want to add a new storage adapter (for example for DynamoDB) following the existing pattern. Where does the new file go and which existing file must also be edited so users can import it?",
+  "all_of": [
+   "src/adapters/index.ts"
+  ],
+  "any_of": [
+   "src/adapters/hybrid.ts",
+   "src/adapters/redis.ts",
+   "src/adapters/postgres.ts",
+   "src/adapters/mysql.ts",
+   "src/adapters/mongo.ts",
+   "src/adapters/sqlite.ts",
+   "src/adapters/supabase.ts",
+   "src/adapters/remote.ts"
+  ],
+  "rubric": "New file in src/adapters/, exported from src/adapters/index.ts (the adapters build entry)."
+ },
+ {
+  "id": "fd-08",
+  "kind": "add",
+  "question": "I want to add a new React hook following the existing pattern. Where does the file go and where must it be exported?",
+  "all_of": [
+   "src/react/hooks/index.ts"
+  ],
+  "any_of": [
+   "src/react/hooks/use-new-feature.ts",
+   "src/react/hooks/use-new-count.ts",
+   "src/react/hooks/use-tour.ts",
+   "src/react/hooks/use-checklist.ts",
+   "src/react/index.ts"
+  ],
+  "rubric": "New file in src/react/hooks/, exported from src/react/hooks/index.ts (and surfaced via src/react/index.ts)."
+ },
+ {
+  "id": "fd-09",
+  "kind": "locate",
+  "question": "Where is the code that forwards feature events to PostHog?",
+  "all_of": [],
+  "any_of": [
+   "src/posthog-client.ts"
+  ],
+  "rubric": "src/posthog-client.ts (flags.ts and cli.ts also mention PostHog but do not forward events)."
+ },
+ {
+  "id": "fd-10",
+  "kind": "locate",
+  "question": "Where does the library compare semantic versions to decide whether a feature applies to the current app version?",
+  "all_of": [],
+  "any_of": [
+   "src/semver.ts"
+  ],
+  "rubric": "src/semver.ts, imported by src/core.ts."
+ }
+]
