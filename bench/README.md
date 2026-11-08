@@ -1,6 +1,6 @@
 # Benchmark harness
 
-A reproducible, offline comparison of ways for a coding agent to find the right file in a repo. Eight arms run on the same hand-verified tasks over six pinned public repos. No LLM is called and no API key is needed. The only network access is `git fetch` of the pinned commits. Methodology, limits and results are in [RESULTS.md](RESULTS.md). An optional LLM-judged variant is described (not implemented) in [OPTIONAL_LLM.md](OPTIONAL_LLM.md).
+A reproducible, offline comparison of ways for a coding agent to find the right file in a repo. Ten arms run on the same hand-verified tasks over six pinned public repos. No LLM is called and no API key is needed. The only network access is `git fetch` of the pinned commits. Methodology, limits and results are in [RESULTS.md](RESULTS.md). An optional LLM-judged variant is described (not implemented) in [OPTIONAL_LLM.md](OPTIONAL_LLM.md).
 
 ## Run it
 
@@ -48,7 +48,8 @@ Token counts, success rates and confidence intervals are deterministic: re-runni
 | `bm25 top-k` | BM25 over source files, question text as the query, top 5 paths printed | yes |
 | `full dump` | Cost of putting every code file in context | yes |
 | `stacklit map+lookup` | `stacklit derive` map, then module entries from `stacklit.json` picked with hand-written terms | yes |
-| `stacklit query N` | One `stacklit query "<question>" --budget N` call, question verbatim | yes |
+| `stacklit query N` | One `stacklit query "<question>" --budget N --json` call, question verbatim, files opened in the order the tool prints them (path order; the tool prints no relevance score) | yes |
+| `stacklit query N + reader order` | Same call and output, files opened in an order picked from the printed text and the question only (harness policy, not a stacklit feature) | yes |
 
 Details and the grading rules are in RESULTS.md.
 
@@ -62,6 +63,7 @@ Details and the grading rules are in RESULTS.md.
 | `baseline.go`, `bm25.go`, `repomap.go` | Baseline arms |
 | `index.go`, `query.go` | Stacklit arms |
 | `stats.go` | Seeded bootstrap confidence intervals |
+| `CHANGES.md`, `PROPOSED_CLAIMS.md` | Task and harness changes since the first run; claims the data does and does not support |
 | `cost.go` | Token approximation |
 | `main.go`, `report.go` | Orchestration, gold verification, timing, memory, markdown |
 
@@ -76,4 +78,6 @@ Add an entry to `repos.json` (a full commit SHA, never a branch) and a `tasks/<n
 - `target`: the module whose dependents are asked for (dependents only)
 - `expect_paths` and `expect_modules`: the answer. Verify it yourself with `grep` or `rg`, never with stacklit's own output. A trailing `/` means "anything under this directory". For localization the first gold path found counts (any of `expect_paths`).
 
-If stacklit hangs or crashes on a file type in a new repo, `stacklit_ignore` in `repos.json` is written to `.stacklitrc.json` in the checkout (this is used for ripgrep, see RESULTS.md).
+The benchmark uses the plain output of `stacklit generate`: no retry, no CPU limit and no ignore rules. The report states per repo whether a parser dropped files and whether every timed run wrote an identical index, so a regression shows up there. Environment variables such as `STACKLIT_MAX_MODULE_FILES=60` are passed through and recorded in the report header.
+
+See [CHANGES.md](CHANGES.md) for what changed since the first run and [PROPOSED_CLAIMS.md](PROPOSED_CLAIMS.md) for wording the data supports.
