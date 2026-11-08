@@ -11,6 +11,12 @@ All notable changes, reconstructed from the git history and release tags. Dates 
 - Stability: parallel parse pool with panic recovery, an on-disk incremental cache, safer walking (symlinks, size cap, nested ignore files, include globs, scan roots), `stacklit doctor`, stable exit codes, `schema_version`, atomic output writes, fuzz tests, monorepo package boundaries and a robust multi-repo index with cross-repo edges.
 - A reproducible benchmark harness in `bench/` with a third arm for the graph query path, plus rewritten README and USAGE, ARCHITECTURE.md, CONTRIBUTING.md, SECURITY.md, ROADMAP.md and issue and PR templates.
 
+- Retrieval: `query` now ranks with BM25 over symbol name, signature, doc comment, a capped body word list and path, blended with PageRank. Identifier queries resolve exact then prefix first, snake_case and schema-prefixed names resolve, and quoted phrases filter. A 40-question gold set over this repo gates the top-5 rate.
+- `stacklit status` (index and graph age versus git HEAD, files changed since) and a one-line stale warning on `query`. `STACKLIT_NO_STALE=1` silences it.
+- `stacklit serve --profile minimal`: four tools (query, slice, impact, map) in about 230 tokens of schema; `full` stays the default.
+- The opt-in PreToolUse hook now answers a grepped identifier with its definition and top callers (max 120 tokens), and stays silent without a graph.
+- `init --hook` and `setup` also install quiet post-checkout, post-merge and post-rewrite refresh hooks.
+
 ### Changed
 - `timestamps` and `git_activity` now default to off so a committed index is byte-stable. Opt in with the config keys or `STACKLIT_TIMESTAMPS=1` and `STACKLIT_GIT=1`.
 - Tree-sitter trees are released after extraction, parsers are reused, and concurrent parse memory is gated (`parse_memory_mb`, `STACKLIT_PARSE_MEMORY_MB`). Cold peak memory on the benchmark repos fell from 2.2 GB to 1.6 GB (flask) and from 2.4 GB to 0.9 GB (hono).
