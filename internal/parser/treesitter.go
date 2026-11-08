@@ -115,7 +115,11 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 
 	lang := entry.Language()
 	parser := gts.NewParser(lang)
-	tree, err := parser.Parse(content)
+	parseSrc := content
+	if entry.Name == "sql" {
+		parseSrc = maskDollarQuotes(content)
+	}
+	tree, err := parser.Parse(parseSrc)
 	if err != nil {
 		// Fallback to generic on parse failure.
 		g := &GenericParser{}
@@ -134,7 +138,7 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 		return g.Parse(path, content)
 	}
 
-	info := extractFn(root, lang, content, path)
+	info := extractFn(root, lang, parseSrc, path)
 	info.Path = path
 	info.LineCount = countLines(content)
 	return info, nil

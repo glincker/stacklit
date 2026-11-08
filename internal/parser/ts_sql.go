@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bytes"
 	"strings"
 
 	gts "github.com/odvcencio/gotreesitter"
@@ -65,4 +66,45 @@ func sqlObjectName(n *gts.Node, lang *gts.Language, src []byte) string {
 		}
 	}
 	return ""
+}
+
+// maskDollarQuotes blanks PostgreSQL $tag$ ... $tag$ bodies into a plain quoted
+// string of equal length, because the grammar cannot parse them and would
+// otherwise drop every statement after the first function. Offsets stay stable.
+func maskDollarQuotes(src []byte) []byte {
+	out := src
+	copied := false
+	i := 0
+	for i < len(src) {
+		if src[i] != '$' {
+			i++
+			continue
+		}
+		j := i + 1
+		for j < len(src) && (src[j] == '_' || (src[j] >= 'a' && src[j] <= 'z') || (src[j] >= 'A' && src[j] <= 'Z') || (j > i+1 && src[j] >= '0' && src[j] <= '9')) {
+			j++
+		}
+		if j >= len(src) || src[j] != '$' {
+			i++
+			continue
+		}
+		tag := src[i : j+1]
+		end := bytes.Index(src[j+1:], tag)
+		if end < 0 {
+			return out
+		}
+		closeAt := j + 1 + end + len(tag) - 1
+		if !copied {
+			out = append([]byte(nil), src...)
+			copied = true
+		}
+		for k := i; k <= closeAt; k++ {
+			if out[k] != '\n' {
+				out[k] = ' '
+			}
+		}
+		out[i], out[closeAt] = '\'', '\''
+		i = closeAt + 1
+	}
+	return out
 }

@@ -70,8 +70,9 @@ func TestMoreLanguages(t *testing.T) {
 		},
 		{
 			name: "sql", file: "sample.sql", language: "sql",
-			exports:  []string{"table users", "table public.orders", "view active_users", "function add_one"},
-			typeDefs: map[string]string{"users": "email VARCHAR(255)", "public.orders": "user_id INT"},
+			exports:    []string{"table users", "table public.orders", "view active_users", "function add_one", "function trg_audit", "table after_function"},
+			notExports: []string{"inner_tmp"},
+			typeDefs:   map[string]string{"users": "email VARCHAR(255)", "public.orders": "user_id INT"},
 		},
 		{
 			name: "gdscript", file: "sample.gd", language: "gdscript",
@@ -106,7 +107,7 @@ func TestMoreLanguages(t *testing.T) {
 			imports:    []string{"System", "System.Collections.Generic"},
 			exports:    []string{"IInvoice", "Invoice", "Money", "Status", "Point"},
 			notExports: []string{"Secret"},
-			typeDefs:   map[string]string{"Invoice": "decimal Total()"},
+			typeDefs:   map[string]string{"Invoice": "decimal Total()", "IInvoice": "string Name { get; }"},
 		},
 		{
 			name: "ruby", file: "sample.rb", language: "ruby",
