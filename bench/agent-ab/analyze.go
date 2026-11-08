@@ -329,6 +329,10 @@ func analyze(c config, repoNames []string) error {
 			}
 		}
 		sum.Memorised[rn] = wilson(k, len(mem))
+		if c.famous {
+			// Same matcher as the task exclusion, so the two cannot disagree.
+			sum.Memorised[rn] = wilson(memoryRate(c.resultsDir, rn, loadTasks(c.tasksDir, rn)))
+		}
 	}
 	sum.Sessions["memory"] = countMemory(c.resultsDir, repoNames)
 	for _, a := range arms {

@@ -281,6 +281,9 @@ func TestFamousReportRule(t *testing.T) {
 	if !strings.Contains(rep, "rule R1): 3 of 5") || !strings.Contains(rep, "R2: at least 3 repos and pooled upper bound below 1.00): ALLOWED") {
 		t.Errorf("three repos with savings and a pooled interval below 1 allow the general claim:\n%s", rep)
 	}
+	if !strings.Contains(rep, "large famous repos\" (rule R2 holds and at least 3 of the repos with savings have more than 5000 tracked files; 2 do): not allowed") {
+		t.Errorf("only two large repos with savings must not allow the large wording:\n%s", rep)
+	}
 	// Two repos only: no general claim.
 	s.Scopes[2].Compare[0].RatioCI.Hi = 1.2
 	if rep := famousReport(s, names, files, nil); strings.Contains(rep, "pooled upper bound below 1.00): ALLOWED") {
@@ -339,5 +342,38 @@ func TestReuseIndexCopiesGeneratedFilesOnly(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(dst, "tracked.go")); err == nil {
 		t.Error("tracked files must not be copied")
+	}
+}
+
+func TestMemorisedTasksAreDroppedFromPairs(t *testing.T) {
+	res, tasks := t.TempDir(), t.TempDir()
+	ts := []task{{ID: "x-01", Kind: "locate", AnyOf: []string{"a.go"}}, {ID: "x-02", Kind: "locate", AnyOf: []string{"b.go"}}}
+	b, _ := json.Marshal(ts)
+	if err := os.WriteFile(filepath.Join(tasks, "x.json"), b, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	put := func(dir string, r record) {
+		if err := writeRecord(filepath.Join(dir, "x", r.Arm, r.Task+"-t1.json"), r); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, id := range []string{"x-01", "x-02"} {
+		put(res, record{Repo: "x", Task: id, Trial: 1, Arm: "control"})
+		put(res, record{Repo: "x", Task: id, Trial: 1, Arm: "stacklit"})
+	}
+	// The model knew x-01 from memory; x-02 it did not.
+	put(filepath.Join(res, "memory"), record{Repo: "x", Task: "x-01", Trial: 1, Arm: "memory", Answer: "a.go"})
+	put(filepath.Join(res, "memory"), record{Repo: "x", Task: "x-02", Trial: 1, Arm: "memory", Answer: "nothing"})
+	c := config{resultsDir: res, tasksDir: tasks}
+	if n := len(pairs(c, "x", "stacklit")); n != 2 {
+		t.Fatalf("without exclusion %d pairs, want 2", n)
+	}
+	c.excludeMem = true
+	ps := pairs(c, "x", "stacklit")
+	if len(ps) != 1 || ps[0].task.ID != "x-02" {
+		t.Fatalf("the memorised task must be dropped: %+v", ps)
+	}
+	if k, n := memoryRate(res, "x", loadTasks(tasks, "x")); k != 1 || n != 2 {
+		t.Fatalf("memory rate %d of %d, want 1 of 2", k, n)
 	}
 }
