@@ -231,7 +231,7 @@ jobs:
 - **Table** -- Sortable module table with search filter.
 - **Flow** -- Top-down dependency flow from entrypoints to leaves.
 
-## 23 languages via tree-sitter
+## 48 languages and file formats
 
 | Language | Extracts |
 |----------|----------|
@@ -257,6 +257,29 @@ jobs:
 | Vue / Svelte | script block imports, exports, types (parsed as TypeScript) |
 | Terraform/HCL | resources, data sources, variables, outputs, modules, providers, module sources |
 | Protobuf | imports, messages (nested), enums, services with rpc signatures |
+| Haskell | imports, signatures (honors the module export list), data/newtype/class declarations |
+| OCaml | open/include, let bindings, types with constructors and fields, modules, exceptions |
+| Clojure | ns requires/imports, `defn`/`def`/`defmacro`, protocols and records |
+| R | library/require/source, non-dot functions with parameters, top-level constants |
+| Perl | use/require/parent, packages, public subs |
+| Julia | using/import, exported functions, structs, abstract types, constants |
+| Objective-C | #import, `@interface`, `@protocol`, methods and properties |
+| Groovy | imports, classes, interfaces, enums, top-level `def` functions |
+| Nim | imports, star-exported procs, funcs, types with fields, constants |
+| Erlang | includes, exported functions as name/arity, records, types |
+| F# | open, modules, types (unions, records, members), non-private lets |
+| Fortran | use, modules, functions, subroutines, derived types |
+| Elm | imports, exposed annotated values and types |
+| Solidity | imports, contracts, interfaces, libraries, public functions, events, structs |
+| PowerShell | Import-Module/using/dot-sourcing, functions with params, classes |
+| Gleam | imports, pub functions, types with constructors, constants |
+| CMake | include/add_subdirectory/find_package, project, library/executable/custom targets, functions, macros |
+| Makefile | includes, explicit targets with prerequisites |
+| Dockerfile | base images, build stages, exposed ports |
+| YAML / TOML / JSON | top-level keys (capped, see below) |
+| GraphQL | object/interface/enum/input/union/scalar types with fields, named operations and fragments |
+
+Config files (YAML, TOML, JSON) report at most `STACKLIT_CONFIG_KEY_CAP` top-level keys (default 40) and skip key extraction above `STACKLIT_CONFIG_MAX_BYTES` (default 262144). Lockfiles and the generated `stacklit.json` are not indexed. Go is parsed with the Go standard library; every other row uses tree-sitter. SQL `$$` function bodies are masked before parsing so later statements still extract. Grammar-specific caveats: Groovy extraction falls back to line patterns where the grammar errors out, and `.m` files are treated as Objective-C.
 
 Any other language gets basic support (line count + language detection).
 
@@ -321,7 +344,7 @@ Repomix concatenates all files into one prompt (50k-500k tokens). Stacklit parse
 Yes, locally. It parses source files with tree-sitter to extract structure (imports, exports, types). No code is sent anywhere unless you use the optional `--summary` flag (which calls the Claude API).
 
 **What if my language isn't supported?**
-Stacklit falls back to basic support (line count + language detection) for any language not in the tree-sitter list. The module map, dependency graph, and git activity still work.
+Stacklit falls back to basic support (line count + language detection) for any language not in the table above. The module map, dependency graph, and git activity still work.
 
 **Does the git hook slow down commits?**
 No. Stacklit uses Merkle hashing to skip regeneration when only docs or configs changed. On a 10k-line repo, regeneration takes ~50ms.
