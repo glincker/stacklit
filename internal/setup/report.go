@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/glincker/stacklit/internal/graph"
+
 	"github.com/glincker/stacklit/internal/schema"
 )
 
@@ -104,7 +106,7 @@ func Report(idx *schema.Index, tools []Tool, mcpTokens int) []ReportRow {
 	rows = append(rows,
 		ReportRow{Item: "claude skill (name+description)", Tokens: Tokens(frontmatterField(SkillMD, "name") + frontmatterField(SkillMD, "description")), Note: "always on; body loads only when invoked"},
 		ReportRow{Item: "claude skill body", Tokens: Tokens(SkillMD), Note: "only when invoked"},
-		ReportRow{Item: "claude PreToolUse nudge", Tokens: Tokens(preToolNudge), Note: "only on broad Grep/Glob"},
+		ReportRow{Item: "claude PreToolUse pointer", Tokens: graph.DefaultPointerTokens, Note: "max, only on Grep for a known identifier"},
 		ReportRow{Item: "claude SessionStart nudge", Tokens: Tokens(sessionNudge), Note: "once per session"},
 	)
 	return rows
