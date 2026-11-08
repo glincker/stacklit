@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "7900088cf3cd24582cd5b47bb4f71e59dc09039ace666c8a62009b61711ab64e",
+  "merkle_hash": "95f75960204d49dc83ae1cff0ce93777a62df903adf288f53b97e63bbeab5dd3",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -198,7 +198,7 @@
       },
       "yaml": {
         "files": 13,
-        "lines": 499
+        "lines": 513
       },
       "zig": {
         "files": 3,
@@ -215,7 +215,7 @@
       "examples/adapters/keyword_concepts.py"
     ],
     "total_files": 410,
-    "total_lines": 44334
+    "total_lines": 44348
   },
   "modules": {
     ".github/ISSUE_TEMPLATE": {
@@ -243,7 +243,7 @@
       "purpose": "Workflows",
       "language": "yaml",
       "files": 5,
-      "lines": 216,
+      "lines": 230,
       "file_list": [
         "site.yml",
         "release.yml",
