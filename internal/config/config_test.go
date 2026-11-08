@@ -73,3 +73,26 @@ func TestScanIgnoreIncludesOutputs(t *testing.T) {
 		}
 	}
 }
+
+func TestMapIconsConfigAndEnv(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, ".stacklitrc.json"), []byte(`{"map_icons":"off"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if !Load(dir).MapIconsOff() {
+		t.Error("map_icons off in the rc file should turn icons off")
+	}
+	empty := t.TempDir()
+	if Load(empty).MapIconsOff() {
+		t.Error("icons should be on by default")
+	}
+	t.Setenv("STACKLIT_MAP_ICONS", "off")
+	if !Load(empty).MapIconsOff() {
+		t.Error("STACKLIT_MAP_ICONS=off should turn icons off")
+	}
+	c := DefaultConfig()
+	c.MapIcons = "maybe"
+	if c.Validate() == nil {
+		t.Error("an unknown map_icons value should fail validation")
+	}
+}

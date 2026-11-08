@@ -248,6 +248,7 @@ func Run(opts Options) (*Result, error) {
 	}
 	idx.MerkleHash = sc.MerkleHash
 	renderer.SetTimestamps(cfg.TimestampsEnabled())
+	renderer.SetMapIcons(!cfg.MapIconsOff())
 
 	// 10. Generate AI summary if requested.
 	if opts.Summary {
