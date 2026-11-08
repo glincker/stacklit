@@ -60,6 +60,10 @@ type GenStats struct {
 	Modules   int
 	Files     int
 	Lines     int
+	// Attempts is how many generate runs it took to get an index with no
+	// parse errors; ParseErrs is what the kept index still had.
+	Attempts  int
+	ParseErrs int
 }
 
 // RepoResult is everything measured for one repo.
@@ -273,6 +277,10 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 	if err != nil {
 		return RepoResult{}, err
 	}
+	gen.Attempts, gen.ParseErrs, err = cleanIndex(binary, dir, maxIndexAttempts)
+	if err != nil {
+		return RepoResult{}, err
+	}
 	// Save the symbol graph once so query calls do not rebuild it each time.
 	graphCmd := exec.Command(binary, "graph")
 	graphCmd.Dir = dir
@@ -335,6 +343,40 @@ func benchRepo(workdir, binary string, spec RepoSpec, o Opts) (RepoResult, error
 		res.Tasks = append(res.Tasks, tr)
 	}
 	return res, nil
+}
+
+// maxIndexAttempts bounds the retries in cleanIndex.
+const maxIndexAttempts = 10
+
+var parseErrRe = regexp.MustCompile(`\((\d+) errors`)
+
+// cleanIndex regenerates the index until no file was dropped by a parser
+// error. The Rust parser panics on a varying subset of files from run to run,
+// which would make every stacklit arm non-deterministic; keeping the first
+// clean index makes the arms reproducible. It returns the attempts used and
+// the parse errors left in the kept index.
+func cleanIndex(binary, dir string, maxTries int) (attempts, errs int, err error) {
+	for attempts = 1; attempts <= maxTries; attempts++ {
+		for _, f := range []string{"stacklit.json", "stacklit.graph.json", "DEPENDENCIES.md", "stacklit.html"} {
+			_ = os.Remove(filepath.Join(dir, f))
+		}
+		cmd := exec.Command(binary, "generate")
+		cmd.Dir = dir
+		// One CPU makes the parser panics rare enough that a retry succeeds.
+		cmd.Env = append(os.Environ(), "STACKLIT_NO_CACHE=1", "GOMAXPROCS=1")
+		out, runErr := cmd.CombinedOutput()
+		if runErr != nil {
+			return attempts, 0, fmt.Errorf("generate: %v: %s", runErr, out)
+		}
+		errs = 0
+		if m := parseErrRe.FindSubmatch(out); m != nil {
+			errs, _ = strconv.Atoi(string(m[1]))
+		}
+		if errs == 0 {
+			return attempts, 0, nil
+		}
+	}
+	return maxTries, errs, nil
 }
 
 // verifyGold fails the run when a hand-written answer does not hold on the
