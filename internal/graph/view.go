@@ -198,6 +198,9 @@ func (g *SymGraph) FitView(sp viewSpec, budget int, asJSON bool) string {
 	return clampTokens(s, budget)
 }
 
+// ClampTokens is clampTokens for callers outside the package.
+func ClampTokens(s string, budget int) string { return clampTokens(s, budget) }
+
 // clampTokens cuts s to at most budget tokens on a line boundary when possible.
 func clampTokens(s string, budget int) string {
 	max := budget * 4
