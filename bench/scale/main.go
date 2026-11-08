@@ -219,6 +219,8 @@ func measure(sp repoSpec, bin, parent string) *result {
 
 	t0 := time.Now()
 	cl := exec.Command("git", "clone", "-q", "--depth", "1", "--branch", sp.Ref, sp.URL, dir)
+	// Some repos track LFS pointers; fetching real blobs would need git-lfs and distort sizes.
+	cl.Env = append(os.Environ(), "GIT_LFS_SKIP_SMUDGE=1")
 	if b, err := cl.CombinedOutput(); err != nil {
 		r.Note = "clone failed: " + strings.TrimSpace(string(b))
 		return r
