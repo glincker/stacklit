@@ -3,7 +3,9 @@ import { SITE, REPO } from '../data/site';
 import copy from '../data/copy.json';
 
 export async function GET() {
-  const docs = (await getCollection('docs')).sort((a, b) => a.data.order - b.data.order);
+  const docs = (await getCollection('docs'))
+    .filter((d) => d.id !== 'docs')
+    .sort((a, b) => (a.data.sidebar.order ?? 99) - (b.data.sidebar.order ?? 99));
   const lines = [
     '# Stacklit',
     '',
@@ -11,7 +13,7 @@ export async function GET() {
     '',
     '## Docs',
     '',
-    ...docs.map((d) => `- [${d.data.title}](${SITE}/docs/${d.id}/): ${d.data.description}`),
+    ...docs.map((d) => `- [${d.data.title}](${SITE}/${d.id}/): ${d.data.description}`),
     '',
     '## More',
     '',
