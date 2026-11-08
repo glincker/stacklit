@@ -13,34 +13,56 @@ type TreeSitterParser struct{}
 
 // tsLangMap maps stacklit language names to extraction functions.
 var tsLangMap = map[string]func(root *gts.Node, lang *gts.Language, src []byte, path string) *FileInfo{
-	"typescript":  extractTypeScript,
-	"tsx":         extractTypeScript,
-	"javascript":  extractTypeScript,
-	"jsx":         extractTypeScript,
-	"python":      extractPython,
-	"rust":        extractRust,
-	"java":        extractJava,
-	"c_sharp":     extractCSharp,
-	"c-sharp":     extractCSharp,
-	"ruby":        extractRuby,
-	"php":         extractPHP,
-	"kotlin":      extractKotlin,
-	"swift":       extractSwift,
-	"c":           extractC,
-	"cpp":         extractC,
-	"objective-c": extractC,
-	"elixir":      extractElixir,
-	"zig":         extractZig,
-	"dart":        extractDart,
-	"lua":         extractLua,
-	"scala":       extractScala,
-	"bash":        extractShell,
-	"sql":         extractSQL,
-	"gdscript":    extractGDScript,
-	"vue":         extractVue,
-	"svelte":      extractSvelte,
-	"hcl":         extractHCL,
-	"proto":       extractProto,
+	"typescript": extractTypeScript,
+	"tsx":        extractTypeScript,
+	"javascript": extractTypeScript,
+	"jsx":        extractTypeScript,
+	"python":     extractPython,
+	"rust":       extractRust,
+	"java":       extractJava,
+	"c_sharp":    extractCSharp,
+	"c-sharp":    extractCSharp,
+	"ruby":       extractRuby,
+	"php":        extractPHP,
+	"kotlin":     extractKotlin,
+	"swift":      extractSwift,
+	"c":          extractC,
+	"cpp":        extractC,
+	"objc":       extractObjC,
+	"elixir":     extractElixir,
+	"zig":        extractZig,
+	"dart":       extractDart,
+	"lua":        extractLua,
+	"scala":      extractScala,
+	"bash":       extractShell,
+	"sql":        extractSQL,
+	"gdscript":   extractGDScript,
+	"vue":        extractVue,
+	"svelte":     extractSvelte,
+	"hcl":        extractHCL,
+	"proto":      extractProto,
+	"haskell":    extractHaskell,
+	"ocaml":      extractOCaml,
+	"clojure":    extractClojure,
+	"r":          extractR,
+	"perl":       extractPerl,
+	"julia":      extractJulia,
+	"nim":        extractNim,
+	"erlang":     extractErlang,
+	"groovy":     extractGroovy,
+	"fsharp":     extractFSharp,
+	"fortran":    extractFortran,
+	"elm":        extractElm,
+	"solidity":   extractSolidity,
+	"cmake":      extractCMake,
+	"make":       extractMake,
+	"dockerfile": extractDockerfile,
+	"json":       extractJSON,
+	"yaml":       extractYAML,
+	"toml":       extractTOML,
+	"graphql":    extractGraphQL,
+	"powershell": extractPowerShell,
+	"gleam":      extractGleam,
 }
 
 // skipExts are file extensions handled by other parsers or that we skip.
@@ -55,7 +77,7 @@ func (p *TreeSitterParser) CanParse(filename string) bool {
 			return false
 		}
 	}
-	entry := grammars.DetectLanguage(filename)
+	entry := detectEntry(filename)
 	if entry == nil {
 		return false
 	}
@@ -63,15 +85,41 @@ func (p *TreeSitterParser) CanParse(filename string) bool {
 	return ok
 }
 
+// detectEntry resolves the grammar for a path. It overrides the registry where
+// an extension is ambiguous (.fs is F# far more often than Forth) and adds the
+// extensionless build files the registry only matches by exact name.
+func detectEntry(path string) *grammars.LangEntry {
+	lower := strings.ToLower(path)
+	base := lower
+	if i := strings.LastIndexAny(base, "/\\"); i >= 0 {
+		base = base[i+1:]
+	}
+	switch {
+	case base == "dockerfile" || strings.HasPrefix(base, "dockerfile.") || strings.HasSuffix(base, ".dockerfile"):
+		return grammars.DetectLanguageByName("dockerfile")
+	case base == "makefile" || base == "gnumakefile" || strings.HasSuffix(base, ".mk"):
+		return grammars.DetectLanguageByName("make")
+	case strings.HasSuffix(base, ".fs"):
+		return grammars.DetectLanguageByName("fsharp")
+	case strings.HasSuffix(base, ".m") || strings.HasSuffix(base, ".mm"):
+		return grammars.DetectLanguageByName("objc")
+	}
+	return grammars.DetectLanguage(path)
+}
+
 func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error) {
-	entry := grammars.DetectLanguage(path)
+	entry := detectEntry(path)
 	if entry == nil {
 		return nil, nil
 	}
 
 	lang := entry.Language()
 	parser := gts.NewParser(lang)
-	tree, err := parser.Parse(content)
+	parseSrc := content
+	if entry.Name == "sql" {
+		parseSrc = maskDollarQuotes(content)
+	}
+	tree, err := parser.Parse(parseSrc)
 	if err != nil {
 		// Fallback to generic on parse failure.
 		g := &GenericParser{}
@@ -90,7 +138,7 @@ func (p *TreeSitterParser) Parse(path string, content []byte) (*FileInfo, error)
 		return g.Parse(path, content)
 	}
 
-	info := extractFn(root, lang, content, path)
+	info := extractFn(root, lang, parseSrc, path)
 	info.Path = path
 	info.LineCount = countLines(content)
 	return info, nil

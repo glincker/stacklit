@@ -4,7 +4,7 @@ using static System.Math;
 
 namespace Acme.Billing
 {
-    public interface IInvoice { decimal Total(); }
+    public interface IInvoice { decimal Total(); void Pay(int amount); string Name { get; } }
 
     public class Invoice : IInvoice
     {

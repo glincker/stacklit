@@ -222,7 +222,10 @@ func (w *walk) run(startAbs, _ string) error {
 		if w.ignored(rel, false) {
 			return nil
 		}
-		if !sourceExtensions[strings.ToLower(filepath.Ext(name))] {
+		if skipBasenames[name] {
+			return nil
+		}
+		if !sourceExtensions[strings.ToLower(filepath.Ext(name))] && !sourceBasenames[name] && !strings.HasPrefix(name, "Dockerfile.") {
 			return nil
 		}
 		if w.includeGi != nil && !w.includeGi.MatchesPath(rel) {

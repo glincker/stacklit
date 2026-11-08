@@ -360,10 +360,16 @@ func assembleIndex(
 	}
 	primaryLang := ""
 	primaryCount := 0
-	for lang, ls := range langStats {
-		if ls.Files > primaryCount || (ls.Files == primaryCount && lang < primaryLang) {
-			primaryCount = ls.Files
-			primaryLang = lang
+	// Config files only decide the language when nothing else is present.
+	for pass := 0; pass < 2 && primaryLang == ""; pass++ {
+		for lang, ls := range langStats {
+			if pass == 0 && parser.IsDataLanguage(lang) {
+				continue
+			}
+			if ls.Files > primaryCount || (ls.Files == primaryCount && lang < primaryLang) {
+				primaryCount = ls.Files
+				primaryLang = lang
+			}
 		}
 	}
 

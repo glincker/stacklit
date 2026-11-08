@@ -177,11 +177,17 @@ func Build(files []*parser.FileInfo, opts BuildOptions) *Graph {
 		sort.Strings(m.Files)
 
 		// Determine the language with the most files in this module.
+		// Config files only decide the language when nothing else is present.
 		bestLang, bestCount := "", 0
-		for lang, count := range m.langCounts {
-			if count > bestCount || (count == bestCount && lang < bestLang) {
-				bestLang = lang
-				bestCount = count
+		for pass := 0; pass < 2 && bestLang == ""; pass++ {
+			for lang, count := range m.langCounts {
+				if pass == 0 && parser.IsDataLanguage(lang) {
+					continue
+				}
+				if count > bestCount || (count == bestCount && lang < bestLang) {
+					bestLang = lang
+					bestCount = count
+				}
 			}
 		}
 		m.PrimaryLanguage = bestLang
@@ -362,7 +368,7 @@ func normalizePythonImport(imp string) (string, bool) {
 	}
 	rest := imp[dots:]
 	if rest == "" {
-		// Bare relative like "." or ".." without module name — can't resolve.
+		// Bare relative like "." or ".." without a module name can't be resolved.
 		return "", false
 	}
 	// "./x.js" and "../x" are already path-style (JS/TS), not Python dot notation.

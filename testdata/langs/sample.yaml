@@ -1,0 +1,7 @@
+name: demo
+version: 1.0
+services:
+  web:
+    image: nginx
+  db:
+    image: postgres
