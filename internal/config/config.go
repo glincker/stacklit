@@ -35,6 +35,7 @@ type Config struct {
 	Cache          *bool    `json:"cache,omitempty"`            // incremental cache, default on
 	Timestamps     *bool    `json:"timestamps,omitempty"`       // write generated_at, default off
 	GitActivity    *bool    `json:"git_activity,omitempty"`     // include hot/recent files, default off
+	MapIcons       string   `json:"map_icons,omitempty"`        // "remote" (default) or "off" for the HTML map
 
 	// Check holds architecture rules evaluated by `stacklit check`.
 	Check *CheckConfig `json:"check,omitempty"`

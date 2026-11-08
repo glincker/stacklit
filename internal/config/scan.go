@@ -113,6 +113,9 @@ func (c *Config) applyEnv() {
 			c.GitActivity = &b
 		}
 	}
+	if v := strings.ToLower(strings.TrimSpace(os.Getenv("STACKLIT_MAP_ICONS"))); v != "" {
+		c.MapIcons = v
+	}
 	if v := os.Getenv("STACKLIT_NO_GIT"); v != "" {
 		off := false
 		c.GitActivity = &off
@@ -187,6 +190,9 @@ func (c *Config) Validate() error {
 	}
 	if c.Workers < 0 {
 		problems = append(problems, "workers must not be negative")
+	}
+	if c.MapIcons != "" && c.MapIcons != "remote" && c.MapIcons != "off" {
+		problems = append(problems, `map_icons must be "remote" or "off"`)
 	}
 	for _, r := range c.Roots {
 		clean := path.Clean(toSlash(r))
@@ -295,3 +301,6 @@ func (c *Config) MemoryLimitBytes() int64 {
 	}
 	return int64(c.MemoryLimitMB) << 20
 }
+
+// MapIconsOff reports whether the HTML map must not request any remote icon.
+func (c *Config) MapIconsOff() bool { return c.MapIcons == "off" }

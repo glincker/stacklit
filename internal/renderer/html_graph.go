@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
-	"strings"
 
-	"github.com/glincker/stacklit/assets"
 	"github.com/glincker/stacklit/internal/graph"
 	"github.com/glincker/stacklit/internal/schema"
 )
@@ -24,10 +22,7 @@ func WriteHTMLWithGraph(idx *schema.Index, g *graph.SymGraph, maxNodes int, path
 			return err
 		}
 	}
-	html := strings.Replace(assets.TemplateHTML, "{{STACKLIT_DATA}}", string(dataJSON), 1)
-	html = strings.Replace(html, "{{STACKLIT_GRAPH}}", string(graphJSON), 1)
-	html = strings.Replace(html, "{{SYMBOLS_JS}}", assets.SymbolsJS, 1)
-	html = strings.Replace(html, "{{LANG_ICONS_JS}}", assets.LangIconsJS, 1)
+	html := renderPage(string(dataJSON), string(graphJSON))
 	data := []byte(html)
 	if existing, err := os.ReadFile(path); err == nil && bytes.Equal(existing, data) {
 		return nil
