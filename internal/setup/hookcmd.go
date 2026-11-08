@@ -5,14 +5,15 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
+
+	"github.com/glincker/stacklit/internal/graph"
 )
 
-// Nudge texts stay at or under 100 tokens (bytes/4); a test enforces it.
-const (
-	preToolNudge = "stacklit.json maps this repo's modules. Check it (or stacklit MCP find_module) before broad grep/glob."
-	sessionNudge = "This repo has a stacklit map: read stacklit.json or call stacklit MCP get_overview before broad searches."
-)
+// graphFile is the symbol graph the hook reads; absent means stay silent.
+const graphFile = "stacklit.graph.json"
+
+// sessionNudge stays at or under 100 tokens (bytes/4); a test enforces it.
+const sessionNudge = "This repo has a stacklit map: read stacklit.json or call stacklit MCP get_overview before broad searches."
 
 type hookInput struct {
 	ToolName  string `json:"tool_name"`
@@ -40,34 +41,31 @@ func hookJSON(event, ctx string) string {
 	return string(b) + "\n"
 }
 
-// isBroad reports whether a Grep or Glob call sweeps the whole repo.
-func isBroad(in hookInput) bool {
-	switch in.ToolName {
-	case "Glob":
-		p := in.ToolInput.Pattern
-		return strings.HasPrefix(p, "**") || p == "*" || strings.HasPrefix(p, "*.") && !strings.Contains(p, "/")
-	case "Grep":
-		t := in.ToolInput
-		return t.Glob == "" && t.Type == "" && (t.Path == "" || t.Path == "." || t.Path == in.Cwd)
-	}
-	return false
-}
-
-// PreToolHook answers a PreToolUse payload. It only adds context, never
-// blocks or approves, and stays silent when there is nothing to say.
+// PreToolHook answers a PreToolUse payload. For a Grep on a single identifier
+// it points at the definition and top callers from the symbol graph; it never
+// blocks or approves, and stays silent without a graph or for non-identifiers.
 func PreToolHook(stdin io.Reader) string {
 	var in hookInput
-	if err := json.NewDecoder(stdin).Decode(&in); err != nil || !isBroad(in) {
+	if err := json.NewDecoder(stdin).Decode(&in); err != nil || in.ToolName != "Grep" {
+		return ""
+	}
+	ident := graph.PatternIdent(in.ToolInput.Pattern)
+	if ident == "" {
 		return ""
 	}
 	dir := in.Cwd
 	if dir == "" {
 		dir = "."
 	}
-	if _, err := os.Stat(filepath.Join(dir, "stacklit.json")); err != nil {
+	g, err := graph.Load(filepath.Join(dir, graphFile))
+	if err != nil {
 		return ""
 	}
-	return hookJSON("PreToolUse", preToolNudge)
+	ptr := g.Pointer(ident)
+	if ptr == "" {
+		return ""
+	}
+	return hookJSON("PreToolUse", ptr)
 }
 
 // SessionHook returns a short, static SessionStart pointer. The digest is
