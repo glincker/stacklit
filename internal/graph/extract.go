@@ -19,6 +19,7 @@ type Def struct {
 	End     int    // last line of the definition body
 	Doc     string // first sentence of the doc comment
 	Sig     string
+	Vis     string   // public, private, protected, internal; empty when unknown
 	Recv    string   // owning type for methods
 	Methods []string // interface method names (Go structural matching)
 }
@@ -46,54 +47,66 @@ type FileSyms struct {
 	Defs    []Def
 	Imports []Import
 	Refs    []Ref
+	// syntaxErrors is set when tree-sitter saw error nodes; the result may be partial.
+	syntaxErrors bool
+	// unreliable is set when the tree contradicts the file's layout (bad nesting).
+	unreliable bool
 }
 
 // ExtractOptions tunes extraction.
 type ExtractOptions struct {
+	// IncludeTests keeps test files in the graph; by default they are skipped.
 	IncludeTests bool
+	// MaxFileBytes skips files larger than this (default 1 MiB).
 	MaxFileBytes int
+	// MaxParseBytes is the largest file handed to tree-sitter. Larger files use
+	// the line scanner where one exists, else contribute only their file node.
+	// 0 reads STACKLIT_GRAPH_MAX_PARSE_BYTES, then the built-in default.
+	MaxParseBytes int
+	// MemoryBudget caps the estimated working set of concurrent tree-sitter
+	// parses in bytes. 0 reads STACKLIT_PARSE_MEMORY_MB (default 512), negative disables the cap.
+	MemoryBudget int64
 }
 
 var langByExt = map[string]string{
 	".go": "go", ".ts": "typescript", ".tsx": "typescript", ".mts": "typescript", ".cts": "typescript",
 	".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
 	".py": "python", ".rs": "rust", ".java": "java",
+	".cs": "csharp", ".kt": "kotlin", ".kts": "kotlin", ".swift": "swift", ".php": "php", ".rb": "ruby",
+	".c": "c", ".h": "c", ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".hpp": "cpp", ".hh": "cpp", ".hxx": "cpp",
+	".scala": "scala", ".sc": "scala", ".dart": "dart", ".ex": "elixir", ".exs": "elixir", ".lua": "lua",
+	".zig": "zig", ".hs": "haskell", ".ml": "ocaml", ".sol": "solidity",
 }
 
 // LangOf returns the graph language for a path, or "" when unsupported.
 func LangOf(path string) string { return langByExt[strings.ToLower(filepath.Ext(path))] }
 
+var testSuffixes = []string{
+	"_test.go", "_test.py", "Test.java", "Tests.java", "Test.kt", "Tests.kt", "Tests.cs", "Test.cs",
+	"Tests.swift", "Test.swift", "Test.php", "_spec.rb", "_test.rb", "_test.exs", "_test.dart", "_test.lua", "_spec.lua",
+	"Test.scala", "Spec.scala", "Spec.hs", "Test.hs", "_test.ml", ".t.sol", "_test.c", "_test.cc", "_test.cpp", "_test.zig",
+}
+
 func isTestFile(path string) bool {
 	b := filepath.Base(path)
-	switch {
-	case strings.HasSuffix(b, "_test.go"):
+	if strings.Contains(b, ".test.") || strings.Contains(b, ".spec.") {
 		return true
-	case strings.Contains(b, ".test.") || strings.Contains(b, ".spec."):
+	}
+	if strings.HasPrefix(b, "test_") && (strings.HasSuffix(b, ".py") || strings.HasSuffix(b, ".rb") || strings.HasSuffix(b, ".lua")) {
 		return true
-	case strings.HasPrefix(b, "test_") && strings.HasSuffix(b, ".py"), strings.HasSuffix(b, "_test.py"):
-		return true
-	case strings.HasSuffix(b, "Test.java") || strings.HasSuffix(b, "Tests.java"):
-		return true
+	}
+	for _, s := range testSuffixes {
+		if strings.HasSuffix(b, s) {
+			return true
+		}
 	}
 	return false
 }
 
-// ExtractFile parses one file's content into symbols and references.
+// ExtractFile parses one file's content into symbols and references using the
+// default size limits.
 func ExtractFile(path string, src []byte) *FileSyms {
-	lang := LangOf(path)
-	switch lang {
-	case "go":
-		return extractGo(path, src)
-	case "typescript", "javascript":
-		return extractJS(path, lang, src)
-	case "python":
-		return extractPython(path, src)
-	case "rust":
-		return extractRust(path, src)
-	case "java":
-		return extractJava(path, src)
-	}
-	return nil
+	return extractFileWith(path, src, ExtractOptions{}, nil)
 }
 
 // Extract reads and parses the given root-relative files in parallel.
@@ -110,6 +123,7 @@ func Extract(root string, files []string, opts ExtractOptions) []*FileSyms {
 		todo = append(todo, f)
 	}
 	out := make([]*FileSyms, len(todo))
+	gate := newParseGate(parseBudget(opts))
 	var wg sync.WaitGroup
 	ch := make(chan int)
 	for w := 0; w < runtime.NumCPU(); w++ {
@@ -117,7 +131,7 @@ func Extract(root string, files []string, opts ExtractOptions) []*FileSyms {
 		go func() {
 			defer wg.Done()
 			for i := range ch {
-				out[i] = ExtractPath(root, todo[i], opts.MaxFileBytes)
+				out[i] = extractPath(root, todo[i], opts, gate)
 			}
 		}()
 	}
@@ -138,15 +152,19 @@ func Extract(root string, files []string, opts ExtractOptions) []*FileSyms {
 
 // ExtractPath reads one root-relative file and extracts it; nil on any read problem.
 func ExtractPath(root, rel string, maxBytes int) *FileSyms {
+	return extractPath(root, rel, ExtractOptions{MaxFileBytes: maxBytes}, nil)
+}
+
+func extractPath(root, rel string, o ExtractOptions, gate *parseGate) *FileSyms {
 	st, err := os.Stat(filepath.Join(root, rel))
-	if err != nil || st.IsDir() || (maxBytes > 0 && st.Size() > int64(maxBytes)) {
+	if err != nil || st.IsDir() || (o.MaxFileBytes > 0 && st.Size() > int64(o.MaxFileBytes)) {
 		return nil
 	}
 	src, err := os.ReadFile(filepath.Join(root, rel))
 	if err != nil {
 		return nil
 	}
-	return ExtractFile(filepath.ToSlash(rel), src)
+	return extractFileWith(filepath.ToSlash(rel), src, o, gate)
 }
 
 // stripNoise blanks comments and string contents with spaces, keeping newlines

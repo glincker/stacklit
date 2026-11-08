@@ -49,6 +49,7 @@ type SymNode struct {
 	Doc       string `json:"doc,omitempty"`
 	Lang      string `json:"lang,omitempty"`
 	Sig       string `json:"sig,omitempty"`
+	Vis       string `json:"vis,omitempty"`
 	Community int    `json:"community"`
 }
 

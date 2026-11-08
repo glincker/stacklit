@@ -124,7 +124,7 @@ func (r *resolver) buildNodes() {
 				id = id + "#" + itoa(d.Line)
 			}
 			seen[id] = true
-			ni := r.addNode(SymNode{ID: id, Name: d.Name, Kind: d.Kind, File: f.Path, Line: d.Line, End: d.End, Doc: d.Doc, Lang: f.Lang, Sig: d.Sig}, fi)
+			ni := r.addNode(SymNode{ID: id, Name: d.Name, Kind: d.Kind, File: f.Path, Line: d.Line, End: d.End, Doc: d.Doc, Lang: f.Lang, Sig: d.Sig, Vis: d.Vis}, fi)
 			r.defNode[fi][di] = ni
 			r.nodeDef[ni] = d
 			r.defsIn[fi][d.Name] = append(r.defsIn[fi][d.Name], ni)
