@@ -162,8 +162,15 @@ func pairsAgainst(c config, repoName, arm, base string) []pair {
 	for _, r := range loadRecords(c.resultsDir, repoName, base) {
 		ctl[fmt.Sprintf("%s|%d", r.Task, r.Trial)] = r
 	}
+	var skip map[string]bool
+	if c.excludeMem {
+		skip = memoryCorrectTasks(c.resultsDir, repoName, tasks)
+	}
 	var out []pair
 	for _, r := range loadRecords(c.resultsDir, repoName, arm) {
+		if skip[r.Task] {
+			continue
+		}
 		k := fmt.Sprintf("%s|%d", r.Task, r.Trial)
 		if a, ok := ctl[k]; ok {
 			out = append(out, pair{repo: repoName, task: tasks[r.Task], trial: r.Trial, a: a, b: r})
@@ -326,13 +333,22 @@ func analyze(c config, repoNames []string) error {
 	sum.Sessions["memory"] = countMemory(c.resultsDir, repoNames)
 	for _, a := range arms {
 		rng := rand.New(rand.NewSource(seed))
-		var all []pair
+		var all, kept []pair
 		for _, rn := range repoNames {
 			ps := pairs(c, rn, a)
 			all = append(all, ps...)
+			if k, n := sum.Memorised[rn].K, sum.Memorised[rn].N; !c.famous || !contaminated(k, n) {
+				kept = append(kept, ps...)
+			}
 			if len(ps) > 0 {
 				sum.Scopes = append(sum.Scopes, buildScope(rn, a, ps, rng, resamples))
 			}
+		}
+		// The famous study pools only repos that passed the memory check;
+		// the pool over every repo is kept as pooled-all.
+		if c.famous {
+			sum.Scopes = append(sum.Scopes, buildScope("pooled", a, kept, rng, resamples), buildScope("pooled-all", a, all, rng, resamples))
+			continue
 		}
 		sum.Scopes = append(sum.Scopes, buildScope("pooled", a, all, rng, resamples))
 	}
@@ -357,7 +373,18 @@ func analyze(c config, repoNames []string) error {
 	if err := os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "summary.json"), b, 0o644); err != nil {
 		return err
 	}
-	if hasArm(arms, "stacklit-e") {
+	if c.famous {
+		excluded := map[string]int{}
+		for _, rn := range repoNames {
+			if c.excludeMem {
+				excluded[rn] = len(memoryCorrectTasks(c.resultsDir, rn, loadTasks(c.tasksDir, rn)))
+			}
+		}
+		rep := famousReport(sum, repoNames, repoFileCounts(c.reposFile), excluded)
+		if err := os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "decision-famous.md"), []byte(rep), 0o644); err != nil {
+			return err
+		}
+	} else if hasArm(arms, "stacklit-e") {
 		rep := decisionReport(sum, repoFileCounts(c.reposFile))
 		if err := os.WriteFile(filepath.Join(filepath.Dir(c.ledger), "decision-round2.md"), []byte(rep), 0o644); err != nil {
 			return err
