@@ -3,6 +3,7 @@ package renderer
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/glincker/stacklit/internal/fsutil"
 	"os"
 	"time"
 
@@ -29,5 +30,5 @@ func WriteJSON(idx *schema.Index, path string) error {
 		return nil
 	}
 
-	return os.WriteFile(path, data, 0644)
+	return fsutil.WriteFileAtomic(path, data, 0644)
 }
