@@ -36,13 +36,14 @@ var steering = map[string]string{
 		"- Where is X or how does Y work: `stacklit query \"<question>\" --budget 800`\n" +
 		"- Need one function or type: `stacklit slice <symbol>`\n" +
 		"- Changing shared code: `stacklit impact <symbol>` lists what depends on it\n",
+	"d": strictRules,
 }
 
 // DefaultSteering is the variant used when none is configured.
 const DefaultSteering = "a"
 
 // SteeringVariants lists the valid variant names.
-func SteeringVariants() []string { return []string{"a", "b", "c"} }
+func SteeringVariants() []string { return []string{"a", "b", "c", "d"} }
 
 func steeringText(variant string) string {
 	if t, ok := steering[strings.ToLower(strings.TrimSpace(variant))]; ok {

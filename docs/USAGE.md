@@ -219,6 +219,16 @@ Uses the existing `stacklit.json`, or generates one if none exists, then configu
 
 With no argument it configures every detected tool and installs the post-commit hook. If no tool is detected it prints the map to stdout so you can paste it. `.mcp.json` is listed in this repository's `.gitignore` because it is user-specific; decide for your own repo whether to commit it.
 
+Claude Code crawl guard (opt in): `stacklit setup claude --crawl-guard[=nudge|redirect|off]` installs a `PreToolUse` hook that recognises repo-wide crawls (`find .`, `ls -R`, `tree`, `grep -r` or `rg` on the root, `Glob **/*`, a Read of a directory, generic "explore the codebase" subagent prompts). A bare `--crawl-guard` means `nudge`; pass a mode with `=`. `nudge` adds a pointer to the stacklit command. `redirect` denies with a reason naming the command, at most twice in a row per session and only while the index is current. `off` removes the hook, as does `--uninstall`. Supports `--dry-run`. Details in [docs/SESSIONS.md](SESSIONS.md#crawl-guard).
+
+### stacklit guide
+
+```
+stacklit guide [--json]
+```
+
+Prints the agent usage guide (rules, command list, examples). It is the same text the strict rules block (steering `d`) uses, so you can paste it into any tool.
+
 ### stacklit refresh, digest and stats
 
 Session plumbing, see [docs/SESSIONS.md](docs/SESSIONS.md) for the design.
@@ -390,7 +400,8 @@ Create `.stacklitrc.json` in the project root. The file is optional and every ke
 | `output.json`, `output.mermaid`, `output.html` | `stacklit.json`, `DEPENDENCIES.md`, `stacklit.html` | Output file names. The outputs are excluded from the next scan automatically. |
 | `timestamps` | false | Write `generated_at`. Off by default so a committed index only changes when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Add git hot and recent files to the index. Off by default for the same reason; opt in with this key or `STACKLIT_GIT=1`. |
-| `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b` or `c` (see [docs/SESSIONS.md](docs/SESSIONS.md)). Env: `STACKLIT_STEERING`. |
+| `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b`, `c` or `d` (see [docs/SESSIONS.md](docs/SESSIONS.md)). Env: `STACKLIT_STEERING`. |
+| `crawl_guard` | (installed mode) | Crawl guard mode: `off`, `nudge` or `redirect`. Env: `STACKLIT_CRAWL_GUARD`. |
 | `stats` | false | Append a local usage log of `query`, `slice`, `explain` and `impact` calls. Env: `STACKLIT_STATS=1`. Never networked. |
 | `map_icons` | remote | `remote` lets the HTML map request language logos from thesvg.org when you open it. `off` removes every remote URL and shows letters instead. Env: `STACKLIT_MAP_ICONS=off`. |
 | `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
@@ -422,7 +433,11 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_EXPORT_MAX_NODES` | `export --format dot`, `mermaid` | Node cap, highest degree kept. Default: 300. |
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
 | `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
-| `STACKLIT_STEERING` | `setup` | Steering wording variant `a`, `b` or `c`. |
+| `STACKLIT_STEERING` | `setup` | Steering wording variant `a`, `b`, `c` or `d`. |
+| `STACKLIT_CRAWL_GUARD` | `hook crawl` | `off`, `nudge` or `redirect`. Overrides the `crawl_guard` config key and the mode the hook was installed with. Default off when nothing sets it. |
+| `STACKLIT_CRAWL_REDIRECTS`, `STACKLIT_CRAWL_FRESH_TTL` | `hook crawl` | Consecutive redirects per session before the guard stands down (default 2), and seconds a staleness verdict is reused (default 10). |
+| `STACKLIT_CRAWL_MAX_DEPTH`, `STACKLIT_CRAWL_PROMPT_CHARS` | `hook crawl` | Deepest `find -maxdepth` or `tree -L` still treated as narrow (default 1), and longest subagent prompt judged generic (default 600). |
+| `STACKLIT_CRAWL_POINTER_MAX_BYTES`, `STACKLIT_CRAWL_STATE_DAYS` | `hook crawl` | Largest graph loaded to build an exact pointer (default 8 MiB), and days before session state files are pruned (default 7). |
 | `STACKLIT_STATS` | `query`, `slice`, `explain`, `impact` | `1` logs usage locally, `0` forces it off. |
 | `STACKLIT_CACHE_DIR` | cache, hooks, stats | Where the parse cache, session state and usage log live. |
 | `STACKLIT_REFRESH_DEBOUNCE_MS`, `STACKLIT_LOCK_STALE_SEC` | `refresh` | Debounce before a refresh (default 30) and age at which a lock is treated as abandoned (default 30). |
