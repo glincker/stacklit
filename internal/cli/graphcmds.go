@@ -13,6 +13,7 @@ import (
 
 	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/graph"
+	"github.com/glincker/stacklit/internal/stats"
 	"github.com/glincker/stacklit/internal/walker"
 )
 
@@ -132,7 +133,9 @@ func newQueryCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprint(cmd.OutOrStdout(), g.QueryOrdered(joinArgs(args), budget, f.json, ord))
+			out := g.QueryOrdered(joinArgs(args), budget, f.json, ord)
+			fmt.Fprint(cmd.OutOrStdout(), out)
+			stats.Record(f.root, "query", out)
 			if !f.json && !f.loaded.IsZero() {
 				fmt.Fprint(cmd.OutOrStdout(), graph.StaleLine(f.root, g, f.loaded))
 			}
@@ -196,6 +199,7 @@ func newExplainCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprint(cmd.OutOrStdout(), out)
+			stats.Record(f.root, "explain", out)
 			return nil
 		},
 	}
@@ -221,6 +225,7 @@ func newImpactCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprint(cmd.OutOrStdout(), out)
+			stats.Record(f.root, "impact", out)
 			return nil
 		},
 	}
@@ -309,6 +314,7 @@ func newSliceCmd() *cobra.Command {
 				return err
 			}
 			fmt.Fprint(cmd.OutOrStdout(), out)
+			stats.Record(f.root, "slice", out)
 			return nil
 		},
 	}
