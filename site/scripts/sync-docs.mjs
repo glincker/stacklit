@@ -178,7 +178,7 @@ add('agent-test', 'Agent test',
   'A real Claude Code A/B on three public repos, 450 sessions: fewer tool calls, no overall cost saving. Results, method, limits and the claims we do and do not make.', 14,
   'bench/agent-ab/RESULTS.md', [
     part(AB_RESULTS, whole(AB_RESULTS)),
-    part(AB_CLAIMS, '## What we claim, and what we do not\n\n' + shift(whole(AB_CLAIMS), 1).replace(/^### Claims the data supports/m, '### Claims the data supports')),
+    part(AB_CLAIMS, '## What we claim, and what we do not\n\n' + shift(whole(AB_CLAIMS), 1)),
   ]);
 
 add('changelog', 'Changelog', 'Release history for Stacklit.', 15, 'CHANGELOG.md', [part(CHANGELOG, whole(CHANGELOG))]);
