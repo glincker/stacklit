@@ -15,6 +15,7 @@ Key facts:
 ## Docs
 - [README](https://github.com/glincker/stacklit/blob/master/README.md): overview and install
 - [Usage](https://github.com/glincker/stacklit/blob/master/docs/USAGE.md): commands, MCP tools, config, index schema
+- [Install](https://github.com/glincker/stacklit/blob/master/docs/INSTALL.md): every install path, Claude Code plugin, Docker, MCP registry
 - [Benchmarks](https://github.com/glincker/stacklit/blob/master/bench/RESULTS.md): methodology, results, limitations
 - [Languages](https://github.com/glincker/stacklit/blob/master/docs/LANGUAGES.md): what is extracted per language
 - [FAQ](https://github.com/glincker/stacklit/blob/master/docs/FAQ.md)
@@ -23,6 +24,7 @@ Key facts:
 - [Skill for agents](https://github.com/glincker/stacklit/blob/master/skills/stacklit/SKILL.md)
 
 ## Optional
+- [Full docs in one file](https://stacklit.glinr.com/llms-full.txt)
 - [Comparison](https://github.com/glincker/stacklit/blob/master/docs/COMPARISON.md)
 - [Roadmap](https://github.com/glincker/stacklit/blob/master/docs/ROADMAP.md)
 - [Changelog](https://github.com/glincker/stacklit/blob/master/CHANGELOG.md)
