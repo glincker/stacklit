@@ -19,6 +19,7 @@ type Def struct {
 	End     int    // last line of the definition body
 	Doc     string // first sentence of the doc comment
 	Sig     string
+	Decl    bool     // prototype only; a definition elsewhere is preferred as a call target
 	Vis     string   // public, private, protected, internal; empty when unknown
 	Recv    string   // owning type for methods
 	Methods []string // interface method names (Go structural matching)

@@ -31,6 +31,8 @@ type tsSpec struct {
 	docFn    func(w *tsw, n *gts.Node) string
 	prepare  func(w *tsw, root *gts.Node)
 	finish   func(w *tsw)
+	// qualAlias maps receiver keywords (parent, static, Self) to the names the resolver knows.
+	qualAlias map[string]string
 }
 
 type defRule struct {
@@ -134,6 +136,7 @@ func extractTS(spec *tsSpec, grammar, file string, src []byte) (fs *FileSyms) {
 	if spec.finish != nil {
 		spec.finish(w)
 	}
+	w.fs.Imports = dedupImports(w.fs.Imports)
 	return w.fs
 }
 
@@ -257,6 +260,8 @@ type defOpts struct {
 	callable, container bool
 	span                *gts.Node
 	walk                []*gts.Node
+	proto               bool // declaration without a body
+	noWalk              bool // leave the body unvisited (prototypes, type bindings)
 	heritage            func(w *tsw, n *gts.Node, idx int)
 	sect                string
 }
@@ -267,12 +272,14 @@ func (w *tsw) define(n *gts.Node, o defOpts) int {
 	if o.span != nil {
 		span = o.span
 	}
-	sp, ep := span.StartPoint(), span.EndPoint()
+	// Some grammars fold the doc comment into the declaration node; start at the code.
+	lead, first := w.leadingComments(span)
+	sp, ep := first.StartPoint(), span.EndPoint()
 	end := int(ep.Row) + 1
 	if ep.Column == 0 && ep.Row > sp.Row {
 		end = int(ep.Row)
 	}
-	d := Def{Name: o.name, Qual: o.name, Kind: o.kind, Line: int(sp.Row) + 1, End: end, Sig: w.sig(span)}
+	d := Def{Name: o.name, Qual: o.name, Kind: o.kind, Line: int(sp.Row) + 1, End: end, Sig: w.sig(span, first)}
 	owner := w.typ
 	if o.recv != "" {
 		owner = o.recv
@@ -283,7 +290,8 @@ func (w *tsw) define(n *gts.Node, o defOpts) int {
 	case isTypeKind(o.kind) && w.typ != "" && !w.inFunc:
 		d.Qual = w.typ + "." + o.name
 	}
-	d.Doc = w.docFor(span)
+	d.Doc = w.docFor(span, lead)
+	d.Decl = o.proto
 	if w.spec.vis != nil {
 		d.Vis = w.spec.vis(w, span, o.name)
 	}
@@ -304,7 +312,8 @@ func (w *tsw) define(n *gts.Node, o defOpts) int {
 			w.typ = d.Recv
 		}
 	}
-	if len(o.walk) > 0 {
+	if o.noWalk {
+	} else if len(o.walk) > 0 {
 		for _, c := range o.walk {
 			w.visit(c)
 		}
@@ -316,8 +325,8 @@ func (w *tsw) define(n *gts.Node, o defOpts) int {
 }
 
 // sig is the declaration text up to its body, on one line.
-func (w *tsw) sig(n *gts.Node) string {
-	start, end := int(n.StartByte()), int(n.EndByte())
+func (w *tsw) sig(n, first *gts.Node) string {
+	start, end := int(first.StartByte()), int(n.EndByte())
 	hasBody := false
 	if b := w.field(n, "body"); b != nil && int(b.StartByte()) > start {
 		end, hasBody = int(b.StartByte()), true
@@ -345,10 +354,41 @@ func (w *tsw) sig(n *gts.Node) string {
 	return s
 }
 
+// leadingComments returns comment children at the start of n and the first real child
+// (or n itself when there are none). Some grammars let a node start at the comment
+// before it, so the first real child gives the true start of the code.
+func (w *tsw) leadingComments(n *gts.Node) ([]*gts.Node, *gts.Node) {
+	var lead []*gts.Node
+	for i := 0; i < n.ChildCount(); i++ {
+		c := n.Child(i)
+		if c == nil {
+			continue
+		}
+		if w.spec.comments[c.Type(w.lang)] || c.IsExtra() {
+			lead = append(lead, c)
+			continue
+		}
+		if c.StartByte() > n.StartByte() {
+			return lead, c
+		}
+		break
+	}
+	return nil, n
+}
+
 // docFor returns the first sentence of the doc comment directly above n.
-func (w *tsw) docFor(n *gts.Node) string {
+func (w *tsw) docFor(n *gts.Node, lead []*gts.Node) string {
 	if w.spec.docFn != nil {
 		if s := w.spec.docFn(w, n); s != "" {
+			return s
+		}
+	}
+	if len(lead) > 0 {
+		var parts []string
+		for _, c := range lead {
+			parts = append(parts, w.text(c))
+		}
+		if s := firstDocLine(parts); s != "" {
 			return s
 		}
 	}
@@ -360,7 +400,7 @@ func (w *tsw) docFor(n *gts.Node) string {
 	var block []string
 	for s := cur.PrevSibling(); s != nil; s = s.PrevSibling() {
 		t := s.Type(w.lang)
-		if w.spec.attrs[t] {
+		if w.spec.attrs[t] || !s.IsNamed() {
 			row = s.StartPoint().Row
 			continue
 		}
@@ -370,8 +410,16 @@ func (w *tsw) docFor(n *gts.Node) string {
 		block = append(block, w.text(s))
 		row = s.StartPoint().Row
 	}
-	for i := len(block) - 1; i >= 0; i-- {
-		for _, l := range strings.Split(block[i], "\n") {
+	for i, j := 0, len(block)-1; i < j; i, j = i+1, j-1 {
+		block[i], block[j] = block[j], block[i]
+	}
+	return firstDocLine(block)
+}
+
+// firstDocLine returns the first meaningful sentence of a run of comment texts, top first.
+func firstDocLine(block []string) string {
+	for _, b := range block {
+		for _, l := range strings.Split(b, "\n") {
 			l = cleanDocLine(l)
 			if l != "" && !strings.HasPrefix(l, "@") {
 				return firstSentence(l)
@@ -509,6 +557,9 @@ func (w *tsw) call(n *gts.Node, r callRule) {
 func (w *tsw) emitCall(name, qual string) {
 	if name == "" || (qual == "" && w.spec.builtins[name]) {
 		return
+	}
+	if a, ok := w.spec.qualAlias[qual]; ok {
+		qual = a
 	}
 	qual = w.infer(qual)
 	key := itoa(w.owner+1) + "\x00" + qual + "\x00" + name
@@ -692,4 +743,20 @@ func (w *tsw) modVis(n *gts.Node) string {
 		}
 	}
 	return ""
+}
+
+func dedupImports(in []Import) []Import {
+	if len(in) < 2 {
+		return in
+	}
+	seen := make(map[string]bool, len(in))
+	out := in[:0]
+	for _, im := range in {
+		k := im.Spec + "\x00" + im.Alias + "\x00" + strings.Join(im.Names, ",")
+		if !seen[k] {
+			seen[k] = true
+			out = append(out, im)
+		}
+	}
+	return out
 }

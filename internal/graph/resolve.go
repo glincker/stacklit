@@ -27,6 +27,7 @@ type named struct {
 }
 
 type fileCtx struct {
+	wild     []string // sorted "*" namespace keys, so wildcard lookup order is stable
 	ns       map[string]binding
 	named    map[string]named
 	external map[string]bool
@@ -52,6 +53,7 @@ type resolver struct {
 	methods    map[string][]int // method name -> nodes
 	methodsOf  map[string][]int // Recv\x00name -> nodes
 	typeNames  map[string]bool
+	supers     map[string][]string // type name -> directly inherited or implemented type names
 	nodeDef    map[int]Def
 	nodeFile   []int // node -> file index
 
@@ -62,6 +64,9 @@ type resolver struct {
 
 	goPending [][2]string // file index, imported dir; linked after refs if unused
 }
+
+// implicitThis lists languages where a bare call inside a method may target an inherited method.
+var implicitThis = wordSet("java csharp kotlin scala swift dart cpp solidity ruby")
 
 var kindCode = map[string]uint8{EdgeCalls: 1, EdgeImports: 2, EdgeInherits: 3, EdgeImplements: 4}
 
@@ -82,6 +87,7 @@ func Resolve(files []*FileSyms, opts ResolveOptions) *SymGraph {
 		edgeIdx: map[symEdgeKey]int{},
 	}
 	r.buildNodes()
+	r.buildSupers()
 	r.buildModIndex()
 	r.buildContexts()
 	r.resolveRefs()
@@ -179,7 +185,7 @@ func (r *resolver) buildModIndex() {
 			}
 		}
 		for k := 0; k < len(parts); k++ {
-			key := strings.ToLower(f.Lang[:1]) + ":" + strings.Join(parts[k:], ".")
+			key := modLang(f.Lang) + ":" + strings.Join(parts[k:], ".")
 			r.mods[key] = append(r.mods[key], fi)
 		}
 	}
@@ -205,7 +211,10 @@ func (r *resolver) lookupMod(lang, from, dotted string) (int, bool) {
 	if dotted == "" {
 		return 0, false
 	}
-	c := r.mods[strings.ToLower(lang[:1])+":"+dotted]
+	c := r.mods[modLang(lang)+":"+dotted]
+	if len(c) == 0 {
+		c = r.mods[modLang(lang)+":"+strings.ToLower(dotted)] // ML-family modules are capitalised, files are not
+	}
 	if len(c) == 0 {
 		return 0, false
 	}
@@ -319,6 +328,12 @@ func (r *resolver) buildContexts() {
 		for _, imp := range f.Imports {
 			r.bindImport(fi, f, imp, &c)
 		}
+		for k := range c.ns {
+			if strings.HasPrefix(k, "*") {
+				c.wild = append(c.wild, k)
+			}
+		}
+		sort.Strings(c.wild)
 		r.ctx[fi] = c
 	}
 }
@@ -437,6 +452,8 @@ func (r *resolver) bindImport(fi int, f *FileSyms, imp Import, c *fileCtx) {
 		b := binding{files: []int{t}}
 		c.named[imp.Alias] = named{b: b, orig: imp.Alias}
 		c.ns[imp.Alias] = b
+	default:
+		r.bindGeneric(fi, f, imp, c)
 	}
 }
 
@@ -528,6 +545,7 @@ func (r *resolver) resolveRefs() {
 }
 
 func (r *resolver) fanout(nodes []int, conf string, uniq, multi float64) []cand {
+	nodes = r.preferDefs(nodes)
 	switch {
 	case len(nodes) == 0 || len(nodes) > r.opts.MaxCandidates:
 		return nil
@@ -563,6 +581,11 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 		if len(local) > 0 {
 			return r.fanout(local, ConfExtracted, 1, 0.5)
 		}
+		if ownerRecv != "" && implicitThis[f.Lang] {
+			if hit := r.inheritedMethod(ownerRecv, name); len(hit) > 0 {
+				return r.fanout(hit, ConfExtracted, 0.8, 0.4)
+			}
+		}
 		if nm, ok := ctx.named[name]; ok {
 			orig := nm.orig
 			if orig == "" {
@@ -592,11 +615,9 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 				return r.fanout(pk, ConfExtracted, 0.95, 0.5)
 			}
 		}
-		for k, b := range ctx.ns { // Java wildcard imports
-			if strings.HasPrefix(k, "*") {
-				if hit := r.defsByName(b, name, false); len(hit) > 0 {
-					return r.fanout(hit, ConfExtracted, 0.9, 0.4)
-				}
+		for _, k := range ctx.wild { // wildcard and namespace imports
+			if hit := r.defsByName(ctx.ns[k], name, false); len(hit) > 0 {
+				return r.fanout(hit, ConfExtracted, 0.9, 0.4)
 			}
 		}
 		if f.Lang == "go" {
@@ -610,6 +631,12 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 	if strings.HasPrefix(q, "@") {
 		if hit := r.methodsOf[q[1:]+"\x00"+name]; len(hit) > 0 {
 			return r.fanout(hit, ConfExtracted, 0.9, 0.45)
+		}
+		if hit := r.inheritedMethod(q[1:], name); len(hit) > 0 {
+			return r.fanout(hit, ConfExtracted, 0.8, 0.4)
+		}
+		if !r.typeNames[q[1:]] {
+			return nil // receiver type is known and lives outside the repo
 		}
 		return r.methodGuess(name, 0.45)
 	}
@@ -628,6 +655,9 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 			}
 			if len(hit) > 0 {
 				return r.fanout(hit, ConfExtracted, 0.85, 0.4)
+			}
+			if hit := r.inheritedMethod(ownerRecv, name); len(hit) > 0 {
+				return r.fanout(hit, ConfExtracted, 0.8, 0.4)
 			}
 			for _, n := range r.defsIn[fi][name] { // Go closures and embedded access
 				if r.nodeDef[n].Recv == "" {
@@ -658,7 +688,13 @@ func (r *resolver) resolveCall(fi int, f *FileSyms, ref Ref, ownerRecv string) [
 		if hit := r.defsByName(b, name, false); len(hit) > 0 {
 			return r.fanout(hit, ConfExtracted, 0.9, 0.45)
 		}
-		return nil
+		// A module table or alias need not match the owner name (Lua, Elixir),
+		// so accept any member of the bound files with this name.
+		var any []int
+		for _, fj := range b.files {
+			any = append(any, r.defsIn[fj][name]...)
+		}
+		return r.fanout(any, ConfExtracted, 0.8, 0.4)
 	}
 	if nm, ok := ctx.named[first]; ok {
 		orig := nm.orig
@@ -760,6 +796,11 @@ func (r *resolver) resolveType(fi int, f *FileSyms, ref Ref) []cand {
 		}
 		if len(pk) > 0 {
 			return r.fanout(pk, ConfExtracted, 0.95, 0.5)
+		}
+	}
+	for _, k := range ctx.wild { // namespace and wildcard imports
+		if hit := r.defsByName(ctx.ns[k], name, true); len(hit) > 0 {
+			return r.fanout(hit, ConfExtracted, 0.9, 0.4)
 		}
 	}
 	var types []int
@@ -916,4 +957,27 @@ func BuildSymbols(root string, files []string, eo ExtractOptions) *SymGraph {
 	g := Resolve(fs, ResolveOptions{GoModules: DiscoverGoModules(root, files)})
 	g.Root = filepath.Base(root)
 	return g
+}
+
+// preferDefs drops prototype-only nodes when a real definition is also a candidate.
+func (r *resolver) preferDefs(nodes []int) []int {
+	if len(nodes) < 2 {
+		return nodes
+	}
+	protos := 0
+	for _, n := range nodes {
+		if r.nodeDef[n].Decl {
+			protos++
+		}
+	}
+	if protos == 0 || protos == len(nodes) {
+		return nodes
+	}
+	out := make([]int, 0, len(nodes)-protos)
+	for _, n := range nodes {
+		if !r.nodeDef[n].Decl {
+			out = append(out, n)
+		}
+	}
+	return out
 }

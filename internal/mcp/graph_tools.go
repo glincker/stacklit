@@ -47,7 +47,13 @@ func loadGraph() (*graph.SymGraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	cachedGraph = graph.BuildSymbols(".", files, graph.ExtractOptions{})
+	eo := graph.OptionsFromEnv()
+	if b := cfg.ParseMemoryBytes(); b > 0 {
+		eo.MemoryBudget = b
+	} else {
+		eo.MemoryBudget = -1
+	}
+	cachedGraph = graph.BuildSymbols(".", files, eo)
 	cachedGraphT, cachedBuilt = time.Time{}, time.Now()
 	return cachedGraph, nil
 }
