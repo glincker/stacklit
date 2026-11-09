@@ -1,21 +1,19 @@
 ---
 import Kicker from './Kicker.astro';
-// Kicker, a giant statement, then a two column intro: text on the left, the legend (spec table) on the right.
-interface Props { id: string; title: string; n: string; label: string; icon?: string; lead?: string }
-const { id, title, n, label, icon, lead } = Astro.props;
+// Kicker, a statement heading, and an optional lead. Two sizes so chapters do not all open the same way:
+// big for the chapters that carry the story, md for the rest.
+interface Props { id: string; title: string; n: string; label: string; icon?: string; lead?: string; size?: 'big' | 'md'; class?: string }
+const { id, title, n, label, icon, lead, size = 'md', class: extra } = Astro.props;
 const hasText = Boolean(lead) || Astro.slots.has('default');
-const hasLegend = Astro.slots.has('legend');
+const heading = size === 'big' ? 'max-w-[22ch] text-statement font-bold' : 'max-w-[28ch] text-h2 font-bold';
 ---
-<header class="mb-12 min-w-0 sm:mb-16">
+<header class:list={['min-w-0', extra]}>
   <Kicker n={n} label={label} icon={icon} class="reveal" />
-  <h2 id={id} class="reveal mt-8 max-w-[22ch] text-statement font-bold text-ink">{title}</h2>
-  {(hasText || hasLegend) && (
-    <div class="mt-10 grid min-w-0 gap-10 lg:grid-cols-12 lg:gap-12">
-      <div class:list={['reveal min-w-0', hasLegend ? 'lg:col-span-7' : 'lg:col-span-8']}>
-        {lead && <p class="max-w-measure text-lead text-ink">{lead}</p>}
-        <slot />
-      </div>
-      {hasLegend && <aside class="reveal min-w-0 lg:col-span-5 lg:border-l lg:border-line lg:pl-10"><slot name="legend" /></aside>}
+  <h2 id={id} class:list={['reveal mt-5 text-ink', heading]}>{title}</h2>
+  {hasText && (
+    <div class="reveal mt-5 min-w-0">
+      {lead && <p class="max-w-measure text-lead text-ink">{lead}</p>}
+      <slot />
     </div>
   )}
 </header>

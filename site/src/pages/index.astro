@@ -6,10 +6,7 @@ import Works from '../sections/Works.astro';
 import Problem from '../sections/Problem.astro';
 import AskTheMap from '../sections/AskTheMap.astro';
 import Steps from '../sections/Steps.astro';
-import AgentTest from '../sections/AgentTest.astro';
-import WhereItHelps from '../sections/WhereItHelps.astro';
 import Benchmark from '../sections/Benchmark.astro';
-import Trust from '../sections/Trust.astro';
 import Faq from '../sections/Faq.astro';
 import FinalCta from '../sections/FinalCta.astro';
 import copy from '../data/copy.json';
@@ -17,15 +14,12 @@ import { fill } from '../data/agentAb';
 ---
 <Landing title={copy.meta.title} description={fill(copy.meta.description)} path="/" jsonLd rail>
   <Hero />
-  <Stats />
-  <Works />
   <Problem />
-  <AskTheMap />
   <Steps />
-  <AgentTest />
-  <WhereItHelps />
+  <AskTheMap />
+  <Stats />
   <Benchmark />
-  <Trust />
+  <Works />
   <Faq />
   <FinalCta />
 </Landing>

@@ -94,7 +94,7 @@
   "proof": {
     "title": "How well does it find the right file?",
     "intro": "We asked 47 where-is-it questions over six public repos and checked which file a simple script would open first. No AI model was involved. With one short query, Stacklit put the right file first on 81% of them and in the top five on 96%.",
-    "note": "Grep with a pattern written by someone who knew the answer did better: 89% first, 100% in the top five. Plain keyword search did worse at the first file, 57%. We tuned Stacklit on these questions, so treat 81% as a best case. On 40 fresh questions from our own repo the right file came first on 28 and in the top five on all 40. This test has no AI model in it. The real agent test is the section above.",
+    "note": "Grep with a pattern written by someone who knew the answer did better: 89% first, 100% in the top five. Plain keyword search did worse at the first file, 57%. We tuned Stacklit on these questions, so treat 81% as a best case. On 40 fresh questions from our own repo the right file came first on 28 and in the top five on all 40. No AI model was involved here. The agent results above come from real sessions.",
     "sizes": "For scale, the whole map of a repo is {range} tokens. A token is a small chunk of text, about three quarters of a word."
   },
   "trust": {

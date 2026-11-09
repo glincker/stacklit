@@ -1,7 +1,6 @@
 ---
 import Section from '../components/Section.astro';
-import SectionHead from '../components/SectionHead.astro';
-import Legend from '../components/Legend.astro';
+import Kicker from '../components/Kicker.astro';
 import Button from '../components/Button.astro';
 import bench from '../data/bench.json';
 import copy from '../data/copy.json';
@@ -14,27 +13,30 @@ const lines: [string, string, string][] = [
   [first(bench.arms.grep.found1), 'Grep, with a pattern written by someone who knew the answer', 'Better than Stacklit at the first file.'],
   [first(bench.arms.bm25.found1), 'Plain keyword search', 'Worse at the first file.'],
 ];
-const rows = [
-  { key: 'Questions', value: `${bench.localizationTasks} where-is-it questions`, href: '/docs/benchmarks/' },
-  { key: 'Repos', value: `${bench.repoCount} public ones`, href: '/docs/benchmarks/' },
-  { key: 'Reader', value: 'A script, no AI model' },
-  { key: 'Run', value: bench.date },
-];
 ---
-<Section id="benchmark" label="bench-title">
-  <SectionHead id="bench-title" n="09" icon="gauge" label="Benchmark" title={copy.proof.title} lead={copy.proof.intro}>
-    <Fragment slot="legend"><Legend title="Legend" rows={rows} /></Fragment>
-  </SectionHead>
-  <ul class="grid min-w-0 border-t border-ink md:grid-cols-3">
-    {lines.map(([n, who, what]) => (
-      <li class="reveal flex min-w-0 flex-col gap-3 border-b border-line py-8 md:border-s md:px-8 md:first:border-s-0 md:first:ps-0">
-        <p class="text-stat font-bold text-ink">{n}</p>
-        <p class="text-h3 text-ink">{who}</p>
-        <p class="text-body text-muted">{what}</p>
-      </li>
-    ))}
-  </ul>
-  <p class="mt-8 max-w-measure text-body text-ink">{copy.proof.note}</p>
-  <p class="mt-4 max-w-measure text-body text-muted">We do not claim it saves tokens over grep, and when you already know the exact name, grep is cheaper than loading a map. {copy.proof.sizes.replace('{range}', range)}</p>
-  <div class="mt-4"><Button href="/docs/benchmarks/" variant="link">See how we measured, with every table and limit</Button></div>
+<Section id="benchmark" label="bench-title" tone="surface">
+  <div class="grid min-w-0 gap-10 lg:grid-cols-12 lg:gap-14">
+    <div class="min-w-0 lg:col-span-5">
+      <Kicker n="06" icon="gauge" label="Benchmark" class="reveal" />
+      <h2 id="bench-title" class="reveal mt-5 max-w-[22ch] text-h2 font-bold text-ink">{copy.proof.title}</h2>
+      <p class="reveal mt-5 max-w-measure text-body text-ink">{copy.proof.intro}</p>
+      <p class="reveal mt-4 max-w-measure text-body text-muted">{copy.proof.sizes.replace('{range}', range)}</p>
+    </div>
+    <div class="min-w-0 lg:col-span-7">
+      <ul class="border-t border-ink">
+        {lines.map(([n, who, what]) => (
+          <li class="reveal grid min-w-0 grid-cols-[minmax(5.5rem,auto)_1fr] items-baseline gap-x-6 border-b border-line py-5 sm:grid-cols-[8rem_1fr]">
+            <p class="text-stat font-bold text-ink">{n}</p>
+            <div class="min-w-0">
+              <p class="text-h3 text-ink">{who}</p>
+              <p class="mt-1 text-body text-muted">{what}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p class="reveal mt-6 max-w-measure text-body text-ink">{copy.proof.note}</p>
+      <p class="reveal mt-3 max-w-measure text-body text-muted">We do not claim it saves tokens over grep. When you already know the exact name, grep is cheaper than loading a map.</p>
+      <div class="mt-3"><Button href="/docs/benchmarks/" variant="link">See how we measured, with every table and limit</Button></div>
+    </div>
+  </div>
 </Section>
