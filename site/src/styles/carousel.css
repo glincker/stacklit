@@ -24,3 +24,6 @@
 .car-term .cw-panels { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .car-term .cw-panels > .cw-panel { flex: 1; min-height: 0; display: flex !important; flex-direction: column; }
 .car-term .codewin pre.astro-code { flex: 1; min-height: 0; max-height: none; }
+
+/* Recorded lines can be long; wrap them inside a slide so nothing is cut off at the edge. */
+.car-term .codewin pre.astro-code code { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
