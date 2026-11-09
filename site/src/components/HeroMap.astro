@@ -1,0 +1,41 @@
+---
+import { W, H, nodes, edgePath, hubEdgePath, hubs, blocks, folderLabels, folderOutlines, stats, hubNames } from '../data/heroGraph';
+// The hero picture: the real file graph of gin v1.10.0, drawn at build time from checked in Stacklit output.
+// Two views share one frame and switch with radio inputs (no script): the dependency graph, hubs sized by PageRank,
+// and a folder and community block map. A slow drift and pulse run only where motion is allowed, see hero-map.css.
+interface Props { class?: string }
+const { class: extra } = Astro.props;
+const alt = `The Stacklit map of ${stats.repo}. Dependency view: ${stats.files} Go files joined by ${stats.edges} links, with the largest hubs by PageRank being ${hubNames.join(', ')}. Folder view: the same files as blocks grouped by folder.`;
+const anchorEnd = (x: number) => x > W * 0.62;
+---
+<figure class:list={['hm relative min-w-0', extra]} aria-labelledby="hm-title">
+  <input type="radio" name="hm-view" id="hm-deps" class="hm-input sr-only" checked aria-label="Dependency graph" />
+  <input type="radio" name="hm-view" id="hm-blocks" class="hm-input sr-only" aria-label="Folder map" />
+  <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 lg:pe-gutter">
+    <figcaption id="hm-title" class="min-w-0 text-caption text-muted"><span class="font-semibold text-ink">{stats.repo}, real Stacklit output.</span> {stats.files} files, {stats.edges} links.</figcaption>
+    <div class="hm-ctl flex gap-1 rounded-full border border-line-strong bg-raised p-1" role="group" aria-label="Map style">
+      <label for="hm-deps" class="hm-opt inline-flex min-h-9 cursor-pointer items-center rounded-full px-4 text-caption font-semibold text-muted">Dependencies</label>
+      <label for="hm-blocks" class="hm-opt inline-flex min-h-9 cursor-pointer items-center rounded-full px-4 text-caption font-semibold text-muted">Folders</label>
+    </div>
+  </div>
+  <div class="hm-stage mt-3 grid min-w-0 max-w-[30rem] lg:w-[122%] lg:max-w-none">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt} class="hm-layer hm-deps col-start-1 row-start-1 h-auto w-full" focusable="false">
+      <g class="hm-drift">
+        <path d={edgePath} class="fill-none stroke-line-strong stroke-[0.7]" />
+        <path d={hubEdgePath} class="hm-pulse fill-none stroke-muted stroke-[0.9]" />
+        {nodes.map((n) => <circle cx={n.x} cy={n.y} r={n.r} class={`${n.cls} stroke-paper stroke-[1.5]`} />)}
+        {hubs.slice(0, 4).map((h) => (
+          <text x={anchorEnd(h.x) ? h.x - h.r - 6 : h.x + h.r + 6} y={h.y + 5} text-anchor={anchorEnd(h.x) ? 'end' : 'start'} font-size="15" font-weight="600" class="fill-ink stroke-paper stroke-[4px] [paint-order:stroke] max-sm:hidden">{h.short}</text>
+        ))}
+      </g>
+    </svg>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt} class="hm-layer hm-blocks col-start-1 row-start-1 h-auto w-full lg:w-[78%]" focusable="false">
+      <g class="hm-drift">
+        {blocks.map((b) => <rect x={b.x} y={b.y} width={b.w} height={b.h} class={b.cls} />)}
+        {folderOutlines.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} class="fill-none stroke-line-strong stroke-[0.8]" />)}
+        {folderLabels.filter((l) => l.w > 84).map((l) => <text x={l.x} y={l.y} font-size="14" font-weight="600" class="fill-ink stroke-paper stroke-[3px] [paint-order:stroke]">{l.text}</text>)}
+      </g>
+    </svg>
+  </div>
+  <p class="sr-only">Larger dots are files that more of the code depends on, ranked by PageRank. Colour shows the community Stacklit found. The same data is in stacklit.json for gin, and the full map is on the demos page.</p>
+</figure>

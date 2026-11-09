@@ -1,19 +1,6 @@
-/* Two very quiet surface details that fit a page that is a map. Static, behind everything, no motion.
- * 1. A survey grid in the hero that fades out toward the text. 2. Crosshair ticks where a section hairline meets the content edge. */
+/* One very quiet surface detail that fits a page that is a map: crosshair ticks where a section hairline meets the
+ * content edge. Static, behind everything, no motion. The hero has its own picture, so it carries no grid. */
 #overview { position: relative; isolation: isolate; }
-#overview::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, color-mix(in srgb, var(--line-strong) 20%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--line-strong) 20%, transparent) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 55% 60% at 88% 0%, black, transparent);
-  -webkit-mask-image: radial-gradient(ellipse 55% 60% at 88% 0%, black, transparent);
-}
 
 main > section:not(#overview) { position: relative; }
 main > section:not(#overview)::before,

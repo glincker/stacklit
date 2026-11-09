@@ -175,6 +175,9 @@
   --text-display: clamp(2.5rem, 1rem + 6vw, 5.75rem);
   --text-display--line-height: 0.96;
   --text-display--letter-spacing: -0.045em;
+  --text-hero-split: clamp(2.5rem, 1rem + 4.1vw, 5rem);
+  --text-hero-split--line-height: 0.98;
+  --text-hero-split--letter-spacing: -0.04em;
   --text-statement: clamp(2.25rem, 1rem + 4.4vw, 4.75rem);
   --text-statement--line-height: 0.98;
   --text-statement--letter-spacing: -0.04em;

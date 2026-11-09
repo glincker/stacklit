@@ -1,0 +1,30 @@
+/* Hero map: two stacked views switched by radio inputs, so it works without a script.
+ * Without a view timeline or motion support, the dependency view is a still frame. */
+.hm-opt { transition: none; }
+#hm-deps:focus-visible ~ div .hm-opt[for='hm-deps'],
+#hm-blocks:focus-visible ~ div .hm-opt[for='hm-blocks'] { outline: 2px solid var(--focus); outline-offset: 2px; }
+#hm-deps:checked ~ div .hm-opt[for='hm-deps'],
+#hm-blocks:checked ~ div .hm-opt[for='hm-blocks'] { background: var(--ink); color: var(--paper); }
+
+.hm-layer { visibility: hidden; opacity: 0; }
+#hm-deps:checked ~ .hm-stage .hm-deps,
+#hm-blocks:checked ~ .hm-stage .hm-blocks { visibility: visible; opacity: 1; }
+
+@keyframes hm-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(8px, -6px); }
+}
+@keyframes hm-pulse {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hm-layer { transition: opacity 500ms var(--ease-stack), visibility 0s linear 500ms; }
+  #hm-deps:checked ~ .hm-stage .hm-deps,
+  #hm-blocks:checked ~ .hm-stage .hm-blocks { transition-delay: 0s; }
+  @supports (animation-duration: 1s) {
+    .hm-drift { animation: hm-drift 40s ease-in-out infinite alternate; }
+    .hm-pulse { animation: hm-pulse 7s ease-in-out infinite alternate; }
+  }
+}
