@@ -13,6 +13,7 @@ Follows the first real-agent A/B (bench/agent-ab, pull request #77), which found
 - Small repo mode: below `small_repo_files` (default 600, `STACKLIT_SMALL_REPO_FILES`, 0 off) source files, the session hook, subagent hook and `setup` carry a one line note that grep is enough instead of the digest (about 60 tokens instead of 490).
 - Quiet repo mode: below `quiet_repo_files` (default 5000, `STACKLIT_QUIET_REPO_FILES`, 0 off) source files, the session and subagent hooks inject nothing at all. Round 2 measured Stacklit as costlier at 412 to 2,919 files and cheaper only at 15,978, so the 5000 default sits between and is not yet measured. The `setup` rules block stays the one line note.
 - `impact` prints a `trust:` line saying how many listed dependents are sure (score 0.9 or more) and how many need a confirming grep.
+- `path` adds advice after the weakest hop score: sure (0.9 or more) needs no confirming grep, otherwise grep the weak hop.
 - A pre-registered second A/B round in `bench/agent-ab/tasks-round2/`, with a `stacklit-e` arm in the harness. It has not been run.
 
 ### Changed
