@@ -12,13 +12,16 @@ import (
 )
 
 // langResolver maps language-specific import strings (Rust paths, Java
-// packages, Ruby requires) to module names. The generic resolver only knows
+// packages, Python absolute imports, Ruby requires) to module names. The generic resolver only knows
 // directory-style paths, which these languages never use.
 type langResolver struct {
 	root     string
 	fileMod  map[string]string   // slash path -> module of that file
 	dirMod   map[string]string   // slash dir -> module of files in that dir
 	javaPkgs map[string][]string // trailing dir path -> sorted unique modules
+	pyPkgs   map[string][]string // trailing dir path of a .py file -> sorted unique modules
+	pyFiles  map[string][]string // trailing path of a .py file without .py -> sorted unique modules
+	pyTop    map[string]bool     // directory names that hold an __init__.py (importable packages)
 	rubyLibs map[string][]string // require path without .rb -> sorted unique file paths
 	crates   map[string]string   // Rust crate identifier -> its source dir
 	seenSrc  map[string]bool
@@ -32,11 +35,15 @@ func newLangResolver(files []*parser.FileInfo, root string, modOf map[string]str
 		fileMod:  map[string]string{},
 		dirMod:   map[string]string{},
 		javaPkgs: map[string][]string{},
+		pyPkgs:   map[string][]string{},
+		pyFiles:  map[string][]string{},
+		pyTop:    map[string]bool{},
 		rubyLibs: map[string][]string{},
 		crates:   map[string]string{},
 		seenSrc:  map[string]bool{},
 	}
 	javaSeen := map[string]map[string]bool{}
+	pySeen := map[string]bool{}
 	for _, f := range files {
 		p := filepath.ToSlash(f.Path)
 		mod := modOf[f.Path]
@@ -54,6 +61,8 @@ func newLangResolver(files []*parser.FileInfo, root string, modOf map[string]str
 					r.javaPkgs[suf] = append(r.javaPkgs[suf], mod)
 				}
 			}
+		case ".py":
+			r.notePython(p, dir, mod, pySeen)
 		case ".rb":
 			noExt := strings.TrimSuffix(p, path.Ext(p))
 			for _, suf := range dirSuffixes(noExt) {
@@ -65,6 +74,12 @@ func newLangResolver(files []*parser.FileInfo, root string, modOf map[string]str
 	}
 	for k := range r.javaPkgs {
 		sort.Strings(r.javaPkgs[k])
+	}
+	for k := range r.pyPkgs {
+		sort.Strings(r.pyPkgs[k])
+	}
+	for k := range r.pyFiles {
+		sort.Strings(r.pyFiles[k])
 	}
 	for k := range r.rubyLibs {
 		sort.Strings(r.rubyLibs[k])
@@ -138,6 +153,15 @@ func (r *langResolver) resolve(f *parser.FileInfo, imp string) (mod string, hand
 		return r.rust(p, imp), true
 	case ".java":
 		return r.java(p, imp), true
+	case ".py":
+		// Relative imports and anything unmatched stay with the generic resolver.
+		if strings.HasPrefix(imp, ".") {
+			return "", false
+		}
+		if m := r.python(p, imp); m != "" {
+			return m, true
+		}
+		return "", false
 	case ".rb":
 		return r.ruby(p, imp), true
 	}
@@ -246,6 +270,51 @@ func (r *langResolver) java(p, imp string) string {
 			continue
 		}
 		return closestModule(p, mods)
+	}
+	return ""
+}
+
+// ---- Python ----
+
+// notePython indexes a .py file under every trailing sub-path of its directory
+// and of its own path, so `app.core.db` can find apps/api/app/core/db.py when
+// the import root (apps/api) is a subdirectory of the scanned root.
+func (r *langResolver) notePython(p, dir, mod string, seen map[string]bool) {
+	add := func(idx map[string][]string, kind, suf string) {
+		k := kind + "|" + suf + "|" + mod
+		if seen[k] {
+			return
+		}
+		seen[k] = true
+		idx[suf] = append(idx[suf], mod)
+	}
+	if path.Base(p) == "__init__.py" {
+		r.pyTop[path.Base(dir)] = true
+	} else {
+		for _, suf := range dirSuffixes(strings.TrimSuffix(p, ".py")) {
+			add(r.pyFiles, "f", suf)
+		}
+	}
+	for _, suf := range dirSuffixes(dir) {
+		add(r.pyPkgs, "d", suf)
+	}
+}
+
+// python resolves an absolute dotted import (`app.core.db`, `app.core`) to a
+// module by the longest leading part of the import that is the tail of a file
+// or directory path. A single-segment import only matches a real package (a
+// directory with an __init__.py), so `import logging` does not land on a
+// repo file called logging.py.
+func (r *langResolver) python(p, imp string) string {
+	segs := strings.Split(imp, ".")
+	for n := len(segs); n >= 1; n-- {
+		key := strings.Join(segs[:n], "/")
+		if mods := r.pyFiles[key]; n >= 2 && len(mods) > 0 {
+			return closestModule(p, mods)
+		}
+		if mods := r.pyPkgs[key]; len(mods) > 0 && (n >= 2 || r.pyTop[segs[0]]) {
+			return closestModule(p, mods)
+		}
 	}
 	return ""
 }

@@ -19,6 +19,9 @@ Follows the first real-agent A/B (bench/agent-ab, pull request #77), which found
 ### Changed
 - The MCP handshake instructions and `stacklit guide` use the routed wording instead of "source of truth, do not crawl" (about 100 tokens, was about 75). `STACKLIT_STEERING=d` keeps the earlier text for comparison.
 
+### Fixed
+- Python absolute imports resolve when the import root is below the scanned root, for example `app.core.db` for `apps/api/app/core/db.py`. Before, such a repo had no module edges and every module was listed as isolated. A single segment import only matches a package, so `import logging` does not resolve to a repo file called `logging.py`.
+
 ### Documentation
 - `docs/SESSIONS.md` and `docs/USAGE.md` report what the first A/B measured. `--crawl-guard` and steering `d` measured worse than no Stacklit (cost 1.12x, correct 82.7% against 94.0%): off by default, not recommended. Added a "When Stacklit helps" section: large repos and locate or add questions, not exact-name lookups or small repos.
 

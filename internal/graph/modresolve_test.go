@@ -150,3 +150,57 @@ func TestModuleRankingPrefersRichFiles(t *testing.T) {
 		t.Errorf("ExportsByRank = %v", m.ExportsByRank)
 	}
 }
+
+// Absolute imports are written from the Python import root (apps/api), which
+// is a subdirectory of the scanned root, so `app.core.db` has to match the
+// tail of apps/api/app/core/db.py.
+func TestPythonAbsoluteImportsFromSubdirectoryRoot(t *testing.T) {
+	files := []*parser.FileInfo{
+		fi("apps/api/app/__init__.py"),
+		fi("apps/api/app/main.py", "app.core", "app.domains.spend.router", "fastapi"),
+		fi("apps/api/app/core/__init__.py"),
+		fi("apps/api/app/core/db.py", "alembic", "sqlalchemy"),
+		fi("apps/api/app/core/logging.py"),
+		fi("apps/api/app/domains/spend/__init__.py"),
+		fi("apps/api/app/domains/spend/router.py", "app.core.db", "app.domains.spend.service", "logging"),
+		fi("apps/api/app/domains/spend/service.py", "app.core.db.Session", ".router"),
+		fi("apps/api/alembic/env.py"),
+	}
+	g := Build(files, BuildOptions{MaxDepth: 6})
+
+	core := "apps/api/app/core"
+	spend := "apps/api/app/domains/spend"
+	if got, want := dependedBy(g, core), []string{"apps/api/app", spend}; !reflect.DeepEqual(got, want) {
+		t.Errorf("core depended_by = %v, want %v", got, want)
+	}
+	// main.py reaches spend through app.domains.spend.router (a file, not a package).
+	if got, want := dependedBy(g, spend), []string{"apps/api/app"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("spend depended_by = %v, want %v", got, want)
+	}
+	// `logging` is the standard library and `alembic` is a third-party package, even though
+	// the repo has a logging.py and an alembic/ directory without an __init__.py.
+	if got := dependedBy(g, "apps/api/alembic"); len(got) != 0 {
+		t.Errorf("alembic depended_by = %v, want none", got)
+	}
+	for _, m := range g.Module(core).DependsOn {
+		t.Errorf("core should depend on nothing, got %s (stdlib logging or third-party alembic matched a repo path)", m)
+	}
+}
+
+func TestPythonSingleSegmentImportNeedsAPackage(t *testing.T) {
+	files := []*parser.FileInfo{
+		fi("svc/app/__init__.py"),
+		fi("svc/app/models.py"),
+		fi("svc/worker/run.py", "app", "app.models"),
+		fi("svc/util/helpers.py"),
+		fi("svc/worker/jobs.py", "helpers"),
+	}
+	g := Build(files, BuildOptions{})
+	if got, want := dependedBy(g, "svc/app"), []string{"svc/worker"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("app depended_by = %v, want %v", got, want)
+	}
+	// helpers is a plain file with no package around it, so a bare `import helpers` stays unresolved.
+	if got := dependedBy(g, "svc/util"); len(got) != 0 {
+		t.Errorf("util depended_by = %v, want none", got)
+	}
+}
