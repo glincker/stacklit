@@ -21,7 +21,7 @@ Tools solve this in different ways. Some dump everything. Some build knowledge g
 | [Aider repo-map](https://github.com/Aider-AI/aider) | 43k** | Tree-sitter + PageRank | Text | ~1k | 40+ | Yes | Locked to Aider |
 | [Codebase-Memory](https://github.com/DeusData/codebase-memory-mcp) | 1.4k | Knowledge graph | SQLite | 2k-10k/session | 66 | Yes (call graph) | MCP server (C) |
 | [Axon](https://github.com/harshkedia177/axon) | 648 | Graph + community detection | Neo4j/KuzuDB | 2k-10k/session | 3 | Yes (blast radius) | MCP server (Python) |
-| **[Stacklit](https://github.com/glincker/stacklit)** | -- | Tree-sitter + module map | JSON + HTML | **120 to 1,100 (compact map; scales with module count)** | 11 | Yes | CLI (Go) |
+| **[Stacklit](https://github.com/glincker/stacklit)** | -- | Tree-sitter + module map | JSON + HTML | **137 to 1,351 (compact map on six repos; scales with module count)** | 48 | Yes | CLI (Go) |
 
 *Token cost = tokens consumed to give an agent full project context on a ~10k-line repo.
 **Aider's 43k stars are for the entire tool, not just the repo-map feature.
