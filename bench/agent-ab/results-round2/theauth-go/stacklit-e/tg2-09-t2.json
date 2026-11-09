@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 4,
+  "cost_usd": 0.0267619,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 423,
+    "cache_creation_input_tokens": 4886,
+    "cache_read_input_tokens": 29719
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.389653958,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash grep -rniE \"permission\" --include=*.go -l . | grep -v _test | head -30; grep -rn \"webhook\" --include=*.go -il . | head -5",
+    "Grep pattern=Permission[A-Za-z]* *= *\"[a-z_.:]+\"",
+    "Grep pattern=PermissionSCIMAdmin"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:52:16Z"
+}

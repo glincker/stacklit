@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-03",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/size-budget.ts, scripts/check-bundle-budgets.mjs",
+  "turns": 2,
+  "cost_usd": 0.0226566,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 97,
+    "cache_creation_input_tokens": 5108,
+    "cache_read_input_tokens": 12466
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.329851709,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"gzip size bundle budget check\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:09:19Z"
+}

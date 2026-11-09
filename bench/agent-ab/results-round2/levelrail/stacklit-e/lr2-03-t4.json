@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-03",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/secretmask/linecarry.go, internal/api/sse_mask.go",
+  "turns": 3,
+  "cost_usd": 0.0247876,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 237,
+    "cache_creation_input_tokens": 5292,
+    "cache_read_input_tokens": 12416
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 21.77913225,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Bash stacklit query \"mask secrets in stream of log lines, secret split across consecutive lines\" --budget 800",
+    "Grep pattern=(?i)split|across (lines|chunks)|carry|overlap|boundary path=internal/secretmask"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:15:23Z"
+}

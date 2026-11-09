@@ -1,0 +1,41 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-09",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/toast.tsx, src/react/index.ts",
+  "turns": 4,
+  "cost_usd": 0.028183099999999996,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 364,
+    "cache_creation_input_tokens": 5579,
+    "cache_read_input_tokens": 22151
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.565277125,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"where are React announcement components like toast defined and re-exported\" --budget 800",
+    "Glob pattern=src/react/**/*{index,toast,Toast}*",
+    "Grep pattern=toast path=/private/tmp/r2/work/ab-2433565811/co-3440418538/src/react"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:11:09Z"
+}

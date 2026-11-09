@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-04",
+  "kind": "trace",
+  "trial": 5,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/checklist.tsx, src/react/hooks/use-checklist.ts, src/react/checklist-registry.ts",
+  "turns": 2,
+  "cost_usd": 0.0192155,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 196,
+    "cache_creation_input_tokens": 4000,
+    "cache_read_input_tokens": 12475
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.241310917,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Grep pattern=checklist path=/private/tmp/r2/work/ab-2433565811/co-1374483430/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:26:09Z"
+}

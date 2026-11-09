@@ -1,0 +1,45 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "I've found the reserve file in `internal/diskguard/diskguard.go`. It's named `.disk-reserve` and sits in the data dir, which defaults to `./data` unless `APP_DATA_DIR` overrides it.\n\n./data/.disk-reserve",
+  "turns": 8,
+  "cost_usd": 0.05895329999999999,
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 1319,
+    "cache_creation_input_tokens": 9974,
+    "cache_read_input_tokens": 58433
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 4,
+    "Read": 2
+  },
+  "files_read": 2,
+  "read_bytes": 2595,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 36.046584833,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"sqlite reserve file disk full commit\" --budget 800",
+    "Grep pattern=reserve.*(\\.|path|Path)|\\.reserve|reserve\\w*\\s*=\\s*\" path=/private/tmp/r2/work/ab-3997012670/co-1373773957/internal/diskguard",
+    "Grep pattern=diskguard\\.New|ReservePath|reserve.*\\.(bin|db|dat|img) path=/private/tmp/r2/work/ab-3997012670/co-1373773957",
+    "Read /private/tmp/r2/work/ab-3997012670/co-1373773957/internal/diskguard/diskguard.go",
+    "Read /private/tmp/r2/work/ab-3997012670/co-1373773957/cmd/levelrail/diskguard_wiring.go",
+    "Grep pattern=disk-reserve path=/private/tmp/r2/work/ab-3997012670/co-1373773957",
+    "Grep pattern=startDiskGuard\\(|DataDir\\s*[:=]|\"/var/lib/[^\"]*\"|/data\" path=/private/tmp/r2/work/ab-3997012670/co-1373773957/cmd/levelrail"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:20:05Z"
+}

@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-01",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/totp/totp.go",
+  "turns": 3,
+  "cost_usd": 0.0309156,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 350,
+    "cache_creation_input_tokens": 6307,
+    "cache_read_input_tokens": 21756
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 22.434402334,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=(?i)totp|hotp|RFC ?6238|HMAC-?SHA1",
+    "Grep pattern=hmac\\.New|func .*(Code|Generate) path=/private/tmp/r2/work/ab-3997012670/co-253836172/internal"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:35:51Z"
+}

@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-09",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit-e-small",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/toast.tsx is the pattern to copy for the new component's location, so the file goes in `src/react/components/`. The re-export goes in `src/react/index.ts`.\n\nsrc/react/components/\u003cnew-component\u003e.tsx, src/react/index.ts",
+  "turns": 3,
+  "cost_usd": 0.021611099999999998,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 362,
+    "cache_creation_input_tokens": 3996,
+    "cache_read_input_tokens": 19951
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.128651625,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=toast",
+    "Grep pattern=toast path=src/react/index.ts"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:08:40Z"
+}

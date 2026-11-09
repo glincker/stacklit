@@ -1,0 +1,37 @@
+{
+  "repo": "theauth",
+  "task": "ta-04",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0.6666666666666666,
+  "answer": "packages/core/src/auth/gdpr-delete.ts, packages/core/src/audit/erasure.ts, packages/core/src/auth/gdpr-progress.ts",
+  "turns": 2,
+  "cost_usd": 0.0231067,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 199,
+    "cache_creation_input_tokens": 4966,
+    "cache_read_input_tokens": 12447
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.843810292,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Bash stacklit query \"resumable account erasure delete step anonymisation step progress marker\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:36:28Z"
+}

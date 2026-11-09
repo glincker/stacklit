@@ -1,0 +1,44 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "`$APP_DATA_DIR/.disk-reserve`, `./data/.disk-reserve`\n\nThe reserve file is `.disk-reserve`, in the platform's data directory. That directory is `$APP_DATA_DIR` when the variable is set. Otherwise it defaults to `./data`. I read this from the code and didn't run anything.",
+  "turns": 8,
+  "cost_usd": 0.0567654,
+  "usage": {
+    "input_tokens": 14,
+    "output_tokens": 1207,
+    "cache_creation_input_tokens": 9389,
+    "cache_read_input_tokens": 71114
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 6
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 27.399051125,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=reserve|ballast|emergency.*file",
+    "Grep pattern=diskguard\\.New\\(|func New\\( path=/private/tmp/r2/work/ab-3997012670/co-4244723337/internal/diskguard/diskguard.go",
+    "Grep pattern=diskguard\\.New\\(",
+    "Bash cd /private/tmp/r2/work/ab-3997012670/co-4244723337; grep -n \"dataDir\" cmd/levelrail/diskguard_wiring.go | head; grep -rn \"wireDiskGuard\\|installDiskGuard\" cmd ",
+    "Grep pattern=startDiskGuard\\( path=/private/tmp/r2/work/ab-3997012670/co-4244723337/cmd",
+    "Grep pattern=agentDataDir\\s*(:=|=) path=/private/tmp/r2/work/ab-3997012670/co-4244723337/cmd",
+    "Grep pattern=defaultDataDir\\s*= path=/private/tmp/r2/work/ab-3997012670/co-4244723337/cmd"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:23:22Z"
+}

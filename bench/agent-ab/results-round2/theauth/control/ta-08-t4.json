@@ -1,0 +1,37 @@
+{
+  "repo": "theauth",
+  "task": "ta-08",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/index.ts, packages/core/src/auth/email-password-http.ts, packages/core/src/auth/username-http.ts, packages/core/src/auth/username.ts, packages/core/src/auth/email-password.ts",
+  "turns": 2,
+  "cost_usd": 0.0154,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 189,
+    "cache_creation_input_tokens": 3155,
+    "cache_read_input_tokens": 8820
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.5663431249999995,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Grep pattern=login-lockout"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:40:21Z"
+}

@@ -1,0 +1,33 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "src/engine/adoption.ts, src/engine/analytics.ts, src/engine/scheduler.ts",
+  "turns": 1,
+  "cost_usd": 0.0107689,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 180,
+    "cache_creation_input_tokens": 2225,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 2.866336917,
+  "seven_day_utilization": 0.6,
+  "call_log": null,
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:55:00Z"
+}

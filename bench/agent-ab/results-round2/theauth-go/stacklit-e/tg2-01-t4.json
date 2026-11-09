@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-01",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ratelimit/ratelimit.go",
+  "turns": 3,
+  "cost_usd": 0.024539699999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 199,
+    "cache_creation_input_tokens": 5324,
+    "cache_read_input_tokens": 12457
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.549881625,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"in-memory rate limiter one limiter per key IP or email, evicts idle keys\" --budget 800",
+    "Grep pattern=rate\\.NewLimiter|golang.org/x/time/rate"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:51:23Z"
+}

@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/saml/tracker.go, internal/saml/service.go",
+  "turns": 3,
+  "cost_usd": 0.0215791,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 303,
+    "cache_creation_input_tokens": 4117,
+    "cache_read_input_tokens": 20691
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.5178812090000005,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=(?i)replay path=/private/tmp/r2/work/ab-2402106989/co-471734628/internal/saml",
+    "Grep pattern=(?i)replay|type .*Tracker|interface path=/private/tmp/r2/work/ab-2402106989/co-471734628/internal/saml/tracker.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:00:54Z"
+}

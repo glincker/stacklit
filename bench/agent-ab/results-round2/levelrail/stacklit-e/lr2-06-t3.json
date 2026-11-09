@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-06",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/components/settings/HeartbeatCard.tsx, web/src/queries/heartbeat.ts",
+  "turns": 2,
+  "cost_usd": 0.0198368,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 193,
+    "cache_creation_input_tokens": 4164,
+    "cache_read_input_tokens": 12428
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 18.508310292,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=heartbeat path=/private/tmp/r2/work/ab-3997012670/co-2016659130/web/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:32:00Z"
+}

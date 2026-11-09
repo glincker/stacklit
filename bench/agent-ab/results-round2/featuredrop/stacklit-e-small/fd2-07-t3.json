@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-07",
+  "kind": "impact",
+  "trial": 3,
+  "arm": "stacklit-e-small",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/rss.ts, src/react/components/changelog-widget.tsx, src/react/components/banner.tsx, src/react/components/announcement-modal.tsx, src/react/components/smart-announcement.tsx, src/react/components/toast.tsx, src/react/components/spotlight.tsx, src/react/components/changelog-page.tsx, src/vue/components/changelog-widget.ts, src/vue/components/spotlight.ts, src/vue/components/banner.ts, src/vue/components/toast.ts",
+  "turns": 3,
+  "cost_usd": 0.0207033,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 451,
+    "cache_creation_input_tokens": 3752,
+    "cache_read_input_tokens": 11773
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.88514225,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Glob pattern=**/markdown.ts",
+    "Grep pattern=from\\s+['\"][^'\"]*\\/markdown(\\.js|\\.ts)?['\"]|require\\(['\"][^'\"]*\\/markdown"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:09:32Z"
+}

@@ -1,0 +1,43 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "\u003cdata dir\u003e/.disk-reserve (default ./data/.disk-reserve)",
+  "turns": 8,
+  "cost_usd": 0.05207370000000001,
+  "usage": {
+    "input_tokens": 16,
+    "output_tokens": 838,
+    "cache_creation_input_tokens": 8896,
+    "cache_read_input_tokens": 80777
+  },
+  "tool_calls": {
+    "Bash": 7
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 2,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 31.92511275,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"reserve file on disk so SQLite can commit when volume is full\" --budget 800",
+    "Bash stacklit slice syncReserve; grep -rn -i \"reserve.*\\.\\(bin\\|dat\\|reserve\\)\\|ReserveFile\\|reservePath\" internal/diskguard | head -20",
+    "Bash sed -n 165,180p internal/diskguard/diskguard.go; grep -rn \"diskguard.New\\|dataDir\" cmd/levelrail/*.go | head",
+    "Bash grep -rn \"diskguard.New(\" --include=*.go . | grep -v _test | head; grep -rn \"disk-reserve\" --include=*.go . | grep -v _test | head",
+    "Bash grep -rn \"diskguard.New(\\|disk-reserve\" . --include='*.go' | grep -v _test | head",
+    "Bash sed -n 1,30p cmd/levelrail/diskguard_wiring.go; grep -rn \"LEVELRAIL_DATA_DIR\\|DataDir.*=\\|/data\" cmd/levelrail/*.go | grep -v _test | head",
+    "Bash grep -rn \"defaultDataDir\\s*=\" cmd/levelrail"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:25:06Z"
+}

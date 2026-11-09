@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-07",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "signals/urlcheck.go, signals/transmitter.go, signals/receiver.go, policy/hook/httpguard.go, internal/cimd/safefetch.go, internal/as/oidc_logout.go, internal/as/jwks_fetcher.go",
+  "turns": 2,
+  "cost_usd": 0.019485699999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 249,
+    "cache_creation_input_tokens": 3936,
+    "cache_read_input_tokens": 12437
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.81012775,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=\"[^\"]*internal/safehttp\" path=/private/tmp/r2/work/ab-2402106989/co-1025982820"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:53:42Z"
+}

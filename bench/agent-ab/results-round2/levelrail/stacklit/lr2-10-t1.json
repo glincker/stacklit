@@ -1,0 +1,40 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-10",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/routes/settings/notification-channels.tsx, web/src/components/settings/",
+  "turns": 4,
+  "cost_usd": 0.0308113,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 502,
+    "cache_creation_input_tokens": 5650,
+    "cache_read_input_tokens": 31753
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 25.234894208,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"dashboard page heartbeat card route\" --budget 800",
+    "Grep pattern=HeartbeatCard",
+    "Grep pattern=HeartbeatCard path=web/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:34:23Z"
+}

@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-08",
+  "kind": "impact",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/desktopmode/token.go, internal/models/apikey.go, internal/api/auth.go, internal/api/git_push_remote.go, internal/api/git_push_http.go, internal/api/gate_settings.go",
+  "turns": 3,
+  "cost_usd": 0.0260872,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 246,
+    "cache_creation_input_tokens": 5594,
+    "cache_read_input_tokens": 12432
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 32.154739833,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/tokenhash package\" --budget 800",
+    "Grep pattern=internal/tokenhash"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:03:51Z"
+}

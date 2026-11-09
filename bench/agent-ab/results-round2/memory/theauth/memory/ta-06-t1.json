@@ -1,0 +1,33 @@
+{
+  "repo": "theauth",
+  "task": "ta-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "packages/core/src/magic-link.ts, packages/core/src/plugins/magic-link.ts",
+  "turns": 1,
+  "cost_usd": 0.0098829,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 93,
+    "cache_creation_input_tokens": 2221,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 2.528223209,
+  "seven_day_utilization": 0.6,
+  "call_log": null,
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:55:17Z"
+}

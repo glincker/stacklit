@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-04",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/trusteddevice/service.go, lifecycle.go, internal/password/lifecycle.go, internal/totp/handlers/handlers.go",
+  "turns": 2,
+  "cost_usd": 0.022683500000000002,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 139,
+    "cache_creation_input_tokens": 5010,
+    "cache_read_input_tokens": 12455
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.046770291,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"remember device trusted browser signed cookie skip second factor MFA, invalidated on password change\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:50:44Z"
+}
