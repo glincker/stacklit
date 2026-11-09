@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-10",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "otp/otp.go, otp/senders.go",
+  "turns": 5,
+  "cost_usd": 0.0244756,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 486,
+    "cache_creation_input_tokens": 4408,
+    "cache_read_input_tokens": 19716
+  },
+  "tool_calls": {
+    "Grep": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 697,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.610166625,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)(type|interface)\\s+\\w*(Sender|Deliver)\\w*\\s+interface",
+    "Grep pattern=(?i)otp|one-time|onetime",
+    "Grep pattern=\\) Send\\( path=/private/tmp/abreal/work/ab-2259468618/co-2324660082/otp",
+    "Read /private/tmp/abreal/work/ab-2259468618/co-2324660082/otp/otp.go"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:04:15Z"
+}

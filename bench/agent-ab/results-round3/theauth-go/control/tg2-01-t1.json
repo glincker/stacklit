@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-01",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ratelimit/ratelimit.go",
+  "turns": 5,
+  "cost_usd": 0.029527400000000002,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 654,
+    "cache_creation_input_tokens": 5187,
+    "cache_read_input_tokens": 22234
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.518107667,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)(limiter|ratelimit|rate_limit)",
+    "Grep pattern=(?i)(evict|idle|lastSeen|last_used|sweep) path=/private/tmp/abreal/work/ab-2259468618/co-2537392846/internal/ratelimit",
+    "Grep pattern=(?i)(evict|idle|lastSeen|sweep) path=/private/tmp/abreal/work/ab-2259468618/co-2537392846/internal/throttle",
+    "Grep pattern=(?i)(evict|idle|lastSeen|sweep|^type |^func New) path=/private/tmp/abreal/work/ab-2259468618/co-2537392846/internal"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:04:03Z"
+}

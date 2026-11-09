@@ -1,0 +1,40 @@
+{
+  "repo": "theauth",
+  "task": "ta-10",
+  "kind": "add",
+  "trial": 4,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/i18n/index.ts, packages/core/src/i18n/locales/",
+  "turns": 4,
+  "cost_usd": 0.0226928,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 504,
+    "cache_creation_input_tokens": 3922,
+    "cache_read_input_tokens": 19528
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 14.596800916,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=locales path=/private/tmp/abreal/work/ab-2412612584/co-1084366696",
+    "Glob pattern=packages/core/**/locales/** path=/private/tmp/abreal/work/ab-2412612584/co-1084366696",
+    "Grep pattern=locales path=/private/tmp/abreal/work/ab-2412612584/co-1084366696/packages/core/src/i18n"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:38:05Z"
+}

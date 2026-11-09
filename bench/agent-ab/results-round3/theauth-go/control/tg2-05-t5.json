@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-05",
+  "kind": "trace",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "storage/memory/memory_toolapprovals.go, storage/sqlite/tool_approvals.go, storage/postgres/postgres_toolapprovals.go",
+  "turns": 3,
+  "cost_usd": 0.015514799999999999,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 247,
+    "cache_creation_input_tokens": 3039,
+    "cache_read_input_tokens": 8808
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.377798917,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=approval",
+    "Glob pattern=**/*approval*"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:14:59Z"
+}

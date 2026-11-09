@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/saml/tracker.go, internal/saml/service.go",
+  "turns": 6,
+  "cost_usd": 0.0361465,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 760,
+    "cache_creation_input_tokens": 6199,
+    "cache_read_input_tokens": 37305
+  },
+  "tool_calls": {
+    "Grep": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.451821333,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)replay|assertion.?id|InResponseTo",
+    "Grep pattern=(?i)saml.*(replay|assertion)|(replay|assertion).*saml",
+    "Grep pattern=(?i)replay|assertion.?id path=/private/tmp/abreal/work/ab-2259468618/co-1368620907/internal/saml/service.go",
+    "Grep pattern=(?i)saml.*(replay|consume|seen)|(replay|consume|seen).*saml",
+    "Grep pattern=Tracker path=/private/tmp/abreal/work/ab-2259468618/co-1368620907/internal/saml"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:06:49Z"
+}

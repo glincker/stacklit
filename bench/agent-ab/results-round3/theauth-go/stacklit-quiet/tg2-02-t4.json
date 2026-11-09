@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/saml/tracker.go, internal/saml/service.go",
+  "turns": 3,
+  "cost_usd": 0.029080800000000004,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 316,
+    "cache_creation_input_tokens": 5971,
+    "cache_read_input_tokens": 20248
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.359093583,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=(?i)replay",
+    "Grep pattern=(?i)replay|tracker path=/private/tmp/abreal/work/ab-2259468618/co-1494391697/internal/saml"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:12:49Z"
+}

@@ -1,0 +1,38 @@
+{
+  "repo": "theauth",
+  "task": "ta-05",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/cli/src/auth/device-flow.ts, packages/cli/src/auth/token-cache.ts, packages/core/src/auth/device-auth.ts",
+  "turns": 3,
+  "cost_usd": 0.016319100000000003,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 263,
+    "cache_creation_input_tokens": 3199,
+    "cache_read_input_tokens": 8851
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.488842083,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=device_code|device/code|device_authorization",
+    "Grep pattern=token cache|TokenCache|token_cache|tokenCache"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:39:01Z"
+}

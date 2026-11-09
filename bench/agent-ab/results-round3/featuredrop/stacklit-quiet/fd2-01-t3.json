@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-01",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/rss.ts",
+  "turns": 3,
+  "cost_usd": 0.019877600000000002,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 263,
+    "cache_creation_input_tokens": 4018,
+    "cache_read_input_tokens": 11676
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.647755875,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=rss|RSS",
+    "Grep pattern=manifest"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:18:56Z"
+}

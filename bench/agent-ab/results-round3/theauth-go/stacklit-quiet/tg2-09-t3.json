@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 3,
+  "cost_usd": 0.024409399999999998,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 297,
+    "cache_creation_input_tokens": 4874,
+    "cache_read_input_tokens": 19314
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.217178416,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)permission.*(webhook|description)|PermissionName|Permission[A-Z]\\w* += ",
+    "Bash cd /private/tmp/abreal/work/ab-2259468618/co-3461480798; head -40 internal/models/permissions.go; echo ----; head -40 internal/rbac/catalog.go"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:05:42Z"
+}

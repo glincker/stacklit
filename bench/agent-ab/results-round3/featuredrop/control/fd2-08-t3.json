@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-08",
+  "kind": "impact",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/provider.tsx, src/react/context.ts, src/react/components/changelog-widget.tsx, src/react/components/changelog-page.tsx",
+  "turns": 3,
+  "cost_usd": 0.015395900000000002,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 293,
+    "cache_creation_input_tokens": 2894,
+    "cache_read_input_tokens": 8819
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.293724292,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=from\\s+['\"][^'\"]*i18n(\\.[jt]s)?['\"]|require\\(['\"][^'\"]*i18n(\\.[jt]s)?['\"]\\)|impo",
+    "Glob pattern=**/i18n.ts"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:23:28Z"
+}

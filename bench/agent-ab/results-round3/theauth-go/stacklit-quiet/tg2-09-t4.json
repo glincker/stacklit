@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 4,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 5,
+  "cost_usd": 0.024738999999999997,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 591,
+    "cache_creation_input_tokens": 4218,
+    "cache_read_input_tokens": 19450
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.933734167,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=(?i)permission.*description|Description.*permission",
+    "Grep pattern=(?i)PermissionManage|PermManage|Permission\\w+\\s*=\\s*\"",
+    "Grep pattern=Description path=/private/tmp/abreal/work/ab-2259468618/co-418832424/internal/rbac/catalog.go",
+    "Grep pattern=Permission\\w+\\s*=\\s*\" path=/private/tmp/abreal/work/ab-2259468618/co-418832424/internal/models/permissions."
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:15:05Z"
+}

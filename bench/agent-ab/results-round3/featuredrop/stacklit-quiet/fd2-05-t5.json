@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-05",
+  "kind": "trace",
+  "trial": 5,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/feature-request-button.tsx, src/react/components/feature-request-form.tsx, src/react/feature-request-store.ts",
+  "turns": 2,
+  "cost_usd": 0.0159762,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 184,
+    "cache_creation_input_tokens": 3240,
+    "cache_read_input_tokens": 11682
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.954563959,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=feature.?request"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:19:47Z"
+}
