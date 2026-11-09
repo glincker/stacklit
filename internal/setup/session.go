@@ -119,6 +119,9 @@ func SessionHook(stdin io.Reader) string {
 	hash := session.StructureHash(idx)
 	var parts []string
 	switch {
+	case IsQuietRepo(root, idx):
+		session.RecordInjected(dir, in.SessionID, hash)
+		return ""
 	case IsSmallRepo(root, idx):
 		parts = append(parts, smallRepoLine(idx))
 	case rulesHash(root) != hash:
@@ -175,6 +178,9 @@ func SubagentHook(stdin io.Reader) string {
 	root := hookRoot(in)
 	idx, err := session.LoadIndex(root)
 	if err != nil {
+		return ""
+	}
+	if IsQuietRepo(root, idx) {
 		return ""
 	}
 	if IsSmallRepo(root, idx) {

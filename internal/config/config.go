@@ -44,6 +44,11 @@ type Config struct {
 	// digest. Nil uses DefaultSmallRepoFiles; 0 turns small repo mode off.
 	// Also STACKLIT_SMALL_REPO_FILES.
 	SmallRepoFiles *int `json:"small_repo_files,omitempty"`
+	// QuietRepoFiles is the source file count below which the session and
+	// subagent hooks inject nothing, because measured sessions cost more with
+	// them on repos this size. Nil uses DefaultQuietRepoFiles; 0 turns quiet
+	// mode off. Also STACKLIT_QUIET_REPO_FILES.
+	QuietRepoFiles *int `json:"quiet_repo_files,omitempty"`
 	// CrawlGuard sets the Claude Code crawl guard hook mode: "off", "nudge" or
 	// "redirect". Also STACKLIT_CRAWL_GUARD. Empty uses the mode setup installed.
 	CrawlGuard string `json:"crawl_guard,omitempty"`

@@ -46,6 +46,7 @@ func TestIsSmallRepoThresholdAndSwitches(t *testing.T) {
 }
 
 func TestSessionHookSmallRepoGetsOneLineNotTheDigest(t *testing.T) {
+	t.Setenv("STACKLIT_QUIET_REPO_FILES", "0")
 	t.Setenv("STACKLIT_CACHE_DIR", t.TempDir())
 	root := t.TempDir()
 	idx := idxWithFiles(100)
@@ -81,6 +82,7 @@ func TestSessionHookSmallRepoGetsOneLineNotTheDigest(t *testing.T) {
 }
 
 func TestSubagentHookSmallRepo(t *testing.T) {
+	t.Setenv("STACKLIT_QUIET_REPO_FILES", "0")
 	t.Setenv("STACKLIT_CACHE_DIR", t.TempDir())
 	root := t.TempDir()
 	writeIdx(t, root, idxWithFiles(100))
@@ -112,4 +114,26 @@ func TestBodyForRootSmallBlockIsShortAndRecognisable(t *testing.T) {
 		t.Error("rulesHash cannot read the small block")
 	}
 	t.Logf("small block %d tokens, full digest %d tokens", Tokens(sb), Tokens(BodyFor(small, "e")))
+}
+
+func TestQuietRepoHooksInjectNothing(t *testing.T) {
+	t.Setenv("STACKLIT_CACHE_DIR", t.TempDir())
+	root := t.TempDir()
+	writeIdx(t, root, idxWithFiles(3000))
+	if !IsQuietRepo(root, idxWithFiles(3000)) || IsQuietRepo(root, idxWithFiles(5000)) {
+		t.Fatal("default quiet limit is exclusive at 5000")
+	}
+	for _, src := range []string{"startup", "resume", "compact"} {
+		if out := SessionHook(payload(t, root, src, "q-"+src)); out != "" {
+			t.Fatalf("%s: quiet repo must inject nothing: %q", src, out)
+		}
+	}
+	in := strings.NewReader(`{"cwd":"` + root + `","agent_type":"Explore"}`)
+	if out := SubagentHook(in); out != "" {
+		t.Fatalf("quiet repo subagent must get nothing: %q", out)
+	}
+	t.Setenv("STACKLIT_QUIET_REPO_FILES", "0")
+	if out := SessionHook(payload(t, root, "startup", "q-off")); out == "" {
+		t.Fatal("quiet mode off must restore the hook text")
+	}
 }

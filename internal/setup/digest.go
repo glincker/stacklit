@@ -79,6 +79,15 @@ func IsSmallRepo(root string, idx *schema.Index) bool {
 	return limit > 0 && n > 0 && n < limit
 }
 
+// IsQuietRepo reports whether hooks should inject nothing for this repo. The
+// small repo limit still applies on top, so a quiet limit of 0 leaves small
+// repos with their one line.
+func IsQuietRepo(root string, idx *schema.Index) bool {
+	limit := config.Load(root).QuietRepoLimit()
+	n := SourceFiles(idx)
+	return limit > 0 && n > 0 && n < limit
+}
+
 // smallRepoLine is the only orientation a small repo gets. It is factual, not
 // imperative, like the other hook text.
 func smallRepoLine(idx *schema.Index) string {
@@ -89,7 +98,7 @@ func smallRepoLine(idx *schema.Index) string {
 // (the note plus the structure token, so the session hook still recognises it),
 // every other repo gets the full digest.
 func BodyForRoot(root string, idx *schema.Index, variant string) string {
-	if !IsSmallRepo(root, idx) {
+	if !IsSmallRepo(root, idx) && !IsQuietRepo(root, idx) {
 		return BodyFor(idx, variant)
 	}
 	return fmt.Sprintf("## Codebase map (stacklit)\n%s\n\n```\n%s | %s | %d modules | %s%s\n```\n",

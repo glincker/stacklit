@@ -96,7 +96,7 @@ func TestPathAndImpact(t *testing.T) {
 		t.Fatalf("unexpected path between disconnected symbols: %+v", p)
 	}
 	im, _ := g.Impact("check", 4, 2000, false)
-	for _, want := range []string{"validate", "ParseConfig"} {
+	for _, want := range []string{"validate", "ParseConfig", "trust: "} {
 		if !strings.Contains(im, want) {
 			t.Errorf("impact missing %s:\n%s", want, im)
 		}
