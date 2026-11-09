@@ -3,6 +3,7 @@
 // missing, so a schema change in the harness is caught in the PR build, not on the site.
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { ab2 } from './agentAbRound2';
 
 // Builds run from site/, and the bundled chunk has no stable relative location.
 const path = resolve(process.cwd(), '../bench/agent-ab/summary.json');
@@ -125,6 +126,7 @@ function rawKindRate(s: Scope, k: string, arm: 'control' | 'stacklit'): number {
 
 // Fills {name} placeholders in copy strings. An unknown name fails the build.
 export function fill(text: string): string {
+  const levelrailDropR1 = Math.round((1 - Number(ab.repos[0].cost.ratio)) * 100);
   const vars: Record<string, string> = {
     sessions: String(ab.sessions), pairs: String(ab.pairs),
     pooledCost: ab.cost.text, pooledTokens: ab.tokens.ratio,
@@ -143,6 +145,13 @@ export function fill(text: string): string {
     featuredropRise: String(Math.round((Number(ab.repos[2].cost.ratio) - 1) * 100)),
     impactRatio: ab.kinds.impact.cost.ratio, impactLo: ab.kinds.impact.cost.lo, impactHi: ab.kinds.impact.cost.hi,
     traceArm: ab.traceCorrect.arm, traceControl: ab.traceCorrect.control,
+    allSessions: (ab.sessions + ab2.sessions).toLocaleString('en-US'), r2Sessions: String(ab2.sessions),
+    r2GrepFewer: ab2.grepFewerA, grepFewerLow: String(Math.min(Number(ab.grepFewerPct), Number(ab2.grepFewerA))), grepFewerHigh: String(Math.max(Number(ab.grepFewerPct), Number(ab2.grepFewerA))),
+    r2ToolFewer: ab2.toolFewerA,
+    levelrailDropLow: String(Math.min(Number(ab2.levelrailDropA), Number(ab2.levelrailDropE), levelrailDropR1)), levelrailDropHigh: String(Math.max(Number(ab2.levelrailDropA), Number(ab2.levelrailDropE), levelrailDropR1)),
+    r2SmallRiseMin: ab2.smallRiseMin, r2SmallRiseMax: ab2.smallRiseMax,
+    r2PooledRiseE: ab2.pooledRiseE, r2PooledRiseA: ab2.pooledRiseA, r2PooledE: ab2.pooledE.text, r2PooledA: ab2.pooledA.text,
+    r2CorrectControl: ab2.correctControl, r2CorrectA: ab2.correctA, r2CorrectE: ab2.correctE,
     strictCost: ab.strict.cost.text, strictTokens: ab.strict.tokens.ratio, strictCorrect: ab.strict.correct,
   };
   return text.replace(/\{(\w+)\}/g, (_, k: string) => vars[k] ?? fail(`copy placeholder {${k}} has no value`));

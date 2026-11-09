@@ -5,11 +5,11 @@
     "variants": {
       "a": {
         "headline": "Stop making your AI re-read your codebase.",
-        "sub": "Stacklit maps your repo once. In our {sessions}-session test, agents ran {grepFewer}% fewer grep and glob searches and a third fewer tool calls."
+        "sub": "Stacklit maps your repo once. In our two tests ({allSessions} sessions), agents ran {grepFewerLow}% to {grepFewerHigh}% fewer grep and glob searches and a quarter to a third fewer tool calls. It was cheaper on the biggest repo and more expensive on smaller ones."
       },
       "alt": {
-        "headline": "Your AI agent runs {grepFewer}% fewer searches.",
-        "sub": "Grep and Glob calls, {pairs} paired Claude Code sessions per arm. Cost stayed the same. Here is the full result."
+        "headline": "Your AI agent runs {grepFewerLow}% to {grepFewerHigh}% fewer searches.",
+        "sub": "Grep and Glob calls, two tests of paired Claude Code sessions. Cheaper on the biggest repo, more expensive on smaller ones. Here is the full result."
       }
     },
     "caption": "Real Claude Code sessions, with and without Stacklit. The method, the tables and the misses are on the agent test page.",
@@ -23,26 +23,26 @@
       {
         "polarity": "good",
         "sentence": "Your AI searches about 5 times less.",
-        "number": "{grepFewer}% fewer",
-        "means": "Fewer grep and glob searches per session, and about a third fewer tool calls overall.",
-        "href": "/docs/agent-test/"
-      },
-      {
-        "polarity": "neutral",
-        "sentence": "It does not make things cheaper.",
-        "number": "Same bill",
-        "means": "Across the three repos we tested, what a session cost stayed about the same.",
+        "number": "{grepFewerLow}% to {grepFewerHigh}% fewer",
+        "means": "Fewer grep and glob searches per session ({grepFewer}% in the first test, {r2GrepFewer}% in the second), and a quarter to a third fewer tool calls overall.",
         "href": "/docs/agent-test/"
       },
       {
         "polarity": "bad",
-        "sentence": "Answers were right a little less often.",
+        "sentence": "Cheaper only on huge repos.",
+        "number": "{r2PooledRiseE}% to {r2PooledRiseA}% more",
+        "means": "Averaged over the four repos we tested, a session cost {r2PooledRiseE}% to {r2PooledRiseA}% more with Stacklit, depending on the wording, not less. On the biggest repo (about 16,000 files) it cost {levelrailDropLow}% to {levelrailDropHigh}% less. On the three smaller ones (400 to 3,000 files) it cost {r2SmallRiseMin}% to {r2SmallRiseMax}% more in the second test.",
+        "href": "/docs/agent-test/"
+      },
+      {
+        "polarity": "bad",
+        "sentence": "Answers were no better.",
         "number": "{correctControl}% to {correctArm}%",
-        "means": "Right answers without Stacklit, then with it. After we fixed our own grading mistakes it was {auditedControl}% against {auditedArm}%, and that gap could be chance.",
+        "means": "First test, right answers without Stacklit, then with it. After we fixed our own grading mistakes it was {auditedControl}% against {auditedArm}%, and that gap could be chance. Second test: {r2CorrectControl}% without, {r2CorrectA}% with.",
         "href": "/docs/agent-test/"
       }
     ],
-    "statRowNote": "One model (Sonnet), three public repos, 30 questions we wrote. It cost more on the smallest repo, and when you already know the exact name, plain grep is better. The tables are on the agent test page."
+    "statRowNote": "Two tests, {allSessions} sessions, one model (Sonnet), four public repos, 70 questions we wrote. When you already know the exact name, plain grep is better. The tables are on the agent test page."
   },
   "cta": {
     "install": "npx stacklit init",
@@ -57,7 +57,7 @@
   "sections": {
     "problem": "Every new session starts by searching",
     "how": "Map once. Ask where.",
-    "proof": "What 450 sessions showed, including the bad news",
+    "proof": "What 1,100 sessions showed, including the bad news",
     "whereItHelps": "Where it helps, and where plain grep wins",
     "faq": "Questions we expect"
   },
@@ -113,19 +113,19 @@
     "items": [
       {
         "q": "Will it lower my token bill?",
-        "a": "Not in our test. Across {pairs} pairs of sessions on three repos, the bill stayed about the same. The behaviour changed instead: {grepFewer}% fewer grep and glob searches, a third fewer tool calls, a quarter fewer turns. What a session cost followed the size of the repo. On the largest (about 16,000 files) it fell {levelrailDrop}%. On the smallest (about 400 files) it rose {featuredropRise}%. Questions like \"who imports X\" cost about {impactRatio} times as much. Dollar figures are Claude Code's own estimates at list prices, for one model and 30 questions we wrote. The full tables are on the agent test page."
+        "a": "No, not overall. We ran two tests ({allSessions} sessions in all). On the biggest repo (about 16,000 files) a session cost {levelrailDropLow}% to {levelrailDropHigh}% less. On repos of a few thousand files or fewer it cost more: {r2SmallRiseMin}% to {r2SmallRiseMax}% more in the second test, and {featuredropRise}% more on the 400 file repo in the first. Averaged over all four repos, a session cost {r2PooledRiseE}% to {r2PooledRiseA}% more, depending on the wording, not less. What fell was the work: {grepFewerLow}% to {grepFewerHigh}% fewer grep and glob searches, a quarter to a third fewer tool calls, about a fifth fewer turns. Questions like \"who imports X\" cost about {impactRatio} times as much in the first test. So today it is for very large repos and \"where is it\" questions, and not yet for small repos. Dollar figures are Claude Code's own estimates at list prices, for one model and questions we wrote. The full tables are on the agent test page."
       },
       {
         "q": "Does it make answers better?",
-        "a": "No. Answers were slightly less often right with Stacklit: {correctControl}% without it, {correctArm}% with it, on the grader we fixed in advance. After we corrected three grading mistakes of ours it was {auditedControl}% against {auditedArm}%, and that gap could be chance. The losses were mostly on questions that need several files, where the agent stopped after one query. The detail is on the agent test page."
+        "a": "No. In the first test answers were slightly less often right with Stacklit: {correctControl}% without it, {correctArm}% with it, on the grader we fixed in advance. After we corrected three grading mistakes of ours it was {auditedControl}% against {auditedArm}%, and that gap could be chance. The losses were mostly on questions that need several files, where the agent stopped after one query. In the second test answers were equally often right: {r2CorrectControl}% without it, {r2CorrectA}% with it. The detail is on the agent test page."
       },
       {
         "q": "Why not just use grep?",
-        "a": "Often grep is enough, and for an exact name it is better: on 'who imports X' questions it was cheaper. Stacklit helps when the question is a plain sentence with no name to grep, and on big repos. In our test agents with the map ran 82% fewer Grep and Glob calls and a third fewer tool calls overall. The map is also one file in git that every assistant reads and a pull request can review."
+        "a": "Often grep is enough, and for an exact name it is better: on 'who imports X' questions it was cheaper. Stacklit helps when the question is a plain sentence with no name to grep, and on big repos. In our two tests agents with the map ran {grepFewerLow}% to {grepFewerHigh}% fewer Grep and Glob calls and a quarter to a third fewer tool calls overall. The map is also one file in git that every assistant reads and a pull request can review."
       },
       {
         "q": "Does 82% fewer searches mean 82% less work?",
-        "a": "No. The agent swapped most greps for Stacklit queries. Total tool calls fell by a third and turns by about a quarter. Cost did not change."
+        "a": "No. The agent swapped most greps for Stacklit queries. Tool calls fell by a quarter to a third and turns by about a fifth. Cost did not follow: it fell on the biggest repo and rose on smaller ones."
       },
       {
         "q": "Does it keep the map fresh?",
@@ -143,9 +143,9 @@
   },
   "meta": {
     "title": "Stacklit: stop making your AI re-read your codebase",
-    "description": "Stacklit maps your repo once. In a 450-session test, agents ran 82% fewer grep and glob searches and a third fewer tool calls. Cost unchanged. Free, MIT, one Go binary.",
+    "description": "Stacklit maps your repo once. In 1,100 test sessions, agents ran 78% to 82% fewer grep and glob searches. Cheaper on a huge repo, dearer on small ones. Free, MIT, Go.",
     "structured": "Stacklit is a free, MIT licensed command line tool that writes a small committed map of a codebase for AI coding agents, with token budgeted queries for files, symbols and dependents.",
-    "llms": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. A 19,500 line Go repo (gin v1.10.0) becomes a 137 token map (tokens are bytes divided by 4). It parses a repository with tree-sitter and writes stacklit.json, a dependency diagram and an interactive HTML map, and sets up 25 assistants including Claude Code, Cursor and Codex. The map is built without an LLM or embeddings. Free, MIT, one Go binary, no account, no telemetry. In our benchmark a 1,000 token query puts the right file first on 81% of questions, and grep with a hand written pattern does better at 89%; it is a benchmark, not an agent study. In a separate test of 450 real Claude Code sessions on three public repos, Stacklit cut tool calls by about a third but did not lower cost overall (cost ratio 1.00, 95% interval 0.93 to 1.07): cheaper on the largest repo, more expensive on the two small ones."
+    "llms": "Stacklit writes a small map of your codebase into git so coding agents start from the layout. A 19,500 line Go repo (gin v1.10.0) becomes a 137 token map (tokens are bytes divided by 4). It parses a repository with tree-sitter and writes stacklit.json, a dependency diagram and an interactive HTML map, and sets up 25 assistants including Claude Code, Cursor and Codex. The map is built without an LLM or embeddings. Free, MIT, one Go binary, no account, no telemetry. In our benchmark a 1,000 token query puts the right file first on 81% of questions, and grep with a hand written pattern does better at 89%; it is a benchmark, not an agent study. In two separate tests of real Claude Code sessions (450, then 650) on four public repos, Stacklit cut tool calls by a quarter to a third but did not lower cost: cheaper on the largest repo (about 16,000 files, 11% to 22% less), more expensive on the smaller ones, and about 9% to 17% more on average across the four repos in the second test."
   },
   "og": {
     "alt": "Stop making your AI re-read your codebase. Stacklit.",
@@ -160,9 +160,9 @@
       {
         "purpose": "stat-led (HN, Reddit, Discord)",
         "line1": "Your AI agent runs",
-        "line2": "82% fewer searches.",
-        "footer": "Grep and Glob calls, 150 paired sessions. Cost unchanged.",
-        "tag": "MEASURED: grep_glob_calls 0.18 [0.14, 0.23]"
+        "line2": "78% to 82% fewer searches.",
+        "footer": "Grep and Glob calls, two tests. It costs more on small repos.",
+        "tag": "MEASURED: grep_glob_calls 0.18 [0.14, 0.23] (round 1), 0.22 (round 2, default wording)"
       },
       {
         "purpose": "story-led (blog, newsletter, LinkedIn)",
@@ -174,15 +174,15 @@
       {
         "purpose": "large repo (posts about big codebases)",
         "line1": "On a 16,000 file repo,",
-        "line2": "sessions cost 22% less.",
-        "footer": "Largest test repo only. Across all three repos, no cost change.",
-        "tag": "MEASURED, one repo: levelrail cost_usd 0.78 [0.70, 0.86]. Never use without the footer."
+        "line2": "sessions cost 11% to 22% less.",
+        "footer": "Largest test repo only. Smaller repos cost more.",
+        "tag": "MEASURED, one repo: levelrail cost_usd 0.78 [0.70, 0.86] (round 1), 0.89 and 0.87 (round 2). Never use without the footer."
       },
       {
         "purpose": "launch tweet card",
-        "line1": "82% fewer grep and glob searches.",
+        "line1": "78% to 82% fewer grep and glob searches.",
         "line2": "We published where it loses too.",
-        "footer": "450 Claude Code sessions. Full tables in the repo.",
+        "footer": "1,100 Claude Code sessions. Full tables in the repo.",
         "tag": "MEASURED plus FRAMING"
       },
       {
@@ -200,24 +200,24 @@
   },
   "agentTest": {
     "title": "What happened in real agent sessions",
-    "intro": "We ran Claude Code on three public repos it had not memorised, with and without Stacklit: {sessions} sessions in all, with the plan written down before the first run. Stacklit changed how the agent works. It did not lower the cost.",
+    "intro": "We ran Claude Code on public repos, with and without Stacklit, in two tests: {sessions} sessions, then {r2Sessions} more, each with the plan written down before the first run. Stacklit changed how the agent works. It was cheaper on the biggest repo, more expensive on smaller ones, and not cheaper overall.",
     "tableCaption": "Cost of a session with Stacklit divided by the same session without it, with a 95% interval. Below 1 means cheaper. 50 paired sessions per repo, {pairs} in all. Cost is the CLI's notional list price.",
-    "pooledLabel": "All three repos",
+    "pooledLabel": "All repos",
     "behaviourTitle": "What changed",
     "helpsTitle": "Where it helped",
     "helps": [
-      "Big repos. On the largest one (about 16,000 files) the bill fell {levelrailDrop}%.",
+      "Big repos. On the largest one (about 16,000 files) a session cost {levelrailDropLow}% to {levelrailDropHigh}% less, in both tests.",
       "Questions like \"where is X?\" when you do not know the name.",
       "Questions like \"where should a new thing go?\""
     ],
     "failsTitle": "Where it did not",
     "fails": [
-      "Small repos. On the two smaller ones the bill stayed the same or went up.",
-      "Following a path across several files. Answers were right {traceArm}% of the time with Stacklit, against {traceControl}% without.",
+      "Small repos. On repos of 400 to 3,000 files a session cost more, up to {r2SmallRiseMax}% more. Averaged over all four repos it cost more, not less.",
+      "Following a path across several files. In the first test answers were right {traceArm}% of the time with Stacklit, against {traceControl}% without.",
       "Exact names. If you already know the name, plain grep is better. Questions like \"who imports X\" cost about {impactRatio} times as much with Stacklit.",
       "The strict setup (it blocks the agent from crawling) was worse. It is off by default."
     ],
-    "limits": "Limits: one model (Sonnet), 30 questions we wrote, three repos, one day. Most questions needed only one or two exact greps. Editing tasks, other models and harder reasoning were not tested.",
+    "limits": "Limits: one model (Sonnet), 70 questions we wrote, four repos, two days. Most questions needed only one or two exact greps. The model had partly memorised one repo (featuredrop), which favours the side without Stacklit. Editing tasks, other models and harder reasoning were not tested.",
     "link": "Read the full agent test",
     "linkHref": "/docs/agent-test/"
   },
