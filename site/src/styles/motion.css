@@ -1,6 +1,6 @@
-/* Scroll linked motion, as progressive enhancement. A browser without animation-timeline shows everything at once,
- * and prefers-reduced-motion turns it all off. Only transform and opacity move. */
-.progress { display: none; position: fixed; inset: 0 0 auto 0; z-index: 60; height: 2px; background: var(--accent); transform-origin: left; transform: scaleX(0); pointer-events: none; }
+/* Two scroll effects, as progressive enhancement: reveal on scroll and the chapter rail (navigation state).
+ * A browser without animation-timeline shows everything at once, and prefers-reduced-motion turns both off.
+ * Only transform and opacity move. */
 @keyframes settle {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
@@ -18,7 +18,7 @@
       animation-range: entry 0% entry 45%;
     }
     /* The chapter rail: each section names a view timeline and its rail link lights while the section crosses the middle. */
-    body { timeline-scope: --c1, --c2, --c3, --c4, --c5, --c6, --c7, --c8, --c9, --c10, --c11, --c12; }
+    body { timeline-scope: --c1, --c2, --c3, --c4, --c5, --c6, --c7, --c8, --c9; }
     main > section:nth-of-type(1) { view-timeline: --c1 block; }
     main > section:nth-of-type(2) { view-timeline: --c2 block; }
     main > section:nth-of-type(3) { view-timeline: --c3 block; }
@@ -28,9 +28,6 @@
     main > section:nth-of-type(7) { view-timeline: --c7 block; }
     main > section:nth-of-type(8) { view-timeline: --c8 block; }
     main > section:nth-of-type(9) { view-timeline: --c9 block; }
-    main > section:nth-of-type(10) { view-timeline: --c10 block; }
-    main > section:nth-of-type(11) { view-timeline: --c11 block; }
-    main > section:nth-of-type(12) { view-timeline: --c12 block; }
     .rail a { animation: rail-here linear both; }
     .rail a:nth-child(1) { animation-timeline: --c1; }
     .rail a:nth-child(2) { animation-timeline: --c2; }
@@ -41,26 +38,16 @@
     .rail a:nth-child(7) { animation-timeline: --c7; }
     .rail a:nth-child(8) { animation-timeline: --c8; }
     .rail a:nth-child(9) { animation-timeline: --c9; }
-    .rail a:nth-child(10) { animation-timeline: --c10; }
-    .rail a:nth-child(11) { animation-timeline: --c11; }
-    .rail a:nth-child(12) { animation-timeline: --c12; }
   }
 }
 
-/* A light layer of motion, all of it inside no-preference. The page reads the same without it. */
+/* Small, not scroll linked, all of it inside no-preference. The page reads the same without it. */
 @keyframes line-in {
   from { opacity: 0; transform: translateX(-6px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes caret {
   50% { opacity: 0; }
-}
-@keyframes progress {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-@keyframes pill-scrolled {
-  to { border-color: var(--line-strong); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -80,48 +67,10 @@
   .cw-type .cw-panel .line:nth-child(n+11) { animation-delay: 300ms; }
   .cw-type .cw-panel .line:last-child::after { animation: caret 1.1s steps(1) infinite; }
 
-  /* Pointer light on the frames. The handler only sets --x and --y. */
-  .glow::after { transition: opacity var(--duration-base) var(--ease-stack); }
-  .glow:hover::after, .glow:hover::before { opacity: 1; }
-
   /* Hover lift on pills and chips. */
   .lift { transition: transform var(--duration-fast) var(--ease-stack), background-color var(--duration-fast), border-color var(--duration-fast); }
   .lift:hover { transform: translateY(-1px); }
-
-  @supports (animation-timeline: scroll()) {
-    .pill { animation: pill-scrolled linear both; }
-    header .pill { animation-timeline: scroll(root); animation-range: 0 120px; }
-    /* A thin reading progress line along the top edge, driven by the page scroll. */
-    .progress { display: block; animation: progress linear both; }
-    body > .progress { animation-timeline: scroll(root); }
-  }
 }
 
 .glow { position: relative; }
-.glow::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(26rem circle at var(--x, 50%) var(--y, 50%), var(--glow), transparent 70%);
-}
 .cw-type .cw-panel .line:last-child::after { content: ''; display: inline-block; width: 0.55ch; height: 1.1em; margin-inline-start: 0.5ch; vertical-align: text-bottom; background: var(--accent); }
-/* A 1px inner border that lights up near the pointer: a masked ring, so only the border shows. */
-.glow::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(14rem circle at var(--x, 50%) var(--y, 50%), var(--accent), transparent 70%);
-  mask: linear-gradient(black 0 0) content-box, linear-gradient(black 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .glow::before { transition: opacity var(--duration-base) var(--ease-stack); }
-}

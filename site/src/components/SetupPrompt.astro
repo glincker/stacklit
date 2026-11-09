@@ -8,7 +8,7 @@ const { class: extra } = Astro.props;
 ---
 <div class:list={['glow min-w-0 rounded-frame border border-line-strong bg-raised', extra]}>
   <div class="flex items-center justify-between gap-3 ps-5">
-    <p class="label-mono flex min-w-0 items-center gap-2 text-ink"><UiIcon name="sparkles" size={14} class="text-accent-text" />Copy setup prompt</p>
+    <p class="flex min-w-0 items-center gap-2 text-caption font-semibold text-ink"><UiIcon name="sparkles" size={14} class="text-accent-text" />Copy setup prompt</p>
     <CopyButton text={setupPrompt} label="Copy prompt" class="m-1 min-h-11 rounded-full bg-accent px-5 text-caption font-semibold text-accent-ink hover:brightness-110" />
   </div>
   <details class="group border-t border-line">

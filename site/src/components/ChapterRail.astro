@@ -5,7 +5,7 @@ import { chapters } from '../data/site';
 ---
 <nav aria-label="Chapters" class="rail fixed left-4 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-1 min-[1380px]:flex">
   {chapters.map((c, i) => (
-    <a href={`#${c.id}`} class="label-mono grid size-8 place-items-center rounded-full border border-transparent text-faint transition-colors duration-fast hover:border-line-strong hover:text-ink motion-reduce:transition-none">
+    <a href={`#${c.id}`} class="grid size-8 place-items-center rounded-full border border-transparent text-caption tabular-nums text-faint transition-colors duration-fast hover:border-line-strong hover:text-ink motion-reduce:transition-none">
       <span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span class="sr-only">{c.label}</span>
     </a>
   ))}

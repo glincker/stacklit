@@ -17,7 +17,7 @@ const links: { label: string; href: string; brand?: string; icon?: string }[] = 
   <Container>
     <ul class="flex flex-wrap gap-x-8 gap-y-1">
       {links.map((l) => (
-        <li><a href={l.href} class="label-mono group/f inline-flex min-h-11 items-center gap-2 text-ink underline decoration-1 underline-offset-4 hover:decoration-2">
+        <li><a href={l.href} class="group/f inline-flex min-h-11 items-center gap-2 text-caption font-medium text-ink underline decoration-1 underline-offset-4 hover:decoration-2">
           {l.brand ? <Logo name={l.label} slug={l.brand} size={16} bare /> : <UiIcon name={l.icon ?? 'link'} size={16} class="text-muted transition-colors duration-fast group-hover/f:text-accent-text motion-reduce:transition-none" />}
           {l.label}
         </a></li>

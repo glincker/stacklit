@@ -19,7 +19,7 @@ const ring = 'pill rounded-full border border-ring bg-raised';
   </a>
   <nav aria-label="Main" class:list={['pointer-events-auto fixed inset-x-0 bottom-4 z-40 mx-auto flex w-fit max-w-[calc(100%-2rem)] items-center gap-1 p-1 md:static md:bottom-auto md:max-w-none', ring]}>
     {items.map(([label, href, on]) => (
-      <a href={href} aria-current={on(path) ? 'page' : undefined} class="label-mono inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-2.5 text-muted transition-colors duration-fast hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-paper motion-reduce:transition-none sm:px-4">{label === 'Benchmarks' ? <><span class="sm:hidden">Bench</span><span class="hidden sm:inline">Benchmarks</span></> : label}</a>
+      <a href={href} aria-current={on(path) ? 'page' : undefined} class="inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-2.5 text-caption font-medium text-muted transition-colors duration-fast hover:text-ink aria-[current=page]:bg-ink aria-[current=page]:text-paper motion-reduce:transition-none sm:px-4">{label === 'Benchmarks' ? <><span class="sm:hidden">Bench</span><span class="hidden sm:inline">Benchmarks</span></> : label}</a>
     ))}
   </nav>
   <div class:list={['pointer-events-auto flex items-center gap-1 justify-self-end p-1', ring]}>

@@ -1,5 +1,4 @@
 ---
-import UiIcon from './UiIcon.astro';
 // Three headline results, each a plain sentence first, one big number, then what it means. Favourable, neutral
 // and unfavourable results share one size and one style; only the unfavourable one takes the drift colour.
 interface Item { polarity: 'good' | 'neutral' | 'bad'; sentence: string; number: string; means: string; href: string }
@@ -12,8 +11,7 @@ const tone = { good: 'text-accent-text', neutral: 'text-ink', bad: 'text-bad' } 
     <li class="reveal flex min-w-0 flex-col gap-4 border-b border-line py-8 md:border-s md:px-8 md:first:border-s-0 md:first:ps-0">
       <h3 class="max-w-[16ch] text-h2 font-bold text-ink">{it.sentence}</h3>
       <p class:list={['text-stat font-bold', tone[it.polarity]]}>{it.number}</p>
-      <p class="text-body text-muted"><span class="label-mono me-2 text-faint">What this means</span><br />{it.means}</p>
-      <a href={it.href} class="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-1 text-caption font-semibold text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">See how we measured<UiIcon name="arrow-right" size={14} /></a>
+      <p class="text-body text-muted"><span class="text-caption font-semibold text-ink">What this means</span><br />{it.means}</p>
     </li>
   ))}
 </ul>
