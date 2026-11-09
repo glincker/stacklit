@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-03",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/size-budget.ts, scripts/check-bundle-budgets.mjs",
+  "turns": 3,
+  "cost_usd": 0.022494,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 399,
+    "cache_creation_input_tokens": 4142,
+    "cache_read_input_tokens": 19240
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.7043535,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=gzip",
+    "Grep pattern=gzip path=/private/tmp/abreal/work/ab-1691852961/co-3877145947"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:23:51Z"
+}

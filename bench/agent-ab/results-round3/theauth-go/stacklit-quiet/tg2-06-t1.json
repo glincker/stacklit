@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-06",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/totp/handlers/handlers.go, internal/totp/service.go, storage/sqlite/totp.go",
+  "turns": 2,
+  "cost_usd": 0.0193826,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 147,
+    "cache_creation_input_tokens": 4184,
+    "cache_read_input_tokens": 11686
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.000152292,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)totp"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:09:04Z"
+}

@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-04",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/trusteddevice/service.go, internal/totp/handlers/handlers.go, internal/password/service.go, internal/password/lifecycle.go, internal/password/handlers/handlers.go",
+  "turns": 4,
+  "cost_usd": 0.0246817,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 535,
+    "cache_creation_input_tokens": 4263,
+    "cache_read_input_tokens": 22637
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.744431,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=remember.?(device|browser|me)|trusted.?(device|browser)|two.?factor|2fa|otp",
+    "Grep pattern=(?i)(trusted.?device|remember.?(device|browser)|device.?trust)",
+    "Grep pattern=(?i)trusteddevice|trusted.?device path=/private/tmp/abreal/work/ab-2259468618/co-1200086078/internal"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:09:18Z"
+}

@@ -1,0 +1,42 @@
+{
+  "repo": "theauth",
+  "task": "ta-09",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/magic-link-plugin.ts, packages/core/src/auth/index.ts",
+  "turns": 5,
+  "cost_usd": 0.0248475,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 425,
+    "cache_creation_input_tokens": 4461,
+    "cache_read_input_tokens": 27375
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Glob": 2,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 16.518323416,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Glob pattern=**/magic-link/**",
+    "Glob pattern=**/plugins/index.ts",
+    "Grep pattern=magic-?link",
+    "Bash cd packages/core \u0026\u0026 ls src; ls src/plugins 2\u003e/dev/null | head -50; grep -rn \"magic-link\" src --include=index.ts | head; grep -n \"magic-link\\|magicLink\" package."
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:27:27Z"
+}

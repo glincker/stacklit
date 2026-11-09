@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 4,
+  "cost_usd": 0.028692300000000004,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 434,
+    "cache_creation_input_tokens": 5389,
+    "cache_read_input_tokens": 27803
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.737614666,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=(?i)permission",
+    "Grep pattern=Permission\\w* *= *\"|Description:.*[Pp]ermission|\"users\\.(read|manage)|PermUsers",
+    "Bash cd /private/tmp/abreal/work/ab-2259468618/co-301930174; head -30 internal/models/permissions.go; grep -n \"\" internal/rbac/catalog.go | head -40"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:06:41Z"
+}

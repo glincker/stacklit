@@ -151,7 +151,7 @@ func loadTasks(dir, repoName string) map[string]task {
 }
 
 // treatmentArms lists every arm that is compared with its base.
-var treatmentArms = []string{"stacklit", "strict", "stacklit-e", "stacklit-e-small"}
+var treatmentArms = []string{"stacklit", "strict", "stacklit-e", "stacklit-e-small", "stacklit-quiet"}
 
 func pairs(c config, repoName, arm string) []pair { return pairsAgainst(c, repoName, arm, "control") }
 

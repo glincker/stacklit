@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-03",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/jwt/multialg.go, mcpresource/jwt.go",
+  "turns": 5,
+  "cost_usd": 0.0288152,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 671,
+    "cache_creation_input_tokens": 5030,
+    "cache_read_input_tokens": 19732
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.001428333,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=ES256|RS256",
+    "Grep pattern=ES256|RS256 path=/private/tmp/abreal/work/ab-2259468618/co-1031943516/internal/jwt",
+    "Grep pattern=ES256|RS256 path=/private/tmp/abreal/work/ab-2259468618/co-1031943516/internal/as/token_policy.go",
+    "Grep pattern=ES256|RS256 path=/private/tmp/abreal/work/ab-2259468618/co-1031943516/mcpresource/jwt.go"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:10:51Z"
+}

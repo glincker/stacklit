@@ -1,0 +1,38 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-10",
+  "kind": "add",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/cli.ts",
+  "turns": 3,
+  "cost_usd": 0.0186821,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 271,
+    "cache_creation_input_tokens": 3624,
+    "cache_read_input_tokens": 14641
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.749128958,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=generate-rss",
+    "Grep pattern=generate-rss path=/private/tmp/abreal/work/ab-1691852961/co-2140625278/src/cli.ts"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:15:57Z"
+}

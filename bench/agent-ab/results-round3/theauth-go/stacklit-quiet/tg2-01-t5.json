@@ -1,0 +1,40 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-01",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/ratelimit/ratelimit.go",
+  "turns": 5,
+  "cost_usd": 0.026681700000000003,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 694,
+    "cache_creation_input_tokens": 4260,
+    "cache_read_input_tokens": 26857
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.493308125,
+  "seven_day_utilization": 0.68,
+  "call_log": [
+    "Grep pattern=rate\\.NewLimiter|rate\\.Limiter",
+    "Grep pattern=evict|lastSeen|cleanup|janitor path=internal/ratelimit",
+    "Grep pattern=evict|lastSeen|cleanup|janitor|rate\\.Limiter|map\\[string\\] path=internal/ratelimit/window.go",
+    "Grep pattern=evict|lastSeen|rate\\.Limiter|map\\[string\\] path=internal/ratelimit/ratelimit.go"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:08:45Z"
+}

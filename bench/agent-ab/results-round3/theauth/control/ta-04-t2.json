@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-04",
+  "kind": "trace",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/gdpr-delete.ts, packages/core/src/auth/gdpr-anon.ts, packages/core/src/auth/gdpr-progress.ts",
+  "turns": 3,
+  "cost_usd": 0.0200042,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 261,
+    "cache_creation_input_tokens": 4126,
+    "cache_read_input_tokens": 8822
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.56354125,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=erasure|anonymi[sz]e|anonymi[sz]ation",
+    "Glob pattern=**/core/**/*{erasure,anonym,delete,checkpoint,progress}*"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:29:18Z"
+}

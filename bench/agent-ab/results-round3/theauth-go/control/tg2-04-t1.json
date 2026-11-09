@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-04",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/trusteddevice/service.go, internal/password/lifecycle.go, internal/totp/handlers/handlers.go, lifecycle.go",
+  "turns": 4,
+  "cost_usd": 0.024787599999999996,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 526,
+    "cache_creation_input_tokens": 4310,
+    "cache_read_input_tokens": 22716
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.3216795,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=remember.?(device|browser|me)|trusted.?(device|browser)|two.?factor|otp|mfa",
+    "Grep pattern=trusted.?device|remember.?device|TrustedDevice|RememberDevice",
+    "Grep pattern=trusteddevice|TrustedDevice"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:14:26Z"
+}

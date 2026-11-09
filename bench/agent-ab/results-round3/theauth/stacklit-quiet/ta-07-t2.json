@@ -1,0 +1,37 @@
+{
+  "repo": "theauth",
+  "task": "ta-07",
+  "kind": "impact",
+  "trial": 2,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/hooks/database-hooks.ts, packages/core/src/auth/magic-link-plugin.ts, packages/core/src/auth/email-verification.ts, packages/core/src/user/user.ts, packages/core/src/auth/magic-link.ts, packages/core/src/auth/email-otp-plugin.ts, packages/core/src/auth/organization-plugin.ts, packages/core/src/auth/email-password.ts, packages/core/src/auth/oauth/plugin.ts, packages/core/src/auth/password-reset.ts, packages/core/src/auth/one-tap.ts, packages/core/src/auth/email-otp.ts",
+  "turns": 2,
+  "cost_usd": 0.0186954,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 330,
+    "cache_creation_input_tokens": 3555,
+    "cache_read_input_tokens": 11674
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 20.457766875,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=normalize-email"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:27:44Z"
+}

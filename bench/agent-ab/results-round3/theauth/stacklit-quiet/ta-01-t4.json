@@ -1,0 +1,37 @@
+{
+  "repo": "theauth",
+  "task": "ta-01",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/hibp.ts",
+  "turns": 2,
+  "cost_usd": 0.0172756,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 268,
+    "cache_creation_input_tokens": 3355,
+    "cache_read_input_tokens": 11676
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.374760292,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Grep pattern=pwnedpasswords|haveibeenpwned|hibp|range/"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:31:00Z"
+}

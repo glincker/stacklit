@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-08",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "stacklit-quiet",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/provider.tsx, src/react/components/changelog-page.tsx, src/react/components/changelog-widget.tsx, src/react/context.ts",
+  "turns": 3,
+  "cost_usd": 0.0210284,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 460,
+    "cache_creation_input_tokens": 3623,
+    "cache_read_input_tokens": 19244
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.539029125,
+  "seven_day_utilization": 0.69,
+  "call_log": [
+    "Bash git ls-files | grep -E 'i18n' ; grep -rnE \"from ['\\\"][^'\\\"]*i18n(\\.ts|\\.js)?['\\\"]|require\\(['\\\"][^'\\\"]*i18n|import\\(['\\\"][^'\\\"]*i18n\" --include=*.ts --include=*",
+    "Grep pattern=i18n path=/private/tmp/abreal/work/ab-1691852961/co-3106307300"
+  ],
+  "stacklit_bin": "0870521fa963",
+  "at": "2026-11-09T04:20:24Z"
+}
