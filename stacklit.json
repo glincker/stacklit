@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "1c9bfe68c6bec9f36e3cc364e0466a9a1c780648dcc603626815671e90bc1f71",
+  "merkle_hash": "b2cfa14e942af46ac89a20c43b4313339899cfbd40b066ebae939af1cb92680c",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -94,11 +94,11 @@
       },
       "javascript": {
         "files": 21,
-        "lines": 1546
+        "lines": 1550
       },
       "json": {
-        "files": 504,
-        "lines": 24619
+        "files": 1179,
+        "lines": 61729
       },
       "julia": {
         "files": 1,
@@ -189,8 +189,8 @@
         "lines": 10
       },
       "typescript": {
-        "files": 17,
-        "lines": 567
+        "files": 18,
+        "lines": 656
       },
       "vue": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 926,
-    "total_lines": 72403
+    "total_files": 1602,
+    "total_lines": 109606
   },
   "modules": {
     ".claude-plugin": {
@@ -1532,7 +1532,7 @@
       "purpose": "Scripts",
       "language": "javascript",
       "files": 13,
-      "lines": 1031,
+      "lines": 1035,
       "file_list": [
         "build-demos.mjs",
         "check-contrast.mjs",
@@ -1566,14 +1566,15 @@
     "site/src/data": {
       "purpose": "Data",
       "language": "typescript",
-      "files": 12,
-      "lines": 870,
+      "files": 13,
+      "lines": 959,
       "file_list": [
         "copy.json",
         "heroGraph.ts",
         "samples.json",
         "site.ts",
         "agentAb.ts",
+        "agentAbRound2.ts",
         "steps.json",
         "demos.json",
         "codeClasses.ts",
@@ -2020,6 +2021,7 @@
   "architecture": {},
   "scan": {
     "lightweight": [
+      "bench/agent-ab/round2/summary.json (large)",
       "bench/agent-ab/summary.json (large)",
       "site/src/data/ask.json (minified)",
       "site/src/data/hero-graph.json (minified)"
