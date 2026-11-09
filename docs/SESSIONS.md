@@ -7,7 +7,7 @@ This page covers the design: what each hook does, what it costs, and what has an
 Tracking issue: #55.
 
 > [!NOTE]
-> The token figures here measure Stacklit's own answers. They do not show a saving on real tasks. The one real-agent A/B found no overall cost saving (cost ratio 1.00). See [What the first real-agent A/B measured](#what-the-first-real-agent-ab-measured).
+> The token figures here measure Stacklit's own answers. They do not show a saving on real tasks. The real-agent A/B tests found no overall cost saving (round 1 cost ratio 1.00, round 2 1.09 to 1.17). See [What the first real-agent A/B measured](#what-the-first-real-agent-ab-measured).
 
 ## What the Claude Code docs say
 
@@ -110,7 +110,7 @@ The `CLAUDE.md` or `AGENTS.md` block opens with a few rules. Pick one of five ph
 - **`b`**: the same three rules on one line.
 - **`c`**: a one-line rationale and three bullets.
 - **`d`**: strict. Not recommended, because it measured worse (see below). It calls Stacklit the source of truth for structure and tells the agent not to crawl. Structure questions go to `stacklit query ... --budget 800`, then `explain`, `impact` or `path`. No recursive listings, no `find`, no `tree`, and no repo-wide grep to learn the structure. Open a file only after the map points to it, and read it with `stacklit slice`. Refresh or regenerate when Stacklit reports a stale index or a missing symbol. Subagents follow the same rules.
-- **`e`**: routed. Use Stacklit when you do not know where something is or how things connect. When you know the exact name, use grep or `stacklit impact <name>`. When the answer is several files (a flow or a chain), check the neighbours with `stacklit explain` or `stacklit path` before you answer. One query is a lead, not the answer. The wording does not forbid grep. It was written after the first A/B, and it has not been measured yet. The default stays `a` until a second round says otherwise.
+- **`e`**: routed. Use Stacklit when you do not know where something is or how things connect. When you know the exact name, use grep or `stacklit impact <name>`. When the answer is several files (a flow or a chain), check the neighbours with `stacklit explain` or `stacklit path` before you answer. One query is a lead, not the answer. The wording does not forbid grep. It was written after the first A/B and measured in round 2. It costs less than `a`, but on small repos still more than no Stacklit. The default stays `a`.
 
 Each variant is byte-stable. The whole block stays under `STACKLIT_DIGEST_TOKENS` (default 500).
 
@@ -136,14 +136,22 @@ With steering `a` and the session hook:
 
 Steering `d` with `--crawl-guard=redirect` did worse. Its cost ratio was 1.12 [1.02, 1.24], its tokens were 1.37x, and it was right 82.7% of the time (89.3% after the audit). That arm was not interleaved with the control arm. The guard itself fired in only 8 of 150 sessions, so the result is mostly about the strict wording. Both are off by default and not recommended.
 
-The changes in steering `e`, the flow line in `query`, importer lists in `impact`, and small repo mode follow from these results. They are not measured yet. A second round is pre-registered in `bench/agent-ab/`, but it has not run.
+The changes in steering `e`, the flow line in `query`, importer lists in `impact`, and small repo mode follow from these results. A second round (650 sessions, four repos) measured them. Steering `e` cost less than `a` (0.93 [0.90, 0.95]) but still more than no Stacklit on the three smaller repos, so `a` stays the default and `e` stays opt-in. Results: [RESULTS-round2.md](../bench/agent-ab/RESULTS-round2.md).
+
+Round 2 numbers, cost against no Stacklit (below 1 is cheaper):
+
+- **16,000 file repo**: 0.89 [0.84, 0.96] with `a`, 0.87 [0.81, 0.93] with `e`. Cheaper again.
+- **Smaller repos**: theauth-go 1.10 and 1.05, featuredrop 1.37 and 1.21, theauth 1.61 and 1.42. More expensive.
+- **All four repos pooled**: 1.17 [1.11, 1.24] with `a`, 1.09 [1.04, 1.14] with `e`. No overall saving.
+- **Work**: tool calls 0.76, turns 0.83, Grep and Glob calls 0.22 with `a` and 0.53 with `e`.
+- **Correctness**: 97.5% without Stacklit, 97.0% with `a`, 97.5% with `e`.
 
 ## When Stacklit helps
 
-This comes from one A/B, with one model and one task set written by us.
+This comes from two A/B tests, with one model and task sets written by us.
 
-- **Helps**: large repos. The 16,000 file repo cost 22% less per session. It also helps on questions where you do not know where something lives, such as locating code or adding a feature that follows a pattern. The agent used about 0.4x the tool calls.
-- **Does not help**: exact-name lookups such as "who imports X", where one grep is already enough. It also does not help small repos (a few hundred files), where the map is overhead. On the 400 file repo, cost went up 23%.
+- **Helps**: large repos. The 16,000 file repo cost 22% less per session in round 1 and 11% to 13% less in round 2. It also helps on questions where you do not know where something lives, such as locating code or adding a feature that follows a pattern. The agent used about 0.4x the tool calls.
+- **Does not help**: exact-name lookups such as "who imports X", where one grep is already enough. It also does not help small repos, where the map is overhead. On the 400 file repo, cost went up 23% in round 1 and 21% to 37% in round 2. On the 1,300 and 2,900 file repos it went up 5% to 61% in round 2.
 - **Needs care**: questions whose answer is several files. A single query can list one plausible file and look final.
 
 ## Small repos

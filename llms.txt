@@ -10,7 +10,7 @@ Key facts:
 - Assistants: `stacklit setup` configures 26 targets, including Claude Code, Cursor, Aider, Codex, Gemini CLI, GitHub Copilot, Windsurf, Cline, Zed and a generic AGENTS.md. MCP server via `stacklit serve` (stdio, 15 tools, or `--profile minimal` for 4).
 - Privacy: no telemetry, no account, no upload. The generated HTML map requests small language logos from thesvg.org unless `STACKLIT_MAP_ICONS=off`. The only opt-in external call is `stacklit init --summary`.
 - Benchmarks: reproducible, no LLM calls, six pinned repos. The derived map is 137 to 1,351 tokens. The benchmark does not show a token saving over grep; it shows cheap orientation. Limitations are documented.
-- Agent test: 450 real Claude Code sessions on three public repos. Stacklit cut tool calls by about a third (0.68, 95% interval 0.61 to 0.77) but did not lower cost overall (pooled cost ratio 1.00, 0.93 to 1.07): cheaper on the largest repo (0.78), more expensive on the two small ones (1.10, 1.23). Answers were right slightly less often. See bench/agent-ab/RESULTS.md.
+- Agent test: two rounds of real Claude Code sessions (450, then 650) on public repos. Stacklit cut tool calls by a quarter to a third but did not lower cost overall. Round 1: pooled cost ratio 1.00 (0.93 to 1.07), cheaper on the largest repo (0.78), more expensive on the two small ones (1.10, 1.23), answers right slightly less often. Round 2, four repos: largest repo 0.89 (0.84 to 0.96), smaller repos 1.05 to 1.61, pooled 1.09 to 1.17, so it cost more on average; answers equally right. See bench/agent-ab/RESULTS.md.
 - Not a search engine. When the exact identifier is known, grep is cheaper.
 
 ## Docs
