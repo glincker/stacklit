@@ -1,25 +1,67 @@
 ---
 import Section from '../components/Section.astro';
 import SectionHead from '../components/SectionHead.astro';
-import CodeBlock from '../components/CodeBlock.astro';
+import Carousel from '../components/Carousel.astro';
 import copy from '../data/copy.json';
+import steps from '../data/steps.json';
+import ask from '../data/ask.json';
+import samples from '../data/samples.json';
+import demos from '../data/demos.json';
+import bench from '../data/bench.json';
+import { queryClasses } from '../data/codeClasses';
+
+// Real recorded output on gin v1.10.0, and the maps Stacklit wrote for the pinned demo repos.
+const q = ask.asks[0];
+const tokens = bench.repos[0].deriveTokens;
+const term = (label: string, code: string, cmd: string, classes: Record<number, string>, caption: string) => ({ kind: 'term' as const, label, code, copy: cmd, classes, caption });
+const demo = (id: string) => {
+  const d = demos.demos.find((x) => x.id === id)!;
+  return {
+    kind: 'pic' as const,
+    light: `/demos/${d.id}/thumb-light.webp`,
+    dark: `/demos/${d.id}/thumb-dark.webp`,
+    alt: `The Stacklit map of ${d.name}, showing its module graph.`,
+    width: 800,
+    height: 500,
+    caption: `The map Stacklit wrote for ${d.name} ${d.ref} (${d.language}, ${d.lines.toLocaleString('en-US')} lines).`,
+    href: `/demos/${d.id}/`,
+  };
+};
+const items = [
+  term('stacklit init', `$ stacklit init\n${steps.init}`, copy.steps.items[0].command, { 1: 'ln-cmd' }, 'stacklit init, recorded on gin v1.10.0.'),
+  demo('gin'),
+  term('stacklit setup', `$ ${copy.steps.items[1].command}\n${steps.setup}`, copy.steps.items[1].command, { 1: 'ln-cmd' }, 'stacklit setup, recorded on a clean copy of gin v1.10.0.'),
+  term('stacklit query', `$ ${q.command}\n${q.output}`, q.command, { 1: 'ln-cmd', ...queryClasses(q.output, 1) }, `stacklit query, recorded on gin v1.10.0. A plain question in, a ranked list of files out.`),
+  {
+    kind: 'pic' as const,
+    light: '/img/map-ripgrep-light.webp',
+    dark: '/img/map-ripgrep-dark.webp',
+    alt: 'The Stacklit map of ripgrep: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it.',
+    width: 1440,
+    height: 900,
+    caption: copy.cta.mapCaption,
+    href: '/demos/ripgrep/',
+    cta: copy.cta.mapLink,
+  },
+  term('stacklit derive', `$ stacklit derive\n${samples.derive.trimEnd()}`, 'stacklit derive', { 1: 'ln-cmd', 2: 'ln-key', 5: 'ln-dim' }, `stacklit derive on gin v1.10.0. The whole map is ${tokens} tokens.`),
+  demo('flask'),
+  demo('hono'),
+  demo('rack'),
+  demo('gson'),
+];
 ---
 <Section id="how" label="how-title">
-  <SectionHead id="how-title" title={copy.steps.title} />
-  <ol class="min-w-0 divide-y divide-line border-y border-line">
+  <SectionHead id="how-title" n="03" icon="workflow" label="How it works" title={copy.steps.title} size="big" lead="Three commands. Every screen below is real output, recorded on public repos." />
+  <ol class="mt-10 grid min-w-0 gap-8 border-t border-ink pt-6 lg:grid-cols-3 lg:gap-10">
     {copy.steps.items.map((s, i) => (
-      <li class="grid min-w-0 grid-cols-1 items-center gap-4 py-6 lg:grid-cols-12 lg:gap-10">
-        <div class="min-w-0 lg:col-span-5">
-          <h3 class="text-h3 text-ink"><span class="mr-2 text-accent-text">{i + 1}.</span>{s.name}</h3>
-          <p class="mt-2 max-w-measure text-body text-muted">{s.text}</p>
-        </div>
-        <div class="min-w-0 lg:col-span-7"><CodeBlock inline copy prompt code={s.command} /></div>
+      <li class="reveal flex min-w-0 flex-col gap-3">
+        <p class="text-caption font-semibold text-muted">Step {i + 1}</p>
+        <h3 class="text-h3 font-bold text-ink">{s.name}</h3>
+        <p class="max-w-measure text-body text-muted">{s.text}</p>
       </li>
     ))}
   </ol>
-  <figure class="mt-12 min-w-0">
-    <img class="w-full rounded-lg border border-line dark:hidden" src="/img/map-ripgrep-light.webp" alt="The Stacklit map of ripgrep: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" loading="lazy" decoding="async" />
-    <img class="hidden w-full rounded-lg border border-line dark:block" src="/img/map-ripgrep-dark.webp" alt="The Stacklit map of ripgrep in the dark theme: a graph of 34 modules sized by lines of code, with the most depended-on modules listed beside it." width="1440" height="900" loading="lazy" decoding="async" />
-    <figcaption class="mt-3 max-w-measure text-caption text-muted">{copy.cta.mapCaption} <a class="underline decoration-1 underline-offset-4 hover:decoration-2" href="/demos/ripgrep/">{copy.cta.mapLink}</a></figcaption>
-  </figure>
+  <div class="reveal mt-12">
+    <Carousel name="screens" label="Real screens from Stacklit" items={items} />
+  </div>
 </Section>

@@ -1,9 +1,19 @@
 ---
-// Heading plus optional lead. Fixed sizes so every section starts the same way.
-interface Props { id: string; title: string; lead?: string }
-const { id, title, lead } = Astro.props;
+import Kicker from './Kicker.astro';
+// Kicker, a statement heading, and an optional lead. Two sizes so chapters do not all open the same way:
+// big for the chapters that carry the story, md for the rest.
+interface Props { id: string; title: string; n: string; label: string; icon?: string; lead?: string; size?: 'big' | 'md'; class?: string }
+const { id, title, n, label, icon, lead, size = 'md', class: extra } = Astro.props;
+const hasText = Boolean(lead) || Astro.slots.has('default');
+const heading = size === 'big' ? 'max-w-[22ch] text-statement font-bold' : 'max-w-[28ch] text-h2 font-bold';
 ---
-<div class="mb-10 min-w-0 sm:mb-12">
-  <h2 id={id} class="max-w-heading text-h2 text-ink">{title}</h2>
-  {lead && <p class="mt-4 max-w-measure text-lead text-muted">{lead}</p>}
-</div>
+<header class:list={['min-w-0', extra]}>
+  <Kicker n={n} label={label} icon={icon} class="reveal" />
+  <h2 id={id} class:list={['reveal mt-5 text-ink', heading]}>{title}</h2>
+  {hasText && (
+    <div class="reveal mt-5 min-w-0">
+      {lead && <p class="max-w-measure text-lead text-ink">{lead}</p>}
+      <slot />
+    </div>
+  )}
+</header>

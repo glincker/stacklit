@@ -1,0 +1,5 @@
+{
+  "repo": "gin v1.10.0",
+  "init": "[stacklit] found 101 files\n[stacklit] parsed 101 files (0 errors, 0 cached)\n[stacklit] done in 37ms - wrote stacklit.json, DEPENDENCIES.md, stacklit.html",
+  "setup": "Claude Code\n  create CLAUDE.md\n  create .mcp.json\nCodex\n  create AGENTS.md\n  create .codex/config.toml\nOpenCode\n  create opencode.json\n  install .git/hooks/post-commit\n  install .git/hooks/{post-checkout,post-merge,post-rewrite}\n\ninjected digest: 59 tokens (235 bytes, bytes/4)\n\nDone, 6 file(s) changed. Your AI tools now have codebase context."
+}

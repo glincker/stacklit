@@ -1,20 +1,22 @@
-/* Hallmark · shape: Plain-column landing (redesign) · genre: modern-minimal · theme: custom · job: try · idea: "A small committed map of a codebase, shown with its real output." · vibe: "warm paper, one deep green accent, plain tools"
- * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack (Avenir Next first) · body: system UI stack · hero: head, one sentence and actions left, real derive output right · nav: wordmark left, text links, star and theme toggle right · footer: one row of links and a privacy line · imagery: the product, real maps and real command output · signature: the 137 token map of gin as terminal output
- * axes: warm-paper/system/green · posture: split · contrast: pass (npm run check:contrast) · fold: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the page has no photography by design, the real command output and real maps carry it */
+/* Hallmark · shape: Chaptered editorial landing · genre: modern-minimal · theme: custom · job: try · idea: "The page is a map: real output as the terrain." · vibe: "warm paper, one deep green route"
+ * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack, weight 700 · body: system UI stack · hero: headline and action on the left, a real gin v1.10.0 map cropped on the right · imagery: the product, recorded real output and real maps · signature: Ask the map */
+/* Owner approved override of Hallmark 67, for the section kickers only: tiny tracked uppercase monospace labels, never body text, AA contrast. Legend rows, table heads, captions and buttons are sentence case in the body face. */
+/* Note on Hallmark 64: mono stays on the terminal text inside the code window, where mono is the material. Copy buttons and captions use the body face. */
+/* Note on Hallmark F8: two scroll effects only, reveal on scroll (one 14px settle) and the chapter rail (navigation state). Both are off under reduced motion. */
 /* Hallmark · waive 49b · links in body text only, the long result links wrap at 320px inside plain paragraphs · buttons keep one line with nowrap */
-/* Hallmark · waive 44c · the hero is a split with the real derive output beside the headline · the first screen is full at every width, measured text ends early only because the code block is not counted */
-/* Hallmark · waive 79 · the gap measured is the stat band starting after the hero actions · the derive output block beside the headline fills that space, so no copy is added */
 @import 'tailwindcss';
 @import './tokens.css';
+@import './code.css';
+@import './motion.css';
+@import './surface.css';
+@import './hero-map.css';
+@import './carousel.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @layer base {
-  html, body {
-    overflow-x: clip;
-  }
   html {
+    scrollbar-color: var(--line-strong) transparent;
     scroll-padding-top: 5rem;
     -webkit-text-size-adjust: 100%;
   }
@@ -35,6 +37,16 @@
   a { text-underline-offset: 0.18em; }
 }
 
+/* The metadata layer: tiny uppercase monospace, wide tracking. Labels and keys only, never sentences. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
 /* A row of actions that wraps as a row: same gap both ways, items keep their natural width. */
 @utility action-row {
   display: flex;
@@ -45,5 +57,6 @@
 }
 
 /* Unlayered on purpose: these two guards must never lose to a utility. */
-html, body { overflow-x: clip; }
+html { overflow-x: clip; }
+body { overflow-x: clip; }
 h1, h2, h3, h4 { overflow-wrap: break-word; min-width: 0; }

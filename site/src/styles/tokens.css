@@ -1,6 +1,6 @@
-/* Hallmark · shape: Plain-column landing (redesign) · genre: modern-minimal · theme: custom · job: try · idea: "A small committed map of a codebase, shown with its real output." · vibe: "warm paper, one deep green accent, plain tools"
- * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack (Avenir Next first) · body: system UI stack · hero: head, one sentence and actions left, real derive output right · nav: wordmark left, text links, star and theme toggle right · footer: one row of links and a privacy line · imagery: the product, real maps and real command output · signature: the 137 token map of gin as terminal output
- * axes: warm-paper/system/green · posture: split · contrast: pass (npm run check:contrast) · fold: pass · v2.0.0 */
+/* Hallmark · shape: Chaptered editorial landing (redesign) · genre: modern-minimal · theme: custom · job: try · idea: "The page is a map: coordinates, a legend, contour hairlines, real output as the terrain." · vibe: "warm paper, one deep green route, surveyor mono labels"
+ * paper: #f5f3ee · accent: #0a6b5b · display: system UI stack (Avenir Next first), weight 700, tracking -0.045em · body: system UI stack · hero: giant headline, intro with legend table, one editor window · nav: three floating pills, bottom dock on phones · footer: a giant finale line, install, links · imagery: the product, recorded real output · signature: Ask the map, recorded gin v1.10.0 queries with one grep is enough answer
+ * axes: warm-paper/system/green · posture: poster-plus-legend · contrast: pass (npm run check:contrast) · fold: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: V, the page has no photography by design, the real command output and real maps carry it */
 /* Single source of every colour, font, size, space, radius and motion value on the site.
  * DESIGN.md describes them. Nothing else in src/ may hold a literal colour or font. */
@@ -32,6 +32,28 @@
   --code-fn: #6b3f8f;
   --code-comment: #5c584e;
   --tile: #ffffff;
+  --tok-string: #075446;
+  --tok-const: #7a4a00;
+  --tok-punct: #55524a;
+  --tok-hl: #dfe7da;
+  --tok-add: #d3e6da;
+  --tok-del: #f0ddd5;
+  --ring: #cfcabc;
+  --t-prompt: #075446;
+  --t-cmd: #1b1a17;
+  --t-flag: #7a4a00;
+  --t-path: #1f5a8a;
+  --t-sym: #6b3f8f;
+  --t-str: #1d5c36;
+  --t-num: #7a4a00;
+  --t-ok: #075446;
+  --t-warn: #7a4a00;
+  --t-err: #9b2c1d;
+  --t-dim: #5c584e;
+  --t-rank: #075446;
+  --t-score: #7a4a00;
+  /* A faint pointer light, derived from the accent of whichever theme is active. */
+  --glow: color-mix(in srgb, var(--accent) 9%, transparent);
 }
 
 :root[data-theme='dark'] {
@@ -57,6 +79,26 @@
   --code-fn: #c8a8ea;
   --code-comment: #a29e92;
   --tile: #23221d;
+  --tok-string: #86e0ca;
+  --tok-const: #e7b46a;
+  --tok-punct: #b0ac9f;
+  --tok-hl: #1f2b26;
+  --tok-add: #16301f;
+  --tok-del: #3a1f19;
+  --ring: #3f3c33;
+  --t-prompt: #5fd0b5;
+  --t-cmd: #ece9df;
+  --t-flag: #e7b46a;
+  --t-path: #8fc1ee;
+  --t-sym: #c8a8ea;
+  --t-str: #a6d98f;
+  --t-num: #e7b46a;
+  --t-ok: #5fd0b5;
+  --t-warn: #e7b46a;
+  --t-err: #f19a8c;
+  --t-dim: #a29e92;
+  --t-rank: #86e0ca;
+  --t-score: #e7b46a;
 }
 
 /* Without scripting the system preference decides. */
@@ -84,6 +126,26 @@
     --code-fn: #c8a8ea;
     --code-comment: #a29e92;
     --tile: #23221d;
+    --tok-string: #86e0ca;
+    --tok-const: #e7b46a;
+    --tok-punct: #b0ac9f;
+    --tok-hl: #1f2b26;
+    --tok-add: #16301f;
+    --tok-del: #3a1f19;
+    --ring: #3f3c33;
+    --t-prompt: #5fd0b5;
+    --t-cmd: #ece9df;
+    --t-flag: #e7b46a;
+    --t-path: #8fc1ee;
+    --t-sym: #c8a8ea;
+    --t-str: #a6d98f;
+    --t-num: #e7b46a;
+    --t-ok: #5fd0b5;
+    --t-warn: #e7b46a;
+    --t-err: #f19a8c;
+    --t-dim: #a29e92;
+    --t-rank: #86e0ca;
+    --t-score: #e7b46a;
   }
 }
 
@@ -104,13 +166,30 @@
   --text-h3--line-height: 1.25;
   --text-h2: clamp(1.75rem, 1.35rem + 1.8vw, 2.5rem);
   --text-h2--line-height: 1.1;
-  --text-stat: clamp(1.875rem, 1.5rem + 1.6vw, 2.25rem);
-  --text-stat--line-height: 1.05;
+  --text-stat: clamp(1.875rem, 1.1rem + 2vw, 2.75rem);
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.04em;
   --text-hero: clamp(2.25rem, 1.4rem + 3.8vw, 4rem);
   --text-hero--line-height: 1.04;
+  /* Editorial scale: the display line for the hero and the section statements, and the mono metadata label. */
+  --text-display: clamp(2.5rem, 1rem + 6vw, 5.75rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.045em;
+  --text-hero-split: clamp(2.5rem, 1rem + 4.1vw, 5rem);
+  --text-hero-split--line-height: 0.98;
+  --text-hero-split--letter-spacing: -0.04em;
+  --text-statement: clamp(2.25rem, 1rem + 4.4vw, 4.75rem);
+  --text-statement--line-height: 0.98;
+  --text-statement--letter-spacing: -0.04em;
+  --text-finale: clamp(3rem, 0.8rem + 10.5vw, 9.5rem);
+  --text-finale--line-height: 0.92;
+  --text-finale--letter-spacing: -0.05em;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.14em;
 
   /* Spacing is Tailwind's 4px scale. Section rhythm and gutters have their own tokens. */
-  --spacing-section: clamp(4rem, 3rem + 5vw, 7rem);
+  --spacing-section: clamp(4.5rem, 2.5rem + 7vw, 9rem);
   --spacing-gutter: clamp(1rem, 0.5rem + 2.4vw, 2.5rem);
 
   --container-site: 76rem;
@@ -120,6 +199,7 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+  --radius-frame: 20px;
 
   --duration-fast: 120ms;
   --duration-base: 220ms;
@@ -152,4 +232,11 @@
   --color-code-fn: var(--code-fn);
   --color-code-comment: var(--code-comment);
   --color-tile: var(--tile);
+  --color-tok-string: var(--tok-string);
+  --color-tok-const: var(--tok-const);
+  --color-tok-punct: var(--tok-punct);
+  --color-tok-hl: var(--tok-hl);
+  --color-tok-add: var(--tok-add);
+  --color-tok-del: var(--tok-del);
+  --color-ring: var(--ring);
 }

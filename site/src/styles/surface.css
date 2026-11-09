@@ -1,0 +1,22 @@
+/* One very quiet surface detail that fits a page that is a map: crosshair ticks where a section hairline meets the
+ * content edge. Static, behind everything, no motion. The hero has its own picture, so it carries no grid. */
+#overview { position: relative; isolation: isolate; }
+
+main > section:not(#overview) { position: relative; }
+main > section:not(#overview)::before,
+main > section:not(#overview)::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line-strong), var(--line-strong)),
+    linear-gradient(var(--line-strong), var(--line-strong));
+  background-repeat: no-repeat;
+  background-position: center, center;
+  background-size: 11px 1px, 1px 11px;
+}
+main > section:not(#overview)::before { left: calc((100% - min(100%, var(--container-site))) / 2 + var(--spacing-gutter) - 5px); }
+main > section:not(#overview)::after { right: calc((100% - min(100%, var(--container-site))) / 2 + var(--spacing-gutter) - 5px); }

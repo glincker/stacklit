@@ -23,7 +23,7 @@ Goal: let an agent ask a precise question and get a small answer, instead of loa
 | Per-module and per-symbol MCP responses sized to a token budget | Planned |
 | Raise or remove the 10-export and 20-file-name caps per module without growing the default map | Planned |
 
-Benchmark link: 2 of the 30 tasks missed because a symbol was unexported or cut by the export cap, and 3 of the 7 "what depends on X" tasks were wrong or incomplete.
+What the benchmark shows: 2 of the 30 tasks missed because a symbol was unexported or cut by the export cap. 3 of the 7 "what depends on X" tasks were wrong or incomplete.
 
 ## 2. Dependency accuracy
 
@@ -98,6 +98,6 @@ The benchmark shows generation takes milliseconds on a Go repo but seconds and 0
 | `check` rules in `.stacklitrc.json`: forbidden edges, cycles, fan-in and fan-out limits, orphans, exit code 3 | Unreleased (0.5.0) |
 | `ingest --scip`: upgrade INFERRED edges to EXACT from a SCIP index, with no new dependencies | Unreleased (0.5.0) |
 
-## How to influence this
+## How to influence the roadmap
 
 Open a [feature request](https://github.com/glincker/stacklit/issues/new/choose), add a benchmark task that shows a gap, or send a pull request. See [CONTRIBUTING.md](../.github/CONTRIBUTING.md).

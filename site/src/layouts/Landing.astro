@@ -2,11 +2,13 @@
 import '../styles/site.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ReleaseBanner from '../components/ReleaseBanner.astro';
+import ChapterRail from '../components/ChapterRail.astro';
 import { SITE } from '../data/site';
 import copy from '../data/copy.json';
 
-interface Props { title: string; description: string; path: string; noindex?: boolean; jsonLd?: boolean; image?: string }
-const { title, description, path, noindex = false, jsonLd = false, image = '/og/default-light.png' } = Astro.props;
+interface Props { title: string; description: string; path: string; noindex?: boolean; jsonLd?: boolean; image?: string; rail?: boolean }
+const { title, description, path, noindex = false, jsonLd = false, image = '/og/default-light.png', rail = false } = Astro.props;
 const canonical = SITE + path;
 const imageUrl = SITE + image;
 const ld = {
@@ -54,13 +56,16 @@ const ld = {
         try { t = localStorage.getItem('starlight-theme') || ''; } catch (e) {}
         var dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.documentElement.classList.add('js');
       })();
     </script>
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(ld)} />}
   </head>
   <body class="min-h-dvh overflow-x-clip">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-raised focus:px-4 focus:py-2 focus:text-ink">Skip to content</a>
+        <ReleaseBanner />
     <Header path={path} />
+    {rail && <ChapterRail />}
     <main id="main"><slot /></main>
     <Footer />
     <script is:inline>
@@ -76,10 +81,17 @@ const ld = {
         var b = e.target.closest && e.target.closest('[data-copy]');
         if (!b || !navigator.clipboard) return;
         navigator.clipboard.writeText(b.getAttribute('data-copy')).then(function () {
-          b.textContent = 'Copied';
-          setTimeout(function () { b.textContent = 'Copy'; }, 1600);
+          var l = b.querySelector('[data-copy-label]') || b;
+          var t = l.textContent;
+          l.textContent = 'Copied';
+          b.setAttribute('data-state', 'copied');
+          setTimeout(function () { l.textContent = t; b.removeAttribute('data-state'); }, 1600);
         }, function () {});
       });
     </script>
   </body>
 </html>
+<style is:global>
+  html { overflow-x: clip; }
+  body { overflow-x: clip; }
+</style>

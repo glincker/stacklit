@@ -9,3 +9,4 @@ screenshots/render-gate/*.png
 screenshots/render-gate/*.jpg
 !screenshots/render-gate/keep-*.jpg
 !screenshots/render-gate/keep-*.png
+src/data/release.json

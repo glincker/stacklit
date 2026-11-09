@@ -58,6 +58,8 @@ const probe = `(() => {
     if (left < 12) out.push('content hugs the edge (' + left.toFixed(1) + 'px)');
   }
   for (const b of document.querySelectorAll('a[class*="min-h-11"], button')) {
+    // Slides inside a sideways scroller (the carousel) are meant to sit past the edge.
+    if (b.closest('.car-track')) continue;
     const r = b.getBoundingClientRect();
     if (r.width && r.right > iw + 1) out.push('control past the edge: ' + (b.textContent || '').trim().slice(0, 30));
   }

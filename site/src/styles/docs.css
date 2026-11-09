@@ -67,3 +67,10 @@
   html[data-has-sidebar] { --sl-content-inline-start: calc(var(--sl-sidebar-width) + var(--docs-gutter)); }
   .main-frame { padding-inline-end: var(--docs-gutter); }
 }
+
+/* Echo the home page: pill search, tight display heading, hairline header. Nothing structural changes. */
+.site-title { font-weight: 700; letter-spacing: -0.02em; }
+site-search > button { border-radius: 999px; }
+.sl-markdown-content :is(h2, h3), main h1#_top { letter-spacing: -0.035em; }
+main h1#_top { font-weight: 700; }
+.right-group a[rel='me'], .social-icons a { border-radius: 999px; }

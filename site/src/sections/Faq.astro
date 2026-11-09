@@ -1,25 +1,51 @@
 ---
+import UiIcon from '../components/UiIcon.astro';
 import Section from '../components/Section.astro';
+import Kicker from '../components/Kicker.astro';
+import release from '../data/release.json';
 import copy from '../data/copy.json';
 import { fill } from '../data/agentAb';
+
+const v = `v${release.version}`;
+const links: [string, string][] = [
+  ['Source', 'https://github.com/glincker/stacklit'],
+  ['Release checksums', `https://github.com/glincker/stacklit/releases/download/${v}/checksums.txt`],
+  ['npm package', 'https://www.npmjs.com/package/stacklit'],
+  ['License', 'https://github.com/glincker/stacklit/blob/master/LICENSE'],
+  ['Privacy', '/docs/privacy/'],
+];
 ---
-<Section tone="surface" label="faq-title">
-  <div class="grid min-w-0 gap-8 lg:grid-cols-12 lg:gap-12">
-  <h2 id="faq-title" class="min-w-0 break-words text-h2 text-ink lg:col-span-4">{copy.faq.title}</h2>
-  <div class="min-w-0 lg:col-span-8">
-  <div class="divide-y divide-line border-y border-line">
-    {copy.faq.items.map((f) => (
-      <details class="group py-1">
-        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-h3 text-ink [&::-webkit-details-marker]:hidden">
-          <span class="min-w-0">{f.q}</span>
-          <span class="shrink-0 text-muted group-open:hidden" aria-hidden="true">+</span>
-          <span class="hidden shrink-0 text-muted group-open:inline" aria-hidden="true">-</span>
-        </summary>
-        <p class="max-w-measure pb-4 text-body text-muted">{fill(f.a)}</p>
-      </details>
-    ))}
-  </div>
-  <p class="mt-6"><a href="/docs/faq/" class="text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}</a></p>
-  </div>
+<Section id="facts" label="faq-title" tone="surface">
+  <div class="grid min-w-0 gap-12 lg:grid-cols-12 lg:gap-14">
+    <div class="min-w-0 lg:col-span-5">
+      <Kicker n="08" icon="shield-check" label="Facts and questions" class="reveal" />
+      <h2 id="faq-title" class="reveal mt-5 max-w-[22ch] text-h2 font-bold text-ink">Plain facts, and how to check them</h2>
+      <ul class="mt-6 border-t border-ink">
+        {copy.trust.items.map((t) => <li class="reveal min-w-0 border-b border-line py-3 text-body text-ink">{t}</li>)}
+      </ul>
+    </div>
+    <div class="min-w-0 lg:col-span-7">
+      <h3 class="reveal text-h3 font-bold text-ink">{copy.faq.title}</h3>
+      <div class="reveal mt-4 border-t border-ink">
+        {copy.faq.items.map((f) => (
+          <details class="group border-b border-line">
+            <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-6 py-4 text-h3 text-ink hover:text-accent-text [&::-webkit-details-marker]:hidden">
+              <span class="min-w-0">{f.q}</span>
+              <span class="grid size-8 shrink-0 place-items-center rounded-full border border-line-strong text-muted transition-colors duration-fast group-hover:text-accent-text motion-reduce:transition-none">
+                <UiIcon name="plus" size={14} class="group-open:hidden" /><UiIcon name="minus" size={14} class="hidden group-open:block" />
+              </span>
+            </summary>
+            <p class="max-w-measure pb-5 text-body text-muted">{fill(f.a)}</p>
+          </details>
+        ))}
+      </div>
+      <p class="mt-5"><a href="/docs/faq/" class="inline-flex min-h-11 items-center gap-1.5 text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{copy.faq.more}<UiIcon name="arrow-right" size={14} /></a></p>
+      <p class="reveal mt-8 max-w-measure text-body text-muted"><span class="font-semibold text-ink">Verify.</span> The release files are listed with their fingerprints (checksums) for {v}. The npm package is published with a build record (npm calls it provenance) that shows it came from our release workflow.</p>
+      <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+        {links.map(([label, href]) => (
+          <li><a href={href} class="inline-flex min-h-11 items-center gap-1 text-caption font-medium text-accent-text underline decoration-1 underline-offset-4 hover:decoration-2">{label}{/^https?:/.test(href) && <UiIcon name="arrow-up-right" size={12} />}</a></li>
+        ))}
+      </ul>
+    </div>
   </div>
 </Section>

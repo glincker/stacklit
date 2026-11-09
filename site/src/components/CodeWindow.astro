@@ -1,0 +1,68 @@
+---
+import { Code } from 'astro:components';
+import { termHtml } from '../data/termHighlight';
+import CopyButton from './CopyButton.astro';
+import UiIcon from './UiIcon.astro';
+// One editor window with up to six tabs. Highlighted at build time (no client code), tabs are radio inputs, so
+// switching works without a script and with the arrow keys. Only the copy buttons use the page's small existing script.
+// Code never wraps: the frame scrolls sideways and takes keyboard focus.
+interface Tab {
+  label: string;               // tab text: a filename or a command
+  icon?: string;               // optional @thesvg/ui icon name shown before the label
+  code: string;
+  lang?: string;               // shiki language, default text
+  caption?: string;            // mono caption row
+  note?: string;               // an honest note under the code, in body type
+  highlight?: number[];        // 1 based line numbers to emphasise
+  add?: number[];              // diff: added lines
+  del?: number[];              // diff: removed lines
+  classes?: Record<number, string>; // 1 based line number to a line class (ln-cmd, ln-key, ln-dim, ln-file)
+  copy?: string;               // text the copy button copies, default the code
+  term?: boolean;              // terminal output: highlighted by role, no line numbers. Default for lang text.
+}
+interface Props { name: string; tabs: Tab[]; label?: string; chips?: boolean; title?: string; typed?: boolean; class?: string }
+const { name, tabs, label = 'Examples', chips = false, title, typed = false, class: extra } = Astro.props;
+const transformersFor = (t: Tab) => [{
+  line(this: { addClassToHast: (n: unknown, c: string) => void }, node: unknown, line: number) {
+    if (t.highlight?.includes(line)) this.addClassToHast(node, 'hl');
+    if (t.add?.includes(line)) this.addClassToHast(node, 'add');
+    if (t.del?.includes(line)) this.addClassToHast(node, 'del');
+    const c = t.classes?.[line];
+    if (c) this.addClassToHast(node, c);
+  },
+}];
+---
+<div class:list={['codewin min-w-0', typed && 'cw-type', extra]} role="radiogroup" aria-label={label}>
+  {tabs.map((t, i) => <input type="radio" class="cw-input sr-only" name={`cw-${name}`} id={`cw-${name}-${i}`} checked={i === 0} aria-label={t.label} />)}
+  {chips && (
+    <div class="mb-5 flex flex-wrap gap-2">
+      {tabs.map((t, i) => <label for={`cw-${name}-${i}`} class="cw-chip lift inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 text-body font-medium transition-colors duration-fast motion-reduce:transition-none">{t.label}</label>)}
+    </div>
+  )}
+  <div class="glow min-w-0 overflow-hidden rounded-frame border border-line-strong bg-sunk">
+    <div class="flex min-h-11 items-stretch border-b border-line bg-surface">
+      <div class="flex shrink-0 items-center gap-1.5 px-4" aria-hidden="true">
+        <span class="size-2.5 rounded-full bg-line"></span><span class="size-2.5 rounded-full bg-line"></span><span class="size-2.5 rounded-full bg-line"></span>
+      </div>
+      {chips
+        ? <p class="flex min-w-0 items-center gap-2 truncate pe-4 text-caption text-muted"><UiIcon name="terminal" size={14} />{title}</p>
+        : <div class="flex min-w-0 overflow-x-auto">
+            {tabs.map((t, i) => <label for={`cw-${name}-${i}`} class="cw-tab flex min-h-11 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap px-4 font-mono text-caption transition-colors duration-fast motion-reduce:transition-none">{t.icon && <UiIcon name={t.icon} size={14} />}{t.label}</label>)}
+          </div>}
+    </div>
+    <div class="cw-panels">
+      {tabs.map((t) => (
+        <div class="cw-panel">
+          {(t.term ?? (t.lang ?? 'text') === 'text')
+            ? <pre class="astro-code term" tabindex="0"><code set:html={termHtml(t.code)} /></pre>
+            : <Code code={t.code} lang={t.lang ?? 'text'} theme="css-variables" transformers={transformersFor(t)} />}
+          {t.note && <p class="border-t border-line px-5 py-3 text-body text-ink">{t.note}</p>}
+          <div class="flex items-center justify-between gap-3 border-t border-line bg-surface ps-5">
+            <p class="min-w-0 py-2 text-caption leading-snug text-muted">{t.caption}</p>
+            <CopyButton text={t.copy ?? t.code} class="min-h-11 px-4 text-caption font-semibold text-accent-text hover:text-ink" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>

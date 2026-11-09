@@ -1,0 +1,29 @@
+/* Screens carousel: native scroll snap. Buttons and the counter only show once the page script has run. */
+.car-ctl { display: none; }
+.js .car-ctl { display: flex; }
+.car-track {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.car-slide { flex: 0 0 88%; scroll-snap-align: start; }
+@media (min-width: 640px) { .car-slide { flex-basis: 62%; } }
+@media (min-width: 1024px) { .car-slide { flex-basis: calc(50% - 0.625rem); } }
+
+/* Every slide has a fixed box, so nothing shifts while images load and nothing is cropped. */
+.car-pic { aspect-ratio: 8 / 5; }
+.car-term { aspect-ratio: 1 / 1; }
+@media (min-width: 640px) { .car-term { aspect-ratio: 8 / 5; } }
+.car-term > .codewin, .car-term .glow { height: 100%; }
+.car-term .glow { display: flex; flex-direction: column; }
+.car-term .cw-panels { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.car-term .cw-panels > .cw-panel { flex: 1; min-height: 0; display: flex !important; flex-direction: column; }
+.car-term .codewin pre.astro-code { flex: 1; min-height: 0; max-height: none; }
+
+/* Recorded lines can be long; wrap them inside a slide so nothing is cut off at the edge. */
+.car-term .codewin pre.astro-code code { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
