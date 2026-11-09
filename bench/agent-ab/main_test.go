@@ -328,3 +328,12 @@ func TestDecisionReportRule(t *testing.T) {
 		t.Error("no data must keep the default")
 	}
 }
+
+func TestArmEnvQuietKeepsTheDefaultLimits(t *testing.T) {
+	env := strings.Join(armEnv(config{}, "stacklit-quiet"), " ")
+	for _, want := range []string{"STACKLIT_QUIET_REPO_FILES=5000", "STACKLIT_SMALL_REPO_FILES=600", "STACKLIT_STEERING=e"} {
+		if !strings.Contains(env, want) {
+			t.Fatalf("quiet arm env %q lacks %s", env, want)
+		}
+	}
+}
