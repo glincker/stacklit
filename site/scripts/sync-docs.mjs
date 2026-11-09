@@ -264,10 +264,34 @@ function fixLinks(p) {
     .join('\n\n');
 }
 
+// GitHub alerts (> [!NOTE] and friends) become Starlight asides. GitHub shows
+// them as callouts, the site as :::note blocks, so the source stays readable in both.
+const ASIDE = { NOTE: 'note', TIP: 'tip', WARNING: 'caution', IMPORTANT: 'danger' };
+function toAsides(md, slug) {
+  const lines = md.split('\n');
+  const out = [];
+  let fence = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^```/.test(line)) fence = !fence;
+    const m = !fence && /^> \[!(NOTE|TIP|WARNING|IMPORTANT)\]\s*$/.exec(line);
+    if (!m) {
+      out.push(line);
+      continue;
+    }
+    const body = [];
+    while (i + 1 < lines.length && /^>/.test(lines[i + 1])) body.push(lines[++i].replace(/^> ?/, ''));
+    if (!body.some((l) => l.trim())) fail(`${slug}: empty ${m[1]} alert.`);
+    if (out.length && out[out.length - 1].trim()) out.push('');
+    out.push(`:::${ASIDE[m[1]]}`, ...body, ':::', '');
+  }
+  return out.join('\n').replace(/\n{3,}/g, '\n\n');
+}
+
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 for (const p of pages) {
-  const body = fixLinks(p);
+  const body = toAsides(fixLinks(p), p.slug);
   const fm = [
     '---',
     `title: ${JSON.stringify(p.title)}`,
