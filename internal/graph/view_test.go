@@ -91,12 +91,15 @@ func TestPathAndImpact(t *testing.T) {
 	if err != nil || !p.Found || len(p.Hops) != 2 || p.Weakest <= 0 {
 		t.Fatalf("path = %+v err=%v", p, err)
 	}
+	if r := p.Render(false); !strings.Contains(r, "weakest hop") || !strings.Contains(r, "grep") {
+		t.Fatalf("path render lacks trust advice: %s", r)
+	}
 	p, _ = g.ShortestPath("ParseConfig", "Serve")
 	if p.Found {
 		t.Fatalf("unexpected path between disconnected symbols: %+v", p)
 	}
 	im, _ := g.Impact("check", 4, 2000, false)
-	for _, want := range []string{"validate", "ParseConfig"} {
+	for _, want := range []string{"validate", "ParseConfig", "trust: "} {
 		if !strings.Contains(im, want) {
 			t.Errorf("impact missing %s:\n%s", want, im)
 		}

@@ -519,6 +519,7 @@ Create `.stacklitrc.json` in the project root. The file is optional, and every k
 | `timestamps` | false | Writes `generated_at`. Off by default, so a committed index changes only when the code does. Env: `STACKLIT_TIMESTAMPS=1`. |
 | `git_activity` | false | Adds git hot and recent files to the index. Off by default for the same reason. Turn it on with this key or with `STACKLIT_GIT=1`. |
 | `steering` | `a` | Wording of the rules at the top of the generated `CLAUDE.md` or `AGENTS.md` block: `a`, `b`, `c`, `d` (strict, measured worse, not recommended) or `e` (routed, not yet measured). See [docs/SESSIONS.md](docs/SESSIONS.md). Env: `STACKLIT_STEERING`. |
+| `quiet_repo_files` | 5000 | A repo with fewer indexed source files than this gets no hook text at all from the session and subagent hooks. 0 turns it off. Env: `STACKLIT_QUIET_REPO_FILES`. |
 | `small_repo_files` | 600 | A repo with fewer indexed source files than this gets a one-line note instead of the digest, in the session hook and in `setup`. 0 turns it off. Env: `STACKLIT_SMALL_REPO_FILES`. |
 | `crawl_guard` | (installed mode) | Crawl guard mode: `off`, `nudge` or `redirect`. Env: `STACKLIT_CRAWL_GUARD`. |
 | `stats` | false | Appends a local usage log of `query`, `slice`, `explain` and `impact` calls. Env: `STACKLIT_STATS=1`. Never sent over the network. |
@@ -555,6 +556,7 @@ Only files with recognised source extensions are scanned. Directories named `tes
 | `STACKLIT_ADAPTER_TIMEOUT_SEC`, `STACKLIT_ADAPTER_MAX_BYTES`, `STACKLIT_ADAPTER_MAX_ITEMS` | `ingest --adapter` | Adapter timeout, output size and item caps. Defaults: 60, 4194304, 5000. |
 | `STACKLIT_DIGEST_TOKENS` | `setup`, hooks | Token cap of the injected digest. Default 500. |
 | `STACKLIT_STEERING` | `setup`, `guide`, `serve` | Steering wording variant `a`, `b`, `c`, `d` or `e`. `d` also selects the older MCP and guide wording. |
+| `STACKLIT_QUIET_REPO_FILES` | hooks | Source file count below which the session and subagent hooks stay silent. Default 5000, 0 off. |
 | `STACKLIT_SMALL_REPO_FILES` | `setup`, hooks | Source file count below which a repo gets the small repo note instead of the digest. Default 600, 0 off. |
 | `STACKLIT_QUERY_NEXT`, `STACKLIT_FLOW_WORDS`, `STACKLIT_QUERY_SPREAD_DIRS`, `STACKLIT_QUERY_SPREAD_TOP`, `STACKLIT_QUERY_FLATNESS` | `query` | The "also ranked" line: files listed (default 4, 0 off), flow word list, and the spread test (defaults 4, 5, 0.5). |
 | `STACKLIT_IMPACT_SCAN`, `STACKLIT_IMPACT_SCAN_MAX` | `impact` | `0` stops `impact` from reading script sources to confirm importers. The cap sets how many files are read (default 20000). |

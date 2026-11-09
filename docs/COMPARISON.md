@@ -2,7 +2,7 @@
 
 This page compares the main ways to give an AI agent codebase context.
 
-Last updated: 2026-04-10. [Submit corrections](https://github.com/glincker/stacklit/issues).
+Last updated: 2026-04-10 (Graphify added 2026-11-08, other rows not rechecked). [Submit corrections](https://github.com/glincker/stacklit/issues).
 
 ## The problem
 
@@ -21,6 +21,7 @@ Tools solve this in different ways. Some dump everything. Some build knowledge g
 | [Aider repo-map](https://github.com/Aider-AI/aider) | 43k** | Tree-sitter + PageRank | Text | ~1k | 40+ | Yes | Locked to Aider |
 | [Codebase-Memory](https://github.com/DeusData/codebase-memory-mcp) | 1.4k | Knowledge graph | SQLite | 2k-10k/session | 66 | Yes (call graph) | MCP server (C) |
 | [Axon](https://github.com/harshkedia177/axon) | 648 | Graph + community detection | Neo4j/KuzuDB | 2k-10k/session | 3 | Yes (blast radius) | MCP server (Python) |
+| [Graphify](https://github.com/Graphify-Labs/graphify) | 144k | Tree-sitter knowledge graph, plus docs and media | graph.json, HTML, report | not measured here | ~40 (code) | Yes (calls, imports, inherits) | Skill and CLI (Python), paid cloud tier |
 | **[Stacklit](https://github.com/glincker/stacklit)** | -- | Tree-sitter + module map | JSON + HTML | **137 to 1,351 (compact map on six repos; scales with module count)** | 48 | Yes | CLI (Go) |
 
 *Token cost = tokens consumed to give an agent full project context on a ~10k-line repo.
@@ -66,6 +67,15 @@ Stacklit parses code with tree-sitter, builds a module-level dependency graph, a
 - The basic use needs no running server. The MCP server is optional.
 
 Best for: any repo, any AI tool, and no ongoing maintenance.
+
+### Graphify
+
+Closest in design to Stacklit's symbol graph. Its README describes local tree-sitter parsing with no LLM for code, edges tagged `EXTRACTED` or `INFERRED`, `query`, `path` and `explain` commands, and communities. Stacklit has the same edge tags and the same three commands. Differences, per its README and not measured by us:
+
+- It also maps docs, PDFs, images and video, using a model for that part. Stacklit indexes code only.
+- Its install is a Python tool plus an assistant skill. Stacklit is one Go binary with a committable `stacklit.json`.
+- Its 80 percent token claim is for its paid cloud product. Its published code benchmark is 6 questions on one repo (82.0 percent key-fact coverage against 70.8 for grep and read), too small to compare with ours.
+- We have not run it on our benchmark. No parity number exists yet, so this page makes no speed, size or accuracy claim against it.
 
 ### IDE-integrated (proprietary)
 

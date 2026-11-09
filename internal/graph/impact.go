@@ -84,6 +84,9 @@ func (g *SymGraph) Impact(target string, maxDepth, budget int, asJSON bool) (str
 		items[i] = item{node: v, tags: []string{fmt.Sprintf("depth %d  %s", depth[v], impactConf(score[v]))}}
 	}
 	head := []string{fmt.Sprintf("%d dependents (%d direct) across %d files, depth<=%d", len(ids), direct, len(files), maxDepth)}
+	if t := trustLine(ids, score); t != "" {
+		head = append(head, t)
+	}
 	hint := fmt.Sprintf("stacklit impact %s --budget %d", target, budget*2)
 	return g.FitView(viewSpec{title: "impact " + g.Label(root), head: head, items: items, hint: hint}, budget, asJSON), nil
 }
@@ -93,4 +96,22 @@ func impactConf(s float64) string {
 		return fmt.Sprintf("sure %.2f", s)
 	}
 	return fmt.Sprintf("likely %.2f", s)
+}
+
+// trustLine tells the agent how much of the list it can rely on without a
+// confirming grep. Empty when there is nothing listed.
+func trustLine(ids []int, score map[int]float64) string {
+	if len(ids) == 0 {
+		return ""
+	}
+	sure := 0
+	for _, v := range ids {
+		if score[v] >= 0.9 {
+			sure++
+		}
+	}
+	if sure == len(ids) {
+		return fmt.Sprintf("trust: all %d sure, no confirming grep needed", sure)
+	}
+	return fmt.Sprintf("trust: %d of %d sure, grep to confirm the %d likely", sure, len(ids), len(ids)-sure)
 }

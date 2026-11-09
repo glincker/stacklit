@@ -115,7 +115,7 @@ func main() {
 	flag.StringVar(&c.model, "model", "sonnet", "model alias passed to claude")
 	flag.StringVar(&c.resultsDir, "results", "bench/agent-ab/results", "directory for per-session JSON")
 	flag.StringVar(&c.ledger, "ledger", "bench/agent-ab/ledger.jsonl", "append-only cost ledger")
-	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run: control, stacklit, strict, stacklit-e, stacklit-e-small")
+	flag.StringVar(&c.arms, "arms", "control,stacklit", "arms to run: control, stacklit, strict, stacklit-e, stacklit-e-small, stacklit-quiet")
 	flag.StringVar(&c.grader, "grader", "audited", "answer matcher: audited (accepts ./path and absolute checkout paths, round 2) or prereg (round 1)")
 	flag.StringVar(&c.smallRepos, "small-repos", "featuredrop", "repos where the stacklit-e-small arm runs (the others are above the small repo limit)")
 	flag.IntVar(&c.smallFiles, "small-repo-files", 600, "STACKLIT_SMALL_REPO_FILES value for the stacklit-e-small arm")
@@ -468,6 +468,8 @@ func armEnv(c config, arm string) []string {
 		return []string{"STACKLIT_STEERING=a", "STACKLIT_SMALL_REPO_FILES=0"}
 	case "stacklit-e":
 		return []string{"STACKLIT_STEERING=e", "STACKLIT_SMALL_REPO_FILES=0"}
+	case "stacklit-quiet":
+		return []string{"STACKLIT_STEERING=e", "STACKLIT_QUIET_REPO_FILES=5000", "STACKLIT_SMALL_REPO_FILES=600"}
 	case "stacklit-e-small":
 		return []string{"STACKLIT_STEERING=e", fmt.Sprintf("STACKLIT_SMALL_REPO_FILES=%d", c.smallFiles)}
 	}

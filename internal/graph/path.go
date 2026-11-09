@@ -127,7 +127,7 @@ func (p *PathResult) Render(asJSON bool) string {
 		fmt.Fprintf(&b, "path %s -> %s: %s\n", p.From, p.To, p.Note)
 		return b.String()
 	}
-	fmt.Fprintf(&b, "path %s -> %s: %d hops, weakest hop %.2f\n", p.From, p.To, len(p.Hops), p.Weakest)
+	fmt.Fprintf(&b, "path %s -> %s: %d hops, weakest hop %.2f (%s)\n", p.From, p.To, len(p.Hops), p.Weakest, pathTrust(p.Weakest))
 	if p.Note != "" {
 		b.WriteString(p.Note + "\n")
 	}
@@ -143,4 +143,12 @@ func (p *PathResult) Render(asJSON bool) string {
 		}
 	}
 	return b.String()
+}
+
+// pathTrust turns the weakest hop score into advice on whether to confirm.
+func pathTrust(weakest float64) string {
+	if weakest >= 0.9 {
+		return "sure, no confirming grep needed"
+	}
+	return "likely, grep to confirm the weak hop"
 }

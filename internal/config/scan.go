@@ -31,6 +31,19 @@ const (
 // STACKLIT_SMALL_REPO_FILES; 0 turns small repo mode off.
 const DefaultSmallRepoFiles = 600
 
+// DefaultQuietRepoFiles is the source file count under which the hooks stay
+// silent. The agent test (bench/agent-ab/RESULTS-round2.md) lost money at
+// 412 to 2,919 files and won at 15,978; the break-even between is unmeasured.
+const DefaultQuietRepoFiles = 5000
+
+// QuietRepoLimit returns the effective quiet threshold (0 means off).
+func (c *Config) QuietRepoLimit() int {
+	if c.QuietRepoFiles == nil {
+		return DefaultQuietRepoFiles
+	}
+	return *c.QuietRepoFiles
+}
+
 // SmallRepoLimit returns the effective small repo threshold (0 means off).
 func (c *Config) SmallRepoLimit() int {
 	if c.SmallRepoFiles == nil {
@@ -65,6 +78,11 @@ func (c *Config) applyEnv() {
 	if v := os.Getenv("STACKLIT_SMALL_REPO_FILES"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
 			c.SmallRepoFiles = &n
+		}
+	}
+	if v := os.Getenv("STACKLIT_QUIET_REPO_FILES"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			c.QuietRepoFiles = &n
 		}
 	}
 	if v := os.Getenv("STACKLIT_WORKERS"); v != "" {
