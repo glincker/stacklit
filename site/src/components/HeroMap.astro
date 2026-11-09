@@ -11,14 +11,14 @@ const anchorEnd = (x: number) => x > W * 0.62;
 <figure class:list={['hm relative min-w-0', extra]} aria-labelledby="hm-title">
   <input type="radio" name="hm-view" id="hm-deps" class="hm-input sr-only" checked aria-label="Dependency graph" />
   <input type="radio" name="hm-view" id="hm-blocks" class="hm-input sr-only" aria-label="Folder map" />
-  <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 lg:pe-gutter">
+  <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 xl:pe-gutter">
     <figcaption id="hm-title" class="min-w-0 text-caption text-muted"><span class="font-semibold text-ink">{stats.repo}, real Stacklit output.</span> {stats.files} files, {stats.edges} links.</figcaption>
     <div class="hm-ctl flex gap-1 rounded-full border border-line-strong bg-raised p-1" role="group" aria-label="Map style">
       <label for="hm-deps" class="hm-opt inline-flex min-h-9 cursor-pointer items-center rounded-full px-4 text-caption font-semibold text-muted">Dependencies</label>
       <label for="hm-blocks" class="hm-opt inline-flex min-h-9 cursor-pointer items-center rounded-full px-4 text-caption font-semibold text-muted">Folders</label>
     </div>
   </div>
-  <div class="hm-stage mt-3 grid min-w-0 max-w-[30rem] lg:w-[122%] lg:max-w-none">
+  <div class="hm-stage mx-auto mt-3 grid min-w-0 max-w-[30rem] md:max-w-[44rem] xl:mx-0 xl:w-[122%] xl:max-w-none">
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt} class="hm-layer hm-deps col-start-1 row-start-1 h-auto w-full" focusable="false">
       <g class="hm-drift">
         <path d={edgePath} class="fill-none stroke-line-strong stroke-[0.7]" />
@@ -29,7 +29,7 @@ const anchorEnd = (x: number) => x > W * 0.62;
         ))}
       </g>
     </svg>
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt} class="hm-layer hm-blocks col-start-1 row-start-1 h-auto w-full lg:w-[78%]" focusable="false">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={alt} class="hm-layer hm-blocks col-start-1 row-start-1 h-auto w-full xl:w-[78%]" focusable="false">
       <g class="hm-drift">
         {blocks.map((b) => <rect x={b.x} y={b.y} width={b.w} height={b.h} class={b.cls} />)}
         {folderOutlines.map((f) => <rect x={f.x} y={f.y} width={f.w} height={f.h} class="fill-none stroke-line-strong stroke-[0.8]" />)}

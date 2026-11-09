@@ -12,7 +12,8 @@ const items: [string, string, (p: string) => boolean][] = [
 ];
 const ring = 'pill rounded-full border border-ring bg-raised';
 ---
-<header class="pointer-events-none sticky top-0 z-40 mx-auto grid w-full max-w-site grid-cols-[1fr_auto] items-center gap-3 px-gutter py-3 md:grid-cols-[1fr_auto_1fr]">
+<header class="sticky top-0 z-40 w-full border-b border-line bg-paper/90">
+<div class="mx-auto grid w-full max-w-site grid-cols-[1fr_auto] items-center gap-3 px-gutter py-3 md:grid-cols-[1fr_auto_1fr]">
   <a href="/" class:list={['pointer-events-auto inline-flex min-h-11 items-center gap-2 justify-self-start px-4 text-body font-bold tracking-tight text-ink', ring]} aria-label="Stacklit home">
     <svg viewBox="0 0 24 24" class="size-5" aria-hidden="true" focusable="false"><rect x="8" y="3" width="13" height="5" rx="1.5" class="fill-accent"/><rect x="3" y="9.5" width="18" height="5" rx="1.5" class="fill-ink"/><rect x="3" y="16" width="13" height="5" rx="1.5" class="fill-ink"/></svg>
     <span>stacklit</span>
@@ -29,4 +30,5 @@ const ring = 'pill rounded-full border border-ring bg-raised';
       <UiIcon name="sun" size={20} class="hidden dark:block" />
     </button>
   </div>
+</div>
 </header>

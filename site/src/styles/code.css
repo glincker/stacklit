@@ -107,3 +107,6 @@
 .codewin .t-dim { color: var(--t-dim); }
 .codewin .t-rank { color: var(--t-rank); font-weight: 650; }
 .codewin .t-score { color: var(--t-score); }
+
+/* Long recorded lines wrap instead of being cut off at the frame edge. */
+.codewin pre.astro-code code { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }

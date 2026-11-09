@@ -28,3 +28,6 @@
     .hm-pulse { animation: hm-pulse 7s ease-in-out infinite alternate; }
   }
 }
+
+/* Fade the graph out at the foot of the hero instead of cutting it off at the section line. */
+.hm-stage { -webkit-mask-image: linear-gradient(to bottom, var(--ink) 80%, transparent); mask-image: linear-gradient(to bottom, var(--ink) 80%, transparent); }

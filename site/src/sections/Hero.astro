@@ -21,7 +21,7 @@ const facts: { icon: string; text: string; href?: string }[] = [
   { icon: 'shield-off', text: 'No telemetry', href: '/docs/privacy/' },
 ];
 // The text column stops before the picture begins, at every width from lg up.
-const col = 'lg:w-[min(38rem,calc(50vw-4rem))]';
+const col = 'xl:w-[min(38rem,calc(50vw-4rem))]';
 ---
 <Section id="overview" label="hero-title" size="hero">
   <div class:list={['min-w-0', col]}>
@@ -38,7 +38,7 @@ const col = 'lg:w-[min(38rem,calc(50vw-4rem))]';
       <SetupPrompt />
     </div>
   </div>
-  <HeroMap class="mt-12 lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:flex lg:w-[46%] lg:flex-col lg:justify-center lg:overflow-hidden lg:pt-8" />
+  <HeroMap class="mt-12 xl:absolute xl:inset-y-0 xl:right-0 xl:mt-0 xl:flex xl:w-[46%] xl:flex-col xl:justify-center xl:overflow-hidden xl:pt-8" />
   <ul class:list={['mt-8 flex min-w-0 flex-wrap gap-x-6 gap-y-2 text-caption text-muted', col]}>
     {facts.map((f) => (
       <li class="inline-flex items-center gap-2">
