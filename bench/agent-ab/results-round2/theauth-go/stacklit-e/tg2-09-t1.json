@@ -1,0 +1,42 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 5,
+  "cost_usd": 0.0349656,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 477,
+    "cache_creation_input_tokens": 6709,
+    "cache_read_input_tokens": 33436
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 2,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 2120,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.457801625,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"built-in permission name constants and seeded permissions with descriptions\" --budget 800",
+    "Grep pattern=(?i)permission",
+    "Read /private/tmp/r2/work/ab-2402106989/co-995178152/internal/rbac/catalog.go",
+    "Grep pattern=PermissionBillingRead\\s*="
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:01:00Z"
+}

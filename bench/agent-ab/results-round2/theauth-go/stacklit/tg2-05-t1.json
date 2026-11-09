@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-05",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "storage/memory/memory_toolapprovals.go, storage/sqlite/tool_approvals.go, storage/postgres/postgres_toolapprovals.go",
+  "turns": 2,
+  "cost_usd": 0.0230475,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 130,
+    "cache_creation_input_tokens": 5123,
+    "cache_read_input_tokens": 12475
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.617974042,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"tool approvals storage memory sqlite postgres\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:04:42Z"
+}

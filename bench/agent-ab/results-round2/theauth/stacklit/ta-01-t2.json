@@ -1,0 +1,37 @@
+{
+  "repo": "theauth",
+  "task": "ta-01",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/hibp.ts",
+  "turns": 2,
+  "cost_usd": 0.0223523,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 100,
+    "cache_creation_input_tokens": 5025,
+    "cache_read_input_tokens": 12443
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.41901175,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"Have I Been Pwned password breach check k-anonymity hash prefix\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:54:17Z"
+}

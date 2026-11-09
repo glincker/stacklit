@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-01",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/rss.ts",
+  "turns": 2,
+  "cost_usd": 0.0223115,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 79,
+    "cache_creation_input_tokens": 5067,
+    "cache_read_input_tokens": 12455
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.5919045,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Bash stacklit query \"build RSS feed from feature manifest\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:28:13Z"
+}

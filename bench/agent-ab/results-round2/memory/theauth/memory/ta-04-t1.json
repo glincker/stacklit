@@ -1,0 +1,33 @@
+{
+  "repo": "theauth",
+  "task": "ta-04",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "packages/core/src/erasure/delete.ts, packages/core/src/erasure/anonymise.ts, packages/core/src/erasure/progress.ts",
+  "turns": 1,
+  "cost_usd": 0.011576900000000001,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 262,
+    "cache_creation_input_tokens": 2222,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 3.815775542,
+  "seven_day_utilization": 0.6,
+  "call_log": null,
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:55:25Z"
+}

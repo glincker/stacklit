@@ -1,0 +1,42 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "/private/tmp/r2/work/ab-2402106989/co-3859819899/internal/saml/tracker.go, /private/tmp/r2/work/ab-2402106989/co-3859819899/internal/saml/service.go",
+  "turns": 7,
+  "cost_usd": 0.0392782,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 1004,
+    "cache_creation_input_tokens": 6529,
+    "cache_read_input_tokens": 31022
+  },
+  "tool_calls": {
+    "Grep": 6
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.7229525,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=replay|InResponseTo|assertion.?id|AssertionID",
+    "Grep pattern=saml",
+    "Grep pattern=replay|assertion.?id path=/private/tmp/r2/work/ab-2402106989/co-3859819899/internal/saml",
+    "Grep pattern=Replay|AssertionID|assertion_id",
+    "Grep pattern=replay|assertion.?id|Tracker|Consume path=/private/tmp/r2/work/ab-2402106989/co-3859819899/internal/saml/tracker.go",
+    "Grep pattern=Replay|AssertionID|assertion_id path=/private/tmp/r2/work/ab-2402106989/co-3859819899/storage.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:03:25Z"
+}

@@ -1,0 +1,43 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 6,
+  "cost_usd": 0.026836899999999997,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 615,
+    "cache_creation_input_tokens": 4613,
+    "cache_read_input_tokens": 22189
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 1738,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.469010083,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=(?i)webhook|permission",
+    "Glob pattern=**/*ermission*",
+    "Grep pattern=Permission path=/private/tmp/r2/work/ab-2402106989/co-2831935712",
+    "Read /private/tmp/r2/work/ab-2402106989/co-2831935712/internal/models/permissions.go",
+    "Grep pattern=PermissionSessionsRevoke"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:55:10Z"
+}

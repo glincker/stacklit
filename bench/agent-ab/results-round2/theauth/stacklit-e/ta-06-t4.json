@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-06",
+  "kind": "trace",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/magic-link.ts, packages/core/src/auth/magic-link-plugin.ts",
+  "turns": 3,
+  "cost_usd": 0.0238986,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 172,
+    "cache_creation_input_tokens": 5232,
+    "cache_read_input_tokens": 12426
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Glob": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.638596083,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"magic link sign in logic and plugin in core package\" --budget 800",
+    "Glob pattern=packages/core/src/**/*magic*"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:49:02Z"
+}

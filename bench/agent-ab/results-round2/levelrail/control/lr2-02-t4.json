@@ -1,0 +1,40 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "`\u003cdataDir\u003e/.disk-reserve`",
+  "turns": 5,
+  "cost_usd": 0.0428818,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 691,
+    "cache_creation_input_tokens": 8186,
+    "cache_read_input_tokens": 32118
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.103848166,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=reserve|ballast",
+    "Grep pattern=diskguard\\.New|dataDir|\\.disk-reserve path=/private/tmp/r2/work/ab-3997012670/co-2021467005/internal/diskguard",
+    "Grep pattern=diskguard\\.New\\(",
+    "Grep pattern=dataDir path=/private/tmp/r2/work/ab-3997012670/co-2021467005/cmd/levelrail/diskguard_wiring."
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:36:50Z"
+}

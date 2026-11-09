@@ -1,0 +1,42 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "`\u003cdataDir\u003e/.disk-reserve`",
+  "turns": 6,
+  "cost_usd": 0.042974000000000005,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 801,
+    "cache_creation_input_tokens": 7674,
+    "cache_read_input_tokens": 42480
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 30.129851709,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"SQLite reserve file ballast disk full\" --budget 800",
+    "Grep pattern=(?i)(reserve|ballast)[\\w_.-]*\\.(db|bin|dat|reserve|file)|reserve file|ballast fi",
+    "Grep pattern=(?i)reserve.*\\.(\\w+)\"|\"[^\"]*reserve[^\"]*\" path=/private/tmp/r2/work/ab-3997012670/co-4271876609/internal/diskguard",
+    "Grep pattern=reserveFileName|reservePath|Dirs|filepath.Join path=/private/tmp/r2/work/ab-3997012670/co-4271876609/internal/diskguard/diskguard.go",
+    "Grep pattern=diskguard\\.New|diskguard\\.Config|Volumes:|ReserveDir"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:43:05Z"
+}

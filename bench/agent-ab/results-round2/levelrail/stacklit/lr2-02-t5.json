@@ -1,0 +1,44 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "\u003cdata dir\u003e/.disk-reserve\n\nThe file is `.disk-reserve` (`reserveFileName` in `internal/diskguard/diskguard.go:34`). It sits in the platform's data directory, which `startDiskGuard` receives as `dataDir`. I didn't trace where `dataDir` comes from, so I can't give you its absolute path.",
+  "turns": 8,
+  "cost_usd": 0.0567051,
+  "usage": {
+    "input_tokens": 16,
+    "output_tokens": 1321,
+    "cache_creation_input_tokens": 8904,
+    "cache_read_input_tokens": 78471
+  },
+  "tool_calls": {
+    "Bash": 4,
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 37.892318958,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Bash stacklit query \"sqlite reserve file disk full ballast\" --budget 800",
+    "Grep pattern=reserve.*\\.(db|bin|dat|reserve|ballast)|ReserveFile|reservePath|\\.reserve path=/private/tmp/r2/work/ab-3997012670/co-1256170523/internal/diskguard",
+    "Grep pattern=reserveFileName|reserve.*=\\s*\"|\\.reserve\" path=/private/tmp/r2/work/ab-3997012670/co-1256170523",
+    "Bash grep -rn \"diskguard.New\\|diskguard.Config\" --include=*.go . | grep -v _test | head; sed -n 160,180p internal/diskguard/diskguard.go",
+    "Bash grep -rn \"diskguard\\.New(\" . | grep -v _test | head",
+    "Bash sed -n 1,30p cmd/levelrail/diskguard_wiring.go; grep -rn \"newDiskGuard\\|wireDiskGuard\" cmd | head",
+    "Grep pattern=disk-reserve|DISK_RESERVE|reserve file path=/private/tmp/r2/work/ab-3997012670/co-1256170523"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:57:30Z"
+}

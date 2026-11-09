@@ -1,0 +1,45 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-04",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/trusteddevice/service.go, lifecycle.go, internal/password/lifecycle.go",
+  "turns": 9,
+  "cost_usd": 0.0459755,
+  "usage": {
+    "input_tokens": 14,
+    "output_tokens": 1355,
+    "cache_creation_input_tokens": 6910,
+    "cache_read_input_tokens": 47575
+  },
+  "tool_calls": {
+    "Grep": 7,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 841,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 17.232093209,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=remember.?(me|device|browser)|trusted.?(device|browser)|remember_2fa|two_factor.",
+    "Grep pattern=trusteddevice|RevokeTrusted|TrustedDevice",
+    "Grep pattern=trusteddevice|TrustedDevice|Trusted path=/private/tmp/r2/work/ab-2402106989/co-641261270/internal/password",
+    "Grep pattern=trusteddevice|TrustedDevice path=/private/tmp/r2/work/ab-2402106989/co-641261270/internal/totp/handlers/handlers.",
+    "Grep pattern=RevokeAll|Revoke|password path=/private/tmp/r2/work/ab-2402106989/co-641261270/internal/trusteddevice/service.g",
+    "Grep pattern=Devices|trusteddevice path=/private/tmp/r2/work/ab-2402106989/co-641261270/lifecycle.go",
+    "Grep pattern=RevokeTrustedDevices|RevokeAll\\(",
+    "Read /private/tmp/r2/work/ab-2402106989/co-641261270/handlers.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:53:49Z"
+}

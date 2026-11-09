@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-07",
+  "kind": "impact",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/user/user.ts, packages/core/src/hooks/database-hooks.ts, packages/core/src/auth/password-reset.ts, packages/core/src/auth/organization-plugin.ts, packages/core/src/auth/one-tap.ts, packages/core/src/auth/oauth/plugin.ts, packages/core/src/auth/magic-link.ts, packages/core/src/auth/magic-link-plugin.ts, packages/core/src/auth/email-verification.ts, packages/core/src/auth/email-password.ts, packages/core/src/auth/email-otp.ts, packages/core/src/auth/email-otp-plugin.ts",
+  "turns": 3,
+  "cost_usd": 0.0273143,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 423,
+    "cache_creation_input_tokens": 5458,
+    "cache_read_input_tokens": 12443
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.703009584,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"which files import normalize-email\" --budget 800",
+    "Grep pattern=normalize-email"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:55:33Z"
+}

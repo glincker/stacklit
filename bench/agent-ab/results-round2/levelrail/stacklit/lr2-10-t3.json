@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-10",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/routes/settings/notification-channels.tsx, web/src/components/settings/\n\nThe heartbeat card isn't on the dashboard. `HeartbeatCard` is only rendered in `web/src/routes/settings/notification-channels.tsx`, so I answered for that page. If you meant the dashboard route itself, that's `web/src/routes/index.tsx`.",
+  "turns": 3,
+  "cost_usd": 0.0282505,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 440,
+    "cache_creation_input_tokens": 5410,
+    "cache_read_input_tokens": 21985
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 70.846718417,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"dashboard page heartbeat card route file listing cards\" --budget 800",
+    "Grep pattern=HeartbeatCard path=web/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:38:12Z"
+}

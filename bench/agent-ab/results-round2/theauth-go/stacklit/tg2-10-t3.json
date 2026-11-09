@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-10",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "otp/otp.go, otp/senders.go",
+  "turns": 3,
+  "cost_usd": 0.0273259,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 164,
+    "cache_creation_input_tokens": 5870,
+    "cache_read_input_tokens": 21939
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.335878417,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"one-time code sender interface and implementations\" --budget 800",
+    "Bash ls otp; grep -n \"Sender\" otp/*.go | grep -v _test | head -30"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:03:42Z"
+}

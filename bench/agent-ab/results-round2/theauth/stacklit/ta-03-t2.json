@@ -1,0 +1,41 @@
+{
+  "repo": "theauth",
+  "task": "ta-03",
+  "kind": "locate",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/cbor.ts, packages/core/src/device/attestation/cbor.ts",
+  "turns": 5,
+  "cost_usd": 0.0358532,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 699,
+    "cache_creation_input_tokens": 6421,
+    "cache_read_input_tokens": 31632
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 16.400722000000002,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Bash stacklit query \"CBOR decoder passkey attestation object max size nesting depth\" --budget 800",
+    "Grep pattern=MAX|depth path=/private/tmp/r2/work/ab-3310913224/co-195428416/packages/core/src",
+    "Grep pattern=MAX|depth|attestation path=/private/tmp/r2/work/ab-3310913224/co-195428416/packages/core/src/auth/cbor.ts",
+    "Grep pattern=MAX|depth path=/private/tmp/r2/work/ab-3310913224/co-195428416/packages/core/src/device/attesta"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:32:00Z"
+}

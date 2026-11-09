@@ -1,0 +1,38 @@
+{
+  "repo": "theauth",
+  "task": "ta-02",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/captcha.ts",
+  "turns": 3,
+  "cost_usd": 0.0161945,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 278,
+    "cache_creation_input_tokens": 2983,
+    "cache_read_input_tokens": 14705
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.960895334,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Grep pattern=turnstile|hcaptcha|recaptcha|siteverify",
+    "Grep pattern=siteverify|challenges\\.cloudflare|hcaptcha\\.com/siteverify|google\\.com/recaptcha path=packages/core/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:31:38Z"
+}

@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-10",
+  "kind": "add",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "web/src/routes/settings/notification-channels.tsx, web/src/components/settings/",
+  "turns": 3,
+  "cost_usd": 0.0264605,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 298,
+    "cache_creation_input_tokens": 5384,
+    "cache_read_input_tokens": 19325
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.253064375,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Grep pattern=[Hh]eartbeat path=/private/tmp/r2/work/ab-3997012670/co-3579788884/web/src",
+    "Grep pattern=HeartbeatCard path=/private/tmp/r2/work/ab-3997012670/co-3579788884/web/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:09:26Z"
+}

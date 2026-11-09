@@ -1,0 +1,37 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-07",
+  "kind": "impact",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/apiclient/disk_resilience.go, internal/api/router.go, internal/api/resilience_disk.go, internal/api/disk_history.go, internal/api/diagnose_stuck.go, internal/api/deploys.go, internal/api/control_plane_backups.go, internal/api/backups.go, cmd/levelrail/diskguard_wiring.go, cmd/levelrail/boot_storage_settings.go",
+  "turns": 2,
+  "cost_usd": 0.023057599999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 254,
+    "cache_creation_input_tokens": 4853,
+    "cache_read_input_tokens": 10976
+  },
+  "tool_calls": {
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.3733062910000005,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=internal/diskguard\""
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:22:06Z"
+}

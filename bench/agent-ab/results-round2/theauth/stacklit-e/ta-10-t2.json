@@ -1,0 +1,38 @@
+{
+  "repo": "theauth",
+  "task": "ta-10",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/i18n/index.ts, packages/core/src/i18n/locales/",
+  "turns": 3,
+  "cost_usd": 0.027951199999999995,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 191,
+    "cache_creation_input_tokens": 5953,
+    "cache_read_input_tokens": 22172
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 14.643417333,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"built-in messages locales i18n\" --budget 800; ls packages/core/src",
+    "Bash cd packages/core/src/i18n; ls -R; grep -n \"import\\|export\" *.ts | head -40"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:55:18Z"
+}

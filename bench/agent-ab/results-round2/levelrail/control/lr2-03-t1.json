@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-03",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/secretmask/linecarry.go, internal/secretmask/secretmask.go",
+  "turns": 4,
+  "cost_usd": 0.034476599999999996,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 519,
+    "cache_creation_input_tokens": 6589,
+    "cache_read_input_tokens": 29146
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 10.160878167,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=(?i)(redact|mask|scrub)\\w*",
+    "Grep pattern=(?i)(split|span|straddl|boundary|carry|across).{0,40}(line|chunk) path=/private/tmp/r2/work/ab-3997012670/co-934114064/internal",
+    "Grep pattern=^(func|type)  path=/private/tmp/r2/work/ab-3997012670/co-934114064/internal/secretmask/linecarry.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:35:31Z"
+}

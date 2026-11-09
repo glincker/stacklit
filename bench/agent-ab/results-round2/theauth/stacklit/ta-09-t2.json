@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-09",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/\u003cyour-plugin\u003e-plugin.ts, packages/core/src/auth/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0263589,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 285,
+    "cache_creation_input_tokens": 5327,
+    "cache_read_input_tokens": 21889
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.537664166999999,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"magic link plugin\" --budget 800",
+    "Grep pattern=magic-link-plugin path=/private/tmp/r2/work/ab-3310913224/co-3900408376/packages/core"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:41:47Z"
+}

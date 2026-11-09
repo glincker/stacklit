@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "\u003cbr\u003e\n\n`\u003cdataDir\u003e/.disk-reserve`",
+  "turns": 3,
+  "cost_usd": 0.030050800000000003,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 333,
+    "cache_creation_input_tokens": 6112,
+    "cache_read_input_tokens": 22608
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 19.272805,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=reserve|ballast",
+    "Grep pattern=diskguard\\.New\\(|\\.disk-reserve"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:26:28Z"
+}

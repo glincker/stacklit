@@ -1,0 +1,41 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "`$APP_DATA_DIR/.disk-reserve`",
+  "turns": 6,
+  "cost_usd": 0.0546827,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 1034,
+    "cache_creation_input_tokens": 9956,
+    "cache_read_input_tokens": 44987
+  },
+  "tool_calls": {
+    "Grep": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 25.998832916,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=reserve|ballast|emergency",
+    "Grep pattern=\\.reserve|reserve\\.|ballast|\\.emergency|reserve_file|ReserveFile path=/private/tmp/r2/work/ab-3997012670/co-1875108026",
+    "Grep pattern=dataDir|reserve path=/private/tmp/r2/work/ab-3997012670/co-1875108026/internal/diskguard/diskguard.go",
+    "Grep pattern=diskguard\\.New|disk-reserve path=/private/tmp/r2/work/ab-3997012670/co-1875108026",
+    "Grep pattern=DATA_DIR|/var/lib/levelrail path=/private/tmp/r2/work/ab-3997012670/co-1875108026/cmd/levelrail"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:31:05Z"
+}

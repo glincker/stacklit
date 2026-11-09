@@ -1,0 +1,38 @@
+{
+  "repo": "theauth",
+  "task": "ta-10",
+  "kind": "add",
+  "trial": 1,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 1,
+  "answer": "packages/core/src/i18n/index.ts, packages/core/src/i18n/locales",
+  "turns": 3,
+  "cost_usd": 0.0223556,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 286,
+    "cache_creation_input_tokens": 4351,
+    "cache_read_input_tokens": 20796
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.095556208,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash grep -rIl -i -E \"locales?\" packages/core/src --include=*.ts -l | grep -v node_modules | head -30; find packages/core -ipath \"*locale*\" -not -path \"*/node_module",
+    "Bash cd /private/tmp/r2/work/ab-3310913224/co-4164881620/packages/core/src/i18n \u0026\u0026 ls; grep -rn \"locales/\" . | head"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:39:30Z"
+}

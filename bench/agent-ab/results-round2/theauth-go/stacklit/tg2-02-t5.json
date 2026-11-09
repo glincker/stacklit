@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/saml/tracker.go, internal/saml/service.go",
+  "turns": 2,
+  "cost_usd": 0.0226339,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 93,
+    "cache_creation_input_tokens": 5112,
+    "cache_read_input_tokens": 12479
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.135843667,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"SAML assertion ID replay cache\" --budget 800"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:50:33Z"
+}

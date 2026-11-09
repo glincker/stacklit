@@ -1,0 +1,40 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-05",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/api/monitor_heartbeat.go, internal/monitor/heartbeat.go, internal/store/monitor_heartbeats.go",
+  "turns": 5,
+  "cost_usd": 0.035846699999999995,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 568,
+    "cache_creation_input_tokens": 7035,
+    "cache_read_input_tokens": 20147
+  },
+  "tool_calls": {
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 8.626908584,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Grep pattern=(?i)heartbeat",
+    "Grep pattern=^func  path=/private/tmp/r2/work/ab-3997012670/co-1752307182/internal/api/monitor_heartbeat.",
+    "Grep pattern=^func  path=/private/tmp/r2/work/ab-3997012670/co-1752307182/internal/monitor/heartbeat.go",
+    "Grep pattern=^func  path=/private/tmp/r2/work/ab-3997012670/co-1752307182/internal/store/monitor_heartbea"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:57:21Z"
+}

@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 2,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 4,
+  "cost_usd": 0.020313400000000002,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 393,
+    "cache_creation_input_tokens": 3709,
+    "cache_read_input_tokens": 15354
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.1616831659999995,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Grep pattern=(?i)permission",
+    "Grep pattern=Perm\\w* *= *\" path=/private/tmp/r2/work/ab-2402106989/co-1761108352/internal",
+    "Grep pattern=Description path=/private/tmp/r2/work/ab-2402106989/co-1761108352/internal/rbac/catalog.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:50:49Z"
+}

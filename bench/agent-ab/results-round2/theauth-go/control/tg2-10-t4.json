@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-10",
+  "kind": "add",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "otp/otp.go, otp/senders.go",
+  "turns": 3,
+  "cost_usd": 0.0153632,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 284,
+    "cache_creation_input_tokens": 2908,
+    "cache_read_input_tokens": 8832
+  },
+  "tool_calls": {
+    "Grep": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 4.308086292,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=(?i)(otp|one.?time).*(sender|send|deliver)|(sender|deliver).*(otp|one.?time)",
+    "Grep pattern=(?i)(interface|trait|protocol|class|type)\\s+\\w*Sender\\b"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:02:18Z"
+}
