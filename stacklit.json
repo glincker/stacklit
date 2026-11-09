@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "b2cfa14e942af46ac89a20c43b4313339899cfbd40b066ebae939af1cb92680c",
+  "merkle_hash": "64671aed04641db0649d55fd0fbd0272e2c4b24d0de6da7e6f302210b3bb77d1",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -70,7 +70,7 @@
       },
       "go": {
         "files": 283,
-        "lines": 43437
+        "lines": 43542
       },
       "graphql": {
         "files": 1,
@@ -215,7 +215,7 @@
       "examples/adapters/keyword_concepts.py"
     ],
     "total_files": 1602,
-    "total_lines": 109606
+    "total_lines": 109711
   },
   "modules": {
     ".claude-plugin": {
@@ -501,7 +501,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 743,
+      "lines": 766,
       "file_list": [
         "scan.go",
         "config.go",
@@ -514,12 +514,12 @@
         "DefaultMaxModuleFiles",
         "DefaultModuleSplitFiles",
         "DefaultSmallRepoFiles",
+        "DefaultQuietRepoFiles",
+        "QuietRepoLimit() int",
         "SmallRepoLimit() int",
         "WorkerCount() int",
         "CacheEnabled() bool",
-        "TimestampsEnabled() bool",
-        "GitActivityEnabled() bool",
-        "NormalizedRoots() []string"
+        "TimestampsEnabled() bool"
       ],
       "type_defs": {
         "CheckConfig": "Forbidden []ForbiddenEdge, Cycles bool, Orphans bool, MaxFanIn int, MaxFanOut int",
@@ -801,7 +801,7 @@
       "purpose": "Dependency graph",
       "language": "go",
       "files": 53,
-      "lines": 12431,
+      "lines": 12463,
       "file_list": [
         "symbols.go",
         "view.go",
@@ -1248,7 +1248,7 @@
       "purpose": "Setup",
       "language": "go",
       "files": 19,
-      "lines": 3577,
+      "lines": 3616,
       "file_list": [
         "crawlguard.go",
         "digest.go",
@@ -1999,6 +1999,7 @@
       "STACKLIT_PARSE_TIMEOUT_MS",
       "STACKLIT_PPROF",
       "STACKLIT_QUERY_ORDER",
+      "STACKLIT_QUIET_REPO_FILES",
       "STACKLIT_ROOTS",
       "STACKLIT_SCALE_BUDGET_S",
       "STACKLIT_SCIP_MAX_BYTES",
