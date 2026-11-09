@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "64671aed04641db0649d55fd0fbd0272e2c4b24d0de6da7e6f302210b3bb77d1",
+  "merkle_hash": "f2a95a6c9425a1ae93c9015939cfe886fc22e88ae7214a81e653aebbf0353068",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -97,8 +97,8 @@
         "lines": 1550
       },
       "json": {
-        "files": 1179,
-        "lines": 61729
+        "files": 1480,
+        "lines": 75994
       },
       "julia": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 1602,
-    "total_lines": 109711
+    "total_files": 1903,
+    "total_lines": 123976
   },
   "modules": {
     ".claude-plugin": {
