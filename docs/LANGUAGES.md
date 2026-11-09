@@ -48,10 +48,25 @@ Stacklit indexes 48 languages and formats. Each row shows what is extracted. Any
 | <img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/yaml/default.svg" alt="YAML / TOML / JSON" width="24" height="24"><img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/toml/default.svg" alt="YAML / TOML / JSON" width="24" height="24"><img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/json/default.svg" alt="YAML / TOML / JSON" width="24" height="24"> | YAML / TOML / JSON | top-level keys (capped, see below) |
 | <img src="https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/graphql/default.svg" alt="GraphQL" width="24" height="24"> | GraphQL | object/interface/enum/input/union/scalar types with fields, named operations and fragments |
 
-Config files (YAML, TOML, JSON) report at most `STACKLIT_CONFIG_KEY_CAP` top-level keys (default 40) and skip key extraction above `STACKLIT_CONFIG_MAX_BYTES` (default 262144). Lockfiles and the generated `stacklit.json` are not indexed. Go is parsed with the Go standard library; every other row uses tree-sitter. SQL `$$` function bodies are masked before parsing so later statements still extract. Grammar-specific caveats: Groovy extraction falls back to line patterns where the grammar errors out, and `.m` files are treated as Objective-C.
+## Limits and parser notes
 
-Any other language gets basic support (line count + language detection).
+- **Config files** (YAML, TOML, JSON) report at most `STACKLIT_CONFIG_KEY_CAP` top-level keys (default 40). Files above `STACKLIT_CONFIG_MAX_BYTES` (default 262144) skip key extraction.
+- **Skipped files**: lockfiles and the generated `stacklit.json` are not indexed.
+- **Parsers**: Go uses the Go standard library. Every other row uses tree-sitter.
+- **SQL**: `$$` function bodies are masked before parsing, so the statements after them still extract.
+- **Groovy** falls back to line patterns where the grammar fails.
+- **`.m` files** are treated as Objective-C.
 
-The symbol graph (`stacklit graph`, `query`, `impact`, `slice`) covers 20 languages; the per-language table is in [ARCHITECTURE.md](ARCHITECTURE.md#symbol-graph-extraction). The other languages still get the module index.
+## Symbol graph
 
-Monorepos are detected automatically: pnpm, npm and yarn workspaces, Go workspaces, Turborepo, Nx, Lerna, Cargo workspaces, and `apps/`, `packages/`, `services/`, `libs/` conventions.
+The symbol graph (`stacklit graph`, `query`, `impact`, `slice`) covers 20 languages. The per-language table is in [ARCHITECTURE.md](ARCHITECTURE.md#symbol-graph-extraction). The other languages still get the module index.
+
+## Monorepos
+
+Monorepos are detected automatically:
+
+- pnpm, npm and yarn workspaces
+- Go workspaces
+- Turborepo, Nx and Lerna
+- Cargo workspaces
+- `apps/`, `packages/`, `services/` and `libs/` directories
