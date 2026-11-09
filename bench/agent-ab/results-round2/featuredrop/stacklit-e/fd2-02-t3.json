@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-02",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/dependencies.ts",
+  "turns": 3,
+  "cost_usd": 0.025257099999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 217,
+    "cache_creation_input_tokens": 5458,
+    "cache_read_input_tokens": 12471
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.469917709,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Bash stacklit query \"feature dependency ordering topological sort and cycle detection\" --budget 800",
+    "Grep pattern=cycle|circular|topolog"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:19:54Z"
+}

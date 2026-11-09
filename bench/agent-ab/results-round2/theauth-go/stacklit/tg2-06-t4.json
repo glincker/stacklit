@@ -1,0 +1,38 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-06",
+  "kind": "trace",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/totp/handlers/handlers.go, internal/totp/service.go, storage/sqlite/totp.go",
+  "turns": 3,
+  "cost_usd": 0.026226,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 260,
+    "cache_creation_input_tokens": 5352,
+    "cache_read_input_tokens": 22060
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.804560792,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"TOTP enroll and confirm handlers, service, sqlite storage of secret\" --budget 800",
+    "Bash ls internal/totp/handlers/ 2\u003e\u00261 | head; grep -n \"FinishEnrollment\" -r --include=*.go -l . | head"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:52:47Z"
+}

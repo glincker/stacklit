@@ -1,0 +1,41 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "\u003cdata dir\u003e/.disk-reserve, \u003cdata dir\u003e/.disk-reserve.tmp",
+  "turns": 5,
+  "cost_usd": 0.047320799999999996,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 677,
+    "cache_creation_input_tokens": 9325,
+    "cache_read_input_tokens": 32348
+  },
+  "tool_calls": {
+    "Grep": 2,
+    "Read": 2
+  },
+  "files_read": 1,
+  "read_bytes": 1606,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.295909208,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Grep pattern=reserve|ballast",
+    "Grep pattern=\\.reserve|reserve\\w*\\.(bin|file|dat)|\"[^\"]*reserve[^\"]*\" path=internal/diskguard",
+    "Read /private/tmp/r2/work/ab-3997012670/co-2222770842/internal/diskguard/diskguard.go",
+    "Read /private/tmp/r2/work/ab-3997012670/co-2222770842/internal/diskguard/diskguard.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:01:23Z"
+}

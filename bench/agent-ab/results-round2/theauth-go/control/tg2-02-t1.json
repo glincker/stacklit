@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-02",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/saml/tracker.go",
+  "turns": 6,
+  "cost_usd": 0.032002,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 735,
+    "cache_creation_input_tokens": 5405,
+    "cache_read_input_tokens": 30120
+  },
+  "tool_calls": {
+    "Grep": 5
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.843352416,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=(?i)(replay|assertion_?id|InResponseTo|used_?assertion|seen_?assertion)",
+    "Grep pattern=(?i)saml",
+    "Grep pattern=(?i)assertion",
+    "Grep pattern=(?i)assertion|replay path=/private/tmp/r2/work/ab-2402106989/co-2650578792/internal/saml/tracker.go",
+    "Grep pattern=(?i)assertion|replay path=/private/tmp/r2/work/ab-2402106989/co-2650578792/storage.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:51:37Z"
+}

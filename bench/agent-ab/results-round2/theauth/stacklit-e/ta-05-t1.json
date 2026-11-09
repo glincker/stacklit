@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-05",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/cli/src/auth/device-flow.ts, packages/cli/src/auth/token-cache.ts, packages/core/src/auth/device-auth.ts",
+  "turns": 3,
+  "cost_usd": 0.026513400000000003,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 250,
+    "cache_creation_input_tokens": 5690,
+    "cache_read_input_tokens": 12454
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 15.054018541,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Bash stacklit query \"CLI device authorization flow polling token, token cache, core device endpoints\" --budget 800",
+    "Grep pattern=device_code|deviceCode"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:34:59Z"
+}

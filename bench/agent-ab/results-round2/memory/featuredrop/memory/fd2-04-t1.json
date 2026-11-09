@@ -1,0 +1,33 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-04",
+  "kind": "trace",
+  "trial": 1,
+  "arm": "memory",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": 0,
+  "answer": "src/react/components/onboarding-checklist.tsx, src/react/hooks/use-onboarding.ts, src/react/onboarding-registry.ts\n\nThis is a best guess. I don't have reliable knowledge of this repository's file layout.",
+  "turns": 1,
+  "cost_usd": 0.0112469,
+  "usage": {
+    "input_tokens": 2,
+    "output_tokens": 229,
+    "cache_creation_input_tokens": 2222,
+    "cache_read_input_tokens": 649
+  },
+  "tool_calls": {},
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 3.54717375,
+  "seven_day_utilization": 0.6,
+  "call_log": null,
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T22:55:08Z"
+}

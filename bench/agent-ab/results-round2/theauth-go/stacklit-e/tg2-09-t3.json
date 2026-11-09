@@ -1,0 +1,42 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 6,
+  "cost_usd": 0.030869399999999998,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 673,
+    "cache_creation_input_tokens": 5298,
+    "cache_read_input_tokens": 29314
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 4
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 12.544017208,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash grep -rniE \"permission\" --include=*.go -l . | grep -viE \"_test\" | head -30",
+    "Grep pattern=Permission\\w* *= *\"",
+    "Grep pattern=(?i)seed\\w*perm|perm\\w*seed|builtinperm|defaultpermissions",
+    "Grep pattern=Description|Perm path=/private/tmp/r2/work/ab-2402106989/co-3284817607/internal/rbac/catalog.go",
+    "Grep pattern=Permission\\w* *= *\" path=/private/tmp/r2/work/ab-2402106989/co-3284817607/internal/models/permissions.go"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:53:11Z"
+}

@@ -1,0 +1,37 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-09",
+  "kind": "add",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "src/react/components/your-component.tsx, src/react/index.ts",
+  "turns": 2,
+  "cost_usd": 0.019074,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 127,
+    "cache_creation_input_tokens": 4137,
+    "cache_read_input_tokens": 12480
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.391217167,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash ls src/react src/react/components \u0026\u0026 grep -n -i toast src/react/index.ts"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:12:25Z"
+}

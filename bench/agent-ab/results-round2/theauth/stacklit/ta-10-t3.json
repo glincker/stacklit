@@ -1,0 +1,41 @@
+{
+  "repo": "theauth",
+  "task": "ta-10",
+  "kind": "add",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/i18n/index.ts, packages/core/src/i18n/locales/it.ts",
+  "turns": 5,
+  "cost_usd": 0.0316595,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 421,
+    "cache_creation_input_tokens": 5821,
+    "cache_read_input_tokens": 41455
+  },
+  "tool_calls": {
+    "Bash": 3,
+    "Read": 1
+  },
+  "files_read": 1,
+  "read_bytes": 472,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 1,
+  "result_subtype": "success",
+  "seconds": 15.844778667,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"locales built-in messages i18n core package\" --budget 800",
+    "Bash cd packages/core/src/i18n \u0026\u0026 ls -R . \u0026\u0026 grep -n \"import\\|locales\" i18n.ts | head -30; ls index.ts locales/index.ts 2\u003e\u00261",
+    "Bash cd packages/core/src/i18n \u0026\u0026 cat index.ts; grep -rn \"locales/\" --include=*.ts .. | grep -v \"^../i18n/locales\" | head",
+    "Read /private/tmp/r2/work/ab-3310913224/co-2864340928/packages/core/src/i18n/index.ts"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:50:59Z"
+}

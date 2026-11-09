@@ -27,7 +27,7 @@ if (!fontSans) throw new Error('--font-sans missing from tokens.css');
 
 const slug = (v) => v.purpose.split(' ')[0].replace(/[^a-z]/g, '') || 'card';
 const names = ['default', 'stat', 'story', 'large-repo', 'launch', 'map'];
-const must = 'Largest test repo only. Across all three repos, no cost change.';
+const must = 'Largest test repo only. Smaller repos cost more.';
 
 function page(v, p) {
   const longest = Math.max(v.line1.length, v.line2.length);

@@ -22,3 +22,19 @@ Source: [RESULTS.md](RESULTS.md) and [summary.json](summary.json). Model claude-
 6. Any latency claim. The `seconds` metric includes clone and `stacklit generate`.
 7. Any claim on editing tasks, other models, other repos, harder multi-file reasoning tasks, or membership usage (the dollars are notional list-price figures).
 8. That the numbers are final for the strict arm: it was not interleaved with control.
+
+## Round 2 update (650 more sessions, see RESULTS-round2.md)
+
+Supported now, in addition to the above:
+
+- On the 16,000 file repo, Stacklit cut notional cost by 11% (steering a) to 13% (steering e, ratio 0.87 [0.81, 0.93]) in a second set of new tasks, at equal correctness.
+- Across four repos, Stacklit sessions made about 24% fewer tool calls (0.76) and 17% fewer turns, and far fewer Grep and Glob calls (0.22 with wording a, 0.53 with the routed wording e).
+- Routed wording e costs less than the current wording a (0.93 [0.90, 0.95]) with the same correctness.
+
+Not supported (do not claim):
+
+- Any overall saving. Pooled cost of e against no Stacklit is 1.09 [1.04, 1.14]; wording a is 1.17 [1.11, 1.24].
+- Savings on repos under about 3,000 files (1.05 to 1.61 depending on repo and wording), or on "who imports X" questions there.
+- That e fixed the round 1 trace correctness loss: control scored 100% on trace in round 2, so that test was at the ceiling.
+- That small repo mode is cost neutral: on featuredrop it is 1.11 [1.06, 1.16] against no Stacklit.
+- Better answer quality: correctness is equal (97.5% against 97.5%) and tasks were mostly easy.

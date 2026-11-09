@@ -1,0 +1,39 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-08",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "theauth.go, internal/scim/handlers/handlers.go, internal/saml/service.go, internal/password/service.go, internal/magiclink/service.go, forwarders.go, email/noop.go, cmd/theauth-go/init.go",
+  "turns": 3,
+  "cost_usd": 0.025915999999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 351,
+    "cache_creation_input_tokens": 5288,
+    "cache_read_input_tokens": 12460
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.035525375,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/emailnorm\" --budget 800",
+    "Grep pattern=internal/emailnorm\""
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:01:55Z"
+}

@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-01",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/rss.ts, src/bridges.ts",
+  "turns": 4,
+  "cost_usd": 0.029296799999999998,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 441,
+    "cache_creation_input_tokens": 5781,
+    "cache_read_input_tokens": 17508
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.489688375,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Grep pattern=rss|RSS",
+    "Grep pattern=manifest",
+    "Grep pattern=rss path=src/bridges.ts"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:12:54Z"
+}

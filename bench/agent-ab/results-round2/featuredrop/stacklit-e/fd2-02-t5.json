@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-02",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/dependencies.ts",
+  "turns": 4,
+  "cost_usd": 0.0285772,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 549,
+    "cache_creation_input_tokens": 5023,
+    "cache_read_input_tokens": 29792
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 9.758045167,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Grep pattern=cycle|circular|topolog|dependsOn path=/private/tmp/r2/work/ab-2433565811/co-1857706540/src",
+    "Grep pattern=cycle|circular|topolog path=/private/tmp/r2/work/ab-2433565811/co-1857706540/src",
+    "Grep pattern=cycle|circular|topolog path=/private/tmp/r2/work/ab-2433565811/co-1857706540/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:24:33Z"
+}

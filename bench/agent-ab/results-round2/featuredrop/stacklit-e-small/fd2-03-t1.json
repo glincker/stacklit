@@ -1,0 +1,39 @@
+{
+  "repo": "featuredrop",
+  "task": "fd2-03",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "stacklit-e-small",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "src/size-budget.ts, scripts/check-bundle-budgets.mjs",
+  "turns": 4,
+  "cost_usd": 0.0232056,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 420,
+    "cache_creation_input_tokens": 4262,
+    "cache_read_input_tokens": 19456
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.149615,
+  "seven_day_utilization": 0.64,
+  "call_log": [
+    "Grep pattern=gzip",
+    "Grep pattern=gzip path=src/size-budget.ts",
+    "Grep pattern=gzip path=scripts"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:24:11Z"
+}

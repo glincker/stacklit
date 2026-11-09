@@ -1,0 +1,41 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-09",
+  "kind": "add",
+  "trial": 5,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/models/permissions.go, internal/rbac/catalog.go",
+  "turns": 5,
+  "cost_usd": 0.033585699999999996,
+  "usage": {
+    "input_tokens": 10,
+    "output_tokens": 427,
+    "cache_creation_input_tokens": 6253,
+    "cache_read_input_tokens": 42837
+  },
+  "tool_calls": {
+    "Bash": 3,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 11.231673875,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"built-in permission name constants and seeded permissions with descriptions\" --budget 800",
+    "Bash sed -n 1,35p internal/rbac/catalog.go; grep -rn \"PermOrg\\|Perm[A-Z][A-Za-z]* *= *\\\"\" --include=*.go -l . | head",
+    "Bash grep -rln \"PermissionSCIMAdmin *=\" --include=*.go .",
+    "Grep pattern=PermissionSCIMAdmin\\s*="
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:00:06Z"
+}

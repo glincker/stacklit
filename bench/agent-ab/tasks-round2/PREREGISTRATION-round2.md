@@ -138,4 +138,8 @@ AGENT_AB_CLONES=/path/to/checkouts go test ./bench/agent-ab
 
 ## Approval
 
-Not given. This section is filled in by the owner before the first paid session: date, approved spend cap, and the commit of the stacklit binary to build. Any change to this document after that point is written below as a dated amendment before the affected sessions run, and amendments never change the decision rule after data exists.
+Given. On 2026-11-08 the owner approved running round 2 on their Claude membership ("spin agents do it"), after being told that round 2 is about 650 sessions and about 19.5 USD notional with a 30 USD cap, plus a 24 session memorisation check of about 0.3 USD. The overall owner cap across all rounds is 60 USD notional and about 12.54 USD was spent in round 1 (`ledger.jsonl`). The runner stops if the grand total of both rounds would pass 45 USD, to leave room for a later round on famous repos. Per session hard cap 0.25 USD and 25 turns. Sessions run sequentially.
+
+Binary: built from the head of `master` at commit 533ea24 (the `feat/steering-v2` changes were merged there by pull request #81), not from the `feat/steering-v2` branch named under "Arms". The product code is the same; the binary hash is recorded in every session record.
+
+Amendment 2026-11-08 (before any paid session): the run commands above use `-work` for the clone directory (outside the repo) and the pre-registered `-grader audited` default, which is the matcher described under "Grading". No change to arms, tasks, trials, seed, or the decision rule.

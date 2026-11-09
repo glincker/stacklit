@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-05",
+  "kind": "trace",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/api/monitor_heartbeat.go, internal/monitor/heartbeat.go, internal/store/monitor_heartbeats.go",
+  "turns": 3,
+  "cost_usd": 0.0306805,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 232,
+    "cache_creation_input_tokens": 6777,
+    "cache_read_input_tokens": 12445
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 19.302833917,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"heartbeat public URL handler monitor engine store record\" --budget 800",
+    "Grep pattern=(?i)heartbeat"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:30:25Z"
+}

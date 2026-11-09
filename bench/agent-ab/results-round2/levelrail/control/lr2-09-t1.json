@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-09",
+  "kind": "add",
+  "trial": 1,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/store/migrate.go, internal/store/migrations/",
+  "turns": 3,
+  "cost_usd": 0.0325904,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 251,
+    "cache_creation_input_tokens": 7243,
+    "cache_read_input_tokens": 11004
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.614212417,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Grep pattern=go:embed path=/private/tmp/r2/work/ab-3997012670/co-2964178367/internal/store",
+    "Glob pattern=internal/store/**/*.sql path=/private/tmp/r2/work/ab-3997012670/co-2964178367"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:01:08Z"
+}

@@ -92,6 +92,7 @@ const LANGUAGES = load('docs/LANGUAGES.md');
 const RESULTS = load('bench/RESULTS.md');
 const AB_RESULTS = load('bench/agent-ab/RESULTS.md');
 const AB_CLAIMS = load('bench/agent-ab/PROPOSED_CLAIMS.md');
+const AB_ROUND2 = load('bench/agent-ab/ROUND2.md');
 const CHANGELOG = load('CHANGELOG.md');
 
 // A page body is a list of parts, each remembering the file it came from so
@@ -183,9 +184,11 @@ add('benchmarks', 'Benchmarks',
 
 // The real agent test: the results, then the wording the data does and does not support.
 add('agent-test', 'Agent test',
-  'A real Claude Code A/B on three public repos, 450 sessions: fewer tool calls, no overall cost saving. Results, method, limits and the claims we do and do not make.', 14,
+  'Two real Claude Code A/B tests on public repos, 1,100 sessions: fewer tool calls, cheaper on a very large repo, more expensive on small ones, no overall saving. Results, method, limits and the claims we do and do not make.', 14,
   'bench/agent-ab/RESULTS.md', [
-    part(AB_RESULTS, whole(AB_RESULTS)),
+    part(AB_ROUND2, 'Short version, from two tests: Stacklit cut tool calls and Grep and Glob calls, and it was cheaper on one very large repo. It was more expensive on smaller repos and more expensive on average across the four repos we tested. Round 1 (450 sessions) comes first, then round 2 (650 sessions), then the claims we do and do not make.'),
+    part(AB_RESULTS, '## Round 1: three repos, 450 sessions\n\n' + shift(whole(AB_RESULTS), 1)),
+    part(AB_ROUND2, '## Round 2: four repos, 650 more sessions\n\n' + shift(whole(AB_ROUND2), 1)),
     part(AB_CLAIMS, '## What we claim, and what we do not\n\n' + shift(whole(AB_CLAIMS), 1)),
   ]);
 
@@ -224,6 +227,7 @@ const fileToPage = {
   'bench/RESULTS.md': '/docs/benchmarks/',
   'bench/agent-ab/RESULTS.md': '/docs/agent-test/',
   'bench/agent-ab/PROPOSED_CLAIMS.md': '/docs/agent-test/',
+  'bench/agent-ab/ROUND2.md': '/docs/agent-test/',
   'CHANGELOG.md': '/docs/changelog/',
 };
 // Usage guide headings that moved to a differently named page.

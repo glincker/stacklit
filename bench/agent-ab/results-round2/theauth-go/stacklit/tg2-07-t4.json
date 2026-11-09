@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-07",
+  "kind": "impact",
+  "trial": 4,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "./internal/as/jwks_fetcher.go, ./internal/as/oidc_logout.go, ./internal/cimd/safefetch.go, ./policy/hook/httpguard.go, ./signals/receiver.go, ./signals/transmitter.go, ./signals/urlcheck.go",
+  "turns": 2,
+  "cost_usd": 0.025384999999999998,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 299,
+    "cache_creation_input_tokens": 5285,
+    "cache_read_input_tokens": 12470
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 6.051741834,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"which files import internal/safehttp\" --budget 800; grep -rl --include='*.go' --exclude='*_test.go' '/internal/safehttp\"' . | sort"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:58:50Z"
+}

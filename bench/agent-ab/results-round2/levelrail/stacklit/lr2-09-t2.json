@@ -1,0 +1,38 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-09",
+  "kind": "add",
+  "trial": 2,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "internal/store/migrate.go, internal/store/migrations/",
+  "turns": 3,
+  "cost_usd": 0.025516999999999998,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 231,
+    "cache_creation_input_tokens": 5252,
+    "cache_read_input_tokens": 21870
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 24.512054125,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"embed and apply sql migrations in order\" --budget 800",
+    "Bash grep -n \"go:embed\" internal/store/migrate.go; ls internal/store/migrations | tail -3"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:21:30Z"
+}

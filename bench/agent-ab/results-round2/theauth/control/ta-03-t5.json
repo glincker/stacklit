@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-03",
+  "kind": "locate",
+  "trial": 5,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/cbor.ts",
+  "turns": 4,
+  "cost_usd": 0.023959400000000002,
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 484,
+    "cache_creation_input_tokens": 4248,
+    "cache_read_input_tokens": 21114
+  },
+  "tool_calls": {
+    "Grep": 3
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 7.939209041,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Grep pattern=(?i)cbor",
+    "Grep pattern=(?i)max|depth path=/private/tmp/r2/work/ab-3310913224/co-373387664/packages/core/src",
+    "Grep pattern=(?i)passkey|attestation object|max.*(depth|size|bytes) path=/private/tmp/r2/work/ab-3310913224/co-373387664/packages/core/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:52:23Z"
+}

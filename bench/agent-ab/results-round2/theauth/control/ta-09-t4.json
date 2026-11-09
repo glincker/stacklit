@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-09",
+  "kind": "add",
+  "trial": 4,
+  "arm": "control",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/magic-link-plugin.ts, packages/core/src/auth/index.ts",
+  "turns": 3,
+  "cost_usd": 0.0195831,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 222,
+    "cache_creation_input_tokens": 3973,
+    "cache_read_input_tokens": 14591
+  },
+  "tool_calls": {
+    "Glob": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 0,
+  "hook_events": 0,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.581532792,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Glob pattern=**/*magic-link*",
+    "Grep pattern=magic-link path=/private/tmp/r2/work/ab-3310913224/co-606913446/packages/core/src"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:49:55Z"
+}

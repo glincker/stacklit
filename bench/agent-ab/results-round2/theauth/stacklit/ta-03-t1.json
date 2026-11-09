@@ -1,0 +1,38 @@
+{
+  "repo": "theauth",
+  "task": "ta-03",
+  "kind": "locate",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "packages/core/src/auth/cbor.ts, packages/core/src/device/attestation/cbor.ts",
+  "turns": 3,
+  "cost_usd": 0.0348842,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 323,
+    "cache_creation_input_tokens": 7363,
+    "cache_read_input_tokens": 21902
+  },
+  "tool_calls": {
+    "Bash": 2
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.141197625,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"CBOR decoder for passkey attestation objects with size and depth limits\" --budget 800",
+    "Bash grep -niE \"max|depth|limit\" /private/tmp/r2/work/ab-3310913224/co-978047776/packages/core/src/auth/cbor.ts /private/tmp/r2/work/ab-3310913224/co-978047776/packa"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:55:05Z"
+}

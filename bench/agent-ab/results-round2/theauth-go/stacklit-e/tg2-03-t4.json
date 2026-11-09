@@ -1,0 +1,37 @@
+{
+  "repo": "theauth-go",
+  "task": "tg2-03",
+  "kind": "locate",
+  "trial": 4,
+  "arm": "stacklit-e",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": -1,
+  "answer": "internal/jwt/multialg.go, internal/as/jwks.go, internal/as/token_policy.go, mcpresource/jwt.go",
+  "turns": 2,
+  "cost_usd": 0.0247754,
+  "usage": {
+    "input_tokens": 4,
+    "output_tokens": 263,
+    "cache_creation_input_tokens": 5223,
+    "cache_read_input_tokens": 12454
+  },
+  "tool_calls": {
+    "Bash": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 5.536024042,
+  "seven_day_utilization": 0.63,
+  "call_log": [
+    "Bash stacklit query \"access token signing and verification with ES256 RS256 EdDSA algorithms\" --budget 800; grep -rlE \"ES256|RS256\" --include=*.go . | grep -v _test "
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:56:24Z"
+}

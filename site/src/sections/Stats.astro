@@ -13,7 +13,7 @@ const items = copy.hero.statRow.map((i) => ({ ...i, polarity: i.polarity as 'goo
 <Section id="results" label="stats-title">
   <SectionHead id="stats-title" n="05" icon="flask-conical" label="Results" title="What happened when we tested it" size="big" lead={fill(at.intro)} />
   <StatRow items={items} class="mt-10" />
-  <p class="mt-6 max-w-measure text-body text-muted">{copy.hero.statRowNote} Turns with the model fell by about a quarter. Editing tasks and other models were not tested.</p>
+  <p class="mt-6 max-w-measure text-body text-muted">{fill(copy.hero.statRowNote)} Turns with the model fell by about a fifth. Editing tasks and other models were not tested.</p>
 
   <div class="reveal mt-12 grid min-w-0 gap-10 md:grid-cols-2 md:gap-0">
     <div class="min-w-0 border-t border-ink pt-5 md:pe-10">

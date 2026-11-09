@@ -1,0 +1,39 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-04",
+  "kind": "trace",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "cmd/levelrail-cli/settings_heartbeat.go, internal/apiclient/settings_heartbeat.go, internal/api/settings_heartbeat.go, internal/heartbeat/service.go",
+  "turns": 3,
+  "cost_usd": 0.0319006,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 289,
+    "cache_creation_input_tokens": 6699,
+    "cache_read_input_tokens": 22026
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 30.1643305,
+  "seven_day_utilization": 0.62,
+  "call_log": [
+    "Bash stacklit query \"outbound heartbeat ping status CLI command\" --budget 800",
+    "Grep pattern=settings/heartbeat|func \\(.*\\) Status\\("
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:29:37Z"
+}

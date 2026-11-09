@@ -1,0 +1,43 @@
+{
+  "repo": "levelrail",
+  "task": "lr2-02",
+  "kind": "locate",
+  "trial": 3,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": false,
+  "recall": -1,
+  "answer": "./data/.disk-reserve\n\nThe reserve file is named `.disk-reserve` and sits in the data directory. That directory is `$APP_DATA_DIR`, and it defaults to `./data` when the variable is unset.",
+  "turns": 8,
+  "cost_usd": 0.0498485,
+  "usage": {
+    "input_tokens": 16,
+    "output_tokens": 729,
+    "cache_creation_input_tokens": 8618,
+    "cache_read_input_tokens": 80545
+  },
+  "tool_calls": {
+    "Bash": 7
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 34.30990675,
+  "seven_day_utilization": 0.61,
+  "call_log": [
+    "Bash stacklit query \"reserve file disk full SQLite commit\" --budget 800",
+    "Bash grep -n -i \"reserve\" internal/diskguard/diskguard.go | head -40",
+    "Bash sed -n 160,185p internal/diskguard/diskguard.go; grep -rn \"diskguard.New\" --include=*.go . | grep -v _test | head",
+    "Bash grep -rn \"diskguard\\.New(\" . --include='*.go' | grep -v _test | head",
+    "Bash cat cmd/levelrail/diskguard_wiring.go | head -30; grep -rn \"startDiskGuard\\|wireDiskGuard\" cmd/levelrail/*.go | head",
+    "Bash grep -rn \"agentDataDir\" cmd/levelrail/*.go | grep -v _test | head -8",
+    "Bash grep -rn \"defaultDataDir\\s*=\" cmd/levelrail/"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-08T23:13:33Z"
+}

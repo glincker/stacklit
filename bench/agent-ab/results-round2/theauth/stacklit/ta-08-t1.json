@@ -1,0 +1,39 @@
+{
+  "repo": "theauth",
+  "task": "ta-08",
+  "kind": "impact",
+  "trial": 1,
+  "arm": "stacklit",
+  "model": "claude-sonnet-5-5",
+  "correct": true,
+  "recall": 1,
+  "answer": "packages/core/src/auth/index.ts, packages/core/src/auth/username-http.ts, packages/core/src/auth/email-password-http.ts, packages/core/src/auth/username.ts, packages/core/src/auth/email-password.ts",
+  "turns": 3,
+  "cost_usd": 0.029094,
+  "usage": {
+    "input_tokens": 6,
+    "output_tokens": 315,
+    "cache_creation_input_tokens": 5935,
+    "cache_read_input_tokens": 21920
+  },
+  "tool_calls": {
+    "Bash": 1,
+    "Grep": 1
+  },
+  "files_read": 0,
+  "read_bytes": 0,
+  "stacklit_calls": 1,
+  "hook_events": 2,
+  "crawl_guard_fired": false,
+  "crawl_redirects": 0,
+  "permission_denials": 0,
+  "result_subtype": "success",
+  "seconds": 13.064619959,
+  "seven_day_utilization": 0.65,
+  "call_log": [
+    "Bash stacklit query \"which files import login-lockout\" --budget 800; grep -rn \"login-lockout\" packages --include=*.ts --include=*.tsx --include=*.js --include=*.svel",
+    "Grep pattern=login-lockout"
+  ],
+  "stacklit_bin": "692502a851ca",
+  "at": "2026-11-09T00:48:37Z"
+}
