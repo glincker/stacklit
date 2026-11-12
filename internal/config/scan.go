@@ -152,6 +152,9 @@ func (c *Config) applyEnv() {
 	if v := strings.ToLower(strings.TrimSpace(os.Getenv("STACKLIT_MAP_ICONS"))); v != "" {
 		c.MapIcons = v
 	}
+	if v := strings.ToLower(strings.TrimSpace(os.Getenv("STACKLIT_MAP_LAYOUT"))); v != "" {
+		c.MapLayout = v
+	}
 	if v := os.Getenv("STACKLIT_NO_GIT"); v != "" {
 		off := false
 		c.GitActivity = &off
@@ -232,6 +235,9 @@ func (c *Config) Validate() error {
 	}
 	if c.MapIcons != "" && c.MapIcons != "remote" && c.MapIcons != "off" {
 		problems = append(problems, `map_icons must be "remote" or "off"`)
+	}
+	if c.MapLayout != "" && c.MapLayout != "flat" && c.MapLayout != "tree" {
+		problems = append(problems, `map_layout must be "flat" or "tree"`)
 	}
 	for _, r := range c.Roots {
 		clean := path.Clean(toSlash(r))
@@ -343,3 +349,13 @@ func (c *Config) MemoryLimitBytes() int64 {
 
 // MapIconsOff reports whether the HTML map must not request any remote icon.
 func (c *Config) MapIconsOff() bool { return c.MapIcons == "off" }
+
+// MapLayoutName returns the configured derived-map layout: "flat" unless the
+// rc file asks for "tree". Unknown values fall back to "flat"; Validate
+// reports them in strict mode.
+func (c *Config) MapLayoutName() string {
+	if c.MapLayout == "tree" {
+		return "tree"
+	}
+	return "flat"
+}
