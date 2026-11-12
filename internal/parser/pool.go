@@ -155,6 +155,7 @@ func scanOne(rel string, o PoolOptions) (res Scanned) {
 	}
 	if o.Cache != nil {
 		if info, ok := o.Cache.Get(key); ok {
+			headerLangOverride(rel, o.Root, info)
 			res.Info, res.Cached = info, true
 			return res
 		}
@@ -173,11 +174,24 @@ func scanOne(rel string, o PoolOptions) (res Scanned) {
 		_, res.Panicked = err.(*PanicError)
 		return res
 	}
+	headerLangOverride(rel, o.Root, info)
 	res.Info = info
 	if o.Cache != nil && info != nil {
 		o.Cache.Put(key, info)
 	}
 	return res
+}
+
+// headerLangOverride upgrades a .h header from "c" to "cpp" when a C++
+// translation unit sits beside it. The parser already classifies a header from
+// its own constructs; this covers headers that are C++ by context only.
+func headerLangOverride(rel, root string, info *FileInfo) {
+	if info == nil || info.Language != "c" || !extIs(rel, ".h") {
+		return
+	}
+	if SiblingIsCpp(filepath.Join(root, filepath.FromSlash(rel))) {
+		info.Language = "cpp"
+	}
 }
 
 // parseCost estimates the peak bytes a tree-sitter parse of one file holds.
