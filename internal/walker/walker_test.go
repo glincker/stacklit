@@ -132,6 +132,30 @@ func TestWalkAlwaysIgnoresDirs(t *testing.T) {
 	}
 }
 
+func TestWalkIncludesCppExtensions(t *testing.T) {
+	dir := t.TempDir()
+	names := []string{"a.cc", "a.cxx", "a.cpp", "a.hh", "a.hpp", "a.hxx", "a.h", "a.c"}
+	for _, n := range names {
+		if err := os.WriteFile(filepath.Join(dir, n), []byte("int f(void);\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	files, err := walker.Walk(dir, nil)
+	if err != nil {
+		t.Fatalf("Walk returned error: %v", err)
+	}
+	got := make(map[string]bool, len(files))
+	for _, f := range files {
+		got[f] = true
+	}
+	for _, n := range names {
+		if !got[n] {
+			t.Errorf("expected %q to be walked, got %v", n, sortedKeys(got))
+		}
+	}
+}
+
 // sortedKeys returns sorted map keys for readable error messages.
 func sortedKeys(m map[string]bool) []string {
 	keys := make([]string, 0, len(m))

@@ -24,6 +24,8 @@ var extensionLanguageMap = map[string]string{
 	".cc":         "cpp",
 	".cxx":        "cpp",
 	".hpp":        "cpp",
+	".hh":         "cpp",
+	".hxx":        "cpp",
 	".cs":         "csharp",
 	".php":        "php",
 	".sh":         "shell",
@@ -111,14 +113,14 @@ func (g *GenericParser) CanParse(_ string) bool {
 func (g *GenericParser) Parse(path string, content []byte) (*FileInfo, error) {
 	return &FileInfo{
 		Path:      path,
-		Language:  detectLanguage(path),
+		Language:  detectLanguage(path, content),
 		LineCount: countLines(content),
 	}, nil
 }
 
-// detectLanguage maps the file extension to a language name.
-// Returns "unknown" for unrecognized extensions.
-func detectLanguage(filename string) string {
+// detectLanguage maps the file extension to a language name. A .h header is
+// classified from its content. Returns "unknown" for unrecognized extensions.
+func detectLanguage(filename string, content []byte) string {
 	lower := strings.ToLower(filename)
 	base := lower
 	if i := strings.LastIndexAny(base, "/\\"); i >= 0 {
@@ -139,6 +141,9 @@ func detectLanguage(filename string) string {
 	}
 
 	ext := lower[idx:]
+	if ext == ".h" && HeaderLooksCpp(content) {
+		return "cpp"
+	}
 	if lang, ok := extensionLanguageMap[ext]; ok {
 		return lang
 	}

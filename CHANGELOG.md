@@ -16,6 +16,10 @@ Follows the first real-agent A/B (bench/agent-ab, pull request #77), which found
 - `path` adds advice after the weakest hop score: sure (0.9 or more) needs no confirming grep, otherwise grep the weak hop.
 - A pre-registered second A/B round in `bench/agent-ab/tasks-round2/`, with a `stacklit-e` arm in the harness. It has not been run.
 
+### Fixed
+- `.cc` and `.cxx` sources were never indexed because the walker did not list those extensions, and `.hh` and `.hxx` were missing too. A C++ project whose sources use `.cc` was reported as C.
+- A `.h` header was always labelled C. It is now C++ when its own text uses C++ constructs or a C++ translation unit sits in the same directory, so a header dominated project no longer reports the wrong primary language. Cached parse results are rebuilt once for this.
+
 ### Changed
 - The MCP handshake instructions and `stacklit guide` use the routed wording instead of "source of truth, do not crawl" (about 100 tokens, was about 75). `STACKLIT_STEERING=d` keeps the earlier text for comparison.
 

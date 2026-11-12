@@ -10,7 +10,7 @@ import (
 // using the tree-sitter AST. The Language field is set based on the file extension.
 func extractC(root *gts.Node, lang *gts.Language, src []byte, path string) *FileInfo {
 	info := &FileInfo{
-		Language: cLanguage(path),
+		Language: cLanguage(path, src),
 		TypeDefs: make(map[string]string),
 	}
 
@@ -143,13 +143,19 @@ func extractC(root *gts.Node, lang *gts.Language, src []byte, path string) *File
 	return info
 }
 
-// cLanguage maps file extension to a language label.
-func cLanguage(filename string) string {
+// cLanguage maps file extension to a language label. A .h header has no fixed
+// language, so its source decides between C and C++.
+func cLanguage(filename string, src []byte) string {
 	switch {
-	case extIs(filename, ".cpp", ".cxx", ".cc", ".hpp", ".hxx"):
+	case extIs(filename, ".cpp", ".cxx", ".cc", ".hpp", ".hh", ".hxx"):
 		return "cpp"
 	case extIs(filename, ".m", ".mm"):
 		return "objective-c"
+	case extIs(filename, ".h"):
+		if HeaderLooksCpp(src) {
+			return "cpp"
+		}
+		return "c"
 	default:
 		return "c"
 	}
