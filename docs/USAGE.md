@@ -524,6 +524,7 @@ Create `.stacklitrc.json` in the project root. The file is optional, and every k
 | `crawl_guard` | (installed mode) | Crawl guard mode: `off`, `nudge` or `redirect`. Env: `STACKLIT_CRAWL_GUARD`. |
 | `stats` | false | Appends a local usage log of `query`, `slice`, `explain` and `impact` calls. Env: `STACKLIT_STATS=1`. Never sent over the network. |
 | `map_icons` | remote | `remote` lets the HTML map request language logos from thesvg.org when you open it. `off` removes every remote URL and shows letters instead. Env: `STACKLIT_MAP_ICONS=off`. |
+| `map_layout` | flat | Module list layout in the map from `stacklit derive`. `flat` prints one line per module with its full path. `tree` prints one line per parent directory with the module names listed after it, which is shorter on repos with many sibling modules. Env: `STACKLIT_MAP_LAYOUT=tree`. |
 | `cache` | true | On-disk parse cache. `STACKLIT_NO_CACHE=1` disables it. |
 | `workers` | CPU count | Parser pool size. Env: `STACKLIT_WORKERS`. |
 | `parse_memory_mb` | 256 | Soft cap on the estimated memory of concurrent tree-sitter parses. A single file above the cap still parses, alone. Env: `STACKLIT_PARSE_MEMORY_MB` (0 disables the cap). |
