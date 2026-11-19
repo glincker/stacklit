@@ -119,3 +119,29 @@ func TestMapIconsConfigAndEnv(t *testing.T) {
 		t.Error("an unknown map_icons value should fail validation")
 	}
 }
+
+func TestMapLayoutConfig(t *testing.T) {
+	if got := Load(t.TempDir()).MapLayoutName(); got != "flat" {
+		t.Errorf("default map layout = %q, want flat", got)
+	}
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, ".stacklitrc.json"), []byte(`{"map_layout":"tree"}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := Load(dir).MapLayoutName(); got != "tree" {
+		t.Errorf("map layout = %q, want tree", got)
+	}
+	t.Setenv("STACKLIT_MAP_LAYOUT", "tree")
+	if got := Load(t.TempDir()).MapLayoutName(); got != "tree" {
+		t.Errorf("STACKLIT_MAP_LAYOUT=tree should select tree, got %q", got)
+	}
+	t.Setenv("STACKLIT_MAP_LAYOUT", "bogus")
+	if got := Load(t.TempDir()).MapLayoutName(); got != "flat" || Load(t.TempDir()).Validate() == nil {
+		t.Errorf("an unknown STACKLIT_MAP_LAYOUT should fall back to flat and fail validation")
+	}
+	c := DefaultConfig()
+	c.MapLayout = "maybe"
+	if c.Validate() == nil {
+		t.Error("an unknown map_layout value should fail validation")
+	}
+}

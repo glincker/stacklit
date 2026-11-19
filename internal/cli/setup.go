@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/derive"
 	"github.com/glincker/stacklit/internal/engine"
 	"github.com/glincker/stacklit/internal/schema"
@@ -113,7 +114,7 @@ func runSetup(cmd *cobra.Command, args []string, f setupFlags) error {
 		}
 		fmt.Fprintln(out, "No AI coding tools detected. Codebase map:")
 		fmt.Fprintln(out)
-		fmt.Fprint(out, derive.CompactMap(idx))
+		fmt.Fprint(out, derive.CompactMap(idx, derive.Options{Layout: config.Load(root).MapLayoutName()}))
 		fmt.Fprintln(out, "\nRun 'stacklit setup --all' or name a tool (see 'stacklit setup --list').")
 		return nil
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/glincker/stacklit/internal/config"
 	"github.com/glincker/stacklit/internal/derive"
 	"github.com/glincker/stacklit/internal/schema"
 	"github.com/spf13/cobra"
@@ -37,14 +38,16 @@ Use --inject to automatically insert the map into agent config files:
 				return fmt.Errorf("could not parse stacklit.json: %w", err)
 			}
 
+			opts := derive.Options{Layout: config.Load(".").MapLayoutName()}
+
 			if deriveInject == "" {
 				// Print to stdout.
-				fmt.Print(derive.CompactMap(&idx))
+				fmt.Print(derive.CompactMap(&idx, opts))
 				return nil
 			}
 
 			// Inject into target file.
-			block := derive.InjectableBlock(&idx)
+			block := derive.InjectableBlock(&idx, opts)
 			var target string
 			switch deriveInject {
 			case "claude":

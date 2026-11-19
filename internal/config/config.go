@@ -36,6 +36,10 @@ type Config struct {
 	Timestamps     *bool    `json:"timestamps,omitempty"`       // write generated_at, default off
 	GitActivity    *bool    `json:"git_activity,omitempty"`     // include hot/recent files, default off
 	MapIcons       string   `json:"map_icons,omitempty"`        // "remote" (default) or "off" for the HTML map
+	// MapLayout picks the module list layout in the derived map: "flat" (one
+	// line per module path, default) or "tree" (one line per parent directory
+	// with its modules listed after it).
+	MapLayout string `json:"map_layout,omitempty"`
 
 	// Steering picks the rule wording in the generated CLAUDE.md block ("a", "b", "c", "d" the strict no-crawl wording, or "e" the routed wording).
 	Steering string `json:"steering,omitempty"`
