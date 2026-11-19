@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "1de016b56fdd78cd71f27100a39883a8f81f06b8a775c9c5bea2747933831c21",
+  "merkle_hash": "132e93f1cb2149c9992a241a4078fb748f3f08b172aed584bd1c2ef1be147c17",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -69,8 +69,8 @@
         "lines": 17
       },
       "go": {
-        "files": 283,
-        "lines": 43665
+        "files": 287,
+        "lines": 44223
       },
       "graphql": {
         "files": 1,
@@ -214,8 +214,8 @@
       "cmd/stacklit/main.go",
       "examples/adapters/keyword_concepts.py"
     ],
-    "total_files": 1903,
-    "total_lines": 124099
+    "total_files": 1907,
+    "total_lines": 124657
   },
   "modules": {
     ".claude-plugin": {
@@ -365,7 +365,7 @@
       "purpose": "Cache",
       "language": "go",
       "files": 2,
-      "lines": 205,
+      "lines": 207,
       "file_list": [
         "cache.go",
         "cache_test.go"
@@ -426,7 +426,7 @@
       "purpose": "Command-line interface",
       "language": "go",
       "files": 28,
-      "lines": 2383,
+      "lines": 2387,
       "file_list": [
         "errors.go",
         "root.go",
@@ -501,7 +501,7 @@
       "purpose": "Configuration management",
       "language": "go",
       "files": 5,
-      "lines": 766,
+      "lines": 812,
       "file_list": [
         "scan.go",
         "config.go",
@@ -546,16 +546,21 @@
     "internal/derive": {
       "purpose": "Derive",
       "language": "go",
-      "files": 1,
-      "lines": 215,
+      "files": 2,
+      "lines": 405,
       "file_list": [
-        "derive.go"
+        "derive.go",
+        "derive_test.go"
       ],
       "exports": [
-        "CompactMap(idx *schema.Index) string",
-        "InjectableBlock(idx *schema.Index) string",
+        "type Options",
+        "CompactMap(idx *schema.Index, opts Options) string",
+        "InjectableBlock(idx *schema.Index, opts Options) string",
         "InjectIntoFile(path string, block string) error"
       ],
+      "type_defs": {
+        "Options": "Layout string"
+      },
       "depends_on": [
         "internal/schema"
       ],
@@ -800,8 +805,8 @@
     "internal/graph": {
       "purpose": "Dependency graph",
       "language": "go",
-      "files": 53,
-      "lines": 12586,
+      "files": 54,
+      "lines": 12646,
       "file_list": [
         "symbols.go",
         "view.go",
@@ -825,14 +830,14 @@
         "rank.go",
         "slice.go",
         "ts_dispatch.go",
+        "cpp_lang_test.go",
         "extract_ecma.go",
         "extract_go.go",
         "extract_java.go",
         "extract_meta_test.go",
         "extract_opts_test.go",
         "extract_py.go",
-        "extract_rs.go",
-        "extract_test.go"
+        "extract_rs.go"
       ],
       "exports": [
         "SchemaVersion",
@@ -1018,8 +1023,8 @@
     "internal/parser": {
       "purpose": "Source code parsers",
       "language": "go",
-      "files": 60,
-      "lines": 7610,
+      "files": 62,
+      "lines": 7838,
       "file_list": [
         "pool.go",
         "limits.go",
@@ -1027,10 +1032,12 @@
         "treesitter.go",
         "generic.go",
         "golang.go",
+        "header_lang.go",
         "datarun.go",
         "fuzz_test.go",
         "generic_test.go",
         "golang_test.go",
+        "header_lang_test.go",
         "java_test.go",
         "langs_test.go",
         "langs_wave2_test.go",
@@ -1048,9 +1055,7 @@
         "ts_csharp.go",
         "ts_dart.go",
         "ts_elixir.go",
-        "ts_elm.go",
-        "ts_erlang.go",
-        "ts_fortran.go"
+        "ts_elm.go"
       ],
       "exports": [
         "type Cache",
@@ -1362,7 +1367,7 @@
       "purpose": "File system walker",
       "language": "go",
       "files": 4,
-      "lines": 807,
+      "lines": 835,
       "file_list": [
         "scan.go",
         "walker.go",
@@ -1987,6 +1992,7 @@
       "STACKLIT_LOCK_HELPER",
       "STACKLIT_LOCK_STALE_SEC",
       "STACKLIT_MAP_ICONS",
+      "STACKLIT_MAP_LAYOUT",
       "STACKLIT_MAP_TOKENS",
       "STACKLIT_MAX_FILE_SIZE",
       "STACKLIT_MAX_LINE_LEN",
