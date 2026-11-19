@@ -3,7 +3,7 @@
   "version": "1",
   "schema_version": 1,
   "stacklit_version": "dev",
-  "merkle_hash": "f2a95a6c9425a1ae93c9015939cfe886fc22e88ae7214a81e653aebbf0353068",
+  "merkle_hash": "1de016b56fdd78cd71f27100a39883a8f81f06b8a775c9c5bea2747933831c21",
   "project": {
     "name": "stacklit",
     "root": ".",
@@ -70,7 +70,7 @@
       },
       "go": {
         "files": 283,
-        "lines": 43542
+        "lines": 43665
       },
       "graphql": {
         "files": 1,
@@ -215,7 +215,7 @@
       "examples/adapters/keyword_concepts.py"
     ],
     "total_files": 1903,
-    "total_lines": 123976
+    "total_lines": 124099
   },
   "modules": {
     ".claude-plugin": {
@@ -801,7 +801,7 @@
       "purpose": "Dependency graph",
       "language": "go",
       "files": 53,
-      "lines": 12463,
+      "lines": 12586,
       "file_list": [
         "symbols.go",
         "view.go",
