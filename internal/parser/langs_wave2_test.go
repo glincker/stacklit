@@ -85,7 +85,7 @@ func writeTemp(t *testing.T, name, content string) string {
 
 func TestGenericDetectsBuildFilesByName(t *testing.T) {
 	for path, want := range map[string]string{"Makefile": "make", "sub/Dockerfile": "dockerfile", "CMakeLists.txt": "cmake", "Dockerfile.prod": "dockerfile", "x.fs": "fsharp"} {
-		if got := detectLanguage(path); got != want {
+		if got := detectLanguage(path, nil); got != want {
 			t.Errorf("detectLanguage(%q) = %q, want %q", path, got, want)
 		}
 	}

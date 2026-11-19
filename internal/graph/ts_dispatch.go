@@ -1,13 +1,14 @@
 package graph
 
 import (
-	"bytes"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/glincker/stacklit/internal/parser"
 )
 
 // Parse cost model, matching the main scanner: the GLR parser holds roughly
@@ -133,20 +134,26 @@ func grammarFor(lang, path string, src []byte) string {
 		}
 	case "csharp":
 		return "c_sharp"
-	case "c":
-		if ext == ".h" && (bytes.Contains(src, []byte("class ")) || bytes.Contains(src, []byte("namespace ")) || bytes.Contains(src, []byte("template<")) || bytes.Contains(src, []byte("template <"))) {
-			return "cpp"
-		}
 	}
 	return lang
 }
 
-// extractFileWith dispatches on language. Tree-sitter handles everything except
-// Go; the line scanners stay as the fallback for oversize or unparsable files.
+// extractFileWith dispatches on language when only the source is available.
+// The neighbour check that can mark a header as C++ is skipped.
 func extractFileWith(path string, src []byte, o ExtractOptions, gate *parseGate) *FileSyms {
+	return extractFileAt(path, "", src, o, gate)
+}
+
+// extractFileAt is extractFileWith with the header's on-disk path, so a .h
+// header can be classified from the translation units next to it.
+func extractFileAt(path, diskPath string, src []byte, o ExtractOptions, gate *parseGate) *FileSyms {
 	lang := LangOf(path)
 	if lang == "" {
 		return nil
+	}
+	// A .h header is C++ when its own text or its neighbours say so.
+	if lang == "c" && strings.EqualFold(filepath.Ext(path), ".h") {
+		lang = parser.HeaderLanguage(diskPath, src)
 	}
 	if lang == "go" {
 		return extractGo(path, src)

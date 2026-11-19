@@ -14,8 +14,10 @@ import (
 	"github.com/glincker/stacklit/internal/parser"
 )
 
-// formatVersion is bumped when the on-disk layout changes.
-const formatVersion = 1
+// formatVersion is bumped when the on-disk layout changes, or when a stored
+// parse result would be wrong under the current classification. Version 2
+// changed how .h headers and .cc files are labelled.
+const formatVersion = 2
 
 type fileFormat struct {
 	Format      int                         `json:"format"`

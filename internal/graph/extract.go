@@ -111,7 +111,9 @@ func isTestFile(path string) bool {
 // ExtractFile parses one file's content into symbols and references using the
 // default size limits.
 func ExtractFile(path string, src []byte) *FileSyms {
-	return extractFileWith(path, src, ExtractOptions{}, nil)
+	// No on-disk path, so a header is classified from its own text only and
+	// the result does not depend on the process working directory.
+	return extractFileAt(path, "", src, ExtractOptions{}, nil)
 }
 
 // Extract reads and parses the given root-relative files in parallel.
@@ -169,7 +171,7 @@ func extractPath(root, rel string, o ExtractOptions, gate *parseGate) *FileSyms 
 	if err != nil {
 		return nil
 	}
-	return extractFileWith(filepath.ToSlash(rel), src, o, gate)
+	return extractFileAt(filepath.ToSlash(rel), filepath.Join(root, filepath.FromSlash(rel)), src, o, gate)
 }
 
 // stripNoise blanks comments and string contents with spaces, keeping newlines
